@@ -1,6 +1,6 @@
 # Assemble docs/plan-data/bend-diagram-comparison.md from compare.md + compare.json + the containment counts (before / after).
 import re, json, collections, subprocess, sys
-W = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends' + '\\'
+W = r'C:\SBM\.worktrees\bends' + '\\'
 
 
 def cont(path):

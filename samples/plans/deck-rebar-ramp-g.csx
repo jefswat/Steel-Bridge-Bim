@@ -28,7 +28,7 @@ double ParseFtIn(string s)
     var m = System.Text.RegularExpressions.Regex.Match(s, @"^(\d+)'-(\d+)$");
     return FI(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value));
 }
-string csv = new[] { @"docs\plan-data\deck-bar-lists.csv", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\docs\plan-data\deck-bar-lists.csv" }.First(System.IO.File.Exists);
+string csv = new[] { @"docs\plan-data\deck-bar-lists.csv", @"C:\SBM\docs\plan-data\deck-bar-lists.csv" }.First(System.IO.File.Exists);
 List<DeckPlanBarLine> BarList(string br, int unit)
 {
     var res = new List<DeckPlanBarLine>();

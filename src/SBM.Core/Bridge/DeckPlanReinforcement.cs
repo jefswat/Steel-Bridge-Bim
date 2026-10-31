@@ -114,6 +114,13 @@ public sealed class DeckLongZone
     /// begin) - the plans' "(STAGGERED)" lines (Br. 02069 p18 / p19: S401M + S402M).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public bool AlternateEnds { get; set; }
+    /// <summary>OPTIONAL first bar of every line (mark + printed length), lapped <see cref="Lap"/> onto the stock bars that follow; with
+    /// <see cref="AlternateEnds"/> the odd lines start it at the END of the track (NCDOT "22-#5B107 & 22-#5B108 alternate bars": one end bar of each
+    /// length per line, the other one = the closing bar). null / 0 = none (the line starts with a stock bar).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? StartMark { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double StartLength { get; set; }
     public DeckLongZone Clone()
     {
         var z = (DeckLongZone)MemberwiseClone();

@@ -69,6 +69,10 @@ public sealed class IntegralSteelCapDefinition
     /// <see cref="StiffenerWeld"/> fillet on both plate faces (Iowa DOT 1617 p.31 Sections B-B / C-C "mill to bear, 5/16 + 5/16").</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public bool StiffenerBottomWeld { get; set; }
+    /// <summary>OPTIONAL plan fit conditions of the cap bearing / jacking stiffener ends (<see cref="StiffenerEndFit"/>, Kind Bearing / Jacking; recorded on the
+    /// parts as <c>SteelPart.Fits</c>, geometry unchanged). Null = none recorded and the bottom (loaded) end flagged POTENTIAL NONCOMPLIANCE (AASHTO LRFD 6.10.11.2).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<StiffenerEndFit>? StiffenerFits { get; set; }
 
     public List<CapCoverPlate> CoverPlates { get; set; } = new();
 
@@ -107,6 +111,7 @@ public sealed class IntegralSteelCapDefinition
         c.BottomFlange = BottomFlange.Clone();
         c.Camber = Camber.Select(x => x.Clone()).ToList();
         c.BearingStiffener = BearingStiffener?.Clone();
+        c.StiffenerFits = StiffenerFits?.Select(x => x.Clone()).ToList();
         c.CoverPlates = CoverPlates.Select(x => x.Clone()).ToList();
         c.Connection = Connection?.Clone();
         c.Handholes = Handholes.Select(x => x.Clone()).ToList();
@@ -272,6 +277,10 @@ public sealed class CapGirderConnection
     /// (plan "5/16 + 5/16, mill to bear", p.30).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public double BottomPlateWeld { get; set; }
+    /// <summary>OPTIONAL plan fit conditions of the diaphragm plate pieces on the bottom (continuity) plate (<see cref="StiffenerEndFit"/>: only Condition and Source
+    /// are read; recorded on the diaphragm plate pieces that meet the bottom plate as <c>SteelPart.Fits</c>); null = none recorded.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<StiffenerEndFit>? DiaphragmPlateFits { get; set; }
     /// <summary>Girder top flange end beyond the cap flange edge (plans 1").</summary>
     public double TopFlangeEndBeyondCapFlange { get; set; } = In(1);
     /// <summary>Corner radius of the girder web cope under the cap flange (drawn as a chamfer of the same legs).</summary>
@@ -300,6 +309,7 @@ public sealed class CapGirderConnection
         c.EndPlateOutline = EndPlateOutline.Select(p => p.Clone()).ToList();
         c.EndPlateBolts = EndPlateBolts.Select(p => p.Clone()).ToList();
         c.BottomPlate = BottomPlate?.Clone();
+        c.DiaphragmPlateFits = DiaphragmPlateFits?.Select(x => x.Clone()).ToList();
         c.OuterSplicePlate = OuterSplicePlate.Clone();
         c.InnerSplicePlate = InnerSplicePlate.Clone();
         c.SpliceBoltColumns = SpliceBoltColumns.ToList();

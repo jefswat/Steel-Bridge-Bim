@@ -20,6 +20,13 @@ public sealed class DatabaseOptions
     public string? ModelFile { get; set; }
     /// <summary>Bridge names of the project: pick the shipped link rules by plan set <c>bridgeGroup</c> when the model folder has none.</summary>
     public List<string> BridgeNames { get; } = new();
+    /// <summary>Roadway corridors of the project (rows under the site, GlobalIds as the IFC export); null = none.</summary>
+    public IReadOnlyList<SBM.Core.Road.RoadModel>? Roads { get; set; }
+    /// <summary>Retaining walls of the project; null = none.</summary>
+    public IReadOnlyList<SBM.Core.Wall.RetainingWallModel>? Walls { get; set; }
+    /// <summary>Grading features of the project; null = none.</summary>
+    public IReadOnlyList<SBM.Core.Grading.GradingModel>? Gradings { get; set; }
+    public IReadOnlyList<SBM.Core.Utility.UtilityModel>? Utilities { get; set; }
     /// <summary>CHECKING database for an independent checker: the element registry only (GlobalId, parent, level, category, mark, bridge / unit /
     /// support / girder, measured mass / volume / length / bbox) WITHOUT sheet links, plan sheets, QC, property text (descriptions, status reasons,
     /// bases) or the model path; elements the originator flagged carry <c>{"flagged":true}</c> and nothing else. See docs/API.md.</summary>
@@ -127,7 +134,7 @@ public static class CompanionDatabase
         string dbDir = Path.GetDirectoryName(Path.GetFullPath(dbPath))!;
         Directory.CreateDirectory(dbDir);
         if (options.BridgeNames.Count == 0) options.BridgeNames.AddRange(project.Bridges.Select(b => b.Name));
-        res.Build = ModelDatabase.Write(dbPath, project, bridges, options.ForCheck ? null : options.ModelFile, options.Vacuum && !options.ForCheck);
+        res.Build = ModelDatabase.Write(dbPath, project, bridges, options.ForCheck ? null : options.ModelFile, options.Vacuum && !options.ForCheck, options.Roads, options.Walls, options.Gradings, options.Utilities);
         using (var cn = ModelDatabase.Open(dbPath))
         {
             if (options.ForCheck) StripForCheck(cn, options.Vacuum);

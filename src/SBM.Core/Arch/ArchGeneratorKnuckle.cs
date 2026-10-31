@@ -283,6 +283,12 @@ public static partial class ArchGenerator
             if (P(c.Splice) is { } rs) sCut = Vec3.Dot(rs - T, tan) - rdef.SpliceGap / 2;
             if (double.IsNaN(sCut) || sCut <= 0) { Warn($"Arch: knuckle {k.Name} corner {c.Point}: splice '{c.Splice}' not found - corner not built."); return; }
             string cm = $"{asm}-{c.Point.Replace("'", "P")}";
+            // knuckle plates standing on the end flange: MILL TO BEAR + 5/16 fillet welds both sides (p.124-126 weld symbols "mill to bear")
+            List<PartFit> KnuckleFits(string src) => new()
+            {
+                new("bottom end", FitCondition.MillToBear, $"{asm}-EF", src),
+                new("bottom end", FitCondition.Welded, $"{asm}-EF", src),
+            };
             var mat = kd.Material;
             // End web inside face in plan: distance from the end line toward the span.
             double dIn = k.EndWebInsideDn();
@@ -329,7 +335,8 @@ public static partial class ArchGenerator
                         RibBoxFill($"{k.Name} {c.Point}", T, cIn, up, bn, t2, n2, hw, w.Depth / 2 - tp, el, dIn, zef);
                 }
                 AddPart($"{cm}-AF{(outside ? "O" : "I")}", PartCategory.KnucklePlate, asm,
-                    $"PL {L(tp)} {(outside ? "outside" : "inside")} arch flange plate, bent (leg {L(h)}, R {L(kd.BendRadius)}) at {c.Point} (p.124/125)", m, mat, sCut + Math.Abs(uEnd));
+                    $"PL {L(tp)} {(outside ? "outside" : "inside")} arch flange plate, bent (leg {L(h)}, R {L(kd.BendRadius)}) at {c.Point} (p.124/125)", m, mat, sCut + Math.Abs(uEnd),
+                    fits: KnuckleFits("p.124 A-A / B-B"));
             }
             // ---- stub web (between the flange plates, along the rib tangent, milled to bear on the end flange)
             {
@@ -342,7 +349,7 @@ public static partial class ArchGenerator
                 PlateBuilder.AddPrism(m, poly, Array.Empty<Hole>(), (s, wv, t) =>
                     W(T + tan * (Math.Abs(s - sCut) > 1e-9 ? (zef - T.Z - bn.Z * wv - nW.Z * t) / tan.Z : s) + bn * wv + nW * t), _ => -kd.StubWebThickness / 2, _ => kd.StubWebThickness / 2);
                 var asu = kd.StubWebUnresolved.Length > 0 ? Assumption.UnresolvedDimension(kd.StubWebUnresolved, $"PL {L(kd.StubWebThickness)}") : null;
-                AddPart($"{cm}-SW", PartCategory.KnucklePlate, asm, $"PL {L(kd.StubWebThickness)} arch stub web at {c.Point}, milled to bear (p.124 A-A)", m, mat, sCut, 0, asu);
+                AddPart($"{cm}-SW", PartCategory.KnucklePlate, asm, $"PL {L(kd.StubWebThickness)} arch stub web at {c.Point}, milled to bear (p.124 A-A)", m, mat, sCut, 0, asu, KnuckleFits("p.124 A-A"));
                 // Arch stiffener: normal to the rib at ArchStiffenerAlongRib, intrados side, web face to the flange tip.
                 var nI = -(cIn * n2.X + up * n2.Y).Normalized();
                 var sp = Ccw(new List<Vec2> { new(-hwW, kd.StubWebThickness / 2), new(hwW, kd.StubWebThickness / 2), new(hwW, hw), new(-hwW, hw) });
@@ -360,7 +367,7 @@ public static partial class ArchGenerator
                 // Bottom on the end flange top and top level, both horizontal (the plate leans with the rib plane).
                 PlateBuilder.AddPrism(mv, vp, Array.Empty<Hole>(), (wv, v, t) =>
                     W(ov + bn * wv + cIn * (hand * t) + up * ((zef + (v > vb0 + 1e-9 ? kd.StiffenerHeight : 0) - ov.Z - bn.Z * wv - cIn.Z * hand * t) / up.Z)), _ => -kd.StiffenerThickness / 2, _ => kd.StiffenerThickness / 2);
-                AddPart($"{cm}-ST", PartCategory.KnucklePlate, asm, $"PL {L(kd.StiffenerThickness)} stiffener at {c.Point} ({L(kd.StiffenerFromSpringing)} outside the springing, {L(kd.StiffenerHeight)} high, p.124 B-B)", mv, mat, 2 * hwW);
+                AddPart($"{cm}-ST", PartCategory.KnucklePlate, asm, $"PL {L(kd.StiffenerThickness)} stiffener at {c.Point} ({L(kd.StiffenerFromSpringing)} outside the springing, {L(kd.StiffenerHeight)} high, p.124 B-B)", mv, mat, 2 * hwW, fits: KnuckleFits("p.124 B-B"));
             }
             // ---- tie joint: tie web stub (knuckle side), gussets + bolts, fill + splice under the tie flange, cheese plates at the jacks
             var tdef = tg.Def;

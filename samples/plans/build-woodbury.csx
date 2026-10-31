@@ -338,5 +338,8 @@ foreach (var w in rep.Warnings.Take(30)) Print("warning " + w);
     }
 }
 foreach (var u in unresolved) Print("UNRESOLVED " + u);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "design-817" in sheet-links-woodbury.json.
+{ const string pdf = @"C:\SBMData\Woodbury 0817 Sioux City I-29 NB over Floyd Blvd_Rev1.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save(outPath);
 Print($"Saved {outPath}");

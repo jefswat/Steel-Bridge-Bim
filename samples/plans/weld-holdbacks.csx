@@ -20,6 +20,19 @@ foreach (var b in Doc.Project.Bridges)
             HoldBack = In(0.25), Source = $"{pg} std. 1021W Detail A",
             StiffenerWebEndFactor = 5, StiffenerWebEndMin = In(2.25), StiffenerWebEndSource = $"{pg} std. 1021W Sections C-C / D-D: X = 5T, 2 1/4\" min from the toe of the flange-to-web weld",
         };
+        // Same Detail A: "TYPICAL ALL STIFFENER TO FLANGE WELDS" = every stiffener end against a flange is welded (stiffener end fits; the intermediate
+        // stiffener bottom stops short of the tension flange). Added to any fits already given (Nebraska F55 mill to bear), never duplicated.
+        var fits = b.Stiffeners.EndFits ?? new List<StiffenerEndFit>();
+        foreach (var (k, e) in new[] { (StiffenerFitKind.Bearing, StiffenerEnd.Top), (StiffenerFitKind.Bearing, StiffenerEnd.Bottom), (StiffenerFitKind.ConnectionPlate, StiffenerEnd.Top),
+                                       (StiffenerFitKind.ConnectionPlate, StiffenerEnd.Bottom), (StiffenerFitKind.Intermediate, StiffenerEnd.Top) })
+            if (!fits.Any(x => x.Kind == k && x.End == e && x.Condition == FitCondition.Welded))
+                fits.Add(new StiffenerEndFit(k, e, FitCondition.Welded, $"{pg} std. 1021W Detail A"));
+        // I-80 p.120 / Ramp G p.103 "BEARING & JACKING STIFFENER" detail: MILL TO BEAR arrow to the top of the bottom flange (read 2026-10-30; the fillet welds
+        // are drawn as well): the bottom ends of the bearing and jacking stiffeners are milled to bear (Nebraska has its own F55 entry)
+        // (Bearing only: the jacking stiffeners take the bearing entries per end, so they keep the weld and get the mill to bear too)
+        if (!b.Name.StartsWith("Nebraska St") && !fits.Any(x => x.Kind == StiffenerFitKind.Bearing && x.End == StiffenerEnd.Bottom && x.Condition == FitCondition.MillToBear))
+            fits.Add(new StiffenerEndFit(StiffenerFitKind.Bearing, StiffenerEnd.Bottom, FitCondition.MillToBear, $"{pg} std. 1021W Bearing & Jacking Stiffener: MILL TO BEAR"));
+        b.Stiffeners.EndFits = fits;
         n++;
     }
     // ODOT Bridge O: p.273 note 7 / p.282-288 note 6 "ALL FILLET WELDS SHALL BE TERMINATED 3/8" (+/- 1/8") FROM EDGES OF ANGLES OR STIFFENER PLATES".

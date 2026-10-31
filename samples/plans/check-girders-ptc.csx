@@ -79,7 +79,7 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     Row(Plates(g1.TopPlates) == "F.L., 86', 51'" ? "PASS" : "DIFF", "top cover plate 86'-0 confirmed by the user 2026-10-20 (p.43 stress sheet + p.44 label; the p.43 dimension lines 51 / 74 / 90 ft are not a conflict)", "86'-0 (top plate 2)", Plates(g1.TopPlates));
     foreach (var pl in new[] { "N", "S" })
     {
-        var p5 = tm.Steel.Parts.FirstOrDefault(p => p.Mark == $"{pl}-G{first + Math.Min(4, nSpans - 1)}");
+        var p5 = tm.Steel.WholeMember($"{pl}-G{first + Math.Min(4, nSpans - 1)}");
         if (p5 != null) Row("INFO", $"{pl} girder span {first + Math.Min(4, nSpans - 1)}: mass", "-", $"{p5.Mass * 2.20462262:N0} lb", $"{p5.Mass * 2.20462262 / ((tm.Points.First(x => x.Plane == pl && x.Name == $"GB{first + Math.Min(4, nSpans - 1)}").Station - tm.Points.First(x => x.Plane == pl && x.Name == $"GA{first + Math.Min(4, nSpans - 1)}").Station) / ft):N0} lb/ft (web + angles + covers only)");
     }
     var n1 = tm.Point("N", $"GA{first}")!; var s1 = tm.Point("S", $"GA{first}")!;
@@ -115,7 +115,7 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
     Cmp("outer stringer lines S2 to S2: 8 spaces @ 8'-3 = 66'-0", 66, Math.Abs(sl[1].Offset - sl[9].Offset) / ft, 0.0005, " ft");
     // brackets B1 (p.45 note: as the approach truss spans, p.55: 10'-9 cantilever = S1 + 8 in., 2'-0 1/2 b. to b. of angles at the tip; flagged)
     {
-        var br = tm.Steel.Parts.First(p => p.Mark == $"S-B1-{first}-1");
+        var br = tm.Steel.WholeMember($"S-B1-{first}-1")!;
         // the bracket is set normal to grade (p.43 / p.44 notes, TRUSS-DESIGN.md section 25): its depth is measured along the leaning section (normal to the
         // grade at its station), not vertically (the 14 in. cover tilts with the grade)
         double brSta = br.Mesh.Positions.Average(v => al0.Inverse(v.XY).Station);
@@ -127,7 +127,7 @@ foreach (var (bname, first, nSpans, planC, planS, planCY) in specs)
         var atTip = pos.Where(q => q.o > tip - 0.02).ToList();
         Cmp("bracket B1 tip from the CL: 29'-0 + 10'-9 = S1 + 8 in. (p.45 -> p.55 / p.48)", 39.75, tip / ft, 0.04, " ft", "tip cut in a vertical plane (section 25)", 4);
         Cmp("bracket B1 depth at the tip: 2'-0 1/2 b. to b. of angles + 1/2 cover plate (p.45 -> p.55)", 25.0 / 12, (atTip.Max(q => q.z) - atTip.Min(q => q.z)) / ft, 0.01, " ft", "measured normal to the grade", 4);
-        var f2 = tm.Steel.Parts.First(p => p.Mark == $"S-F2-{first}-1");
+        var f2 = tm.Steel.WholeMember($"S-F2-{first}-1")!;
         double o0 = f2.Mesh.Positions.Max(v => al0.Inverse(v.XY).Offset) / ft;
         Cmp("floor beam F2 end at the girder (11 in. = the girder cover plate edge; p.45 cover plates flush with the girder F.L. plate)", 29 - 11.0 / 12, o0, 0.04, " ft", "end cut square to the crowned beam axis: its bottom corner reaches 3/8 in. further", 4);
     }

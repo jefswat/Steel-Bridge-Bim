@@ -1,0 +1,1515 @@
+bent,arm,tendon,joint,lane,row,resid,page,tag
+19,D,T12,0,1,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T8,0,3,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T1,0,5,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T2,0,7,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T4,0,8,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T7,0,9,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T9,0,10,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T3,0,4,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T5,0,4,B,,285,VECTOR: bent-end label on the drawn line
+19,D,T13,0,6,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T14,0,6,B,,285,VECTOR: bent-end label on the drawn line
+19,D,T11,0,11,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T10,0,2,A,,285,VECTOR: bent-end label on the drawn line
+19,D,T5,1,4,B,,285,"MATCHED: joint not readable on p.285; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,D,T5,2,4,B,,285,"MATCHED: joint not readable on p.285; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,D,T5,3,4,B,,285,"MATCHED: joint not readable on p.285; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,D,T5,4,4,B,,285,"MATCHED: joint not readable on p.285; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,D,T5,5,5,B,,285,"MATCHED: joint not readable on p.285; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,D,T12,1,1,A,0.2,285,VECTOR: traced line at the joint
+19,D,T12,2,1,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,3,1,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,4,1,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,5,1,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,6,1,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,7,1,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,8,2,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,9,3,A,0.2,285,VECTOR: traced line at the joint
+19,D,T12,10,4,A,0.1,285,VECTOR: traced line at the joint
+19,D,T12,11,5,A,0.9,285,VECTOR: anchor lane = end of the traced line
+19,D,T10,1,2,A,0.2,285,VECTOR: traced line at the joint
+19,D,T10,2,2,A,0.1,285,VECTOR: traced line at the joint
+19,D,T10,3,2,A,0.2,285,VECTOR: traced line at the joint
+19,D,T10,4,2,A,0.1,285,VECTOR: traced line at the joint
+19,D,T10,5,2,A,0.1,285,VECTOR: traced line at the joint
+19,D,T10,6,2,A,0.1,285,VECTOR: traced line at the joint
+19,D,T10,7,3,A,0.1,285,VECTOR: traced line at the joint
+19,D,T10,8,4,A,0.1,285,VECTOR: traced line at the joint
+19,D,T10,9,5,A,0.9,285,VECTOR: anchor lane = end of the traced line
+19,D,T8,1,3,A,0.2,285,VECTOR: traced line at the joint
+19,D,T8,2,3,A,0.1,285,VECTOR: traced line at the joint
+19,D,T8,3,3,A,0.1,285,VECTOR: traced line at the joint
+19,D,T8,4,3,A,0.1,285,VECTOR: traced line at the joint
+19,D,T8,5,3,A,0.1,285,VECTOR: traced line at the joint
+19,D,T8,6,4,A,0.1,285,VECTOR: traced line at the joint
+19,D,T8,7,5,A,0.9,285,VECTOR: anchor lane = end of the traced line
+19,D,T3,1,4,A,0.2,285,VECTOR: traced line at the joint
+19,D,T3,2,4,A,0.1,285,VECTOR: traced line at the joint
+19,D,T3,3,5,A,1.1,285,VECTOR: anchor lane = end of the traced line
+19,D,T1,1,5,A,,285,"MATCHED: joint not readable on p.285; lane of all 9 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,D,T13,1,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,2,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,3,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,4,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,5,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,6,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,7,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,8,6,A,0.0,285,VECTOR: traced line at the joint
+19,D,T13,9,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,10,6,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,11,7,A,0.1,285,VECTOR: traced line at the joint
+19,D,T13,12,7,A,0.1,285,VECTOR: anchor lane = end of the traced line
+19,D,T2,1,7,A,0.1,285,VECTOR: traced line at the joint
+19,D,T2,2,7,A,,285,"MATCHED: joint not readable on p.285; lane of all 9 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,D,T4,1,8,A,0.1,285,VECTOR: traced line at the joint
+19,D,T4,2,8,A,0.1,285,VECTOR: traced line at the joint
+19,D,T4,3,8,A,0.1,285,VECTOR: traced line at the joint
+19,D,T4,4,7,A,-1.0,285,VECTOR: anchor lane = end of the traced line
+19,D,T7,1,9,A,0.1,285,VECTOR: traced line at the joint
+19,D,T7,2,9,A,0.1,285,VECTOR: traced line at the joint
+19,D,T7,3,9,A,0.1,285,VECTOR: traced line at the joint
+19,D,T7,4,9,A,0.1,285,VECTOR: traced line at the joint
+19,D,T7,5,8,A,0.0,285,VECTOR: traced line at the joint
+19,D,T7,6,7,A,-0.7,285,VECTOR: anchor lane = end of the traced line
+19,D,T9,1,10,A,0.1,285,VECTOR: traced line at the joint
+19,D,T9,2,10,A,0.1,285,VECTOR: traced line at the joint
+19,D,T9,3,10,A,0.1,285,VECTOR: traced line at the joint
+19,D,T9,4,10,A,0.1,285,VECTOR: traced line at the joint
+19,D,T9,5,10,A,0.1,285,VECTOR: traced line at the joint
+19,D,T9,6,9,A,0.0,285,VECTOR: traced line at the joint
+19,D,T9,7,8,A,0.0,285,VECTOR: traced line at the joint
+19,D,T9,8,7,A,-0.7,285,VECTOR: anchor lane = end of the traced line
+19,D,T11,1,11,A,0.1,285,VECTOR: traced line at the joint
+19,D,T11,2,11,A,0.1,285,VECTOR: traced line at the joint
+19,D,T11,3,11,A,0.0,285,VECTOR: traced line at the joint
+19,D,T11,4,11,A,0.1,285,VECTOR: traced line at the joint
+19,D,T11,5,11,A,0.0,285,VECTOR: traced line at the joint
+19,D,T11,6,11,A,0.0,285,VECTOR: traced line at the joint
+19,D,T11,7,10,A,0.0,285,VECTOR: traced line at the joint
+19,D,T11,8,9,A,0.1,285,VECTOR: traced line at the joint
+19,D,T11,9,8,A,0.1,285,VECTOR: traced line at the joint
+19,D,T11,10,7,A,-0.7,285,VECTOR: anchor lane = end of the traced line
+19,U,T12,0,1,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T11,0,11,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T8,0,3,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T3,0,4,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T5,0,4,B,,286,VECTOR: bent-end label on the drawn line
+19,U,T1,0,5,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T13,0,6,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T14,0,6,B,,286,VECTOR: bent-end label on the drawn line
+19,U,T2,0,7,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T4,0,8,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T7,0,9,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T9,0,10,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T10,0,2,A,,286,VECTOR: bent-end label on the drawn line
+19,U,T5,1,4,B,,286,"MATCHED: joint not readable on p.286; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,U,T5,2,4,B,,286,"MATCHED: joint not readable on p.286; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,U,T5,3,4,B,,286,"MATCHED: joint not readable on p.286; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,U,T5,4,4,B,,286,"MATCHED: joint not readable on p.286; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,U,T5,5,5,B,,286,"MATCHED: joint not readable on p.286; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+19,U,T12,1,1,A,0.4,286,VECTOR: traced line at the joint
+19,U,T12,2,1,A,0.3,286,VECTOR: traced line at the joint
+19,U,T12,3,1,A,0.2,286,VECTOR: traced line at the joint
+19,U,T12,4,1,A,0.2,286,VECTOR: traced line at the joint
+19,U,T12,5,1,A,0.2,286,VECTOR: traced line at the joint
+19,U,T12,6,1,A,0.2,286,VECTOR: traced line at the joint
+19,U,T12,7,1,A,0.2,286,VECTOR: traced line at the joint
+19,U,T12,8,2,A,0.0,286,VECTOR: traced line at the joint
+19,U,T12,9,3,A,0.0,286,VECTOR: traced line at the joint
+19,U,T12,10,4,A,0.1,286,VECTOR: traced line at the joint
+19,U,T12,11,5,A,0.9,286,VECTOR: anchor lane = end of the traced line
+19,U,T10,1,2,A,0.4,286,VECTOR: traced line at the joint
+19,U,T10,2,2,A,0.3,286,VECTOR: traced line at the joint
+19,U,T10,3,2,A,0.3,286,VECTOR: traced line at the joint
+19,U,T10,4,2,A,0.2,286,VECTOR: traced line at the joint
+19,U,T10,5,2,A,0.2,286,VECTOR: traced line at the joint
+19,U,T10,6,2,A,0.2,286,VECTOR: traced line at the joint
+19,U,T10,7,3,A,0.1,286,VECTOR: traced line at the joint
+19,U,T10,8,4,A,0.1,286,VECTOR: traced line at the joint
+19,U,T10,9,5,A,0.9,286,VECTOR: anchor lane = end of the traced line
+19,U,T8,1,3,A,0.3,286,VECTOR: traced line at the joint
+19,U,T8,2,3,A,0.3,286,VECTOR: traced line at the joint
+19,U,T8,3,3,A,0.3,286,VECTOR: traced line at the joint
+19,U,T8,4,3,A,0.2,286,VECTOR: traced line at the joint
+19,U,T8,5,3,A,0.2,286,VECTOR: traced line at the joint
+19,U,T8,6,4,A,0.1,286,VECTOR: traced line at the joint
+19,U,T8,7,5,A,0.9,286,VECTOR: anchor lane = end of the traced line
+19,U,T3,1,4,A,0.4,286,VECTOR: traced line at the joint
+19,U,T3,2,4,A,0.3,286,VECTOR: traced line at the joint
+19,U,T3,3,5,A,1.2,286,VECTOR: anchor lane = end of the traced line
+19,U,T1,1,5,A,0.3,286,VECTOR: anchor lane = end of the traced line
+19,U,T13,1,6,A,0.3,286,VECTOR: traced line at the joint
+19,U,T13,2,6,A,0.3,286,VECTOR: traced line at the joint
+19,U,T13,3,6,A,0.2,286,VECTOR: traced line at the joint
+19,U,T13,4,6,A,0.2,286,VECTOR: traced line at the joint
+19,U,T13,5,6,A,0.1,286,VECTOR: traced line at the joint
+19,U,T13,6,6,A,0.1,286,VECTOR: traced line at the joint
+19,U,T13,7,6,A,0.1,286,VECTOR: traced line at the joint
+19,U,T13,8,6,A,0.1,286,VECTOR: traced line at the joint
+19,U,T13,9,6,A,0.1,286,VECTOR: traced line at the joint
+19,U,T13,10,6,A,0.1,286,VECTOR: traced line at the joint
+19,U,T13,11,7,A,0.1,286,VECTOR: traced line at the joint
+19,U,T13,12,7,A,0.1,286,VECTOR: anchor lane = end of the traced line
+19,U,T2,1,7,A,0.3,286,VECTOR: traced line at the joint
+19,U,T2,2,7,A,0.2,286,VECTOR: anchor lane = end of the traced line
+19,U,T4,1,8,A,0.2,286,VECTOR: traced line at the joint
+19,U,T4,2,8,A,0.2,286,VECTOR: traced line at the joint
+19,U,T4,3,8,A,0.2,286,VECTOR: traced line at the joint
+19,U,T4,4,7,A,-0.9,286,VECTOR: anchor lane = end of the traced line
+19,U,T7,1,9,A,0.2,286,VECTOR: traced line at the joint
+19,U,T7,2,9,A,0.1,286,VECTOR: traced line at the joint
+19,U,T7,3,9,A,0.1,286,VECTOR: traced line at the joint
+19,U,T7,4,9,A,0.1,286,VECTOR: traced line at the joint
+19,U,T7,5,8,A,0.0,286,VECTOR: traced line at the joint
+19,U,T7,6,7,A,-0.7,286,VECTOR: anchor lane = end of the traced line
+19,U,T9,1,10,A,0.2,286,VECTOR: traced line at the joint
+19,U,T9,2,10,A,0.2,286,VECTOR: traced line at the joint
+19,U,T9,3,10,A,0.1,286,VECTOR: traced line at the joint
+19,U,T9,4,10,A,0.1,286,VECTOR: traced line at the joint
+19,U,T9,5,10,A,0.1,286,VECTOR: traced line at the joint
+19,U,T9,6,9,A,-0.0,286,VECTOR: traced line at the joint
+19,U,T9,7,8,A,-0.0,286,VECTOR: traced line at the joint
+19,U,T9,8,7,A,-0.7,286,VECTOR: anchor lane = end of the traced line
+19,U,T11,1,11,A,0.2,286,VECTOR: traced line at the joint
+19,U,T11,2,11,A,0.1,286,VECTOR: traced line at the joint
+19,U,T11,3,11,A,0.1,286,VECTOR: traced line at the joint
+19,U,T11,4,11,A,0.1,286,VECTOR: traced line at the joint
+19,U,T11,5,11,A,0.1,286,VECTOR: traced line at the joint
+19,U,T11,6,11,A,0.1,286,VECTOR: traced line at the joint
+19,U,T11,7,10,A,-0.1,286,VECTOR: traced line at the joint
+19,U,T11,8,9,A,-0.0,286,VECTOR: traced line at the joint
+19,U,T11,9,8,A,0.0,286,VECTOR: traced line at the joint
+19,U,T11,10,7,A,-0.7,286,VECTOR: anchor lane = end of the traced line
+19,U,B3,12,6,C,,286,VECTOR: closure-end label on the drawn line (joint = closure end)
+19,U,B4,12,5,C,,286,VECTOR: closure-end label on the drawn line (joint = closure end)
+19,U,B5,12,4,C,,286,VECTOR: closure-end label on the drawn line (joint = closure end)
+19,U,B6,12,3,C,,286,VECTOR: closure-end label on the drawn line (joint = closure end)
+19,U,B7,12,2,C,,286,VECTOR: closure-end label on the drawn line (joint = closure end)
+19,U,B1,12,1,C,,286,VECTOR: closure-end label on the drawn line (joint = closure end)
+19,U,B1,11,1,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B7,11,2,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B6,11,3,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B5,11,4,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B4,11,5,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B3,11,6,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B1,10,1,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B6,10,2,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B5,10,4,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B4,10,5,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B3,10,6,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B1,9,1,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B5,9,2,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B4,9,4,C,0.1,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B3,9,6,C,0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+19,U,B1,5,2,C,-0.0,286,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,T12,0,1,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T11,0,11,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T8,0,3,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T3,0,4,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T5,0,4,B,,287,VECTOR: bent-end label on the drawn line
+20,D,T1,0,5,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T13,0,6,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T14,0,6,B,,287,VECTOR: bent-end label on the drawn line
+20,D,T2,0,7,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T4,0,8,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T7,0,9,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T9,0,10,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T10,0,2,A,,287,VECTOR: bent-end label on the drawn line
+20,D,T5,1,4,B,,287,"MATCHED: joint not readable on p.287; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,D,T5,2,4,B,,287,"MATCHED: joint not readable on p.287; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,D,T5,3,4,B,,287,"MATCHED: joint not readable on p.287; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,D,T5,4,4,B,,287,"MATCHED: joint not readable on p.287; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,D,T5,5,5,B,,287,"MATCHED: joint not readable on p.287; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,D,T12,1,1,A,0.5,287,VECTOR: traced line at the joint
+20,D,T12,2,1,A,0.4,287,VECTOR: traced line at the joint
+20,D,T12,3,1,A,0.3,287,VECTOR: traced line at the joint
+20,D,T12,4,1,A,0.3,287,VECTOR: traced line at the joint
+20,D,T12,5,1,A,0.3,287,VECTOR: traced line at the joint
+20,D,T12,6,1,A,0.3,287,VECTOR: traced line at the joint
+20,D,T12,7,1,A,0.2,287,VECTOR: traced line at the joint
+20,D,T12,8,2,A,0.1,287,VECTOR: traced line at the joint
+20,D,T12,9,3,A,0.1,287,VECTOR: traced line at the joint
+20,D,T12,10,4,A,0.1,287,VECTOR: traced line at the joint
+20,D,T12,11,5,A,,287,MATCHED: joint not readable on p.287; lane of the other arm of bent 20 (the arms agree at every joint both read)
+20,D,T10,1,2,A,0.4,287,VECTOR: traced line at the joint
+20,D,T10,2,2,A,0.3,287,VECTOR: traced line at the joint
+20,D,T10,3,2,A,0.3,287,VECTOR: traced line at the joint
+20,D,T10,4,2,A,0.3,287,VECTOR: traced line at the joint
+20,D,T10,5,2,A,0.3,287,VECTOR: traced line at the joint
+20,D,T10,6,2,A,0.3,287,VECTOR: traced line at the joint
+20,D,T10,7,3,A,0.7,287,VECTOR: traced line at the joint
+20,D,T10,8,4,A,0.2,287,VECTOR: traced line at the joint
+20,D,T10,9,5,A,1.0,287,VECTOR: anchor lane = end of the traced line
+20,D,T8,1,3,A,0.4,287,VECTOR: traced line at the joint
+20,D,T8,2,3,A,0.4,287,VECTOR: traced line at the joint
+20,D,T8,3,3,A,0.3,287,VECTOR: traced line at the joint
+20,D,T8,4,3,A,0.3,287,VECTOR: traced line at the joint
+20,D,T8,5,3,A,0.3,287,VECTOR: traced line at the joint
+20,D,T8,6,4,A,0.9,287,VECTOR: traced line at the joint
+20,D,T8,7,5,A,,287,MATCHED: joint not readable on p.287; lane of the other arm of bent 20 (the arms agree at every joint both read)
+20,D,T3,1,4,A,0.4,287,VECTOR: traced line at the joint
+20,D,T3,2,4,A,0.3,287,VECTOR: traced line at the joint
+20,D,T3,3,5,A,,287,MATCHED: joint not readable on p.287; lane of the other arm of bent 20 (the arms agree at every joint both read)
+20,D,T1,1,5,A,,287,"MATCHED: joint not readable on p.287; lane of all 9 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,D,T13,1,6,A,0.3,287,VECTOR: traced line at the joint
+20,D,T13,2,6,A,0.3,287,VECTOR: traced line at the joint
+20,D,T13,3,6,A,0.2,287,VECTOR: traced line at the joint
+20,D,T13,4,6,A,0.2,287,VECTOR: traced line at the joint
+20,D,T13,5,6,A,0.2,287,VECTOR: traced line at the joint
+20,D,T13,6,6,A,0.2,287,VECTOR: traced line at the joint
+20,D,T13,7,6,A,0.2,287,VECTOR: traced line at the joint
+20,D,T13,8,6,A,0.2,287,VECTOR: traced line at the joint
+20,D,T13,9,6,A,0.1,287,VECTOR: traced line at the joint
+20,D,T13,10,6,A,0.1,287,VECTOR: traced line at the joint
+20,D,T13,11,7,A,0.0,287,VECTOR: traced line at the joint
+20,D,T13,12,7,A,0.1,287,VECTOR: anchor lane = end of the traced line
+20,D,T2,1,7,A,0.3,287,VECTOR: traced line at the joint
+20,D,T2,2,7,A,,287,"MATCHED: joint not readable on p.287; lane of all 9 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,D,T4,1,8,A,0.3,287,VECTOR: traced line at the joint
+20,D,T4,2,8,A,0.2,287,VECTOR: traced line at the joint
+20,D,T4,3,8,A,0.2,287,VECTOR: traced line at the joint
+20,D,T4,4,7,A,,287,MATCHED: joint not readable on p.287; lane of the other arm of bent 20 (the arms agree at every joint both read)
+20,D,T7,1,9,A,0.3,287,VECTOR: traced line at the joint
+20,D,T7,2,9,A,0.2,287,VECTOR: traced line at the joint
+20,D,T7,3,9,A,0.2,287,VECTOR: traced line at the joint
+20,D,T7,4,9,A,0.2,287,VECTOR: traced line at the joint
+20,D,T7,5,8,A,-0.7,287,VECTOR: traced line at the joint
+20,D,T7,6,7,A,,287,MATCHED: joint not readable on p.287; lane of the other arm of bent 20 (the arms agree at every joint both read)
+20,D,T9,1,10,A,0.2,287,VECTOR: traced line at the joint
+20,D,T9,2,10,A,0.2,287,VECTOR: traced line at the joint
+20,D,T9,3,10,A,0.1,287,VECTOR: traced line at the joint
+20,D,T9,4,10,A,0.2,287,VECTOR: traced line at the joint
+20,D,T9,5,10,A,0.2,287,VECTOR: traced line at the joint
+20,D,T9,6,9,A,-0.7,287,VECTOR: traced line at the joint
+20,D,T9,7,8,A,-0.6,287,VECTOR: traced line at the joint
+20,D,T9,8,7,A,0.0,287,VECTOR: anchor lane = end of the traced line
+20,D,T11,1,11,A,0.2,287,VECTOR: traced line at the joint
+20,D,T11,2,11,A,0.2,287,VECTOR: traced line at the joint
+20,D,T11,3,11,A,0.1,287,VECTOR: traced line at the joint
+20,D,T11,4,11,A,0.2,287,VECTOR: traced line at the joint
+20,D,T11,5,11,A,0.2,287,VECTOR: traced line at the joint
+20,D,T11,6,11,A,0.2,287,VECTOR: traced line at the joint
+20,D,T11,7,10,A,-0.6,287,VECTOR: traced line at the joint
+20,D,T11,8,9,A,0.0,287,VECTOR: traced line at the joint
+20,D,T11,9,8,A,-0.0,287,VECTOR: traced line at the joint
+20,D,T11,10,7,A,-0.7,287,VECTOR: anchor lane = end of the traced line
+20,D,B2,12,7,C,,287,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,D,B3,12,6,C,,287,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,D,B4,12,5,C,,287,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,D,B5,12,4,C,,287,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,D,B6,12,3,C,,287,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,D,B7,12,2,C,,287,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,D,B1,12,1,C,,287,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,D,B1,11,1,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B7,11,2,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B6,11,3,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B5,11,4,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B4,11,5,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B3,11,6,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B2,11,7,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B1,10,1,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B6,10,2,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B5,10,4,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B4,10,5,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B3,10,6,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B2,10,7,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B1,9,1,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B5,9,2,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B4,9,4,C,-1.5,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B3,9,6,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B2,9,7,C,-0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B1,8,1,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B4,8,2,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B3,8,4,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B2,8,6,C,-2.6,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B1,7,1,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B3,7,2,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B2,7,4,C,-2.6,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B1,6,1,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B2,6,2,C,0.0,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,D,B1,5,2,C,-0.1,287,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,T12,0,1,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T11,0,11,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T8,0,3,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T3,0,4,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T5,0,4,B,,288,VECTOR: bent-end label on the drawn line
+20,U,T1,0,5,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T13,0,6,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T14,0,6,B,,288,VECTOR: bent-end label on the drawn line
+20,U,T2,0,7,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T4,0,8,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T7,0,9,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T9,0,10,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T10,0,2,A,,288,VECTOR: bent-end label on the drawn line
+20,U,T5,1,4,B,,288,"MATCHED: joint not readable on p.288; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,U,T5,2,4,B,,288,"MATCHED: joint not readable on p.288; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,U,T5,3,4,B,,288,"MATCHED: joint not readable on p.288; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,U,T5,4,4,B,,288,"MATCHED: joint not readable on p.288; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,U,T5,5,5,B,,288,"MATCHED: joint not readable on p.288; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+20,U,T12,1,1,A,0.4,288,VECTOR: traced line at the joint
+20,U,T12,2,1,A,0.4,288,VECTOR: traced line at the joint
+20,U,T12,3,1,A,0.3,288,VECTOR: traced line at the joint
+20,U,T12,4,1,A,0.2,288,VECTOR: traced line at the joint
+20,U,T12,5,1,A,0.2,288,VECTOR: traced line at the joint
+20,U,T12,6,1,A,0.2,288,VECTOR: traced line at the joint
+20,U,T12,7,1,A,0.2,288,VECTOR: traced line at the joint
+20,U,T12,8,2,A,0.0,288,VECTOR: traced line at the joint
+20,U,T12,9,3,A,0.0,288,VECTOR: traced line at the joint
+20,U,T12,10,4,A,0.1,288,VECTOR: traced line at the joint
+20,U,T12,11,5,A,0.9,288,VECTOR: anchor lane = end of the traced line
+20,U,T10,1,2,A,0.4,288,VECTOR: traced line at the joint
+20,U,T10,2,2,A,0.3,288,VECTOR: traced line at the joint
+20,U,T10,3,2,A,0.3,288,VECTOR: traced line at the joint
+20,U,T10,4,2,A,0.3,288,VECTOR: traced line at the joint
+20,U,T10,5,2,A,0.2,288,VECTOR: traced line at the joint
+20,U,T10,6,2,A,0.2,288,VECTOR: traced line at the joint
+20,U,T10,7,3,A,0.1,288,VECTOR: traced line at the joint
+20,U,T10,8,4,A,0.1,288,VECTOR: traced line at the joint
+20,U,T10,9,5,A,1.0,288,VECTOR: anchor lane = end of the traced line
+20,U,T8,1,3,A,0.4,288,VECTOR: traced line at the joint
+20,U,T8,2,3,A,0.3,288,VECTOR: traced line at the joint
+20,U,T8,3,3,A,0.3,288,VECTOR: traced line at the joint
+20,U,T8,4,3,A,0.3,288,VECTOR: traced line at the joint
+20,U,T8,5,3,A,0.2,288,VECTOR: traced line at the joint
+20,U,T8,6,4,A,0.1,288,VECTOR: traced line at the joint
+20,U,T8,7,5,A,0.2,288,VECTOR: anchor lane = end of the traced line
+20,U,T3,1,4,A,0.4,288,VECTOR: traced line at the joint
+20,U,T3,2,4,A,0.3,288,VECTOR: traced line at the joint
+20,U,T3,3,5,A,1.2,288,VECTOR: anchor lane = end of the traced line
+20,U,T1,1,5,A,0.3,288,VECTOR: anchor lane = end of the traced line
+20,U,T13,1,6,A,0.3,288,VECTOR: traced line at the joint
+20,U,T13,2,6,A,0.3,288,VECTOR: traced line at the joint
+20,U,T13,3,6,A,0.2,288,VECTOR: traced line at the joint
+20,U,T13,4,6,A,0.2,288,VECTOR: traced line at the joint
+20,U,T13,5,6,A,0.2,288,VECTOR: traced line at the joint
+20,U,T13,6,6,A,0.2,288,VECTOR: traced line at the joint
+20,U,T13,7,6,A,0.1,288,VECTOR: traced line at the joint
+20,U,T13,8,6,A,0.1,288,VECTOR: traced line at the joint
+20,U,T13,9,6,A,0.1,288,VECTOR: traced line at the joint
+20,U,T13,10,6,A,0.1,288,VECTOR: traced line at the joint
+20,U,T13,11,7,A,0.1,288,VECTOR: traced line at the joint
+20,U,T13,12,7,A,0.1,288,VECTOR: anchor lane = end of the traced line
+20,U,T2,1,7,A,0.3,288,VECTOR: traced line at the joint
+20,U,T2,2,7,A,0.3,288,VECTOR: anchor lane = end of the traced line
+20,U,T4,1,8,A,0.2,288,VECTOR: traced line at the joint
+20,U,T4,2,8,A,0.2,288,VECTOR: traced line at the joint
+20,U,T4,3,8,A,0.2,288,VECTOR: traced line at the joint
+20,U,T4,4,7,A,-0.9,288,VECTOR: anchor lane = end of the traced line
+20,U,T7,1,9,A,0.3,288,VECTOR: traced line at the joint
+20,U,T7,2,9,A,0.2,288,VECTOR: traced line at the joint
+20,U,T7,3,9,A,0.1,288,VECTOR: traced line at the joint
+20,U,T7,4,9,A,0.2,288,VECTOR: traced line at the joint
+20,U,T7,5,8,A,0.0,288,VECTOR: traced line at the joint
+20,U,T7,6,7,A,-0.6,288,VECTOR: anchor lane = end of the traced line
+20,U,T9,1,10,A,0.2,288,VECTOR: traced line at the joint
+20,U,T9,2,10,A,0.2,288,VECTOR: traced line at the joint
+20,U,T9,3,10,A,0.2,288,VECTOR: traced line at the joint
+20,U,T9,4,10,A,0.1,288,VECTOR: traced line at the joint
+20,U,T9,5,10,A,0.1,288,VECTOR: traced line at the joint
+20,U,T9,6,9,A,-0.0,288,VECTOR: traced line at the joint
+20,U,T9,7,8,A,-0.0,288,VECTOR: traced line at the joint
+20,U,T9,8,7,A,0.0,288,VECTOR: anchor lane = end of the traced line
+20,U,T11,1,11,A,0.2,288,VECTOR: traced line at the joint
+20,U,T11,2,11,A,0.1,288,VECTOR: traced line at the joint
+20,U,T11,3,11,A,0.2,288,VECTOR: traced line at the joint
+20,U,T11,4,11,A,0.1,288,VECTOR: traced line at the joint
+20,U,T11,5,11,A,0.1,288,VECTOR: traced line at the joint
+20,U,T11,6,11,A,0.1,288,VECTOR: traced line at the joint
+20,U,T11,7,10,A,-0.0,288,VECTOR: traced line at the joint
+20,U,T11,8,9,A,-0.0,288,VECTOR: traced line at the joint
+20,U,T11,9,8,A,0.0,288,VECTOR: traced line at the joint
+20,U,T11,10,7,A,-0.7,288,VECTOR: anchor lane = end of the traced line
+20,U,B4,12,5,C,,288,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,U,B5,12,4,C,,288,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,U,B6,12,3,C,,288,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,U,B7,12,2,C,,288,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,U,B1,12,1,C,,288,VECTOR: closure-end label on the drawn line (joint = closure end)
+20,U,B1,11,1,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B7,11,2,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B6,11,3,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B5,11,4,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B4,11,5,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B1,10,1,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B6,10,2,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B5,10,4,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B4,10,5,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B1,9,1,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B5,9,2,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B4,9,4,C,0.1,288,"VECTOR: crossing at the joint, order kept from the closure"
+20,U,B1,5,2,C,0.0,288,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,T12,0,1,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T8,0,3,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T3,0,4,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T5,0,4,B,,289,VECTOR: bent-end label on the drawn line
+22,D,T1,0,5,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T13,0,6,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T14,0,6,B,,289,VECTOR: bent-end label on the drawn line
+22,D,T2,0,7,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T7,0,9,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T9,0,10,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T11,0,11,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T10,0,2,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T4,0,8,A,,289,VECTOR: bent-end label on the drawn line
+22,D,T6,0,8,B,,289,VECTOR: bent-end label on the drawn line
+22,D,T5,1,4,B,,289,"MATCHED: joint not readable on p.289; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,D,T5,2,4,B,,289,"MATCHED: joint not readable on p.289; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,D,T5,3,4,B,,289,"MATCHED: joint not readable on p.289; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,D,T5,4,4,B,,289,"MATCHED: joint not readable on p.289; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,D,T5,5,5,B,,289,"MATCHED: joint not readable on p.289; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,D,T6,1,?,B,,289,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,D,T6,2,?,B,,289,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,D,T6,3,?,B,,289,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,D,T6,4,?,B,,289,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,D,T6,5,?,B,,289,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,D,T12,1,1,A,0.4,289,VECTOR: traced line at the joint
+22,D,T12,2,1,A,0.3,289,VECTOR: traced line at the joint
+22,D,T12,3,1,A,0.3,289,VECTOR: traced line at the joint
+22,D,T12,4,1,A,0.3,289,VECTOR: traced line at the joint
+22,D,T12,5,1,A,0.2,289,VECTOR: traced line at the joint
+22,D,T12,6,1,A,0.2,289,VECTOR: traced line at the joint
+22,D,T12,7,1,A,0.1,289,VECTOR: traced line at the joint
+22,D,T12,8,2,A,0.0,289,VECTOR: traced line at the joint
+22,D,T12,9,3,A,0.0,289,VECTOR: traced line at the joint
+22,D,T12,10,4,A,0.1,289,VECTOR: traced line at the joint
+22,D,T12,11,5,A,,289,MATCHED: joint not readable on p.289; lane of the other arm of bent 22 (the arms agree at every joint both read)
+22,D,T10,1,2,A,0.4,289,VECTOR: traced line at the joint
+22,D,T10,2,2,A,0.3,289,VECTOR: traced line at the joint
+22,D,T10,3,2,A,0.3,289,VECTOR: traced line at the joint
+22,D,T10,4,2,A,0.3,289,VECTOR: traced line at the joint
+22,D,T10,5,2,A,0.2,289,VECTOR: traced line at the joint
+22,D,T10,6,2,A,0.2,289,VECTOR: traced line at the joint
+22,D,T10,7,3,A,0.7,289,VECTOR: traced line at the joint
+22,D,T10,8,4,A,0.1,289,VECTOR: traced line at the joint
+22,D,T10,9,5,A,0.9,289,VECTOR: anchor lane = end of the traced line
+22,D,T8,1,3,A,0.4,289,VECTOR: traced line at the joint
+22,D,T8,2,3,A,0.3,289,VECTOR: traced line at the joint
+22,D,T8,3,3,A,0.3,289,VECTOR: traced line at the joint
+22,D,T8,4,3,A,0.2,289,VECTOR: traced line at the joint
+22,D,T8,5,3,A,0.2,289,VECTOR: traced line at the joint
+22,D,T8,6,4,A,0.8,289,VECTOR: traced line at the joint
+22,D,T8,7,5,A,,289,MATCHED: joint not readable on p.289; lane of the other arm of bent 22 (the arms agree at every joint both read)
+22,D,T3,1,4,A,0.3,289,VECTOR: traced line at the joint
+22,D,T3,2,4,A,0.3,289,VECTOR: traced line at the joint
+22,D,T3,3,5,A,,289,MATCHED: joint not readable on p.289; lane of the other arm of bent 22 (the arms agree at every joint both read)
+22,D,T1,1,5,A,,289,"MATCHED: joint not readable on p.289; lane of all 9 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,D,T13,1,6,A,0.3,289,VECTOR: traced line at the joint
+22,D,T13,2,6,A,0.2,289,VECTOR: traced line at the joint
+22,D,T13,3,6,A,0.2,289,VECTOR: traced line at the joint
+22,D,T13,4,6,A,0.2,289,VECTOR: traced line at the joint
+22,D,T13,5,6,A,0.2,289,VECTOR: traced line at the joint
+22,D,T13,6,6,A,0.1,289,VECTOR: traced line at the joint
+22,D,T13,7,6,A,0.1,289,VECTOR: traced line at the joint
+22,D,T13,8,6,A,0.1,289,VECTOR: traced line at the joint
+22,D,T13,9,6,A,0.1,289,VECTOR: traced line at the joint
+22,D,T13,10,6,A,0.1,289,VECTOR: traced line at the joint
+22,D,T13,11,7,A,0.0,289,VECTOR: traced line at the joint
+22,D,T13,12,7,A,0.1,289,VECTOR: anchor lane = end of the traced line
+22,D,T2,1,7,A,0.2,289,VECTOR: traced line at the joint
+22,D,T2,2,7,A,,289,"MATCHED: joint not readable on p.289; lane of all 9 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,D,T4,1,8,A,0.2,289,VECTOR: traced line at the joint
+22,D,T4,2,8,A,0.2,289,VECTOR: traced line at the joint
+22,D,T4,3,8,A,0.2,289,VECTOR: traced line at the joint
+22,D,T4,4,7,A,,289,MATCHED: joint not readable on p.289; lane of the other arm of bent 22 (the arms agree at every joint both read)
+22,D,T7,1,9,A,0.2,289,VECTOR: traced line at the joint
+22,D,T7,2,9,A,0.2,289,VECTOR: traced line at the joint
+22,D,T7,3,9,A,0.1,289,VECTOR: traced line at the joint
+22,D,T7,4,9,A,0.1,289,VECTOR: traced line at the joint
+22,D,T7,5,8,A,-0.8,289,VECTOR: traced line at the joint
+22,D,T7,6,7,A,,289,MATCHED: joint not readable on p.289; lane of the other arm of bent 22 (the arms agree at every joint both read)
+22,D,T9,1,10,A,0.2,289,VECTOR: traced line at the joint
+22,D,T9,2,10,A,0.1,289,VECTOR: traced line at the joint
+22,D,T9,3,10,A,0.1,289,VECTOR: traced line at the joint
+22,D,T9,4,10,A,0.2,289,VECTOR: traced line at the joint
+22,D,T9,5,10,A,0.1,289,VECTOR: traced line at the joint
+22,D,T9,6,9,A,-0.8,289,VECTOR: traced line at the joint
+22,D,T9,7,8,A,-0.6,289,VECTOR: traced line at the joint
+22,D,T9,8,7,A,-0.0,289,VECTOR: anchor lane = end of the traced line
+22,D,T11,1,11,A,0.2,289,VECTOR: traced line at the joint
+22,D,T11,2,11,A,0.2,289,VECTOR: traced line at the joint
+22,D,T11,3,11,A,0.1,289,VECTOR: traced line at the joint
+22,D,T11,4,11,A,0.1,289,VECTOR: traced line at the joint
+22,D,T11,5,11,A,0.1,289,VECTOR: traced line at the joint
+22,D,T11,6,11,A,0.1,289,VECTOR: traced line at the joint
+22,D,T11,7,10,A,-0.7,289,VECTOR: traced line at the joint
+22,D,T11,8,9,A,-0.1,289,VECTOR: traced line at the joint
+22,D,T11,9,8,A,-0.0,289,VECTOR: traced line at the joint
+22,D,T11,10,7,A,-0.8,289,VECTOR: anchor lane = end of the traced line
+22,D,B1,12,1,C,,289,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,D,B7,12,2,C,,289,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,D,B6,12,3,C,,289,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,D,B5,12,4,C,,289,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,D,B4,12,5,C,,289,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,D,B3,12,6,C,,289,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,D,B2,12,7,C,,289,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,D,B1,11,1,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B7,11,2,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B6,11,3,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B5,11,4,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B4,11,5,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B3,11,6,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B2,11,7,C,0.1,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B1,10,1,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B6,10,2,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B5,10,4,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B4,10,5,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B3,10,6,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B2,10,7,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B1,9,1,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B5,9,2,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B4,9,4,C,-1.5,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B3,9,6,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B2,9,7,C,-0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B1,8,1,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B4,8,2,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B3,8,4,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B2,8,6,C,-2.6,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B1,7,1,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B3,7,2,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B2,7,4,C,-2.6,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B1,6,1,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B2,6,2,C,0.0,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,D,B1,5,2,C,-0.1,289,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,T12,0,1,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T11,0,11,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T8,0,3,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T3,0,4,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T5,0,4,B,,290,VECTOR: bent-end label on the drawn line
+22,U,T1,0,5,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T13,0,6,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T14,0,6,B,,290,VECTOR: bent-end label on the drawn line
+22,U,T2,0,7,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T7,0,9,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T9,0,10,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T10,0,2,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T4,0,8,A,,290,VECTOR: bent-end label on the drawn line
+22,U,T6,0,8,B,,290,VECTOR: bent-end label on the drawn line
+22,U,T5,1,4,B,,290,"MATCHED: joint not readable on p.290; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,U,T5,2,4,B,,290,"MATCHED: joint not readable on p.290; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,U,T5,3,4,B,,290,"MATCHED: joint not readable on p.290; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,U,T5,4,4,B,,290,"MATCHED: joint not readable on p.290; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,U,T5,5,5,B,,290,"MATCHED: joint not readable on p.290; lane of all 6 cantilevers with the same anchor segments that read it (unanimous, consistent with this arm)"
+22,U,T6,1,?,B,,290,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,U,T6,2,?,B,,290,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,U,T6,3,?,B,,290,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,U,T6,4,?,B,,290,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,U,T6,5,?,B,,290,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+22,U,T12,1,1,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,2,1,A,-0.1,290,VECTOR: traced line at the joint
+22,U,T12,3,1,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,4,1,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,5,1,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,6,1,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,7,1,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,8,2,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,9,3,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,10,4,A,0.1,290,VECTOR: traced line at the joint
+22,U,T12,11,5,A,0.9,290,VECTOR: anchor lane = end of the traced line
+22,U,T10,1,2,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,2,2,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,3,2,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,4,2,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,5,2,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,6,2,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,7,3,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,8,4,A,0.1,290,VECTOR: traced line at the joint
+22,U,T10,9,5,A,0.9,290,VECTOR: anchor lane = end of the traced line
+22,U,T8,1,3,A,0.1,290,VECTOR: traced line at the joint
+22,U,T8,2,3,A,0.1,290,VECTOR: traced line at the joint
+22,U,T8,3,3,A,0.1,290,VECTOR: traced line at the joint
+22,U,T8,4,3,A,0.1,290,VECTOR: traced line at the joint
+22,U,T8,5,3,A,0.1,290,VECTOR: traced line at the joint
+22,U,T8,6,4,A,0.1,290,VECTOR: traced line at the joint
+22,U,T8,7,5,A,0.9,290,VECTOR: anchor lane = end of the traced line
+22,U,T3,1,4,A,0.1,290,VECTOR: traced line at the joint
+22,U,T3,2,4,A,0.1,290,VECTOR: traced line at the joint
+22,U,T3,3,5,A,1.0,290,VECTOR: anchor lane = end of the traced line
+22,U,T1,1,5,A,0.1,290,VECTOR: anchor lane = end of the traced line
+22,U,T13,1,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,2,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,3,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,4,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,5,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,6,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,7,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,8,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,9,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,10,6,A,0.1,290,VECTOR: traced line at the joint
+22,U,T13,11,7,A,0.0,290,VECTOR: traced line at the joint
+22,U,T13,12,7,A,0.0,290,VECTOR: anchor lane = end of the traced line
+22,U,T2,1,7,A,0.0,290,VECTOR: traced line at the joint
+22,U,T2,2,7,A,0.1,290,VECTOR: anchor lane = end of the traced line
+22,U,T4,1,8,A,0.1,290,VECTOR: traced line at the joint
+22,U,T4,2,8,A,0.0,290,VECTOR: traced line at the joint
+22,U,T4,3,8,A,0.1,290,VECTOR: traced line at the joint
+22,U,T4,4,7,A,-0.9,290,VECTOR: anchor lane = end of the traced line
+22,U,T7,1,9,A,0.1,290,VECTOR: traced line at the joint
+22,U,T7,2,9,A,0.0,290,VECTOR: traced line at the joint
+22,U,T7,3,9,A,0.1,290,VECTOR: traced line at the joint
+22,U,T7,4,9,A,0.0,290,VECTOR: traced line at the joint
+22,U,T7,5,8,A,0.0,290,VECTOR: traced line at the joint
+22,U,T7,6,7,A,-0.8,290,VECTOR: anchor lane = end of the traced line
+22,U,T9,1,10,A,0.1,290,VECTOR: traced line at the joint
+22,U,T9,2,10,A,0.0,290,VECTOR: traced line at the joint
+22,U,T9,3,10,A,0.1,290,VECTOR: traced line at the joint
+22,U,T9,4,10,A,0.0,290,VECTOR: traced line at the joint
+22,U,T9,5,10,A,0.0,290,VECTOR: traced line at the joint
+22,U,T9,6,9,A,0.0,290,VECTOR: traced line at the joint
+22,U,T9,7,8,A,0.0,290,VECTOR: traced line at the joint
+22,U,T9,8,7,A,-0.8,290,VECTOR: anchor lane = end of the traced line
+22,U,T11,1,11,A,0.1,290,VECTOR: traced line at the joint
+22,U,T11,2,11,A,0.0,290,VECTOR: traced line at the joint
+22,U,T11,3,11,A,0.1,290,VECTOR: traced line at the joint
+22,U,T11,4,11,A,0.0,290,VECTOR: traced line at the joint
+22,U,T11,5,11,A,0.0,290,VECTOR: traced line at the joint
+22,U,T11,6,11,A,0.0,290,VECTOR: traced line at the joint
+22,U,T11,7,10,A,0.0,290,VECTOR: traced line at the joint
+22,U,T11,8,9,A,0.0,290,VECTOR: traced line at the joint
+22,U,T11,9,8,A,0.0,290,VECTOR: traced line at the joint
+22,U,T11,10,7,A,-0.8,290,VECTOR: anchor lane = end of the traced line
+22,U,B2,12,7,C,,290,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,U,B3,12,6,C,,290,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,U,B4,12,5,C,,290,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,U,B5,12,4,C,,290,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,U,B6,12,3,C,,290,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,U,B7,12,2,C,,290,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,U,B1,12,1,C,,290,VECTOR: closure-end label on the drawn line (joint = closure end)
+22,U,B1,11,1,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B7,11,2,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B6,11,3,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B5,11,4,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B4,11,5,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B3,11,6,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B2,11,7,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B1,10,1,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B6,10,2,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B5,10,4,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B4,10,5,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B3,10,6,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B2,10,7,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B1,9,1,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B5,9,2,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B4,9,4,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B3,9,6,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B2,9,7,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B1,8,1,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B4,8,2,C,-0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B3,8,4,C,-0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B2,8,6,C,-0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B1,7,1,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B3,7,2,C,-0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B2,7,4,C,-0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B1,6,1,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B2,6,2,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+22,U,B1,5,2,C,0.0,290,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,T3,0,4,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T5,0,4,B,,291,VECTOR: bent-end label on the drawn line
+24,D,T12,0,1,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T8,0,3,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T1,0,5,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T13,0,6,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T14,0,6,B,,291,VECTOR: bent-end label on the drawn line
+24,D,T2,0,7,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T7,0,9,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T9,0,10,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T11,0,11,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T10,0,2,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T4,0,8,A,,291,VECTOR: bent-end label on the drawn line
+24,D,T6,0,8,B,,291,VECTOR: bent-end label on the drawn line
+24,D,T5,1,4,B,,291,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+24,D,T5,2,4,B,,291,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+24,D,T5,3,4,B,0.1,291,VECTOR: traced dashed line at the joint
+24,D,T5,4,4,B,0.1,291,VECTOR: traced dashed line at the joint
+24,D,T5,5,5,B,0.8,291,VECTOR: anchor lane = end of the traced dashed line
+24,D,T6,1,8,B,,291,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+24,D,T6,2,8,B,,291,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+24,D,T6,3,8,B,,291,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+24,D,T6,4,8,B,0.0,291,VECTOR: traced dashed line at the joint
+24,D,T6,5,7,B,-0.7,291,VECTOR: anchor lane = end of the traced dashed line
+24,D,T12,1,1,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,2,1,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,3,1,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,4,1,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,5,1,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,6,1,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,7,1,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,8,2,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,9,3,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,10,4,A,0.1,291,VECTOR: traced line at the joint
+24,D,T12,11,5,A,0.8,291,VECTOR: anchor lane = end of the traced line
+24,D,T10,1,2,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,2,2,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,3,2,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,4,2,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,5,2,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,6,2,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,7,3,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,8,4,A,0.1,291,VECTOR: traced line at the joint
+24,D,T10,9,5,A,0.8,291,VECTOR: anchor lane = end of the traced line
+24,D,T8,1,3,A,0.1,291,VECTOR: traced line at the joint
+24,D,T8,2,3,A,0.1,291,VECTOR: traced line at the joint
+24,D,T8,3,3,A,0.1,291,VECTOR: traced line at the joint
+24,D,T8,4,3,A,0.1,291,VECTOR: traced line at the joint
+24,D,T8,5,3,A,0.1,291,VECTOR: traced line at the joint
+24,D,T8,6,4,A,0.1,291,VECTOR: traced line at the joint
+24,D,T8,7,5,A,0.8,291,VECTOR: anchor lane = end of the traced line
+24,D,T3,1,4,A,0.1,291,VECTOR: traced line at the joint
+24,D,T3,2,4,A,0.1,291,VECTOR: traced line at the joint
+24,D,T3,3,5,A,0.8,291,VECTOR: anchor lane = end of the traced line
+24,D,T1,1,5,A,0.1,291,VECTOR: anchor lane = end of the traced line
+24,D,T13,1,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,2,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,3,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,4,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,5,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,6,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,7,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,8,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,9,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,10,6,A,0.1,291,VECTOR: traced line at the joint
+24,D,T13,11,7,A,0.0,291,VECTOR: traced line at the joint
+24,D,T13,12,7,A,0.0,291,VECTOR: anchor lane = end of the traced line
+24,D,T2,1,7,A,0.0,291,VECTOR: traced line at the joint
+24,D,T2,2,7,A,0.0,291,VECTOR: anchor lane = end of the traced line
+24,D,T4,1,8,A,0.0,291,VECTOR: traced line at the joint
+24,D,T4,2,8,A,0.0,291,VECTOR: traced line at the joint
+24,D,T4,3,8,A,0.0,291,VECTOR: traced line at the joint
+24,D,T4,4,7,A,-0.7,291,VECTOR: anchor lane = end of the traced line
+24,D,T7,1,9,A,0.0,291,VECTOR: traced line at the joint
+24,D,T7,2,9,A,0.0,291,VECTOR: traced line at the joint
+24,D,T7,3,9,A,0.0,291,VECTOR: traced line at the joint
+24,D,T7,4,9,A,0.0,291,VECTOR: traced line at the joint
+24,D,T7,5,8,A,0.0,291,VECTOR: traced line at the joint
+24,D,T7,6,7,A,-0.7,291,VECTOR: anchor lane = end of the traced line
+24,D,T9,1,10,A,0.0,291,VECTOR: traced line at the joint
+24,D,T9,2,10,A,0.0,291,VECTOR: traced line at the joint
+24,D,T9,3,10,A,0.0,291,VECTOR: traced line at the joint
+24,D,T9,4,10,A,0.0,291,VECTOR: traced line at the joint
+24,D,T9,5,10,A,0.0,291,VECTOR: traced line at the joint
+24,D,T9,6,9,A,0.0,291,VECTOR: traced line at the joint
+24,D,T9,7,8,A,0.1,291,VECTOR: traced line at the joint
+24,D,T9,8,7,A,,291,MATCHED: joint not readable on p.291; lane of the other arm of bent 24 (the arms agree at every joint both read)
+24,D,T11,1,11,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,2,11,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,3,11,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,4,11,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,5,11,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,6,11,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,7,10,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,8,9,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,9,8,A,0.0,291,VECTOR: traced line at the joint
+24,D,T11,10,7,A,-0.7,291,VECTOR: anchor lane = end of the traced line
+24,D,B2,12,7,C,,291,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,D,B3,12,6,C,,291,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,D,B4,12,5,C,,291,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,D,B5,12,4,C,,291,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,D,B6,12,3,C,,291,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,D,B7,12,2,C,,291,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,D,B1,12,1,C,,291,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,D,B1,11,1,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B7,11,2,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B6,11,3,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B5,11,4,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B4,11,5,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B3,11,6,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B2,11,7,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B1,10,1,C,-0.3,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B6,10,2,C,-0.2,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B5,10,4,C,-0.2,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B4,10,5,C,-0.2,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B3,10,6,C,-0.2,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B2,10,7,C,-0.2,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B1,9,1,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B5,9,2,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B4,9,4,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B3,9,6,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B2,9,7,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B1,8,1,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B4,8,2,C,-0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B3,8,4,C,-0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B2,8,6,C,-0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B1,7,1,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B3,7,2,C,-0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B2,7,4,C,-0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B1,6,1,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B2,6,2,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,D,B1,5,2,C,0.0,291,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,T11,0,11,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T9,0,10,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T7,0,9,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T2,0,7,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T13,0,6,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T14,0,6,B,,292,VECTOR: bent-end label on the drawn line
+24,U,T1,0,5,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T3,0,4,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T5,0,4,B,,292,VECTOR: bent-end label on the drawn line
+24,U,T8,0,3,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T12,0,1,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T10,0,2,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T4,0,8,A,,292,VECTOR: bent-end label on the drawn line
+24,U,T6,0,8,B,,292,VECTOR: bent-end label on the drawn line
+24,U,T5,1,4,B,,292,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+24,U,T5,2,4,B,,292,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+24,U,T5,3,4,B,0.1,292,VECTOR: traced dashed line at the joint
+24,U,T5,4,4,B,0.1,292,VECTOR: traced dashed line at the joint
+24,U,T5,5,5,B,0.8,292,VECTOR: anchor lane = end of the traced dashed line
+24,U,T6,1,?,B,,292,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+24,U,T6,2,?,B,,292,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+24,U,T6,3,?,B,,292,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+24,U,T6,4,?,B,,292,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+24,U,T6,5,?,B,,292,UNRESOLVED: the traced dashed line does not end at an anchor position (P1 / P2)
+24,U,T12,1,1,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,2,1,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,3,1,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,4,1,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,5,1,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,6,1,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,7,1,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,8,2,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,9,3,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,10,4,A,0.1,292,VECTOR: traced line at the joint
+24,U,T12,11,5,A,0.8,292,VECTOR: anchor lane = end of the traced line
+24,U,T10,1,2,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,2,2,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,3,2,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,4,2,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,5,2,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,6,2,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,7,3,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,8,4,A,0.1,292,VECTOR: traced line at the joint
+24,U,T10,9,5,A,0.8,292,VECTOR: anchor lane = end of the traced line
+24,U,T8,1,3,A,0.1,292,VECTOR: traced line at the joint
+24,U,T8,2,3,A,0.1,292,VECTOR: traced line at the joint
+24,U,T8,3,3,A,0.1,292,VECTOR: traced line at the joint
+24,U,T8,4,3,A,0.1,292,VECTOR: traced line at the joint
+24,U,T8,5,3,A,0.1,292,VECTOR: traced line at the joint
+24,U,T8,6,4,A,0.1,292,VECTOR: traced line at the joint
+24,U,T8,7,5,A,0.8,292,VECTOR: anchor lane = end of the traced line
+24,U,T3,1,4,A,0.1,292,VECTOR: traced line at the joint
+24,U,T3,2,4,A,0.1,292,VECTOR: traced line at the joint
+24,U,T3,3,5,A,0.8,292,VECTOR: anchor lane = end of the traced line
+24,U,T1,1,5,A,0.1,292,VECTOR: anchor lane = end of the traced line
+24,U,T13,1,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,2,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,3,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,4,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,5,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,6,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,7,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,8,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,9,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,10,6,A,0.1,292,VECTOR: traced line at the joint
+24,U,T13,11,7,A,0.0,292,VECTOR: traced line at the joint
+24,U,T13,12,7,A,0.0,292,VECTOR: anchor lane = end of the traced line
+24,U,T2,1,7,A,0.0,292,VECTOR: traced line at the joint
+24,U,T2,2,7,A,0.0,292,VECTOR: anchor lane = end of the traced line
+24,U,T4,1,8,A,0.0,292,VECTOR: traced line at the joint
+24,U,T4,2,8,A,0.0,292,VECTOR: traced line at the joint
+24,U,T4,3,8,A,0.0,292,VECTOR: traced line at the joint
+24,U,T4,4,7,A,-0.7,292,VECTOR: anchor lane = end of the traced line
+24,U,T7,1,9,A,0.0,292,VECTOR: traced line at the joint
+24,U,T7,2,9,A,0.0,292,VECTOR: traced line at the joint
+24,U,T7,3,9,A,0.0,292,VECTOR: traced line at the joint
+24,U,T7,4,9,A,0.0,292,VECTOR: traced line at the joint
+24,U,T7,5,8,A,0.0,292,VECTOR: traced line at the joint
+24,U,T7,6,7,A,-0.7,292,VECTOR: anchor lane = end of the traced line
+24,U,T9,1,10,A,0.0,292,VECTOR: traced line at the joint
+24,U,T9,2,10,A,0.0,292,VECTOR: traced line at the joint
+24,U,T9,3,10,A,0.0,292,VECTOR: traced line at the joint
+24,U,T9,4,10,A,0.0,292,VECTOR: traced line at the joint
+24,U,T9,5,10,A,0.0,292,VECTOR: traced line at the joint
+24,U,T9,6,9,A,0.0,292,VECTOR: traced line at the joint
+24,U,T9,7,8,A,0.1,292,VECTOR: traced line at the joint
+24,U,T9,8,7,A,-0.7,292,VECTOR: anchor lane = end of the traced line
+24,U,T11,1,11,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,2,11,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,3,11,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,4,11,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,5,11,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,6,11,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,7,10,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,8,9,A,0.0,292,VECTOR: traced line at the joint
+24,U,T11,9,8,A,0.1,292,VECTOR: traced line at the joint
+24,U,T11,10,7,A,-0.7,292,VECTOR: anchor lane = end of the traced line
+24,U,B2,12,7,C,,292,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,U,B3,12,6,C,,292,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,U,B4,12,5,C,,292,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,U,B5,12,4,C,,292,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,U,B6,12,3,C,,292,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,U,B7,12,2,C,,292,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,U,B1,12,1,C,,292,VECTOR: closure-end label on the drawn line (joint = closure end)
+24,U,B1,11,1,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B7,11,2,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B6,11,3,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B5,11,4,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B4,11,5,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B3,11,6,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B2,11,7,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B1,10,1,C,-0.3,292,"VECTOR: crossing at the joint, order kept from the closure (read +2 pt from the joint)"
+24,U,B6,10,2,C,-0.2,292,"VECTOR: crossing at the joint, order kept from the closure (read +2 pt from the joint)"
+24,U,B5,10,4,C,-0.2,292,"VECTOR: crossing at the joint, order kept from the closure (read +2 pt from the joint)"
+24,U,B4,10,5,C,-0.2,292,"VECTOR: crossing at the joint, order kept from the closure (read +2 pt from the joint)"
+24,U,B3,10,6,C,-0.2,292,"VECTOR: crossing at the joint, order kept from the closure (read +2 pt from the joint)"
+24,U,B2,10,7,C,-0.2,292,"VECTOR: crossing at the joint, order kept from the closure (read +2 pt from the joint)"
+24,U,B1,9,1,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B5,9,2,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B4,9,4,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B3,9,6,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B2,9,7,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B1,8,1,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B4,8,2,C,-0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B3,8,4,C,-0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B2,8,6,C,-0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B1,7,1,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B3,7,2,C,-0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B2,7,4,C,-0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B1,6,1,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B2,6,2,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+24,U,B1,5,2,C,0.0,292,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,T8,0,3,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T1,0,5,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T2,0,7,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T4,0,8,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T7,0,9,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T9,0,10,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T12,0,1,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T3,0,4,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T5,0,4,B,,293,VECTOR: bent-end label on the drawn line
+26,D,T13,0,6,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T14,0,6,B,,293,VECTOR: bent-end label on the drawn line
+26,D,T11,0,11,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T10,0,2,A,,293,VECTOR: bent-end label on the drawn line
+26,D,T5,1,4,B,,293,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+26,D,T5,2,4,B,,293,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+26,D,T5,3,4,B,0.1,293,VECTOR: traced dashed line at the joint
+26,D,T5,4,4,B,0.1,293,VECTOR: traced dashed line at the joint
+26,D,T5,5,5,B,0.8,293,VECTOR: anchor lane = end of the traced dashed line
+26,D,T12,1,1,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,2,1,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,3,1,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,4,1,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,5,1,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,6,1,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,7,1,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,8,2,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,9,3,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,10,4,A,0.1,293,VECTOR: traced line at the joint
+26,D,T12,11,5,A,0.8,293,VECTOR: anchor lane = end of the traced line
+26,D,T10,1,2,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,2,2,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,3,2,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,4,2,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,5,2,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,6,2,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,7,3,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,8,4,A,0.1,293,VECTOR: traced line at the joint
+26,D,T10,9,5,A,0.8,293,VECTOR: anchor lane = end of the traced line
+26,D,T8,1,3,A,0.1,293,VECTOR: traced line at the joint
+26,D,T8,2,3,A,0.1,293,VECTOR: traced line at the joint
+26,D,T8,3,3,A,0.1,293,VECTOR: traced line at the joint
+26,D,T8,4,3,A,0.1,293,VECTOR: traced line at the joint
+26,D,T8,5,3,A,0.1,293,VECTOR: traced line at the joint
+26,D,T8,6,4,A,0.1,293,VECTOR: traced line at the joint
+26,D,T8,7,5,A,0.8,293,VECTOR: anchor lane = end of the traced line
+26,D,T3,1,4,A,0.1,293,VECTOR: traced line at the joint
+26,D,T3,2,4,A,0.1,293,VECTOR: traced line at the joint
+26,D,T3,3,5,A,0.8,293,VECTOR: anchor lane = end of the traced line
+26,D,T1,1,5,A,0.1,293,VECTOR: anchor lane = end of the traced line
+26,D,T13,1,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,2,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,3,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,4,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,5,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,6,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,7,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,8,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,9,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,10,6,A,0.1,293,VECTOR: traced line at the joint
+26,D,T13,11,7,A,0.0,293,VECTOR: traced line at the joint
+26,D,T13,12,7,A,0.0,293,VECTOR: anchor lane = end of the traced line
+26,D,T2,1,7,A,0.0,293,VECTOR: traced line at the joint
+26,D,T2,2,7,A,0.0,293,VECTOR: anchor lane = end of the traced line
+26,D,T4,1,8,A,0.0,293,VECTOR: traced line at the joint
+26,D,T4,2,8,A,0.0,293,VECTOR: traced line at the joint
+26,D,T4,3,8,A,0.0,293,VECTOR: traced line at the joint
+26,D,T4,4,7,A,-0.7,293,VECTOR: anchor lane = end of the traced line
+26,D,T7,1,9,A,0.0,293,VECTOR: traced line at the joint
+26,D,T7,2,9,A,0.0,293,VECTOR: traced line at the joint
+26,D,T7,3,9,A,0.0,293,VECTOR: traced line at the joint
+26,D,T7,4,9,A,0.0,293,VECTOR: traced line at the joint
+26,D,T7,5,8,A,0.0,293,VECTOR: traced line at the joint
+26,D,T7,6,7,A,-0.7,293,VECTOR: anchor lane = end of the traced line
+26,D,T9,1,10,A,0.0,293,VECTOR: traced line at the joint
+26,D,T9,2,10,A,0.0,293,VECTOR: traced line at the joint
+26,D,T9,3,10,A,0.0,293,VECTOR: traced line at the joint
+26,D,T9,4,10,A,0.0,293,VECTOR: traced line at the joint
+26,D,T9,5,10,A,0.0,293,VECTOR: traced line at the joint
+26,D,T9,6,9,A,0.0,293,VECTOR: traced line at the joint
+26,D,T9,7,8,A,0.1,293,VECTOR: traced line at the joint
+26,D,T9,8,7,A,-0.7,293,VECTOR: anchor lane = end of the traced line
+26,D,T11,1,11,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,2,11,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,3,11,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,4,11,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,5,11,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,6,11,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,7,10,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,8,9,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,9,8,A,0.0,293,VECTOR: traced line at the joint
+26,D,T11,10,7,A,-0.7,293,VECTOR: anchor lane = end of the traced line
+26,D,B2,12,7,C,,293,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,D,B3,12,6,C,,293,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,D,B4,12,5,C,,293,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,D,B5,12,4,C,,293,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,D,B6,12,3,C,,293,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,D,B7,12,2,C,,293,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,D,B1,12,1,C,,293,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,D,B1,11,1,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B7,11,2,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B6,11,3,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B5,11,4,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B4,11,5,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B3,11,6,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B2,11,7,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B1,10,1,C,-0.3,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B6,10,2,C,-0.2,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B5,10,4,C,-0.2,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B4,10,5,C,-0.2,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B3,10,6,C,-0.2,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B2,10,7,C,-0.2,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B1,9,1,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B5,9,2,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B4,9,4,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B3,9,6,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B2,9,7,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B1,8,1,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B4,8,2,C,-0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B3,8,4,C,-0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B2,8,6,C,-0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B1,7,1,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B3,7,2,C,-0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B2,7,4,C,-0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B1,6,1,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B2,6,2,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,D,B1,5,2,C,0.0,293,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,T8,0,3,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T1,0,5,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T2,0,7,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T4,0,8,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T7,0,9,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T9,0,10,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T12,0,1,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T3,0,4,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T5,0,4,B,,294,VECTOR: bent-end label on the drawn line
+26,U,T13,0,6,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T14,0,6,B,,294,VECTOR: bent-end label on the drawn line
+26,U,T11,0,11,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T10,0,2,A,,294,VECTOR: bent-end label on the drawn line
+26,U,T5,1,4,B,,294,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+26,U,T5,2,4,B,,294,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+26,U,T5,3,4,B,0.1,294,VECTOR: traced dashed line at the joint
+26,U,T5,4,4,B,0.1,294,VECTOR: traced dashed line at the joint
+26,U,T5,5,5,B,0.8,294,VECTOR: anchor lane = end of the traced dashed line
+26,U,T12,1,1,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,2,1,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,3,1,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,4,1,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,5,1,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,6,1,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,7,1,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,8,2,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,9,3,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,10,4,A,0.1,294,VECTOR: traced line at the joint
+26,U,T12,11,5,A,0.8,294,VECTOR: anchor lane = end of the traced line
+26,U,T10,1,2,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,2,2,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,3,2,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,4,2,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,5,2,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,6,2,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,7,3,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,8,4,A,0.1,294,VECTOR: traced line at the joint
+26,U,T10,9,5,A,0.8,294,VECTOR: anchor lane = end of the traced line
+26,U,T8,1,3,A,0.1,294,VECTOR: traced line at the joint
+26,U,T8,2,3,A,0.1,294,VECTOR: traced line at the joint
+26,U,T8,3,3,A,0.1,294,VECTOR: traced line at the joint
+26,U,T8,4,3,A,0.1,294,VECTOR: traced line at the joint
+26,U,T8,5,3,A,0.1,294,VECTOR: traced line at the joint
+26,U,T8,6,4,A,0.1,294,VECTOR: traced line at the joint
+26,U,T8,7,5,A,0.8,294,VECTOR: anchor lane = end of the traced line
+26,U,T3,1,4,A,0.1,294,VECTOR: traced line at the joint
+26,U,T3,2,4,A,0.1,294,VECTOR: traced line at the joint
+26,U,T3,3,5,A,0.8,294,VECTOR: anchor lane = end of the traced line
+26,U,T1,1,5,A,0.1,294,VECTOR: anchor lane = end of the traced line
+26,U,T13,1,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,2,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,3,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,4,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,5,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,6,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,7,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,8,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,9,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,10,6,A,0.1,294,VECTOR: traced line at the joint
+26,U,T13,11,7,A,0.0,294,VECTOR: traced line at the joint
+26,U,T13,12,7,A,0.0,294,VECTOR: anchor lane = end of the traced line
+26,U,T2,1,7,A,0.0,294,VECTOR: traced line at the joint
+26,U,T2,2,7,A,0.0,294,VECTOR: anchor lane = end of the traced line
+26,U,T4,1,8,A,0.0,294,VECTOR: traced line at the joint
+26,U,T4,2,8,A,0.0,294,VECTOR: traced line at the joint
+26,U,T4,3,8,A,0.0,294,VECTOR: traced line at the joint
+26,U,T4,4,7,A,-0.7,294,VECTOR: anchor lane = end of the traced line
+26,U,T7,1,9,A,0.0,294,VECTOR: traced line at the joint
+26,U,T7,2,9,A,0.0,294,VECTOR: traced line at the joint
+26,U,T7,3,9,A,0.0,294,VECTOR: traced line at the joint
+26,U,T7,4,9,A,0.0,294,VECTOR: traced line at the joint
+26,U,T7,5,8,A,0.0,294,VECTOR: traced line at the joint
+26,U,T7,6,7,A,-0.7,294,VECTOR: anchor lane = end of the traced line
+26,U,T9,1,10,A,0.0,294,VECTOR: traced line at the joint
+26,U,T9,2,10,A,0.0,294,VECTOR: traced line at the joint
+26,U,T9,3,10,A,0.0,294,VECTOR: traced line at the joint
+26,U,T9,4,10,A,0.0,294,VECTOR: traced line at the joint
+26,U,T9,5,10,A,0.0,294,VECTOR: traced line at the joint
+26,U,T9,6,9,A,0.0,294,VECTOR: traced line at the joint
+26,U,T9,7,8,A,0.1,294,VECTOR: traced line at the joint
+26,U,T9,8,7,A,-0.7,294,VECTOR: anchor lane = end of the traced line
+26,U,T11,1,11,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,2,11,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,3,11,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,4,11,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,5,11,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,6,11,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,7,10,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,8,9,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,9,8,A,0.0,294,VECTOR: traced line at the joint
+26,U,T11,10,7,A,-0.7,294,VECTOR: anchor lane = end of the traced line
+26,U,B2,12,7,C,,294,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,U,B3,12,6,C,,294,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,U,B4,12,5,C,,294,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,U,B5,12,4,C,,294,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,U,B6,12,3,C,,294,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,U,B7,12,2,C,,294,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,U,B1,12,1,C,,294,VECTOR: closure-end label on the drawn line (joint = closure end)
+26,U,B1,11,1,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B7,11,2,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B6,11,3,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B5,11,4,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B4,11,5,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B3,11,6,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B2,11,7,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B1,10,1,C,-0.3,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B6,10,2,C,-0.2,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B5,10,4,C,-0.2,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B4,10,5,C,-0.2,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B3,10,6,C,-0.2,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B2,10,7,C,-0.2,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B1,9,1,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B5,9,2,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B4,9,4,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B3,9,6,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B2,9,7,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B1,8,1,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B4,8,2,C,-0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B3,8,4,C,-0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B2,8,6,C,-0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B1,7,1,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B3,7,2,C,-0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B2,7,4,C,-0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B1,6,1,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B2,6,2,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+26,U,B1,5,2,C,0.0,294,"VECTOR: crossing at the joint, order kept from the closure"
+28,D,T8,0,3,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T1,0,5,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T2,0,7,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T4,0,8,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T7,0,9,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T9,0,10,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T12,0,1,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T3,0,4,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T5,0,4,B,,295,VECTOR: bent-end label on the drawn line
+28,D,T13,0,6,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T14,0,6,B,,295,VECTOR: bent-end label on the drawn line
+28,D,T11,0,11,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T10,0,2,A,,295,VECTOR: bent-end label on the drawn line
+28,D,T5,1,4,B,,295,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+28,D,T5,2,4,B,,295,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+28,D,T5,3,4,B,0.1,295,VECTOR: traced dashed line at the joint
+28,D,T5,4,4,B,0.1,295,VECTOR: traced dashed line at the joint
+28,D,T5,5,5,B,0.8,295,VECTOR: anchor lane = end of the traced dashed line
+28,D,T12,1,1,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,2,1,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,3,1,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,4,1,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,5,1,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,6,1,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,7,1,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,8,2,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,9,3,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,10,4,A,0.1,295,VECTOR: traced line at the joint
+28,D,T12,11,5,A,0.8,295,VECTOR: anchor lane = end of the traced line
+28,D,T10,1,2,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,2,2,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,3,2,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,4,2,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,5,2,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,6,2,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,7,3,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,8,4,A,0.1,295,VECTOR: traced line at the joint
+28,D,T10,9,5,A,0.8,295,VECTOR: anchor lane = end of the traced line
+28,D,T8,1,3,A,0.1,295,VECTOR: traced line at the joint
+28,D,T8,2,3,A,0.1,295,VECTOR: traced line at the joint
+28,D,T8,3,3,A,0.1,295,VECTOR: traced line at the joint
+28,D,T8,4,3,A,0.1,295,VECTOR: traced line at the joint
+28,D,T8,5,3,A,0.1,295,VECTOR: traced line at the joint
+28,D,T8,6,4,A,0.1,295,VECTOR: traced line at the joint
+28,D,T8,7,5,A,0.8,295,VECTOR: anchor lane = end of the traced line
+28,D,T3,1,4,A,0.1,295,VECTOR: traced line at the joint
+28,D,T3,2,4,A,0.1,295,VECTOR: traced line at the joint
+28,D,T3,3,5,A,0.8,295,VECTOR: anchor lane = end of the traced line
+28,D,T1,1,5,A,0.1,295,VECTOR: anchor lane = end of the traced line
+28,D,T13,1,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,2,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,3,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,4,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,5,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,6,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,7,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,8,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,9,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,10,6,A,0.1,295,VECTOR: traced line at the joint
+28,D,T13,11,7,A,0.0,295,VECTOR: traced line at the joint
+28,D,T13,12,7,A,0.0,295,VECTOR: anchor lane = end of the traced line
+28,D,T2,1,7,A,0.0,295,VECTOR: traced line at the joint
+28,D,T2,2,7,A,0.0,295,VECTOR: anchor lane = end of the traced line
+28,D,T4,1,8,A,0.0,295,VECTOR: traced line at the joint
+28,D,T4,2,8,A,0.0,295,VECTOR: traced line at the joint
+28,D,T4,3,8,A,0.0,295,VECTOR: traced line at the joint
+28,D,T4,4,7,A,-0.7,295,VECTOR: anchor lane = end of the traced line
+28,D,T7,1,9,A,0.0,295,VECTOR: traced line at the joint
+28,D,T7,2,9,A,0.0,295,VECTOR: traced line at the joint
+28,D,T7,3,9,A,0.0,295,VECTOR: traced line at the joint
+28,D,T7,4,9,A,0.0,295,VECTOR: traced line at the joint
+28,D,T7,5,8,A,0.0,295,VECTOR: traced line at the joint
+28,D,T7,6,7,A,-0.7,295,VECTOR: anchor lane = end of the traced line
+28,D,T9,1,10,A,0.0,295,VECTOR: traced line at the joint
+28,D,T9,2,10,A,0.0,295,VECTOR: traced line at the joint
+28,D,T9,3,10,A,0.0,295,VECTOR: traced line at the joint
+28,D,T9,4,10,A,0.0,295,VECTOR: traced line at the joint
+28,D,T9,5,10,A,0.0,295,VECTOR: traced line at the joint
+28,D,T9,6,9,A,0.0,295,VECTOR: traced line at the joint
+28,D,T9,7,8,A,0.1,295,VECTOR: traced line at the joint
+28,D,T9,8,7,A,-0.7,295,VECTOR: anchor lane = end of the traced line
+28,D,T11,1,11,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,2,11,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,3,11,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,4,11,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,5,11,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,6,11,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,7,10,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,8,9,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,9,8,A,0.0,295,VECTOR: traced line at the joint
+28,D,T11,10,7,A,-0.7,295,VECTOR: anchor lane = end of the traced line
+28,U,T8,0,3,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T1,0,5,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T2,0,7,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T7,0,9,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T9,0,10,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T4,0,8,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T12,0,1,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T3,0,4,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T5,0,4,B,,296,VECTOR: bent-end label on the drawn line
+28,U,T13,0,6,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T14,0,6,B,,296,VECTOR: bent-end label on the drawn line
+28,U,T11,0,11,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T10,0,2,A,,296,VECTOR: bent-end label on the drawn line
+28,U,T5,1,4,B,,296,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+28,U,T5,2,4,B,,296,VECTOR: drawn over the row A line of its bent-end lane (dashed line joins it nearer the anchor)
+28,U,T5,3,4,B,0.1,296,VECTOR: traced dashed line at the joint
+28,U,T5,4,4,B,0.1,296,VECTOR: traced dashed line at the joint
+28,U,T5,5,5,B,1.1,296,VECTOR: anchor lane = end of the traced dashed line
+28,U,T12,1,1,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,2,1,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,3,1,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,4,1,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,5,1,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,6,1,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,7,1,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,8,2,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,9,3,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,10,4,A,0.1,296,VECTOR: traced line at the joint
+28,U,T12,11,5,A,0.9,296,VECTOR: anchor lane = end of the traced line
+28,U,T10,1,2,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,2,2,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,3,2,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,4,2,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,5,2,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,6,2,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,7,3,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,8,4,A,0.1,296,VECTOR: traced line at the joint
+28,U,T10,9,5,A,0.9,296,VECTOR: anchor lane = end of the traced line
+28,U,T8,1,3,A,0.1,296,VECTOR: traced line at the joint
+28,U,T8,2,3,A,0.1,296,VECTOR: traced line at the joint
+28,U,T8,3,3,A,0.1,296,VECTOR: traced line at the joint
+28,U,T8,4,3,A,0.1,296,VECTOR: traced line at the joint
+28,U,T8,5,3,A,0.1,296,VECTOR: traced line at the joint
+28,U,T8,6,4,A,0.1,296,VECTOR: traced line at the joint
+28,U,T8,7,5,A,0.9,296,VECTOR: anchor lane = end of the traced line
+28,U,T3,1,4,A,0.1,296,VECTOR: traced line at the joint
+28,U,T3,2,4,A,0.1,296,VECTOR: traced line at the joint
+28,U,T3,3,5,A,1.1,296,VECTOR: anchor lane = end of the traced line
+28,U,T1,1,5,A,0.1,296,VECTOR: anchor lane = end of the traced line
+28,U,T13,1,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,2,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,3,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,4,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,5,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,6,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,7,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,8,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,9,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,10,6,A,0.1,296,VECTOR: traced line at the joint
+28,U,T13,11,7,A,0.0,296,VECTOR: traced line at the joint
+28,U,T13,12,7,A,0.0,296,VECTOR: anchor lane = end of the traced line
+28,U,T2,1,7,A,0.0,296,VECTOR: traced line at the joint
+28,U,T2,2,7,A,0.0,296,VECTOR: anchor lane = end of the traced line
+28,U,T4,1,8,A,0.0,296,VECTOR: traced line at the joint
+28,U,T4,2,8,A,0.0,296,VECTOR: traced line at the joint
+28,U,T4,3,8,A,0.0,296,VECTOR: traced line at the joint
+28,U,T4,4,7,A,-1.0,296,VECTOR: anchor lane = end of the traced line
+28,U,T7,1,9,A,0.0,296,VECTOR: traced line at the joint
+28,U,T7,2,9,A,0.0,296,VECTOR: traced line at the joint
+28,U,T7,3,9,A,0.0,296,VECTOR: traced line at the joint
+28,U,T7,4,9,A,0.0,296,VECTOR: traced line at the joint
+28,U,T7,5,8,A,0.0,296,VECTOR: traced line at the joint
+28,U,T7,6,7,A,-0.8,296,VECTOR: anchor lane = end of the traced line
+28,U,T9,1,10,A,0.0,296,VECTOR: traced line at the joint
+28,U,T9,2,10,A,0.0,296,VECTOR: traced line at the joint
+28,U,T9,3,10,A,0.0,296,VECTOR: traced line at the joint
+28,U,T9,4,10,A,0.0,296,VECTOR: traced line at the joint
+28,U,T9,5,10,A,0.0,296,VECTOR: traced line at the joint
+28,U,T9,6,9,A,0.0,296,VECTOR: traced line at the joint
+28,U,T9,7,8,A,0.0,296,VECTOR: traced line at the joint
+28,U,T9,8,7,A,-0.8,296,VECTOR: anchor lane = end of the traced line
+28,U,T11,1,11,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,2,11,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,3,11,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,4,11,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,5,11,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,6,11,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,7,10,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,8,9,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,9,8,A,0.0,296,VECTOR: traced line at the joint
+28,U,T11,10,7,A,-1.0,296,VECTOR: anchor lane = end of the traced line
+19,D,B1,7,2,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+19,D,B1,8,1,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+19,D,B1,9,1,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+19,D,B1,10,1,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+19,D,B1,11,1,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+19,D,B1,12,1,C,-0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+19,D,B1,13,2,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+19,D,B2,8,2,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+19,D,B2,9,4,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+19,D,B2,10,4,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+19,D,B2,11,4,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+19,D,B2,12,4,C,-0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+19,D,B2,13,4,C,0.0,285,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+19,D,B3,9,2,C,0.0,285,VECTOR: end-span line traced from its start (segment 13) to its anchor in segment 9
+19,D,B3,10,2,C,0.0,285,VECTOR: end-span line traced from its start (segment 13) to its anchor in segment 9
+19,D,B3,11,2,C,0.0,285,VECTOR: end-span line traced from its start (segment 13) to its anchor in segment 9
+19,D,B3,12,2,C,-0.0,285,VECTOR: end-span line traced from its start (segment 13) to its anchor in segment 9
+28,U,B1,7,2,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+28,U,B1,8,1,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+28,U,B1,9,1,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+28,U,B1,10,1,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+28,U,B1,11,1,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+28,U,B1,12,1,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+28,U,B1,13,2,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 7
+28,U,B2,8,2,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+28,U,B2,9,4,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+28,U,B2,10,4,C,0.8,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+28,U,B2,11,4,C,0.3,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+28,U,B2,12,4,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+28,U,B2,13,4,C,0.0,296,VECTOR: end-span line traced from its start (end segment) to its anchor in segment 8
+28,U,B3,9,2,C,0.0,296,VECTOR: end-span line traced from its start (segment 13 (anchor block table; the drawn start symbol lies on a line B1 continues)) to its anchor in segment 9
+28,U,B3,10,2,C,0.0,296,VECTOR: end-span line traced from its start (segment 13 (anchor block table; the drawn start symbol lies on a line B1 continues)) to its anchor in segment 9
+28,U,B3,11,2,C,0.0,296,VECTOR: end-span line traced from its start (segment 13 (anchor block table; the drawn start symbol lies on a line B1 continues)) to its anchor in segment 9
+28,U,B3,12,2,C,0.0,296,VECTOR: end-span line traced from its start (segment 13 (anchor block table; the drawn start symbol lies on a line B1 continues)) to its anchor in segment 9
+19,U,B1,6,1,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B1,7,1,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B1,8,1,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B2,6,2,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B2,7,4,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B2,8,6,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B2,9,7,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B2,10,7,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B2,11,7,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B2,12,7,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B3,7,2,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B3,8,4,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,U,B4,8,2,C,,286,"TYPICAL: joint not readable on p.286; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B1,6,1,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B1,7,1,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B1,8,1,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B2,6,2,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B2,7,4,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B2,8,6,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B2,9,7,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B2,10,7,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B2,11,7,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B2,12,7,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B3,7,2,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B3,8,4,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B3,9,6,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B3,10,6,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B3,11,6,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B3,12,6,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+20,U,B4,8,2,C,,288,"TYPICAL: joint not readable on p.288; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,5,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,6,1,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,7,1,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,8,1,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,9,1,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,10,1,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,11,1,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B1,12,1,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B2,6,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B2,7,4,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B2,8,6,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B2,9,7,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B2,10,7,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B2,11,7,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B2,12,7,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B3,7,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B3,8,4,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B3,9,6,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B3,10,6,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B3,11,6,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B3,12,6,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B4,8,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B4,9,4,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B4,10,5,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B4,11,5,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B4,12,5,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B5,9,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B5,10,4,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B5,11,4,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B5,12,4,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B6,10,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B6,11,3,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B6,12,3,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B7,11,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+28,D,B7,12,2,C,,295,"TYPICAL: joint not readable on p.295; lane of the 7 fully read interior cantilevers (p.287, 289, 290, 291, 292, 293, 294), all identical"
+19,D,C1,13,10,A,0.1,285,VECTOR: plan solid line at joint 13 (x 263.0); elevation row A line
+19,D,C1,12,10,A,0.1,285,VECTOR: plan solid line at joint 12 (x 389.7; the line breaks at the joint and the next piece starts on lane 10); elevation row A line
+19,D,C1,11,8,A,0.1,285,VECTOR: plan line at joint 11 (x 516.5) after the lane 10 -> 8 move in segment 12 (P.I. circles at x 420.2 / 483.5); elevation still row A (row A -> B transition at x 574-616 inside segment 11)
+19,D,C1,10,8,B,0.1,285,"VECTOR: plan dashed line at joint 10 (x 643.1); elevation row B (moved A -> B in segment 11); anchor in segment 10 (end of the dashed line x 735.8, 106.5 in from CL = 3 in inboard of lane 8)"
+19,D,C2,13,8,B,0.1,285,VECTOR: plan dashed line at joint 13; elevation row B line
+19,D,C2,12,8,B,0.1,285,VECTOR: plan dashed line at joint 12; elevation row B line
+19,D,C2,11,8,B,0.1,285,"VECTOR: plan line at joint 11 (C1 solid drawn over it from segment 12 to x 571.6); elevation row B; anchor in segment 11 (plan kink x 571.6 -> 609.0 drawn solid, end 106.5 in from CL; elevation drop from row B at x 580.4 to the anchor)"
+28,U,C1,13,10,A,0.0,296,VECTOR: plan solid line at joint 13 (x 1922.6); elevation row A line
+28,U,C1,12,10,A,0.0,296,VECTOR: plan solid line at joint 12 (x 1796.6); elevation row A line
+28,U,C1,11,8,A,0.0,296,VECTOR: plan line at joint 11 (x 1670.7) after the lane 10 -> 8 move in segment 12 (P.I. circles ~x 1702 / 1765); elevation still row A (row A -> B transition at x 1573-1615 inside segment 11)
+28,U,C1,10,8,B,0.0,296,VECTOR: plan dashed line at joint 10 (x 1544.7); elevation row B (line from the U10 anchor at x 1451 starts on row B); anchor in segment 10
+28,U,C2,13,8,B,0.0,296,VECTOR: plan dashed line at joint 13; elevation row B line
+28,U,C2,12,8,B,0.0,296,VECTOR: plan dashed line at joint 12; elevation row B line
+28,U,C2,11,8,B,0.0,296,VECTOR: plan line at joint 11 (C1 solid drawn over it); elevation row B; anchor in segment 11 (elevation line from the anchor at x 1577 rises to row B at x 1617.5)

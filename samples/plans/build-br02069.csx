@@ -318,5 +318,8 @@ Print("UNRESOLVED (plan items not stated / not read):");
 foreach (var s in unresolved) Print("  " + s);
 Print("GAPS (program features missing; closest input used):");
 foreach (var s in gaps) Print("  GAP " + s);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "br02069" in sheet-links-br02069.json.
+{ const string pdf = @"C:\SBMData\Br02069_Certified Plans_20250926.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save();
 Print($"Saved {Doc.FilePath}");

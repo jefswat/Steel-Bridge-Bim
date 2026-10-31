@@ -223,7 +223,20 @@ public static class ModelPipeline
             File.Exists(db) ? (DatabaseUpToDate(db, model, inputs) ? $"{Path.GetFileName(db)} is newer than the model and its rules" : $"{Path.GetFileName(db)} is OLDER than the model / rules")
                             : $"no companion database ({Path.GetFileName(db)})",
             DatabaseUpToDate(db, model, inputs) ? null : "run `sbm pipeline <model.sbm>`");
+        AgentReviewStep(doc, rep);
         return rep;
+    }
+
+    /// <summary>Agent review without regeneration or writes: open flags keep the pipeline open (docs/AGENT-REVIEW.md).</summary>
+    private static void AgentReviewStep(SbmDocument doc, PipelineReport rep)
+    {
+        try
+        {
+            var r = AgentReview.Run(doc, new AgentReviewOptions { Regenerate = false, Record = false });
+            rep.Add("agent review", r.Open > 0 ? PipelineStepStatus.Unresolved : PipelineStepStatus.UpToDate, r.Summary,
+                r.Open > 0 ? "run `sbm review <model.sbm>` and resolve the open flags (or --confirm starting values that are right)" : null);
+        }
+        catch (Exception e) { rep.Add("agent review", PipelineStepStatus.Failed, e.Message); }
     }
 
     private static List<string> LinkInputs(string? links)
@@ -270,12 +283,12 @@ public static class ModelPipeline
         string? links = o.SheetIndex ? SheetIndexStep(doc, o, rep, Log) : CompanionDatabase.FindLinksFile(model, doc.Project.Bridges.Select(b => b.Name));
         if (!o.SheetIndex) rep.Add("sheet index", PipelineStepStatus.Skipped, "--no-index");
 
-        if (!o.Database) { rep.Add("database", PipelineStepStatus.Skipped, "--no-db"); return rep; }
+        if (!o.Database) { rep.Add("database", PipelineStepStatus.Skipped, "--no-db"); return Reviewed(doc, o, rep); }
         string db = CompanionDatabase.DefaultPath(model);
         if (!o.ForceDatabase && DatabaseUpToDate(db, model, LinkInputs(links)))
         {
             rep.Add("database", PipelineStepStatus.UpToDate, $"{Path.GetFileName(db)} is newer than the model and its link rules (--force-db rebuilds)");
-            return rep;
+            return Reviewed(doc, o, rep);
         }
         try
         {
@@ -291,6 +304,19 @@ public static class ModelPipeline
                 st == PipelineStepStatus.Done ? null : res.LinksFile == null ? "see the sheet index step" : "write link rules in " + Path.GetFileName(res.LinksFile));
         }
         catch (Exception ex) { rep.Add("database", PipelineStepStatus.Failed, ex.Message); }
+        return Reviewed(doc, o, rep);
+    }
+
+    /// <summary>Last pipeline step: the agent review (records PDF fingerprints, writes the database table agent_review).</summary>
+    private static PipelineReport Reviewed(SbmDocument doc, PipelineOptions o, PipelineReport rep)
+    {
+        try
+        {
+            var r = AgentReview.Run(doc, new AgentReviewOptions { Regenerate = o.Regenerate });
+            rep.Add("agent review", r.Open > 0 ? PipelineStepStatus.Unresolved : PipelineStepStatus.Done, r.Summary,
+                r.Open > 0 ? "run `sbm review <model.sbm>` and resolve the open flags (or --confirm starting values that are right)" : null);
+        }
+        catch (Exception e) { rep.Add("agent review", PipelineStepStatus.Failed, e.Message); }
         return rep;
     }
 

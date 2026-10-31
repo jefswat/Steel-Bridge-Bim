@@ -266,7 +266,7 @@ foreach (var (n, _) in bentSta)
     b.Pier = pier;
     sg.Bents.Add(b);
 }
-G("Piles: 284 x 36\" sq PS piles at 2:12 batter (p.251-253 layouts) - counts on the footings only, piles not modeled.");
+// Piles (284 x 36" sq PS, 2:12 batter, footing plans p.335-352) and the Detail C centring of footing / column / cap / bearings: misc-bonner-unit5.csx.
 
 // Tendons: pt-tendon-schedule.csv (S3-57 / 58), anchor segments cantilever-tendon-anchors.csv (DERIVED from plan labels p285-296).
 // Ducts (S3-35 p283, RASTER 140 dpi): top slab rows A (7 1/4" below the top) and B (9" lower), ducts 1-11 per half at 15'-8 1/2", 14'-11 1/2",
@@ -330,19 +330,22 @@ Tr(SegmentType.Closure, F(4), "TT", 2, 246.2);
 Tr(SegmentType.Closure, F(3, 6), "TT", 1, 123.1);
 Tr(SegmentType.BentHalf, 0, "F", 2, 245.6);
 Tr(SegmentType.End, 0, "E", 4, 492.4);
-U("p.278", "number of bent segments with transverse tendons F1 & F2 / vertical PT bars", "the S3-30 table lists 18 (and 9 for the longitudinal bars) while 10 cantilever bents have 20 split halves",
+U("p.278", "number of bent segments with transverse tendons F1 & F2", "the S3-30 table lists 18 (and 9 for the longitudinal bars) while 10 cantilever bents have 20 split halves",
   "Each of the 20 bent halves gets F1 & F2 (difference reported by the check).");
 
 // Plan items not modeled (GAP) and remaining open items.
-G("Temporary 1 3/4\" PT bars and their anchor blocks (p299-301, 313); bent segment vertical / longitudinal PT bars and end segment vertical bars (p272, 278) - not modeled.");
-G("Future PT pipes F1-F4 in the closure joint deviators (p308) and the deviator / anchor blocks (p297-302) - not modeled.");
-G("Shear keys, alignment keys, epoxy joints (p283) - joints are plain planes; mild reinforcing (p269-282) - not modeled.");
-G("Parapets / 2-bar metal rail (S3-75..83, cast after all PT), modular expansion joints at bents 18 / 29 (S2 / S4 sheets), lighting, access openings, survey blockouts - not modeled.");
-U("S2 / S4 sheets", "expansion joint gap and devices at bents 18 and 29", "the joint details are bound with the S2 / S4 drawings (not read)", "The end segments end at their derived faces; no joint.");
+G("Permanent bent PT bar pockets, temporary bar couplers (p278, 299) - not modeled; bent / end segment vertical and bent longitudinal PT bars built by details-bonner-unit5.csx (FixedBars) (erection bars joint to joint and D1-U1 + Type A / B / C blocks: details-bonner-unit5.csx).");
+G("Tendon lanes / deviations of every cantilever, continuity, closure and end-span tendon (p272, 285-298, 303-304) by details-bonner-unit5.csx; deviation blocks + pipes (p302), future PT pipes F1-F4 (p308), cantilever / continuity tendon lanes + anchor deviations (p285-297, 303) built by details-bonner-unit5.csx.");
+G("Shear keys, alignment keys, epoxy joints (p283) - joints are plain planes; mild reinforcing in every segment by rebar-bonner-unit5.csx (bars without counts / bill: UNRESOLVED list).");
+G("Navigational lights (channel station not given), box lighting conduit runs (shop drawings), hoist receptacles, platform clips / bolts, door hardware - not modeled (parapet, A.O. / T.A.O. / A.O.B. / bent diaphragm + utility openings by details-bonner-unit5.csx; piles, deck drains, modular joint envelopes / blockouts / end posts / cover plates, 2-bar metal rail, solar array platforms, nav light conduit sleeves, box girder luminaires / boxes / panels, access doors, vermin screens, vent holes, survey blockouts by misc-bonner-unit5.csx; inventory segmental-unit5/MISC-DATA.md).");
 sg.Unresolved.AddRange(unresolved);
 sg.Reported.AddRange(reported);
 br.Segmental = sg;
 Doc.Project.Bridges.Add(br);
+// Concrete details (blocks, openings, parapet) and the XX-D3 / XX-U3 typical segment bars (re-runnable on its own).
+{ var rr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", "details-bonner-unit5.csx"), Doc, new[] { "--no-regen" }); Print(rr.Output.TrimEnd()); if (!rr.Success) Print($"ERROR in details-bonner-unit5.csx: {rr.Error}"); }
+// Piles, bent centring (Detail C), deck drains, modular expansion joints (re-runnable on its own).
+{ var rr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", "misc-bonner-unit5.csx"), Doc, new[] { "--no-regen" }); Print(rr.Output.TrimEnd()); if (!rr.Success) Print($"ERROR in misc-bonner-unit5.csx: {rr.Error}"); }
 
 // ================================================================ 4. regenerate, save, report
 var rep = Doc.Regenerate();
@@ -350,8 +353,11 @@ Print($"Regenerated {rep.Bridges} bridge(s) in {rep.Elapsed.TotalSeconds:0.0} s;
 foreach (var e in rep.Errors) Print("ERROR " + e);
 var sm = Doc.Segmental(BridgeName);
 Print($"Segments {sm.Segments.Count}, tendons {sm.Tendons.Count}, bearings {sm.Bearings.Count}, bents with substructure {sm.Substructure?.Units.Count ?? 0}");
-Print($"Box concrete {sm.ConcreteVolume / Math.Pow(Ft(1), 3) / 27:0} CY");
+Print($"Box concrete {sm.ConcreteVolume / Math.Pow(Ft(1), 3) / 27:0} CY; blocks {sm.Blocks.Count} (+{sm.BlockVolume / Math.Pow(Ft(1), 3) / 27:0.0} CY), openings {sm.Openings.Count} (-{sm.OpeningVolume / Math.Pow(Ft(1), 3) / 27:0.0} CY), parapets {sm.ParapetVolume / Math.Pow(Ft(1), 3) / 27:0.0} CY, bars {sm.Bars.Count} placed / {sm.Marks.Sum(m => m.Count)} scheduled");
 Print("GAP (not modeled):");
 foreach (var g in gaps) Print("  " + g);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "b2500-s3" in sheet-links-bonner-unit5.json.
+{ const string pdf = @"C:\SBMData\B-2500 Bonner - Revision 3 Combined Plan Set - Unofficial.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save(outPath);
 Print($"Saved {outPath}");

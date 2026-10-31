@@ -9,11 +9,11 @@ using SBM.Core.Bridge;
 using SBM.Core.Steel;
 
 var inv = CultureInfo.InvariantCulture;
-int pass = 0, diff = 0, info = 0;
+int pass = 0, diff = 0, info = 0, conflict = 0;
 void Row(string kind, string item, string plan, string model, string note = "")
 {
-    if (kind == "PASS") pass++; else if (kind == "DIFF") diff++; else info++;
-    Print($"{kind,-5} {item}: plan {plan} | model {model}{(note == "" ? "" : " | " + note)}");
+    if (kind == "PASS") pass++; else if (kind == "DIFF") diff++; else if (kind == "CONFLICT") conflict++; else info++;
+    Print($"{kind,-8} {item}: plan {plan} | model {model}{(note == "" ? "" : " | " + note)}");
 }
 void Cmp(string item, double plan, double model, double tol, string unit, string note = "", int dec = 4)
 {
@@ -101,7 +101,7 @@ foreach (var pl in new[] { "N", "S" })
     Cmp($"{pl}: rigid suspenders L14-W14 / L14'-W14' (p.70 / p.71)", 2, C(TrussMemberRole.Hanger, pl), 0, "", dec: 0);
 }
 Cmp("floor beams 0 .. 22 .. 0' (p.72)", 45, C(TrussMemberRole.FloorBeam), 0, "", dec: 0);
-Cmp("stringers: 11 lines x 44 bays (p.72 / p.94)", 11 * 44, C(TrussMemberRole.Stringer), 0, "", dec: 0);
+Cmp("stringers: 11 lines x 12 continuous members (p.72 diagram: 2-span S13-S16 at each end, 4-span S9-S12 between the pavement breaks)", 11 * 12, C(TrussMemberRole.Stringer), 0, "", dec: 0);
 Cmp("rope suspenders 15 .. 22 .. 15' x 2 trusses (p.70 / p.94)", 30, tm.Suspenders.Count, 0, "", dec: 0);
 Cmp("shoes L0 / L11 / L11' / L0' x 2 trusses (p.73 / p.96)", 8, tm.Shoes.Count, 0, "", dec: 0);
 {
@@ -168,7 +168,7 @@ foreach (var s in tm.Shoes)
 foreach (var (pl, mk, pt) in new[] { ("N", "N-L0-L2", "L0"), ("N", "N-L2'-L0'", "L0'"), ("S", "S-L0-L2", "L0"), ("S", "S-L2'-L0'", "L0'") })
 {
     var sh = tm.Shoes.First(s => s.Name == $"{pl}-{pt}");
-    var ch = tm.Steel.Parts.First(p => p.Mark == mk);
+    var ch = tm.Steel.WholeMember(mk)!;
     double pinS = al.Inverse(sh.Pin.XY).Station;
     var ss = ch.Mesh.Positions.Select(v => al.Inverse(v.XY).Station).ToList();
     double past = (pt == "L0" ? pinS - ss.Min() : ss.Max() - pinS) / ft;
@@ -180,7 +180,7 @@ var sOff = bdef.Truss!.Floor!.Stringers.Select(s => s.Offset / ft).OrderBy(o => 
 Cmp("stringer lines (p.72: S13 S14 S15 S15 S15 S16 S15 S15 S15 S14 S13)", 11, sOff.Count, 0, "", dec: 0);
 Cmp("outside stringer S13 from the CL (p.85: 33'-0 + 6'-1; 10 in. outside the gutter, 4'-5 inside the truss)", 39 + 1.0 / 12, Math.Max(-sOff[0], sOff[^1]), 0.0005, " ft");
 {
-    var fb = tm.Steel.Parts.First(p => p.Mark == "FB1");
+    var fb = tm.Steel.WholeMember("FB1")!;
     double o1 = fb.Mesh.Positions.Max(v => al.Inverse(v.XY).Offset) / ft;
     Cmp("framed floor beam F6 end from the truss CL (p.85: floor beam finished at the inside face of the truss vertical, scaled 1'-2 3/4; built 1'-2 1/2)", 1 + 2.75 / 12, 43.5 - o1, 0.03, " ft", "end angles / connection material not built", 4);
 }
@@ -248,8 +248,57 @@ Print("--- 8b. gusset layers (plates per face, total thickness)");
     Row("INFO", "gusset plates (all layers)", "-", $"{gp.Count} plates, {gp.Sum(p => p.Mass) * 2.20462262:N0} lb ({gp.Where(p => System.Text.RegularExpressions.Regex.IsMatch(p.Mark, @"-[LR]\d$")).Sum(p => p.Mass) * 2.20462262:N0} lb in the outer layers)");
 }
 
+// 8b. bracing rivet counts per member END vs the p.71 diagrams (batch 5b; Note A: the detail sheets govern only where the diagram gives no number)
+{
+    var tdef = bdef.Truss!;
+    var defs = (tdef.BracingGussets ?? new()).Where(g => g.Label == "2-1/2 Pls." && g.Side == TrussBracingPlateSide.Both && g.Rivets != null).ToList();
+    var latM = tdef.Members.Where(m => m.System is "Upper laterals" or "Lower laterals" && m.Role != TrussMemberRole.Strut).ToList();
+    var strM = tdef.Members.Where(m => m.System is "Upper laterals" or "Lower laterals" && m.Role == TrussMemberRole.Strut && !m.Section.StartsWith("STRUT L")).ToList();
+    int Num(string sp) { var mm = System.Text.RegularExpressions.Regex.Match(sp, @"\d+"); return mm.Success ? int.Parse(mm.Value) : -1; }
+    string P(string sp) => sp[(sp.IndexOf(':') + 1)..];
+    (string cls, int? plan) Plan(TrussMemberDefinition m)
+    {
+        string a = P(m.From), b = P(m.To);
+        if (m.Role == TrussMemberRole.Strut)
+        {
+            int k = Num(a);
+            if (a.StartsWith("L13H")) return ("lower strut at L13 1/2", 46);
+            if (a.StartsWith("U")) return k == 22 ? ("upper strut U22", 16) : ("upper struts U12-U21", 40);
+            return k == 22 ? ("lower strut L22", 16) : k == 12 ? ("lower strut L12", 50) : k is 8 or 9 or 10 ? ("lower struts L8-L10", 46) : ("lower struts L1-L7, L16-L21", 40);
+        }
+        if (a.StartsWith("U")) return ("upper lateral diagonals", 26);
+        if (a.StartsWith("LM") && b.StartsWith("LM")) return ("lower CL lateral LM16-LM17", 26);
+        if (a.Contains("L13H") || b.StartsWith("LQ")) return ("lower double K L13 - L13 1/2", 28);
+        int kc = Num(a), ka = Num(b);
+        if (ka == kc - 1) return kc <= 8 ? ("lower diagonals L0-L8", 26) : kc <= 10 ? ("lower diagonals L8-L10", 32) : ("lower diagonals L10-L11", 36);
+        if (kc == 11) return ("lower diagonals L11-L12", 40);
+        if (kc == 12) return ("lower diagonals L12-L13 (no number on p.71; p.97 detail 24 per plate)", null);
+        if (kc == 15) return ("lower diagonals L15-L16", 38);
+        return ("lower diagonals L16-L22", 26);
+    }
+    foreach (var g in latM.Concat(strM).GroupBy(m => Plan(m).cls))
+    {
+        var plan = Plan(g.First()).plan;
+        // model: rivets per plate x 2 plates at each end that has a plate definition naming the member (apex: the strut through it is not an end)
+        var ends = g.SelectMany(m => new[] { m.From, m.To }.Select(sp => (m, sp))).ToList();
+        var vals = new List<int>();
+        foreach (var (m, sp) in ends)
+        {
+            string key = sp.Contains(":LM") || sp.Contains(":UM") ? "N:" + P(sp) : sp;
+            var d = defs.FirstOrDefault(x => x.Point == key && (x.Members.Count == 0 || x.Members.Contains(m.Name)));
+            if (d != null && d.Rivets!.TryGetValue(m.Name, out var c)) vals.Add(2 * c);
+        }
+        string model = vals.Count == 0 ? "no plate" : string.Join(" / ", vals.Distinct().OrderBy(v => v)) + $" per end ({vals.Count} ends)";
+        if (plan == null) Row("INFO", $"bracing rivets per end: {g.Key}", "-", model);
+        else Row(vals.Count > 0 && vals.All(v => v == plan || v == plan + 1) ? "PASS" : "DIFF", $"bracing rivets per end: {g.Key}", $"{plan} (p.71)", model, plan % 2 == 1 ? "odd count split over the two plates" : "");
+    }
+    Row("CONFLICT", "C02 bracing rivet counts: p.71 diagram vs the p.97 / p.98 detail drawings", "p.71: laterals 26 / struts 40 per end (special panels 28-50)",
+        "p.97 / p.98 details drawn with 20 (2-13[ 31.8) / 24 (2-13[ 50) per lateral and 18 per strut per plate", "Note A: the diagram governs where it gives a number; the model uses it");
+    Row("CONFLICT", "C01 wind chord top vs the suspended floor beam bottom", "p.69 wind chord CL elevations + 14 BP 73 half depth", "p.94 floor beam bottom ~0.3 in. lower (overlap)", "both kept as printed; floor lateral bottom plates sit 0.23 - 0.31 in. into the floor beam covers");
+}
+
 // 9. warnings
 var warns = rep.Warnings.Where(w => w.StartsWith(bdef.Name)).ToList();
 Print($"--- 9. {warns.Count} warnings ({warns.Count(w => w.Contains("UNRESOLVED"))} UNRESOLVED, {warns.Count(w => w.Contains("CHECK"))} CHECK)");
 foreach (var w in warns.Where(w => w.Contains("UNRESOLVED")).Take(60)) Print("  " + w);
-Print($"SUMMARY: {pass} PASS / {diff} DIFF / {info} INFO");
+Print($"SUMMARY: {pass} PASS / {diff} DIFF / {info} INFO / {conflict} CONFLICT");

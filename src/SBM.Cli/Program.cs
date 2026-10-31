@@ -30,10 +30,12 @@ public static partial class Program
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
           sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
                                                             [--for-check [--keep-designations]]  IFC for an independent checker: originator notes stripped
-                                                            [--3dm a.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7|8]]
+                                                            [--3dm a.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7|8] [--3dm-layers REGEX]]
                                                             Rhino 3DM: exact extrusions / B-reps, fastener blocks, bar and alignment
                                                             curves, layers per bridge, IFC GlobalIds as user text (IFC base point)
-          sbm 3dm-info <file.3dm> [--blocks]                Read a 3DM back: units, objects by layer / type, blocks, notes
+          sbm 3dm-info <file.3dm> [--blocks] [--objects [layer regex]]
+                                                            Read a 3DM back: units, objects by layer / type, blocks, notes;
+                                                            --objects: one row per object (type, closed, valid, volume, bounds)
           sbm db <file.sbm> [out.sqlite] [--pages] [--plans <folder>[,<folder>]] [--links rules.json] [--no-previews] [--no-vacuum]
                                                             [--for-check]  registry only: no sheet links, props text or model path
                                                             [--unused report.md]
@@ -46,6 +48,8 @@ public static partial class Program
                                                             inspections (element-level CS1-CS4, NBI/SNBI ratings, CSV import /
                                                             export), findings, calcs (summary pages, values, diff, apply).
                                                             "sbm asset <file.sbm> help" lists the commands
+          sbm <command> ... --lod 300[,Fasteners=200,...]   (any command: level of detail 100/200/300/350/400 per group Steel, Connections,
+                                                            Fasteners, Welds, Reinforcing, Prestressing; in memory only, never saved)
           sbm run <script.csx> [file.sbm] [--no-pipeline] [-- args...]
                                                             Run a C# script (globals: Doc, Print, Ft, In, Sta, Len); when the script
                                                             SAVES a model, `sbm pipeline` runs on it afterwards (--no-pipeline skips;
@@ -80,6 +84,20 @@ public static partial class Program
                                                             along the view direction; developed: x = station (alignment) or distance
                                                             along the girder, y = elevation, depth = offset (viewer on the right)
           sbm elevations <file.sbm> [bridge]              Step-by-step elevations, grade to bearing seat, at every bearing
+          sbm roads <file.sbm>                              Roadway corridors: course volumes, top areas, earthwork, clearances, diagnostics
+          sbm walls <file.sbm>                              Retaining walls: stem / footing volumes per panel, face area, diagnostics
+          sbm grading <file.sbm> [--at x,y]                 Grading: graded surface, cut / fill, protection; --at = finished ground at a point
+          sbm finished-ground <file.sbm> <out.xml> [--spacing L] [--margin L]
+                                                            Merged finished ground (roads > grading > existing ground) as one LandXML TIN on a
+                                                            grid (default 1 m spacing) over the civil items + margin (default 15 m)
+          sbm import-corridor <file.sbm> <landxml> [--alignment A] [--name ROAD] [--lines a,b,c*] [--courses Name:t:Material,...] [--template]
+                                                            Civil 3D corridor feature lines (PlanFeatures) -> a road built between the lines;
+                                                            --template = parametric Left / Right components when the offsets are constant
+          sbm utilities <file.sbm> [--profile <folder>] [--ve N] [--no-clash]
+                                                            Utility networks: structures (rim, sump, size, cone / frame), pipes (inverts,
+                                                            slope, cover), duct banks, hangers, LF by size, checks, clashes / clearances
+                                                            against the bridges / walls / roads / other networks; --profile = one DXF pipe
+                                                            profile per run (vertical exaggeration --ve, default 10). Import: sbm import-landxml
           sbm blocking <file.sbm> [bridge] [--all]          Camber / blocking per girder (key points; --all = every plan point)
           sbm drawings <file.sbm> <folder|file.zip> [bridge] [--zip]
                                                             2D DXF models: layout plan + elevation, plan, sections, bents, bar bending
@@ -99,6 +117,10 @@ public static partial class Program
                                                             distances, rebar); "sbm measure" alone lists the options. Never saves the model.
           sbm centerlines <file.sbm> [--bridge NAME] [--kind sub,part] [--category Column] [--csv f] [--json f] [--dxf f]
                                                             Geometric centerline + section centroid line of every element; "sbm centerlines" alone = help.
+          sbm crossframes <file.sbm> [--bridge NAME] [--csv f] [--twist] [--top L --depth L ...]
+                                                            Standard cross frame depth report, hole-shift table and twist (read-only); "sbm crossframes" alone = help.
+          sbm review <file.sbm> [--all] [--no-regen] [--confirm PATH] [--accept-pdf FILE]   agent review: PDFs attached / unchanged,
+                                                            sheets vs elements, inputs still at program starting values, generator flags
           sbm cable-stayed <file.sbm> [--json f] [--nodes f --members f] [--stays f]
                                                             Cable-stayed report (stays, first-cut forces, pylon balance, clearances) + analysis wireframe.
 
@@ -166,6 +188,13 @@ public static partial class Program
     public static async Task<int> Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
+        // global option: --lod <level[,Group=level...]> = level of detail of every model opened by this command, in memory only (never saved)
+        int li = Array.IndexOf(args, "--lod");
+        if (li >= 0 && li + 1 < args.Length)
+        {
+            SbmDocument.LodOverride = SbmDocument.ParseLod(args[li + 1]);
+            args = args.Take(li).Concat(args.Skip(li + 2)).ToArray();
+        }
         if (args.Length == 0 || args[0] is "-h" or "--help" or "help")
         {
             Console.WriteLine(Usage);
@@ -289,6 +318,13 @@ public static partial class Program
                     Console.WriteLine("  by type: " + string.Join(", ", s.ByType.Select(kv => $"{kv.Key} {kv.Value:N0}")));
                     foreach (var (layer, types) in s.ByLayer) Console.WriteLine($"  {layer}: " + string.Join(", ", types.Select(kv => $"{kv.Key} {kv.Value:N0}")));
                     if (args.Contains("--blocks")) foreach (var (b, n) in s.BlockUse) Console.WriteLine($"  block '{b}': {n:N0}");
+                    if (Array.IndexOf(args, "--objects") is int oi && oi > 0)
+                    {
+                        string? rx = oi + 1 < args.Length && !args[oi + 1].StartsWith("--") ? args[oi + 1] : null;
+                        Console.WriteLine("  layer\tname\tkind\ttype\tclosed\tvalid\tfaces\tvolume\tminX\tminY\tminZ\tmaxX\tmaxY\tmaxZ\tmodel_m3\telement\tnaked");
+                        foreach (var ob in SBM.IO.Rhino3dm.Rhino3dmInfo.Objects(args[1], rx))
+                            Console.WriteLine(FormattableString.Invariant($"  {ob.Layer}\t{ob.Name}\t{ob.Kind}\t{ob.Type}\t{ob.Closed}\t{ob.Valid}\t{ob.Faces}\t{ob.Volume:G9}\t{ob.MinX:F4}\t{ob.MinY:F4}\t{ob.MinZ:F4}\t{ob.MaxX:F4}\t{ob.MaxY:F4}\t{ob.MaxZ:F4}\t{ob.ModelVolumeM3}\t{ob.Element}\t{ob.Naked}"));
+                    }
                     foreach (var (k, v) in s.DocumentStrings) Console.WriteLine($"  {k} = {v}");
                     return 0;
                 }
@@ -332,7 +368,7 @@ public static partial class Program
                         var sw = System.Diagnostics.Stopwatch.StartNew();
                         var bl = Opt("--bridges")?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         var rr = doc.Export3dm(r3, bl, detail: !args.Contains("--no-detail"), meshOnly: args.Contains("--mesh-only"),
-                            terrain: args.Contains("--terrain"), barSolids: args.Contains("--bar-solids"), fileVersion: int.Parse(Opt("--3dm-version") ?? "8"), centerlines: args.Contains("--centerlines"), exactCurved: !args.Contains("--no-exact"));
+                            terrain: args.Contains("--terrain"), barSolids: args.Contains("--bar-solids"), fileVersion: int.Parse(Opt("--3dm-version") ?? "8"), centerlines: args.Contains("--centerlines"), exactCurved: !args.Contains("--no-exact"), layers: Opt("--3dm-layers"));
                         Console.WriteLine($"  Rhino 3DM ({rr.Units}) â†’ {r3}  ({rr.Elapsed.TotalSeconds:0.0} s export, {sw.Elapsed.TotalSeconds:0.0} s with the regeneration check, {new FileInfo(r3).Length / 1048576.0:0.0} MB, {rr.Objects:N0} objects: " +
                                           $"{rr.Extrusions:N0} extrusions, {rr.MiteredExtrusions:N0} mitered extrusions, {rr.ObliqueBreps:N0} oblique B-reps, {rr.NurbsBreps:N0} NURBS B-reps ({rr.NurbsBrepsClosed:N0} closed), {rr.PlanarBreps:N0} planar B-reps, {rr.ExactBodies:N0} beam bodies, {rr.Meshes:N0} meshes, " +
                                           $"{rr.Curves:N0} curves ({rr.CurveSegments:N0} pieces), {rr.BlockInstances:N0} block instances of {rr.BlockDefinitions:N0} blocks; {rr.Layers} layers, {rr.Fallbacks} fallbacks to mesh, {rr.DroppedSlivers:N0} sliver triangles left out)");
@@ -414,6 +450,201 @@ public static partial class Program
                     var chains = doc.BearingElevations(args.Length > 2 ? args[2] : null);
                     Console.Write(SBM.Core.Checks.ElevationCheck.ToText(chains, doc.Project.Units));
                     return chains.Any(c => c.Mismatch) ? 2 : 0;
+                }
+                case "roads":
+                {
+                    Need(args, 2);
+                    var doc = SbmDocument.Open(args[1]);
+                    var u = doc.Project.Units;
+                    double vol = u.IsUS ? 1 / 0.764554857984 : 1, area = u.IsUS ? 1 / 0.83612736 : 1;
+                    string vu = u.IsUS ? "CY" : "m3", au = u.IsUS ? "SY" : "m2";
+                    foreach (var rm in doc.Roads())
+                    {
+                        Console.WriteLine($"Road {rm.Definition.Name} ({rm.Definition.AlignmentName} {u.FormatStation(rm.Definition.BeginStation)} - {u.FormatStation(rm.Definition.EndStation)})");
+                        foreach (var g in rm.Parts.GroupBy(p => (p.Side, p.Component)))
+                            foreach (var p in g)
+                                Console.WriteLine($"  {g.Key.Side,-5} {g.Key.Component,-22} {(p.Course == "" ? "(section)" : p.Course),-18} {p.Material,-28} {p.Volume * vol,12:N2} {vu}");
+                        foreach (var (k, a) in rm.TopArea) Console.WriteLine($"  top area {k,-30} {a * area,12:N2} {au}");
+                        // section levels at the first, middle and last section: depth below the finished surface at the inner edge of each side
+                        foreach (var lv in rm.Levels.Where(l => l.Name != "finished grade"))
+                        {
+                            var fg = rm.Levels.FirstOrDefault(l => l.Side == lv.Side && l.Name == "finished grade");
+                            var secs = lv.Sections;
+                            if (secs.Count == 0) continue;
+                            var picks = new[] { secs[0], secs[secs.Count / 2], secs[^1] }.Distinct();
+                            Console.WriteLine($"  level {lv.Side,-5} {lv.Name,-30}" + string.Concat(picks.Select(x =>
+                            {
+                                // depth below the road's own finished surface at that offset (none beyond the template)
+                                var top = fg?.Sections.FirstOrDefault(f => Math.Abs(f.Station - x.Station) < 1e-9).Line;
+                                double? Fin(double o)
+                                {
+                                    if (top == null) return null;
+                                    for (int k = 0; k + 1 < top.Count; k++)
+                                    {
+                                        var (a0, z0) = top[k]; var (a1, z1) = top[k + 1];
+                                        double lo = Math.Min(a0, a1), hi = Math.Max(a0, a1);
+                                        if (hi - lo > 1e-9 && o >= lo - 1e-6 && o <= hi + 1e-6) return z0 + (z1 - z0) * (o - a0) / (a1 - a0);
+                                    }
+                                    return null;
+                                }
+                                string At((double o, double z) q) => $"EL {u.FormatLength(q.z, SBM.Core.Units.LengthKind.Coordinate)} at {(Math.Abs(q.o) < 1e-6 ? "CL" : u.FormatLength(Math.Abs(q.o)) + (q.o < 0 ? " LT" : " RT"))}"
+                                    + (Fin(q.o) is double f ? $" ({u.FormatLength(f - q.z)} below the finished surface)" : " (beyond the template)");
+                                return $"\n      {u.FormatStation(x.Station)}: {At(x.Line[0])} to {At(x.Line[^1])}";
+                            })));
+                        }
+                        if (rm.CutVolume is double cv && rm.FillVolume is double fv)
+                            Console.WriteLine($"  earthwork (to subgrade / placed subbase, average end areas): cut {cv * vol,12:N2} {vu}   fill {fv * vol,12:N2} {vu}");
+                        foreach (var c in rm.Clearances)
+                            Console.WriteLine($"  {c.Kind} clearance to {c.Bridge,-28} {u.FormatLength(c.Measured)} (required {(double.IsNaN(c.Required) ? "not given - UNRESOLVED" : u.FormatLength(c.Required))}) " +
+                                $"{(c.Ok switch { true => "OK", false => "CONFLICT", null => "" })} at {c.Element}");
+                        foreach (var dg in rm.Diagnostics) Console.WriteLine($"  {dg.Severity}: {dg.Message}");
+                    }
+                    if (doc.Project.Roads.Count == 0) Console.WriteLine("No roads in this model (BridgeProject.Roads).");
+                    return 0;
+                }
+                case "finished-ground":
+                {
+                    Need(args, 3);
+                    var doc = SbmDocument.Open(args[1]);
+                    string? FO(string n) { int i = Array.IndexOf(args, n); return i >= 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    double M(string? v, double dflt) => v == null ? dflt : doc.Project.Units.TryParseLength(v, SBM.Core.Units.LengthKind.Long, out double x) ? x : throw new ArgumentException("bad length " + v);
+                    double spacing = M(FO("--spacing"), 1.0), margin = M(FO("--margin"), 15.0);
+                    foreach (var m in doc.ExportFinishedGround(args[2], spacing, margin)) Console.WriteLine(m);
+                    return 0;
+                }
+                case "import-corridor":
+                {
+                    Need(args, 3);
+                    var doc = SbmDocument.Open(args[1]);
+                    string? CO(string n) { int i = Array.IndexOf(args, n); return i >= 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    string al = CO("--alignment") ?? doc.Project.Alignments.FirstOrDefault()?.Name ?? throw new ArgumentException("The model has no alignment.");
+                    var lines = CO("--lines")?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    // --courses "Surface:0.05:HMA,Base:0.25:Aggregate" (thicknesses in the display length unit)
+                    var courses = CO("--courses")?.Split(',').Select(c => c.Split(':')).Select(p => new SBM.Core.Road.RoadCourse
+                    {
+                        Name = p[0], Thickness = doc.Project.Units.TryParseLength(p.Length > 1 ? p[1] : "", SBM.Core.Units.LengthKind.Short, out double tk) ? tk : throw new ArgumentException($"--courses: bad thickness in '{string.Join(":", p)}'."), Material = p.Length > 2 ? p[2] : "",
+                    }).ToList();
+                    foreach (var m in doc.ImportCorridor(args[2], al, CO("--name"), lines, courses, args.Contains("--template"))) Console.WriteLine(m);
+                    doc.Save();
+                    return 0;
+                }
+                case "utilities":
+                {
+                    Need(args, 2);
+                    var doc = SbmDocument.Open(args[1]);
+                    var u = doc.Project.Units;
+                    string L(double m) => u.FormatLength(m);
+                    string E(double m) => double.IsNaN(m) ? "-" : u.FormatLength(m, SBM.Core.Units.LengthKind.Coordinate);
+                    string? UOpt(string n) { int i = Array.IndexOf(args, n); return i >= 0 && i + 1 < args.Length ? args[i + 1] : null; }
+                    string? profDir = UOpt("--profile");
+                    double ve = UOpt("--ve") is string ves ? double.Parse(ves, System.Globalization.CultureInfo.InvariantCulture) : 10;
+                    var nets = doc.Utilities(finish: !args.Contains("--no-clash"));
+                    var fgp = profDir != null ? doc.FinishedGround() : null;
+                    foreach (var um in nets)
+                    {
+                        var nd = um.Definition;
+                        Console.WriteLine($"Network {nd.Name} ({nd.System}{(nd.Owner.Length > 0 ? ", " + nd.Owner : "")}){(nd.Source.Length > 0 ? " - " + nd.Source : "")}");
+                        foreach (var s in um.Structures)
+                        {
+                            var sd = s.Definition;
+                            string size = sd.Shape == SBM.Core.Utility.UtilityStructureShape.Round ? $"{(double.IsNaN(sd.InnerDiameter) ? "?" : L(sd.InnerDiameter))} dia" : $"{(double.IsNaN(sd.InnerLength) ? "?" : L(sd.InnerLength))} x {(double.IsNaN(sd.InnerWidth) ? "?" : L(sd.InnerWidth))}";
+                            Console.WriteLine($"  structure {sd.Name,-14} {sd.Kind,-11} {size,-20} rim {E(s.Rim)} ({(s.RimSource.Length > 0 ? s.RimSource : "-")})  sump {E(s.Sump)}  depth {(double.IsNaN(s.Rim) || double.IsNaN(s.Sump) ? "-" : L(s.Rim - s.Sump))}{(s.IsBuilt ? "" : "  NOT BUILT")}");
+                        }
+                        foreach (var p in um.Pipes)
+                        {
+                            var pd = p.Definition;
+                            string size = pd.Shape == SBM.Core.Utility.UtilityPipeShape.Circular ? L(pd.InnerDiameter) + " dia" : $"{L(pd.InnerRise)} x {L(pd.InnerSpan)} {pd.Shape}";
+                            Console.WriteLine($"  pipe      {pd.Name,-14} {pd.From,-10} -> {pd.To,-10} {size,-18} {pd.Material,-8} L {L(p.Length)}  inv {E(p.Start.Z)} / {E(p.End.Z)}  slope {p.Slope * 100:0.###} %  cover {(p.MinCover is double c ? L(c) : "-")}");
+                        }
+                        foreach (var g in um.Pipes.GroupBy(p => (p.Definition.Shape, p.Definition.InnerDiameter, p.Definition.InnerRise, p.Definition.InnerSpan, p.Definition.Material)))
+                        {
+                            var f = g.First().Definition;
+                            string size = f.Shape == SBM.Core.Utility.UtilityPipeShape.Circular ? L(f.InnerDiameter) : $"{L(f.InnerRise)} x {L(f.InnerSpan)}";
+                            double len = g.Sum(p => p.Length);
+                            Console.WriteLine($"  quantity  {f.Shape} {size} {f.Material}: {(u.IsUS ? len / 0.3048 : len):N1} {(u.IsUS ? "LF" : "m")}");
+                        }
+                        foreach (var b in um.DuctBanks)
+                            Console.WriteLine($"  duct bank {b.Definition.Name,-14} {b.Definition.From,-10} -> {b.Definition.To,-10} {b.Definition.Rows} x {b.Definition.Columns} @ {L(b.Definition.ConduitDiameter)}  encasement {L(b.Definition.Width)} x {L(b.Definition.Height)}  L {L(b.Length)}  bottom {E(b.Start.Z)} / {E(b.End.Z)}  concrete {b.ConcreteVolume:0.###} m3");
+                        foreach (var hg in um.Hangers.GroupBy(h => h.Pipe))
+                            Console.WriteLine($"  hangers   {hg.Key.Definition.Name,-14} {hg.Count()} from {hg.Key.Definition.Hangers!.Bridge}, rods {L(hg.Min(h => h.Length))} - {L(hg.Max(h => h.Length))}{(hg.Any(h => h.Mesh.IsEmpty) ? " (rods not built: no diameter)" : "")}");
+                        foreach (var g in um.Structures.Where(s => s.IsBuilt).GroupBy(s => s.Definition.Kind))
+                            Console.WriteLine($"  quantity  {g.Key}: {g.Count()} EA");
+                        foreach (var g in um.Structures.SelectMany(s => s.Parts).Where(p => p.Kind != "cone").GroupBy(p => p.Kind))
+                            Console.WriteLine($"  quantity  {g.Key}: {g.Count()} EA");
+                        if (um.DuctBanks.Count > 0) Console.WriteLine($"  quantity  conduit: {(u.IsUS ? um.DuctBanks.Sum(b => b.ConduitLength) / 0.3048 : um.DuctBanks.Sum(b => b.ConduitLength)):N1} {(u.IsUS ? "LF" : "m")}, encasement {um.DuctBanks.Sum(b => b.ConcreteVolume) * (u.IsUS ? 1.30795 : 1):N2} {(u.IsUS ? "CY" : "m3")}");
+                        foreach (var c in um.Clashes)
+                            Console.WriteLine($"  {c.Kind,-9} {c.Element} x {c.OtherKind} {c.Other}: {(c.Overlap ? "overlap " : "clear ")}{L(c.Value)}{(c.Overlap ? "" : ", required " + L(c.Required))}");
+                        if (profDir != null)
+                        {
+                            Directory.CreateDirectory(profDir);
+                            foreach (var run in SBM.Core.Drawing.Views.UtilityProfileViews.Runs(um))
+                            {
+                                var dwg = SBM.Core.Drawing.Views.UtilityProfileViews.Profile(run, p => fgp!.Query(p), u, ve);
+                                string fn = Path.Combine(profDir, string.Concat(run.Name.Split(':')[0].Select(ch => Path.GetInvalidFileNameChars().Contains(ch) || ch == ' ' ? '_' : ch)) + ".dxf");
+                                SBM.IO.Dxf.DxfWriter.Write(fn, dwg, 1, flat: true);
+                                Console.WriteLine($"  profile   {run.Name} -> {fn}");
+                            }
+                        }
+                        foreach (var dg in um.Diagnostics) Console.WriteLine($"  {dg.Severity}: {dg.Message}");
+                    }
+                    if (doc.Project.Utilities.Count == 0) Console.WriteLine("No utility networks in this model (BridgeProject.Utilities).");
+                    return 0;
+                }
+                case "grading":
+                {
+                    Need(args, 2);
+                    var doc = SbmDocument.Open(args[1]);
+                    var u = doc.Project.Units;
+                    double vol = u.IsUS ? 1 / 0.764554857984 : 1, area = u.IsUS ? 1 / 0.09290304 : 1;
+                    string vu = u.IsUS ? "CY" : "m3", au = u.IsUS ? "SF" : "m2";
+                    foreach (var gm in doc.Gradings())
+                    {
+                        var gd = gm.Definition;
+                        Console.WriteLine($"Grading {gd.Name} ({(gd.Closed ? "closed" : "open")}, {gd.Points.Count} points{(gd.AlignmentName.Length > 0 ? ", on " + gd.AlignmentName : "")})");
+                        if (gm.IsBuilt)
+                            Console.WriteLine($"  surface {gm.SurfaceArea * area:N0} {au}   cut {(gm.CutVolume is double c ? (c * vol).ToString("N1") : "-")} {vu}   fill {(gm.FillVolume is double f ? (f * vol).ToString("N1") : "-")} {vu}");
+                        foreach (var p in gm.Protection)
+                            Console.WriteLine($"  {p.Name}: {p.Area * area:N0} {au}, {u.FormatLength(p.Definition.Thickness)} thick, {p.Volume * vol:N1} {vu}");
+                        foreach (var dg in gm.Diagnostics) Console.WriteLine($"  {dg.Severity}: {dg.Message}");
+                    }
+                    if (doc.Project.Gradings.Count == 0) Console.WriteLine("No grading in this model (BridgeProject.Gradings).");
+                    // OPTIONAL: --at x,y (project meters) = finished ground there and the layer it came from
+                    int at = Array.IndexOf(args, "--at");
+                    if (at > 0 && at + 1 < args.Length)
+                    {
+                        var xy = args[at + 1].Split(',').Select(s => double.Parse(s, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+                        var (z, src) = doc.FinishedGround().Query(new SBM.Core.Geometry.Vec2(xy[0], xy[1]));
+                        Console.WriteLine(z is double zz ? $"Finished ground at {xy[0]:0.###},{xy[1]:0.###}: {u.FormatLength(zz)} ({src})" : "No surface covers that point.");
+                    }
+                    return 0;
+                }
+                case "walls":
+                {
+                    Need(args, 2);
+                    var doc = SbmDocument.Open(args[1]);
+                    var u = doc.Project.Units;
+                    double vol = u.IsUS ? 1 / 0.764554857984 : 1, area = u.IsUS ? 1 / 0.09290304 : 1;
+                    string vu = u.IsUS ? "CY" : "m3", au = u.IsUS ? "SF" : "m2";
+                    foreach (var wm in doc.Walls())
+                    {
+                        var wd = wm.Definition;
+                        Console.WriteLine($"Wall {wd.Name} ({wd.AlignmentName} {u.FormatStation(wd.BeginStation)} - {u.FormatStation(wd.EndStation)}, offset {u.FormatLength(wd.Offset)})");
+                        if (wm.IsMse)
+                        {
+                            foreach (var g in wm.Elements.GroupBy(e => e.Role))
+                                Console.WriteLine($"  {g.Key,-15} {g.Count(),5} element(s)   {g.Sum(e => e.Volume) * vol,10:N2} {vu}" +
+                                    (g.Any(e => !double.IsNaN(e.Length)) ? $"   lengths {string.Join(", ", g.Where(e => !double.IsNaN(e.Length)).Select(e => u.FormatLength(e.Length)).Distinct().Take(8))}" : ""));
+                            Console.WriteLine($"  exposed face {wm.FaceArea * area:N0} {au}");
+                        }
+                        else
+                        foreach (var p in wm.Panels)
+                            Console.WriteLine($"  panel {p.Index,-3} {u.FormatStation(p.FromStation)} - {u.FormatStation(p.ToStation)}   stem {p.StemVolume * vol,10:N2} {vu}   footing {p.FootingVolume * vol,10:N2} {vu}");
+                        if (!wm.IsMse && wm.Panels.Count > 0)
+                            Console.WriteLine($"  total stem {wm.StemVolume * vol:N2} {vu}, footing {wm.FootingVolume * vol:N2} {vu}, exposed face above the footing top {wm.FaceArea * area:N0} {au}");
+                        foreach (var dg in wm.Diagnostics) Console.WriteLine($"  {dg.Severity}: {dg.Message}");
+                    }
+                    if (doc.Project.Walls.Count == 0) Console.WriteLine("No retaining walls in this model (BridgeProject.Walls).");
+                    return 0;
                 }
                 case "blocking":
                 {
@@ -511,8 +742,12 @@ public static partial class Program
                     return MeasureCommand.Measure(args);
                 case "centerlines":
                     return CenterlinesCommand.Run(args);
+                case "crossframes":
+                    return CrossFramesCommand.Run(args);
                 case "cable-stayed":
                     return CableStayedCommand.Run(args);
+                case "review":
+                    return ReviewCommand.Run(args);
                 case "section":
                     if (args.Length < 3) { Console.WriteLine(MeasureCommand.Help); return args.Length < 2 ? 1 : 0; }
                     return MeasureCommand.Section(args);

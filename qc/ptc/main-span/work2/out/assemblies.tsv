@@ -1,0 +1,53 @@
+TRUSS-N	TrussLine	Main truss spans 18-20 - truss line N
+TRUSS-S	TrussLine	Main truss spans 18-20 - truss line S
+FLOOR	TrussFloor	Main truss spans 18-20 - floor system
+BR-UPPER-LATERALS	TrussBracing	Main truss spans 18-20 - Upper laterals
+BR-PORTALS	TrussBracing	Main truss spans 18-20 - Portals
+BR-LOWER-LATERALS	TrussBracing	Main truss spans 18-20 - Lower laterals
+BR-SWAY-FRAMES	TrussBracing	Main truss spans 18-20 - Sway frames
+BR-FLOOR-LATERALS	TrussBracing	Main truss spans 18-20 - Floor laterals
+DAM-DAM-PIER-20	ExpansionJoint	finger expansion dam dam Pier 20 (p.91)
+DAM-DAM-W22	ExpansionJoint	finger expansion dam dam W22 (p.92)
+WALKWAYS	InspectionWalkway	PTC Arch truss 18-20 - service walkways (p.106)
+PLATFORMS	InspectionWalkway	PTC Arch truss 18-20 - inspection platforms (p.104)
+LADDERS	InspectionWalkway	PTC Arch truss 18-20 - safety ladders (p.103, p.104)
+SUSP-N15	TrussSuspender	Main truss spans 18-20 - suspender N15 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S15	TrussSuspender	Main truss spans 18-20 - suspender S15 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N16	TrussSuspender	Main truss spans 18-20 - suspender N16 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S16	TrussSuspender	Main truss spans 18-20 - suspender S16 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N17	TrussSuspender	Main truss spans 18-20 - suspender N17 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S17	TrussSuspender	Main truss spans 18-20 - suspender S17 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N18	TrussSuspender	Main truss spans 18-20 - suspender N18 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S18	TrussSuspender	Main truss spans 18-20 - suspender S18 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N19	TrussSuspender	Main truss spans 18-20 - suspender N19 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S19	TrussSuspender	Main truss spans 18-20 - suspender S19 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N20	TrussSuspender	Main truss spans 18-20 - suspender N20 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S20	TrussSuspender	Main truss spans 18-20 - suspender S20 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N21	TrussSuspender	Main truss spans 18-20 - suspender N21 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S21	TrussSuspender	Main truss spans 18-20 - suspender S21 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N22	TrussSuspender	Main truss spans 18-20 - suspender N22 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S22	TrussSuspender	Main truss spans 18-20 - suspender S22 (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N15'	TrussSuspender	Main truss spans 18-20 - suspender N15' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S15'	TrussSuspender	Main truss spans 18-20 - suspender S15' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N16'	TrussSuspender	Main truss spans 18-20 - suspender N16' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S16'	TrussSuspender	Main truss spans 18-20 - suspender S16' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N17'	TrussSuspender	Main truss spans 18-20 - suspender N17' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S17'	TrussSuspender	Main truss spans 18-20 - suspender S17' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N18'	TrussSuspender	Main truss spans 18-20 - suspender N18' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S18'	TrussSuspender	Main truss spans 18-20 - suspender S18' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N19'	TrussSuspender	Main truss spans 18-20 - suspender N19' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S19'	TrussSuspender	Main truss spans 18-20 - suspender S19' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N20'	TrussSuspender	Main truss spans 18-20 - suspender N20' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S20'	TrussSuspender	Main truss spans 18-20 - suspender S20' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-N21'	TrussSuspender	Main truss spans 18-20 - suspender N21' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SUSP-S21'	TrussSuspender	Main truss spans 18-20 - suspender S21' (1 x 4" rope, 4" bridge rope, breaking strength 730 T (p.70))
+SHOE-N-L0	Bearing	Expansion shoe N-L0 (L0) at Pier 17 main brg
+SHOE-N-L0'	Bearing	Expansion shoe N-L0' (L0') at Pier 20 main brg
+SHOE-N-L11	Bearing	Fixed shoe N-L11 (L11) at Pier 18
+SHOE-N-L11'	Bearing	Expansion shoe N-L11' (L11') at Pier 19
+SHOE-S-L0	Bearing	Expansion shoe S-L0 (L0) at Pier 17 main brg
+SHOE-S-L0'	Bearing	Expansion shoe S-L0' (L0') at Pier 20 main brg
+SHOE-S-L11	Bearing	Fixed shoe S-L11 (L11) at Pier 18
+SHOE-S-L11'	Bearing	Expansion shoe S-L11' (L11') at Pier 19
+RAIL-LEFT-PARAPET-RAILING	Railing	PTC aluminum parapet railing (p.107 / p.108) Left parapet railing, 1364'-0" along the reference line 40'-8" left of the alignment
+RAIL-RIGHT-PARAPET-RAILING	Railing	PTC aluminum parapet railing (p.107 / p.108) Right parapet railing, 1364'-0" along the reference line 40'-8" right of the alignment

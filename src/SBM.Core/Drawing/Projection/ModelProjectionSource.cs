@@ -55,12 +55,15 @@ public static class ModelLayers
         ("3D-CS-PYLON", 240, 240, 240, new[] { PartCategory.Pylon, PartCategory.PylonCrossBeam, PartCategory.PylonStrut }),
         ("3D-CS-STAYS", 215, 215, 225, new[] { PartCategory.StayCable }),
         ("3D-CS-DECK", 220, 160, 50, new[] { PartCategory.CsDeck }),
+        ("3D-CS-FLOORBEAMS", 90, 150, 210, new[] { PartCategory.CsFloorbeamPlate, PartCategory.CsStringerPlate }),
+        ("3D-CS-ANCHORAGES", 235, 150, 70, new[] { PartCategory.StayAnchorPipe, PartCategory.StayAnchorPlate }),
+        ("3D-CS-PYLON-ANCHORAGES", 235, 150, 70, new[] { PartCategory.PylonAnchorPlate, PartCategory.PylonGuidePipe }),
     };
 
     private static readonly Dictionary<string, (byte r, byte g, byte b)> Colors = new()
     {
         ["3D-UNRESOLVED-STEEL"] = (255, 110, 40), ["3D-BOLTS"] = (220, 220, 225), ["3D-RIVETS"] = (205, 190, 175), ["3D-STUDS"] = (200, 200, 160), ["3D-ANCHOR-BOLTS"] = (180, 160, 120),
-        ["3D-DECK"] = (180, 180, 172), ["3D-BARRIER"] = (190, 190, 182), ["3D-JOINTS"] = (230, 140, 40), ["3D-SEGMENTS"] = (205, 200, 186),
+        ["3D-DECK"] = (180, 180, 172), ["3D-DECK-PANELS"] = (190, 188, 178), ["3D-DECK-CLOSURES"] = (150, 140, 120), ["3D-BARRIER"] = (190, 190, 182), ["3D-JOINTS"] = (230, 140, 40), ["3D-SEGMENTS"] = (205, 200, 186),
         ["3D-UNRESOLVED-SEGMENTS"] = (255, 110, 40), ["3D-SEGMENTAL-BEARINGS"] = (140, 140, 150), ["3D-PS-GIRDERS"] = (205, 200, 186),
         ["3D-BEARING-SOLE-PLATES"] = (140, 145, 155), ["3D-DIAPHRAGMS"] = (188, 186, 176), ["3D-DIAPHRAGM-FILLERS"] = (235, 232, 200),
         ["3D-UNRESOLVED-DIAPHRAGMS"] = (255, 110, 40), ["3D-SUB-CAP"] = (196, 190, 176), ["3D-SUB-PEDESTAL"] = (214, 196, 160), ["3D-SUB-COLUMN"] = (186, 182, 170),
@@ -225,8 +228,14 @@ public static class ModelProjectionSource
             Add(concrete.Deck, "3D-DECK", "deck", "Deck", "Deck slab", concrete);
             Add(concrete.Haunches, "3D-DECK", "haunches", "Deck", "Haunches", concrete);
             foreach (var b in concrete.DeckBumps) Add(b.Mesh, "3D-DECK", "deck/" + b.Name, "Deck", b.Name, b);
+            foreach (var dp in concrete.DeckParts) Add(dp.Mesh, dp.IsPanel ? "3D-DECK-PANELS" : "3D-DECK-CLOSURES", "deck/" + dp.Name, "Deck", dp.Name, dp);
             foreach (var ch in concrete.CapHaunches) Add(ch.Mesh, "3D-DECK", "deck/" + ch.Name, "Deck", ch.Name, ch);
             foreach (var b in concrete.Barriers) Add(b.Mesh, "3D-BARRIER", "barrier/" + b.Name, "Barrier", b.Name, b);
+            foreach (var a in concrete.ApproachSlabs)
+            {
+                Add(a.Mesh, "3D-APPROACH-SLABS", "approach/" + a.Name, "Deck", a.Name, a);
+                Add(a.Sleeper, "3D-APPROACH-SLABS", "approach/Sleeper slab at " + a.Support, "Deck", "Sleeper slab at " + a.Support, a);
+            }
             foreach (var j in concrete.Joints)
             {
                 Add(j.Blockout, "3D-JOINTS", "joint/" + j.BlockoutName, "Joint", j.BlockoutName, j);
@@ -237,6 +246,8 @@ public static class ModelProjectionSource
             {
                 foreach (var s in sm.Segments) Add(s.Mesh, s.Assumption != null ? "3D-UNRESOLVED-SEGMENTS" : "3D-SEGMENTS", "segment/" + s.Name, "Segment", s.Name, s);
                 foreach (var b in sm.Bearings) Add(b.Mesh, "3D-SEGMENTAL-BEARINGS", "bearing/" + b.Name, "Bearing", b.Name, b);
+                foreach (var bl in sm.Blocks) Add(bl.Mesh, "3D-SEGMENT-BLOCKS", "block/" + bl.Name, "Block", bl.Name, bl);
+                foreach (var hw in sm.PtHardware) Add(hw.Mesh, "3D-SEGMENT-PT-HARDWARE", "pt/" + hw.Name, hw.IsPipe ? "Pipe" : "PtBar", hw.Name, hw);
                 if (o.Rebar) foreach (var t in sm.Tendons) Add(null, "3D-PT-TENDONS", "tendon/" + t.Name, "Tendon", t.Name, t, -1, false, new[] { t.Points.ToArray() });
             }
             if (o.Rebar)
@@ -287,6 +298,9 @@ public static class ModelProjectionSource
         Misc.MiscGroup.SignSupport => "3D-SIGN-SUPPORT",
         Misc.MiscGroup.CrashCushion => "3D-CRASH-CUSHION",
         Misc.MiscGroup.Lighting => "3D-LIGHTING",
+        Misc.MiscGroup.ExpansionJoint => "3D-EXPANSION-JOINTS",
+        Misc.MiscGroup.SolarPlatform => "3D-SOLAR-PLATFORMS",
+        Misc.MiscGroup.Access => "3D-ACCESS-HARDWARE",
         _ => "3D-MISC",
     };
 

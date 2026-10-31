@@ -102,6 +102,10 @@ public sealed class BeamReinforcementDefinition
 {
     /// <summary>Standard / plan reference (sheet, edition, PDF pages) - quoted in the checks.</summary>
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL bar schedule unit of these beams (marks are numbered per unit); null = "{designation} beams". Needed when beams of one
+    /// designation carry different bar lists (NCDOT B-2500: one list per girder sheet).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unit { get; set; }
     /// <summary>Reinforcing steel yield (ksi) for the material name.</summary>
     public double SteelYieldKsi { get; set; } = 60;
     public List<BeamBarSet> Bars { get; set; } = new();

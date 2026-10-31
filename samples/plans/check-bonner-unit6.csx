@@ -198,9 +198,75 @@ Row("debonded strands per girder", b0.Strands.Count(s => s.Debonded), 20, 0, "")
 Row("hold-down from midspan", (b0.Length / 2 - b0.HoldDownFromEnd) / ft, 5.0, 0.05, "ft", "p428 5'-0\" each side of CL (measured along the sloped beam)");
 Print($"   girder concrete total {ps.ConcreteVolume / cy:0.0} CY (24 girders; plan 49.9 x 4 + 50.5 x 20 = {49.9 * 4 + 50.5 * 20:0.0} CY)");
 
+// ---------------------------------------------------------------- 8. diaphragms, joints, parapet, deck and girder reinforcing (2026-10-30)
+Print("== 8. Diaphragms (p.405-408), joints (p.454), parapet (p.448-451), deck bars (p.409-414, p.455), girder bars (p.428-431)");
+var cm = Doc.Concrete(Name);
+var dm = Doc.Diaphragms(Name);
+Row("diaphragms built (bents 29-35)", dm.Diaphragms.Count, 7, 0, "");
+foreach (var d in dm.Diaphragms.OrderBy(d => d.SupportIndex))
+{
+    double w = (d.Parts.Max(p => p.XMax) - d.Parts.Min(p => p.XMin)) / inch;
+    bool end = d.Kind == SBM.Core.Bridge.ConcreteDiaphragmKind.ExpansionJointEnd;
+    Row($"{d.Name} width normal to the bent line", w, end ? 22 + 8 : 28, 1.0 / 16, "in", end ? "1'-10\" (MIN.) + 8\" deck-to-diaphragm fillet (p.407 K-K / p.408 N-N)" : "2'-4\" (p.406 / p.407 L-L)");
+    Row($"{d.Name} length along the bent line", d.Length / ft, end ? 2 * (17.25 + 19 / 12.0 + 5 / 12.0 + 1 / 192.0) : 2 * (17.25 + 3.625), 0.01, "ft",
+        end ? "19'-3\" (+1/16\") each side at the bottom, sloped end faces to the deck edge at the soffit (p.405)" : "20'-10 1/2\" each side (p.406 Section A-A)");
+    Print($"   info  {d.Name}: {d.Volume / cy:0.00} CY");
+}
+Print($"   info  diaphragm concrete total {dm.ConcreteVolume / cy:0.0} CY (the plans give no separate diaphragm quantity: p.455 sand-lightweight concrete 1,541.1 CY = deck + diaphragms)");
+Row("deck + haunch + diaphragms vs sand-lightweight concrete quantity (p.455)", (cm.DeckVolume + cm.HaunchVolume + dm.ConcreteVolume) / cy, 1541.1, 15, "CY",
+    "1 % tolerance: build-up varies along the girders (p.404), joint blockouts / end post concrete are other items");
+var j29 = cm.Joints.FirstOrDefault(j => j.Support == "Bent 29"); var j35 = cm.Joints.FirstOrDefault(j => j.Support == "Bent 35");
+Row("expansion joints built (bent 29 modular, bent 35 Transflex)", cm.Joints.Count, 2, 0, "");
+if (j35 != null) Row("bent 35 Transflex blockout (magnesium ammonium phosphate concrete)", j35.BlockoutVolume / cy, 0.6, 0.1, "CY", "p.455 MAP concrete 0.6 CY; 1'-3 1/2\" x 4\" x length between the parapets");
+if (j29 != null) Print($"   info  bent 29 modular joint blockout {j29.BlockoutVolume / cy:0.00} CY (limited to the 9\" slab; the 1'-1\" min. blockout depth reaches into the diaphragm), device envelope {j29.Length / ft:0.00} ft");
+var s29d = b.Supports[0]; var s35d = b.Supports[^1];
+Row("deck end at bent 29 ahead of the bent control line", -s29d.DeckEndOffset / inch, 14.5 + 17, 1.0 / 16, "in", "CL modular joint 1'-2 1/2\" (+-) + DIM A / 2 (2'-10\" / 2), p.407 / p.454");
+Row("deck end at bent 35 back of the bent control line", -s35d.DeckEndOffset / inch, 4.25 / 2, 1.0 / 16, "in", "CL joint = bent control line, DIM A 4 1/4\" (p.454)");
+Print($"   info  bent 35 deck face {(-s35d.DeckEndOffset) / inch:0.000}\" vs diaphragm face 5\" from the bent control line (p.408 N-N): the slab overhangs the diaphragm by {(5 - (-s35d.DeckEndOffset) / inch):0.000}\" (two plan dimensions, not adjusted)");
+Row("parapet concrete incl. end posts (both sides)", cm.BarrierVolume / cy, 209.2, 0.1, "CY", "p.451 Class AA concrete quantities for parapet, Unit 6");
+foreach (var bar in cm.Barriers)
+    Row($"{bar.Name}: solid pieces (35 open joints + 2 end posts + 1)", cm.BarrierPieces.TryGetValue(bar.Name, out var pcs) ? pcs.Count : 1, 38, 0, "", "p.448: 1/2\" joints at bents 30-34 and 28'-5\" + 4 @ 26'-0\" from each bent line");
+double MarkN(string m) => cm.Marks.Where(x => x.Mark == m).Sum(x => x.Count);
+double MarkLb(Func<SBM.Core.Concrete.BarMark, bool> f) => cm.Marks.Where(f).Sum(x => x.TotalMass) * 2.2046226218;
+Row("A101 lines placed (top 1924 + bottom 2199)", MarkN("A101"), 1924 + 2199, 0, "", "bill p.455 prints 4125 = 1924 + 2199 + 2 (note: each plan-of-span bill carries 2 additional A101)");
+Row("A101 length", cm.Marks.First(x => x.Mark == "A101").Length / inch, 42 * 12 + 1, 1.0 / 16, "in", "42'-1\" (3\" clear at the deck edges)");
+Row("B107 placed", MarkN("B107"), 44, 0, ""); Row("B108 placed", MarkN("B108"), 44, 0, ""); Row("B109 placed", MarkN("B109"), 792, 0, "");
+Row("B108 (closing bar) length", cm.Marks.First(x => x.Mark == "B108").Length / inch, 360, 3, "in", "30'-0\" printed; the closing bar takes what the line leaves (3\" end covers)");
+Row("deck bill weight (A, B, E, G, K, S, U, H marks; placed + schedule)", MarkLb(x => !x.Location.Contains("parapet")), 299412, 299412 * 0.005, "lb", "p.455 total stainless 299,412 lb");
+Print($"   info  parapet bars Unit 6 (placed + schedule, p.451 Unit 6 column): {MarkLb(x => x.Location.Contains("parapet")):N0} lb");
+Print($"   info  deck bars placed in 3D: {cm.Bars.Count}");
+foreach (var (m, n) in new[] { ("B101", 145), ("B102", 290), ("B103", 280), ("S1", 1924), ("B1", 384), ("B6", 160), ("B7", 16), ("E1", 32), ("E2", 8), ("F1", 24), ("S2", 22), ("B105", 116), ("B106", 29) })
+    Row($"{m} placed", cm.Bars.Count(x => x.Mark == m), n, 0, "", m.StartsWith("B10") ? "p.409 / p.414 top B bars" : "p.448 / p.450 / p.451 parapet and end posts (both sides)");
+Row("B104 placed (spans 31-34 + end spans)", cm.Bars.Count(x => x.Mark == "B104"), 261, 0, "", "spans 31-34: 2 x 29'-4\" lapped 2'-2\" close the gap exactly; end spans at the minimum laps (reading)");
+Row("K302 placed (7 diaphragms)", cm.Bars.Count(x => x.Mark == "K302"), 252, 0, "", "6 rows x 2 faces x 3 bays (p.407 L-L / K-K, p.408 N-N)");
+foreach (var (m, n) in new[] { ("S305", 280), ("U309", 140), ("H7", 34), ("U301", 4), ("U302", 4), ("U303", 4), ("U304", 4), ("U305", 4), ("U306", 8) }) Row($"{m} placed", cm.Bars.Count(x => x.Mark == m), n, 0, "", m == "H7" ? "p.445 temporary access openings (2 x 17)" : m.StartsWith("U30") && m != "U309" ? "p.405 sloped ends of the expansion joint diaphragms" : "p.406 A-A / p.407 L-L bent diaphragms");
+Row("B104 schedule count", MarkN("B104"), 261, 0, "");
+// rail (p.452, p.38)
+
+var steelRail = Doc.Model(Name).Steel;
+var rr = steelRail?.Railings;
+int nPosts = rr?.Runs.Sum(x => x.Posts) ?? 0;
+Row("2-bar metal rail posts (both sides)", nPosts, 314, 0, "", "p.38 4-bolt anchor assembly table, Unit 6 = 314; chains p.452");
+// deck drains (p.409-414)
+var drn = sub.Drainage.Where(x => x.Kind == SubElementKind.DrainPipe).ToList();
+Row("6\" PVC pipe deck drains", drn.Count, 11 + 5 * 12, 0, "", "p.409 11 (span 30), p.410-414 12 per span");
+foreach (var grp in ps.Beams.GroupBy(x => x.Span == 0 ? "30" : x.Span < 5 ? "31-34" : x.Girder < 2 ? "35 G1-G2" : "35 G3-G4"))
+{
+    var bm = grp.First();
+    int N(string m) => bm.Bars.Count(x => x.Mark == m);
+    var gr = GRow(30 + bm.Span, bm.Girder + 1);
+    Row($"girder bars span {grp.Key}: S1 per girder", N("S1"), 148, 0, "");
+    Row($"girder bars span {grp.Key}: S5 per girder", N("S5"), grp.Key == "30" ? 150 : 154, 0, "");
+    Row($"girder bars span {grp.Key}: S6 per girder", N("S6"), grp.Key == "30" ? 111 : 36, 0, "");
+    if (grp.Key != "30") Row($"girder bars span {grp.Key}: S8 per girder", N("S8"), 77, 0, "");
+    Row($"girder bars span {grp.Key}: S3 per girder", N("S3"), 16, 0, "", "8-S3 each end (p.438 A-A)");
+    Row($"girder bars span {grp.Key}: S4 per girder", N("S4"), 302, 0, "", "bar list 302; chain = 2 x (27 S2 + 10 S1 + S5 stations)");
+}
+Print($"   info  girder bars placed {ps.Beams.Sum(x => x.Bars.Count)} ({ps.RebarMass * 2.2046226218:N0} lb); S2 / S7 / V1 / WWF not placed (REMAINING.md)");
+
 // ---------------------------------------------------------------- generator messages
 Print("== Generator warnings (prestressed / substructure)");
-foreach (var d in ps.Diagnostics.Concat(sub.Diagnostics).Where(d => d.Severity != SBM.Core.Framing.DiagnosticSeverity.Info)) Print("   " + d.Message);
+foreach (var d in ps.Diagnostics.Concat(sub.Diagnostics).Concat(dm.Diagnostics).Concat(cm.Diagnostics).Where(d => d.Severity != SBM.Core.Framing.DiagnosticSeverity.Info)) Print("   " + d.Message);
 Print("== Generator info (prestressed)");
 foreach (var d in ps.Diagnostics.Where(d => d.Severity == SBM.Core.Framing.DiagnosticSeverity.Info)) Print("   " + d.Message);
 Print("");

@@ -50,6 +50,13 @@ foreach (var bn in approach)
     string Norm(string spec) => spec.Contains(":UM") || spec.Contains(":LM") ? "N:" + spec[(spec.IndexOf(':') + 1)..] : spec;   // CL points: one plate
     foreach (var m in t.Members.Where(m => m.Role is TrussMemberRole.UpperLateral or TrussMemberRole.LowerLateral)) { pts.Add(Norm(m.From)); pts.Add(Norm(m.To)); }
     foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.Strut && m.Name.StartsWith("BS"))) { pts.Add(m.From); pts.Add(m.To); }
+    // batch 5d: the double K apexes on the floor beam F8 (LQ13): p.95 Sections B-E rivet the lateral gussets to the F8 bottom flange, but the 33 WF 130
+    // diagonals lie in the steep L13 - L14 chord panel plane (L13 1/2 is 6.8 ft above L13) and the gusset outline / its seat on the flange are not drawn: not built (flag)
+    pts.RemoveWhere(sp => sp.Contains(":LQ13"));
+    t.Unresolved.RemoveAll(s => s.Contains("double K apex gussets on the floor beam F8"));
+    t.Unresolved.Add(U("p.95, p.98", "double K apex gussets on the floor beam F8 (LQ13 / LQ13')",
+        "p.95 Sections B-E rivet the lateral gussets to the F8 bottom flange but give no gusset outline, and the 33 WF 130 diagonals rise in the L13 - L14 chord panel plane (L13 1/2 is 6.8 ft above L13) while F8 is level",
+        "not built; the diagonals stop clear of F8."));
     foreach (var spec in pts)
     {
         string pt = spec[(spec.IndexOf(':') + 1)..];
@@ -78,7 +85,7 @@ foreach (var bn in approach)
 // struts 18 (3 lines x 6), 2-13[ 31.8 laterals 20, 2-13[ 50 laterals 24, edge angles 13 (L1 / L10 / L12 / L15-L17 drawn), apex: strut 12.
 string mainPlateFlag = U("p.97, p.98", "main span lateral / strut gusset plates (2-1/2 Pls.) and edge angles (2-Ls 7 x 4 x 1/2)",
     "the details draw the plates, angles and rivets without outline dimensions or gages (the 1'-2 1/2 W.P. line and the 2'-10 min. / 1'-10 member end distances are the only dimensions)",
-    "one plate on the top and one on the bottom face of the members = envelope of the member laps (1'-6 lap, 1 1/2 edge), lengthened to the counted rivets (2 lines per channel flange, 12 3/4 / 15 1/4 in. from the member CL, 3 in. pitch); edge angle on the stack face over the plate length; members stop 4 3/4 in. clear of the stack and 1/2 in. clear of the strut / other bracing.");
+    "one plate on the top and one on the bottom face of the members, in the plane of the members it connects = envelope of the member laps (1'-6 lap, 1 1/2 edge), lengthened to the p.71 rivet counts and carried to 1/4 in. from the stack under the edge angle; fills where a member face stands off the plate (Section A '1/2 Fill' is the only printed fill); 4 rivet lines spread across each member's width 2 1/2 in. from its sides, 3 in. pitch; edge angle on the stack face over the plate length; members stop 4 3/4 in. clear of the stack and 1/2 in. clear of the strut / other bracing.");
 string mainBoxFlag = U("p.71, p.97", "box strut L0 / L11 connection to the chord joint and to the lateral plates",
     "the box struts (30 / 40 in. webs) are drawn in the bracing diagram only; their end connection and how the 1/2 in. lateral plates meet them are not detailed",
     "the lateral plates lie on the laterals and stop 1/4 in. clear of the box strut; the strut connection is not built.");
@@ -119,13 +126,46 @@ if (T(Main) is { } tm0)
     var struts = t.Members.Where(m => m.Role == TrussMemberRole.Strut && m.System is "Upper laterals" or "Lower laterals").ToList();
     foreach (var m in lat) { pts.Add(Norm(m.From)); pts.Add(Norm(m.To)); }
     foreach (var m in struts) { pts.Add(m.From); pts.Add(m.To); }
+    // batch 5b (2026-10-28, p.71 BOTTOM / TOP CHORD LATERAL SYSTEM diagrams; Note A: the detail sheets govern only where the diagram gives no number):
+    // rivets per member END (split over the two plates). Lower diagonals 26 (L0-L8, L16-L22), 32 (L8-L10), 36 (L10-L11), 40 (L11-L12), 28 (L13-L13 1/2),
+    // 38 (L15-L16); lower struts 40, 46 (L8-L10), 50 at L12, 46 at L13 1/2, 16 at L22; upper diagonals 26, struts 40, 16 at U22. No number for L12-LM13
+    // (detail sheet p.97: 24 per plate kept) and for the strut passing a K apex (p.97: 12 per plate kept).
+    int Num(string spec) { var mm = System.Text.RegularExpressions.Regex.Match(spec, @"(\d+)"); return mm.Success ? int.Parse(mm.Value) : -1; }
+    int? PerEnd(TrussMemberDefinition m)
+    {
+        string a = m.From[(m.From.IndexOf(':') + 1)..], b = m.To[(m.To.IndexOf(':') + 1)..];
+        if (m.Role == TrussMemberRole.Strut)
+        {
+            int k = Num(a);
+            if (a.StartsWith("L13H")) return 46;
+            if (a.StartsWith("U")) return k == 22 ? 16 : 40;
+            return k == 22 ? 16 : k == 12 ? 50 : k is 8 or 9 or 10 ? 46 : 40;
+        }
+        if (a.StartsWith("U") || a.StartsWith("UM")) return 26;
+        if (a.StartsWith("LM") && b.StartsWith("LM")) return 26;   // LL-CL16 (L16-L22 range)
+        if (a.Contains("L13H") || b.Contains("L13H") || b.StartsWith("LQ")) return 28;
+        int kc = Num(a), ka = Num(b);
+        if (ka == kc - 1) return kc <= 8 ? 26 : kc <= 10 ? 32 : 36;
+        if (kc == 11) return 40;
+        if (kc == 12) return null;
+        if (kc == 15) return 38;
+        return 26;
+    }
+    // batch 5d: the double K apexes on the floor beam F8 (LQ13): p.95 Sections B-E rivet the lateral gussets to the F8 bottom flange, but the 33 WF 130
+    // diagonals lie in the steep L13 - L14 chord panel plane (L13 1/2 is 6.8 ft above L13) and the gusset outline / its seat on the flange are not drawn: not built (flag)
+    pts.RemoveWhere(sp => sp.Contains(":LQ13"));
+    t.Unresolved.RemoveAll(s => s.Contains("double K apex gussets on the floor beam F8"));
+    t.Unresolved.Add(U("p.95, p.98", "double K apex gussets on the floor beam F8 (LQ13 / LQ13')",
+        "p.95 Sections B-E rivet the lateral gussets to the F8 bottom flange but give no gusset outline, and the 33 WF 130 diagonals rise in the L13 - L14 chord panel plane (L13 1/2 is 6.8 ft above L13) while F8 is level",
+        "not built; the diagonals stop clear of F8."));
     foreach (var spec in pts)
     {
         string pt = spec[(spec.IndexOf(':') + 1)..];
         bool apex = pt.StartsWith("UM") || pt.StartsWith("LM");
+        bool quarter = pt.StartsWith("LQ");   // double K apex on the floor beam F8 (p.95: gussets riveted to its bottom flange, no edge angle)
         var rv = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        foreach (var m in lat) rv[m.Name] = m.Section == "LAT50" ? 24 : 20;
-        foreach (var m in struts) rv[m.Name] = apex ? 12 : 18;
+        foreach (var m in lat) rv[m.Name] = PerEnd(m) is { } pe ? (pe + 1) / 2 : 24;
+        foreach (var m in struts) rv[m.Name] = apex ? 12 : PerEnd(m) is { } ps ? (ps + 1) / 2 : 18;
         // L0 / L11: the box struts (30 / 40 in. deep, p.71) are deeper than the laterals: one plate pair per lateral, lying on the lateral and stopping
         // clear of the strut
         var deep = struts.Where(m => m.Section.StartsWith("STRUT L") && (m.From == spec || m.To == spec)).ToList();
@@ -138,8 +178,11 @@ if (T(Main) is { } tm0)
             {
                 Members = members, Suffix = groups.Count > 1 ? "-" + "abcd"[gi++] : "",
                 Point = spec, Label = "2-1/2 Pls.", Orientation = TrussBracingPlateOrientation.Fitted, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
-                EdgeAngle = apex || deep.Count > 0 ? "" : "L7x4x1/2", EdgeRivets = apex || deep.Count > 0 ? 0 : 13, Rivets = rv, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
+                EdgeAngle = apex || quarter || deep.Count > 0 ? "" : pt.StartsWith("L13H") ? "L7-1/2x4x1/2" : "L7x4x1/2", EdgeRivets = apex || quarter || deep.Count > 0 ? 0 : 13, Rivets = rv, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
                 RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet", Material = "C", Unresolved = mainPlateFlag, Source = "p.97 / p.98",
+                // batch 5a: since batch 1b the members are 14 / 19 in. wide (channels top and bottom): plate in the plane of the members it connects, fills
+                // where a member face stands off it, plate carried to the stack under the edge angle, 4 rivet lines across each member's own width
+                MemberPlane = true, MemberFills = true, PlateToStack = !apex && deep.Count == 0, RivetGageEdge = In(2.5), RivetGapTolerance = In(3.0 / 16), ProbeFaces = true,
             });
     }
     report.Add($"{Main}: {t.BracingGussets.Count} bracing plate definitions");
@@ -152,7 +195,7 @@ if (T(Main) is { } tm0)
 // the floor beam top (it crossed the stringer bottom flanges by 0.59 in.), the ends stop clear of the floor beams and the girder.
 string gLatFlag = U("p.45", "girder-span lateral gusset plates (7/16 Pl.) and fills",
     "the plan view draws the plates over the floor beam flange with fills (13/16, 7/16) and the tension plate but gives no outline, level or fill extent",
-    "one 7/16 plate on the flange tops of the laterals at each lateral node (floor beam top level), envelope of the lateral laps, stopping 1/4 in. clear of the floor beam (the plate-to-floor-beam rivets and the fills are not built); 8 rivets 1 in. carbon per lateral end.");
+    "one 7/16 plate on the flange tops of the laterals at each lateral node (floor beam top level), envelope of the lateral laps, stopping 1/4 in. clear of the floor beam (the plate-to-floor-beam rivets and the fills are not built); 10 rivets 7/8 in. carbon per lateral end (2 x 5 drawn, p.45).");
 foreach (var gn in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
 {
     var t = T(gn); if (t == null) continue;
@@ -167,7 +210,8 @@ foreach (var gn in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
         t.BracingGussets.Add(new TrussBracingGussetDefinition
         {
             Point = spec, Label = "7/16 Pl. (C)", Orientation = TrussBracingPlateOrientation.Horizontal, Side = TrussBracingPlateSide.Above, Thickness = In(7.0 / 16),
-            RivetsPerMember = 8, RivetPitch = In(3), RivetGage = In(2.75), RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet", Material = "C",
+            // agent review girders G22: p.45 draws 2 x 5 = 10 rivets per lateral end, 7/8 carbon (floor / bracing rivets 7/8 unless noted, p.44)
+            RivetsPerMember = 10, RivetPitch = In(3), RivetGage = In(2.75), RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet", Material = "C",
             Unresolved = gLatFlag, Source = "p.45",
         });
     report.Add($"{gn}: {t.BracingGussets.Count} lateral plate definitions; laterals lowered {wt.YMax / 0.0254:0.00} in.");

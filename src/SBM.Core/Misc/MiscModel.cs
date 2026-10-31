@@ -5,7 +5,7 @@ using SBM.Core.Solids;
 
 namespace SBM.Core.Misc;
 
-public enum MiscGroup { Drainage, SignSupport, CrashCushion, Lighting }
+public enum MiscGroup { Drainage, SignSupport, CrashCushion, Lighting, ExpansionJoint, SolarPlatform, Access }
 
 /// <summary>What an element is; exporters map it to IFC classes and viewport layers.</summary>
 public enum MiscKind
@@ -18,6 +18,10 @@ public enum MiscKind
     EndPostConcrete, CushionPlaceholder,
     // lighting
     PoleBaseConcrete, PoleAnchorBolt, JunctionBox, Conduit,
+    // expansion joints (segmental units: device envelope by others, parapet end posts above the parapet, parapet cover plates)
+    JointDevice, JointEndPost, JointCoverPlate,
+    // segmental fixtures (appended): platform steel, equipment by others, box lighting, access hardware
+    PlatformMember, PlatformPlate, PlatformGrating, SolarArray, Battery, Luminaire, OutletBox, Panelboard, ElectricalBox, VerminScreen, AccessDoor,
 }
 
 /// <summary>One solid of a misc assembly. <see cref="Opening"/> = solid that voids the deck slab (IFC opening), when the element passes through it. <see cref="Placeholder"/> elements are envelopes of things by others (Pset SBM_Placeholder in IFC).</summary>

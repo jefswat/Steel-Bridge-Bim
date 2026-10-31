@@ -86,7 +86,7 @@ public static partial class ArchGenerator
             var rows = new List<string>();
             foreach (var (corner, m) in _ribFills)
             {
-                Append(ends, m);
+                AppendExact(ends, m);
                 double v = Math.Abs(m.Volume());
                 vol += v;
                 // Steel plates inside the fill (stub web, knuckle tie web, stiffeners, studs are not cut out of the concrete): sampled on a 1/4" grid.

@@ -52,3 +52,21 @@ public sealed class BarrierZone
         return c;
     }
 }
+
+/// <summary>
+/// OPTIONAL open joint in a custom barrier (<see cref="BarrierDefinition.Joints"/>): a gap of <see cref="Width"/> across the whole section, centred
+/// <see cref="Along"/> along the deck edge (+ = up-station) from the point where a support's CL (or a station's radial line) crosses that edge - e.g.
+/// NCDOT "spacing of joints in concrete parapet" measured along the outside edge of deck from the bent control lines. The joint filler is not modeled.
+/// </summary>
+public sealed class BarrierJoint
+{
+    /// <summary>Support whose CL crosses the deck edge at the reference point ("" = use <see cref="Station"/>).</summary>
+    public string Support { get; set; } = "";
+    public double Station { get; set; } = double.NaN;
+    /// <summary>Distance along the deck edge from the reference point to the joint centre.</summary>
+    public double Along { get; set; }
+    public double Width { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Source { get; set; }
+    public BarrierJoint Clone() => (BarrierJoint)MemberwiseClone();
+}

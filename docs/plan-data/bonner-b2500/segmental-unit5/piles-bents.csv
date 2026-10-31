@@ -1,0 +1,13 @@
+bent,pile_count,max_factored_axial_tons,pile_tip_no_higher_than_el_ft,scour_critical_el_ft,pile_data_pdf_page,pile_data_sheet,bom_pile_LF,bom_pdf_page,footing_plan_pdf_page,embedment_typ_in,embedment_exceptions,cl_footing_column_cap_offset_left_of_L_in,offset_source,tag
+18,18,455,-95.0,-72.0,254,S3-06,1797,336,335,48,,4.875,"p335 Detail C - Bent 18 (4 7/8"" offset)",TEXT + VECTOR
+19,20,550,-100.0,-72.0,254,S3-06,2099,339,338,48,,10.375,"p338 Detail C (10 3/8"")",TEXT + VECTOR
+20,24,520,-110.0,-85.0,255,S3-07,2762,342,341,48,,10.375,"p341 Detail C, W.P. #21-#23 (10 3/8"")",TEXT + VECTOR
+21,24,570,-120.0,-85.0,255,S3-07,3005,342,341,48,,10.375,"p341 Detail C (10 3/8"")",TEXT + VECTOR
+22,24,520,-120.0,-85.0,256,S3-08,3005,342,341,48,,10.375,"p341 Detail C (10 3/8""); p252 raster 26'-4 3/8"" / 24'-7 5/8""",TEXT + VECTOR
+23,30,505,-120.0,-85.0,256,S3-08,3752,347,344,48,"15 in for the 4 piles at S +-7'-6"", N +-3'-9"" (note 'PILE PENETRATION 1'-3"" INTO CIP FOOTING, THESE FOUR PILES ONLY', leaders traced)",5.75,"p344 Detail C, W.P. #24 / #25 (5 3/4"")",TEXT + VECTOR
+24,30,505,-120.0,-85.0,257,S3-09,3752,347,344,48,"15 in for the 4 piles at S +-7'-6"", N +-3'-9"" (as bent 23)",5.75,"p344 Detail C (5 3/4"")",TEXT + VECTOR
+25,24,535,-130.0,-85.0,257,S3-09,3248,350,349,48,,5.75,"p349 Detail C, W.P. #26 (5 3/4"")",TEXT + VECTOR
+26,24,540,-115.0,-85.0,258,S3-10,2883,353,352,48,,5.75,"p352 Detail C, W.P. #27-#29 (5 3/4"")",TEXT + VECTOR
+27,24,555,-115.0,-85.0,258,S3-10,2883,353,352,48,,5.75,"p352 Detail C (5 3/4"")",TEXT + VECTOR
+28,24,515,-125.0,-85.0,259,S3-11,3127,353,352,48,,5.75,"p352 Detail C (5 3/4"")",TEXT + VECTOR
+29,18,440,-115.0,-85.0,259,S3-11,2162,336,335,48,,2.6875,"p335 Detail C - Bent 29 (2 11/16"")",TEXT + VECTOR

@@ -18,7 +18,7 @@ public static class SceneInventory
         SceneBuilder.AnchorLayer => VramGroup.AnchorBolts,
         _ when layer.StartsWith("3D-REBAR", StringComparison.Ordinal) => VramGroup.Rebar,
         _ when layer.StartsWith("3D-PS-", StringComparison.Ordinal) => VramGroup.Prestressed,
-        _ when layer.StartsWith("3D-DRAIN-", StringComparison.Ordinal) || layer is "3D-SIGN-SUPPORT" or "3D-CRASH-CUSHION" or "3D-LIGHTING" or "3D-UNRESOLVED" or "3D-UNRESOLVED-STEEL" or "3D-PLACEHOLDER" => VramGroup.Misc,
+        _ when layer.StartsWith("3D-DRAIN-", StringComparison.Ordinal) || layer is "3D-SIGN-SUPPORT" or "3D-CRASH-CUSHION" or "3D-LIGHTING" or "3D-EXPANSION-JOINTS" or "3D-UNRESOLVED" or "3D-UNRESOLVED-STEEL" or "3D-PLACEHOLDER" => VramGroup.Misc,
         _ => VramGroup.Steel,
     };
 

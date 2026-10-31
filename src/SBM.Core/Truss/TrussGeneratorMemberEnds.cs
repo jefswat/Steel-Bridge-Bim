@@ -78,6 +78,7 @@ public static partial class TrussGenerator
         {
             Mark = p.Mark, Category = p.Category, Assembly = p.Assembly, Description = p.Description, Mesh = mesh, Material = p.Material, Role = p.Role, Length = length,
             NominalWeightLbPerFt = p.NominalWeightLbPerFt, Assumption = p.Assumption, Density = p.Density, Fabrication = p.Fabrication, MassNotCounted = p.MassNotCounted,
+            Member = p.Member, Piece = p.Piece,
         };
 
         private readonly record struct NotchBox(double S0, double S1, double X0, double X1, double Y0, double Y1, string Label);

@@ -1,0 +1,18 @@
+regen 58.9s
+bracing plates 580, edge angles 520
+bracing rivets 28550: bg-only-multi 2908, conn 23026, nobg 2472, own 144
+bracing member ends 572: no connecting rivet 80 (no bracing plate within 2.5 ft: 20); Strut 8/124, UpperLateral 0/88, Portal 4/4, LowerLateral 40/252, Sway 28/104
+  Truss: bracing plate at N:L11-a stops 1/4" clear of LS-L11 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:L11'-a stops 1/4" clear of LS-L11' (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:L13H stops 1/4" clear of FL-X13-15a1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:L13H' stops 1/4" clear of FL-X13'-15'a1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L11-a stops 1/4" clear of LS-L11 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L11'-a stops 1/4" clear of LS-L11' (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L13H stops 1/4" clear of FL-X13-15b1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L13H' stops 1/4" clear of FL-X13'-15'b1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:LM0-SW stops 1/4" clear of LL-NL1-LM0 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:LM1-SW stops 1/4" clear of LL-NL2-LM1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:SW1-SW stops 1/4" clear of FB1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:SW1-SW stops 1/4" clear of FB1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+edge angles 520: without a connecting rivet 8; e.g. N-BGSW11-SW-B-EA, N-BGSW11-SW-T-EA, S-BGSW11-SW-B-EA, S-BGSW11-SW-T-EA, N-BGSW11'-SW-B-EA, N-BGSW11'-SW-T-EA, S-BGSW11'-SW-B-EA, S-BGSW11'-SW-T-EA
+bracing plates 580: without a rivet to a member 16; e.g. N-BGFX14-1, N-BGFX14-2, N-BGFX16-1, N-BGFX16-2, N-BGFX18-1, N-BGFX18-2, N-BGFX20-1, N-BGFX20-2, N-BGFX14'-1, N-BGFX14'-2, N-BGFX16'-1, N-BGFX16'-2

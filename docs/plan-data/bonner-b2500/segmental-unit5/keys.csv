@@ -1,0 +1,13 @@
+item,parameter,printed,value_in,basis,pdf_page,sheet,tag
+WEB SHEAR KEYS,profile (male),"1 1/4"" deep, 2 5/8"" flat face, 5/8"" transitions with R = 1"" (TYP.) each side (3 7/8"" at the base)",,Section B-B,283,S3-35,TEXT
+WEB SHEAR KEYS,spacing,"@ 6 1/2"" along the web (""A"" male keys @ 6 1/2"" = ""B""), number / zone / bottom dimension per section in web-shear-keys.csv (13 rows = complete vs the p.283 tables)",6.5,elevation + TYPICAL WEB KEY DATA / WEB KEY DATA AT BENT,283,S3-35,TEXT
+WEB SHEAR KEYS,key width across the web,"1'-2""",14,elevation (1'-2"" across the web face),283,S3-35,TEXT
+WEB SHEAR KEYS,key zone,"bottom of the zone ""C"" above the bottom slab corner (table); top 1'-1 1/2"" below the top slab underside region (elevation)",,elevation,283,S3-35,TEXT UNRESOLVED (top reference)
+ALIGNMENT KEYS (top slab),plan size,"3'-0"" (U.O.N.) long x 3 7/8"" wide (2 5/8"" flat + 5/8"" chamfers)",36 x 3.875,alignment key detail,283,S3-35,TEXT
+ALIGNMENT KEYS (top slab),profile,"1 1/4"" deep, R = 1"" transitions, key 2 1/2"" below the deck top to its top edge",,Section A-A,283,S3-35,TEXT
+ALIGNMENT KEYS (top slab),locations,"3: on CL girder and 19'-0"" each side of CL girder (CL alignment key (TYP.))",,elevation,283,S3-35,TEXT
+ALIGNMENT KEYS (bottom slab),profile,"1 1/4"" deep, 2 5/8"" + 5/8"", R = 1"", 3 1/16"" / 3 7/8"" from the bottom; 5"" over T at the key",,Section C-C,283,S3-35,TEXT
+ALIGNMENT KEYS (bottom slab),locations sections 2-5,"one key 3'-0"" long, 5'-6"" from the web bottom corner reference (Detail A, 5"" below the bottom slab top)",,Detail A (FOR SECTIONS 2 THROUGH 5 ONLY),283,S3-35,TEXT UNRESOLVED (reference point of 5'-6"")
+ALIGNMENT KEYS (bottom slab),locations section 1,"two keys (upper / lower) 1'-6"" long, 4'-10"" reference, 1'-0"" apart vertically (Detail B)",,Detail B (FOR SECTION 1 ONLY),283,S3-35,TEXT UNRESOLVED (reference point)
+ALIGNMENT KEYS (bottom slab),locations sections 6-12,not detailed (Details A / B cover sections 1-5 only); elevation at midspan shows one key on CL girder in the bottom slab,,elevation at mid-span,283,S3-35,UNRESOLVED
+JOINTS,epoxy,match-cast epoxy joints between precast segments (bulkhead / match cast faces),,bulkhead and shear key details,283,S3-35,TEXT

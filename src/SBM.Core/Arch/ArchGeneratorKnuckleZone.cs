@@ -134,15 +134,16 @@ public static partial class ArchGenerator
             const int nBot = 12;
             var rings = new List<Vec3[]>();
             double area = 0;
-            foreach (double t in tl)
+            Vec3[] ZoneRing(double t)
             {
                 var a0 = AtT(sb, tS, t); var b0 = AtT(nb, tN, t);
                 var a1 = AtT(st, tS, t); var b1 = AtT(nt, tN, t);
                 var r = new List<Vec3>();
                 for (int i = 0; i <= nBot; i++) r.Add(W(Vec2.Lerp(a0, b0, (double)i / nBot).WithZ(zb)));
                 for (int i = topN; i >= 0; i--) { var q = Vec2.Lerp(a1, b1, (double)i / topN); r.Add(W(q.WithZ(GradeZ(q.X, q.Y)))); }
-                rings.Add(r.ToArray());
+                return r.ToArray();
             }
+            foreach (double t in tl) rings.Add(ZoneRing(t));
             for (int i = 0; i + 1 < rings.Count; i++)
             {
                 var r1 = rings[i]; var r2 = rings[i + 1];
@@ -152,7 +153,10 @@ public static partial class ArchGenerator
             var r0 = rings[0];
             var ex = (r0[nBot] - r0[0]).Normalized(); var ez = _fr.Z;
             var sec = r0.Select(p => new Vec2(Vec3.Dot(p - r0[0], ex), Vec3.Dot(p - r0[0], ez))).ToArray();
+            int tri0 = target.TriangleCount;
             MeshBuilder.AddLoft(target, sec, rings);
+            // exact: the ring function above, continuous in t; the sides are polylines, so their vertices are kinks
+            ExactSweep(target, tri0, r0.Length, ZoneRing, tl, "knuckle zone slab");
             Info($"Arch knuckle {k.Name} zone slab: end web inside face to the {(atStart ? "first" : "last")} floorbeam, between the tie web inside faces; rib corners cut back to the inside arch flange plates (p.151).");
             return area;
         }

@@ -1,0 +1,369 @@
+plane,point,side,samples,layers,layer_gap_max_in,layer_gap_n,float_n,overlap_n,overlap_max_in,overlap_with,inner_gap_n,inner_gap_max_in,inner_nb,outer_nb,outside_steel_n
+N,L0,-1,473,1,0.000,0,0,0,0.000,"",6,0.688,"TrussChord:247; TrussVertical:88; TrussDiagonal:54","",0
+N,L0,1,473,1,0.000,0,0,0,0.000,"",6,0.688,"TrussChord:247; TrussVertical:88; TrussDiagonal:54","TrussConnectionAngle:54",54
+N,U0,-1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+N,U0,1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+N,L1,-1,256,1,0.000,0,0,0,0.000,"",2,0.687,"TrussChord:162; TrussVertical:54","",0
+N,L1,1,256,1,0.000,0,0,0,0.000,"",2,0.688,"TrussChord:162; TrussVertical:54","TrussConnectionAngle:60",60
+N,U1,-1,664,1,0.000,0,0,0,0.000,"",2,0.687,"TrussChord:356; TrussDiagonal:88; TrussVertical:54","",0
+N,U1,1,664,1,0.000,0,0,0,0.000,"",2,0.688,"TrussChord:356; TrussDiagonal:88; TrussVertical:54","",0
+N,L2,-1,819,1,0.000,0,0,0,0.000,"",26,1.000,"TrussChord:392; TrussDiagonal:143; TrussVertical:79","",0
+N,L2,1,819,1,0.000,0,0,0,0.000,"",26,1.000,"TrussChord:392; TrussDiagonal:143; TrussVertical:79","TrussConnectionAngle:114",114
+N,U2,-1,291,1,0.000,0,0,0,0.000,"",1,0.687,"TrussChord:186; TrussVertical:48","",0
+N,U2,1,291,1,0.000,0,0,0,0.000,"",1,0.688,"TrussChord:186; TrussVertical:48","",0
+N,L3,-1,256,1,0.000,0,0,0,0.000,"",4,0.688,"TrussChord:163; TrussVertical:54","",0
+N,L3,1,256,1,0.000,0,0,0,0.000,"",4,0.687,"TrussChord:163; TrussVertical:54","TrussConnectionAngle:60",60
+N,U3,-1,854,1,0.000,0,0,0,0.000,"",13,1.000,"TrussChord:389; TrussDiagonal:164; TrussVertical:78","",0
+N,U3,1,854,1,0.000,0,0,0,0.000,"",13,1.000,"TrussChord:389; TrussDiagonal:164; TrussVertical:78","",0
+N,L4,-1,890,1,0.000,0,0,0,0.000,"",18,1.125,"TrussChord:405; TrussDiagonal:180; TrussVertical:78","",0
+N,L4,1,890,1,0.000,0,0,0,0.000,"",18,1.125,"TrussChord:405; TrussDiagonal:180; TrussVertical:78","TrussConnectionAngle:119",119
+N,U4,-1,295,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+N,U4,1,295,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+N,L5,-1,321,1,0.000,0,0,0,0.000,"",1,1.125,"TrussChord:216; TrussVertical:54","",0
+N,L5,1,321,1,0.000,0,0,0,0.000,"",1,1.125,"TrussChord:216; TrussVertical:54","TrussConnectionAngle:60",60
+N,U5,-1,994,1,0.000,0,0,0,0.000,"",30,1.875,"TrussChord:428; TrussDiagonal:226; TrussVertical:97","",0
+N,U5,1,994,1,0.000,0,0,0,0.000,"",30,1.875,"TrussChord:428; TrussDiagonal:226; TrussVertical:97","",0
+N,L6,-1,1069,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:450; TrussDiagonal:248; TrussVertical:95","",0
+N,L6,1,1069,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:450; TrussDiagonal:247; TrussVertical:96","TrussConnectionAngle:126",126
+N,U6,-1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:159; TrussVertical:48","",0
+N,U6,1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:159; TrussVertical:48","",0
+N,L7,-1,278,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","",0
+N,L7,1,278,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","TrussConnectionAngle:63",63
+N,U7,-1,925,1,0.000,0,0,0,0.000,"",15,1.937,"TrussChord:422; TrussDiagonal:222; TrussVertical:92","",0
+N,U7,1,925,1,0.000,0,0,0,0.000,"",15,1.937,"TrussChord:422; TrussDiagonal:228; TrussVertical:86","",0
+N,L8,-1,1007,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:238; TrussVertical:94","",0
+N,L8,1,1007,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:250; TrussVertical:82","TrussConnectionAngle:114",114
+N,U8,-1,337,1,0.000,0,0,0,0.000,"",262,1.250,"TrussChord:192; TrussVertical:70","",0
+N,U8,1,337,1,0.000,0,0,0,0.000,"",262,1.250,"TrussChord:192; TrussVertical:70","",0
+N,L9,-1,453,1,0.000,0,0,0,0.000,"",329,0.750,"TrussChord:245; TrussVertical:84","",0
+N,L9,1,453,1,0.000,0,0,0,0.000,"",329,0.750,"TrussChord:245; TrussVertical:84","TrussConnectionAngle:83",83
+N,U9,-1,1364,1,0.000,0,0,0,0.000,"",42,1.938,"TrussChord:439; TrussDiagonal:358; TrussVertical:180","",0
+N,U9,1,1364,1,0.000,0,0,0,0.000,"",42,1.938,"TrussChord:439; TrussDiagonal:384; TrussVertical:154","",0
+N,L10,-1,1690,2,0.000,0,0,0,0.000,"",27,1.000,"TrussChord:547; TrussDiagonal:437; TrussVertical:194","",0
+N,L10,1,1690,2,0.000,0,0,0,0.000,"",27,1.000,"TrussChord:547; TrussDiagonal:409; TrussVertical:222","TrussConnectionAngle:120",120
+N,U10,-1,398,1,0.000,0,0,0,0.000,"",312,1.125,"TrussChord:232; TrussVertical:80","",0
+N,U10,1,398,1,0.000,0,0,0,0.000,"",312,1.125,"TrussChord:232; TrussVertical:80","",0
+N,L11,-1,469,3,0.000,0,0,0,0.000,"",120,1.125,"TrussChord:241; TrussVertical:120","",0
+N,L11,1,469,3,0.000,0,0,0,0.000,"",120,1.125,"TrussChord:241; TrussVertical:120","TrussConnectionAngle:42",42
+N,U11,-1,1962,1,0.000,0,0,0,0.000,"",29,1.938,"TrussDiagonal:567; TrussChord:560; TrussVertical:236","",0
+N,U11,1,1962,1,0.000,0,0,0,0.000,"",29,1.937,"TrussChord:560; TrussDiagonal:455; TrussVertical:348","TrussConnectionAngle:110",110
+N,L12,-1,1537,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:545; TrussDiagonal:245; TrussVertical:228","",0
+N,L12,1,1537,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:545; TrussVertical:260; TrussDiagonal:213","TrussConnectionAngle:121",121
+N,U12,-1,1311,1,0.000,0,0,0,0.000,"",15,1.937,"TrussChord:483; TrussDiagonal:211; TrussVertical:191","",0
+N,U12,1,1311,1,0.000,0,0,0,0.000,"",15,1.938,"TrussChord:483; TrussVertical:221; TrussDiagonal:181","TrussConnectionAngle:122",122
+N,L13,-1,1723,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:607; TrussDiagonal:225; TrussVertical:191","",0
+N,L13,1,1723,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:607; TrussDiagonal:213; TrussVertical:203","TrussConnectionAngle:175; TrussFloorBeam:41",216
+N,U13,-1,1150,1,0.000,0,0,0,0.000,"",47,2.000,"TrussChord:402; TrussDiagonal:211; TrussVertical:191","",0
+N,U13,1,1150,1,0.000,0,0,0,0.000,"",37,2.000,"TrussChord:402; TrussVertical:199; TrussDiagonal:193","TrussConnectionAngle:102",102
+N,L14,-1,1552,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:496; TrussDiagonal:201; TrussVertical:185; TrussHanger:63","",0
+N,L14,1,1552,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:496; TrussDiagonal:206; TrussVertical:180; TrussHanger:63","",0
+N,U14,-1,942,1,0.000,0,0,0,0.000,"",33,2.000,"TrussChord:402; TrussDiagonal:168; TrussVertical:143","",0
+N,U14,1,942,1,0.000,0,0,0,0.000,"",18,2.000,"TrussChord:402; TrussDiagonal:152; TrussVertical:144","TrussConnectionAngle:116",116
+N,W14,-1,266,1,0.000,0,0,20,0.750,"LxTrussHanger:20",50,0.487,"TrussChord:50","",0
+N,W14,1,266,1,0.000,0,0,20,0.750,"RxTrussHanger:20",50,0.487,"TrussChord:50","",0
+N,L15,-1,1419,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:440; TrussDiagonal:204; TrussVertical:180","",0
+N,L15,1,1419,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:440; TrussDiagonal:217; TrussVertical:167","TrussConnectionAngle:68",68
+N,U15,-1,885,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:372; TrussDiagonal:153; TrussVertical:149","",0
+N,U15,1,885,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:372; TrussVertical:159; TrussDiagonal:143","TrussConnectionAngle:120",120
+N,L16,-1,1066,1,0.000,0,0,0,0.000,"",13,1.500,"TrussChord:381; TrussDiagonal:150; TrussVertical:136","",0
+N,L16,1,1066,1,0.000,0,0,0,0.000,"",13,1.500,"TrussChord:381; TrussDiagonal:143; TrussVertical:143","TrussConnectionAngle:110",110
+N,U16,-1,713,1,0.000,0,0,0,0.000,"",11,1.500,"TrussChord:319; TrussVertical:128; TrussDiagonal:113","",0
+N,U16,1,713,1,0.000,0,0,0,0.000,"",11,1.500,"TrussChord:319; TrussVertical:122; TrussDiagonal:119","TrussConnectionAngle:113",113
+N,L17,-1,991,1,0.000,0,0,0,0.000,"",30,1.500,"TrussChord:357; TrussVertical:135; TrussDiagonal:132","",0
+N,L17,1,991,1,0.000,0,0,0,0.000,"",30,1.500,"TrussChord:357; TrussDiagonal:137; TrussVertical:130","TrussConnectionAngle:103",103
+N,U17,-1,682,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:309; TrussVertical:125; TrussDiagonal:114","",0
+N,U17,1,682,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:309; TrussVertical:126; TrussDiagonal:113","TrussConnectionAngle:104",104
+N,L18,-1,1002,1,0.000,0,0,0,0.000,"",37,1.500,"TrussChord:383; TrussVertical:131; TrussDiagonal:127","",0
+N,L18,1,1002,1,0.000,0,0,0,0.000,"",37,1.500,"TrussChord:383; TrussVertical:130; TrussDiagonal:128","TrussConnectionAngle:105",105
+N,U18,-1,692,1,0.000,0,0,0,0.000,"",24,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:115","",0
+N,U18,1,692,1,0.000,0,0,0,0.000,"",24,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:115","TrussConnectionAngle:109",109
+N,L19,-1,1002,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:372; TrussDiagonal:123; TrussVertical:120","",0
+N,L19,1,1002,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:372; TrussDiagonal:123; TrussVertical:120","TrussConnectionAngle:102",102
+N,U19,-1,681,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:322; TrussVertical:112; TrussDiagonal:94","",0
+N,U19,1,681,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:322; TrussVertical:112; TrussDiagonal:94","TrussConnectionAngle:112",112
+N,L20,-1,976,1,0.000,0,0,0,0.000,"",14,1.687,"TrussChord:397; TrussDiagonal:82; TrussVertical:82","",0
+N,L20,1,976,1,0.000,0,0,0,0.000,"",14,1.687,"TrussChord:397; TrussDiagonal:82; TrussVertical:82","TrussConnectionAngle:112",112
+N,U20,-1,682,1,0.000,0,0,0,0.000,"",5,1.125,"TrussChord:346; TrussDiagonal:73; TrussVertical:72","",0
+N,U20,1,682,1,0.000,0,0,0,0.000,"",5,1.125,"TrussChord:346; TrussDiagonal:73; TrussVertical:72","TrussConnectionAngle:104",104
+N,L21,-1,980,1,0.000,0,0,0,0.000,"",546,1.750,"TrussChord:387; TrussVertical:84; TrussDiagonal:75","",0
+N,L21,1,980,1,0.000,0,0,0,0.000,"",546,1.750,"TrussChord:387; TrussVertical:84; TrussDiagonal:75","TrussConnectionAngle:109",109
+N,U21,-1,677,1,0.000,0,0,0,0.000,"",473,1.625,"TrussChord:337; TrussVertical:72; TrussDiagonal:64","",0
+N,U21,1,677,1,0.000,0,0,0,0.000,"",473,1.625,"TrussChord:337; TrussVertical:72; TrussDiagonal:64","TrussConnectionAngle:106",106
+N,L22,-1,1932,2,0.000,0,0,0,0.000,"",5,0.500,"TrussChord:635; TrussDiagonal:167; TrussVertical:84","",0
+N,L22,1,1932,2,0.000,0,0,0,0.000,"",5,0.500,"TrussChord:635; TrussDiagonal:167; TrussVertical:84","TrussConnectionAngle:48",48
+N,U22,-1,238,1,0.000,0,0,0,0.000,"",0,0.000,"","",0
+N,U22,1,238,1,0.000,0,0,0,0.000,"",0,0.000,"","TrussConnectionAngle:48",48
+N,L0',-1,477,1,0.000,0,0,0,0.000,"",7,0.687,"TrussChord:247; TrussVertical:77; TrussDiagonal:54","",0
+N,L0',1,477,1,0.000,0,0,0,0.000,"",7,0.688,"TrussChord:247; TrussVertical:77; TrussDiagonal:54","TrussConnectionAngle:36",36
+N,U0',-1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+N,U0',1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+N,L1',-1,256,1,0.000,0,0,0,0.000,"",3,0.687,"TrussChord:163; TrussVertical:54","",0
+N,L1',1,256,1,0.000,0,0,0,0.000,"",3,0.688,"TrussChord:163; TrussVertical:54","TrussConnectionAngle:60",60
+N,U1',-1,665,1,0.000,0,0,0,0.000,"",17,0.688,"TrussChord:356; TrussDiagonal:90; TrussVertical:63","",0
+N,U1',1,665,1,0.000,0,0,0,0.000,"",17,0.687,"TrussChord:356; TrussDiagonal:90; TrussVertical:63","",0
+N,L2',-1,817,1,0.000,0,0,0,0.000,"",22,1.000,"TrussChord:393; TrussDiagonal:138; TrussVertical:79","",0
+N,L2',1,817,1,0.000,0,0,0,0.000,"",22,1.000,"TrussChord:393; TrussDiagonal:138; TrussVertical:79","TrussConnectionAngle:111",111
+N,U2',-1,290,1,0.000,0,0,0,0.000,"",9,0.688,"TrussChord:183; TrussVertical:56","",0
+N,U2',1,290,1,0.000,0,0,0,0.000,"",9,0.688,"TrussChord:183; TrussVertical:56","",0
+N,L3',-1,256,1,0.000,0,0,0,0.000,"",3,0.687,"TrussChord:163; TrussVertical:54","",0
+N,L3',1,256,1,0.000,0,0,0,0.000,"",3,0.688,"TrussChord:163; TrussVertical:54","TrussConnectionAngle:59",59
+N,U3',-1,852,1,0.000,0,0,0,0.000,"",11,1.000,"TrussChord:389; TrussDiagonal:160; TrussVertical:78","",0
+N,U3',1,852,1,0.000,0,0,0,0.000,"",11,1.000,"TrussChord:389; TrussDiagonal:160; TrussVertical:78","",0
+N,L4',-1,900,1,0.000,0,0,0,0.000,"",31,1.125,"TrussChord:409; TrussDiagonal:178; TrussVertical:91","",0
+N,L4',1,900,1,0.000,0,0,0,0.000,"",31,1.125,"TrussChord:409; TrussDiagonal:178; TrussVertical:91","TrussConnectionAngle:118",118
+N,U4',-1,293,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+N,U4',1,293,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+N,L5',-1,322,1,0.000,0,0,0,0.000,"",10,1.125,"TrussChord:216; TrussVertical:63","",0
+N,L5',1,322,1,0.000,0,0,0,0.000,"",10,1.125,"TrussChord:216; TrussVertical:63","TrussConnectionAngle:60",60
+N,U5',-1,998,1,0.000,0,0,0,0.000,"",16,1.875,"TrussChord:424; TrussDiagonal:229; TrussVertical:84","",0
+N,U5',1,998,1,0.000,0,0,0,0.000,"",16,1.875,"TrussChord:424; TrussDiagonal:229; TrussVertical:84","",0
+N,L6',-1,1068,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:451; TrussDiagonal:247; TrussVertical:96","",0
+N,L6',1,1068,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:451; TrussDiagonal:249; TrussVertical:94","TrussConnectionAngle:126",126
+N,U6',-1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:158; TrussVertical:48","",0
+N,U6',1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:158; TrussVertical:48","",0
+N,L7',-1,277,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","",0
+N,L7',1,277,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","TrussConnectionAngle:63",63
+N,U7',-1,924,1,0.000,0,0,0,0.000,"",25,1.937,"TrussChord:422; TrussDiagonal:226; TrussVertical:98","",0
+N,U7',1,924,1,0.000,0,0,0,0.000,"",25,1.938,"TrussChord:422; TrussDiagonal:223; TrussVertical:101","",0
+N,L8',-1,1009,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:249; TrussVertical:84","",0
+N,L8',1,1009,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:239; TrussVertical:94","TrussConnectionAngle:113",113
+N,U8',-1,336,1,0.000,0,0,0,0.000,"",261,1.250,"TrussChord:191; TrussVertical:70","",0
+N,U8',1,336,1,0.000,0,0,0,0.000,"",261,1.250,"TrussChord:191; TrussVertical:70","",0
+N,L9',-1,447,1,0.000,0,0,0,0.000,"",337,1.750,"TrussChord:241; TrussVertical:96","",0
+N,L9',1,447,1,0.000,0,0,0,0.000,"",337,1.750,"TrussChord:241; TrussVertical:96","TrussConnectionAngle:84",84
+N,U9',-1,1364,1,0.000,0,0,0,0.000,"",45,1.938,"TrussChord:439; TrussDiagonal:386; TrussVertical:153","",0
+N,U9',1,1364,1,0.000,0,0,0,0.000,"",45,1.937,"TrussChord:439; TrussDiagonal:359; TrussVertical:180","",0
+N,L10',-1,1691,2,0.000,0,0,0,0.000,"",43,1.000,"TrussChord:547; TrussDiagonal:408; TrussVertical:238","",0
+N,L10',1,1691,2,0.000,0,0,0,0.000,"",43,1.000,"TrussChord:547; TrussDiagonal:438; TrussVertical:208","TrussConnectionAngle:120",120
+N,U10',-1,400,1,0.000,0,0,0,0.000,"",316,1.125,"TrussChord:235; TrussVertical:81","",0
+N,U10',1,400,1,0.000,0,0,0,0.000,"",316,1.125,"TrussChord:235; TrussVertical:81","",0
+N,L11',-1,470,3,0.000,0,0,0,0.000,"",110,1.125,"TrussChord:241; TrussVertical:110","",0
+N,L11',1,470,3,0.000,0,0,0,0.000,"",110,1.125,"TrussChord:241; TrussVertical:110","TrussConnectionAngle:32",32
+N,U11',-1,1960,1,0.000,0,0,0,0.000,"",32,1.938,"TrussChord:564; TrussDiagonal:457; TrussVertical:347","",0
+N,U11',1,1960,1,0.000,0,0,0,0.000,"",32,1.938,"TrussDiagonal:565; TrussChord:564; TrussVertical:239","TrussConnectionAngle:112",112
+N,L12',-1,1531,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:542; TrussVertical:260; TrussDiagonal:211","",0
+N,L12',1,1531,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:542; TrussDiagonal:245; TrussVertical:226","TrussConnectionAngle:121",121
+N,U12',-1,1314,1,0.000,0,0,0,0.000,"",16,1.938,"TrussChord:485; TrussVertical:245; TrussDiagonal:170","",0
+N,U12',1,1314,1,0.000,0,0,0,0.000,"",16,1.938,"TrussChord:485; TrussVertical:209; TrussDiagonal:206","TrussConnectionAngle:122",122
+N,L13',-1,1726,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:609; TrussDiagonal:215; TrussVertical:204","",0
+N,L13',1,1726,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:609; TrussDiagonal:225; TrussVertical:194","TrussConnectionAngle:175; TrussConnectionPlate:30; TrussFloorBeam:11",216
+N,U13',-1,1149,1,0.000,0,0,0,0.000,"",28,2.000,"TrussChord:401; TrussVertical:193; TrussDiagonal:192","",0
+N,U13',1,1149,1,0.000,0,0,0,0.000,"",45,2.000,"TrussChord:401; TrussDiagonal:209; TrussVertical:193","TrussConnectionAngle:102",102
+N,L14',-1,1555,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:499; TrussDiagonal:206; TrussVertical:179; TrussHanger:63","",0
+N,L14',1,1555,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:499; TrussDiagonal:201; TrussVertical:184; TrussHanger:63","",0
+N,U14',-1,949,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:409; TrussVertical:152; TrussDiagonal:150","",0
+N,U14',1,949,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:409; TrussDiagonal:168; TrussVertical:134","TrussConnectionAngle:115",115
+N,W14',-1,266,1,0.000,0,0,20,0.750,"LxTrussHanger:20",50,0.487,"TrussChord:50","",0
+N,W14',1,266,1,0.000,0,0,20,0.750,"RxTrussHanger:20",50,0.487,"TrussChord:50","",0
+N,L15',-1,1418,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:438; TrussDiagonal:214; TrussVertical:170","",0
+N,L15',1,1418,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:438; TrussDiagonal:204; TrussVertical:180","TrussConnectionAngle:62",62
+N,U15',-1,873,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:369; TrussVertical:158; TrussDiagonal:140","",0
+N,U15',1,873,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:369; TrussDiagonal:153; TrussVertical:145","TrussConnectionAngle:120",120
+N,L16',-1,1065,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:381; TrussDiagonal:144; TrussVertical:143","",0
+N,L16',1,1065,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:381; TrussDiagonal:151; TrussVertical:136","TrussConnectionAngle:110",110
+N,U16',-1,716,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:314; TrussVertical:124; TrussDiagonal:121","",0
+N,U16',1,716,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:314; TrussVertical:129; TrussDiagonal:116","TrussConnectionAngle:112",112
+N,L17',-1,989,1,0.000,0,0,0,0.000,"",27,1.500,"TrussChord:358; TrussDiagonal:137; TrussVertical:126","",0
+N,L17',1,989,1,0.000,0,0,0,0.000,"",27,1.500,"TrussChord:358; TrussDiagonal:132; TrussVertical:131","TrussConnectionAngle:99",99
+N,U17',-1,682,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:309; TrussVertical:126; TrussDiagonal:114","",0
+N,U17',1,682,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:309; TrussVertical:125; TrussDiagonal:115","TrussConnectionAngle:104",104
+N,L18',-1,1001,1,0.000,0,0,0,0.000,"",38,1.500,"TrussChord:383; TrussVertical:130; TrussDiagonal:128","",0
+N,L18',1,1001,1,0.000,0,0,0,0.000,"",38,1.500,"TrussChord:383; TrussVertical:131; TrussDiagonal:127","TrussConnectionAngle:104",104
+N,U18',-1,694,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:117","",0
+N,U18',1,694,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:117","TrussConnectionAngle:109",109
+N,L19',-1,1001,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:373; TrussDiagonal:124; TrussVertical:120","",0
+N,L19',1,1001,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:373; TrussDiagonal:124; TrussVertical:120","TrussConnectionAngle:101",101
+N,U19',-1,684,1,0.000,0,0,0,0.000,"",17,1.125,"TrussChord:320; TrussVertical:126; TrussDiagonal:91","",0
+N,U19',1,684,1,0.000,0,0,0,0.000,"",17,1.125,"TrussChord:320; TrussVertical:126; TrussDiagonal:91","TrussConnectionAngle:111",111
+N,L20',-1,967,1,0.000,0,0,0,0.000,"",18,1.687,"TrussChord:394; TrussVertical:94; TrussDiagonal:83","",0
+N,L20',1,967,1,0.000,0,0,0,0.000,"",18,1.688,"TrussChord:394; TrussVertical:94; TrussDiagonal:83","TrussConnectionAngle:109",109
+N,U20',-1,682,1,0.000,0,0,0,0.000,"",27,1.125,"TrussChord:342; TrussVertical:84; TrussDiagonal:77","",0
+N,U20',1,682,1,0.000,0,0,0,0.000,"",27,1.125,"TrussChord:342; TrussVertical:84; TrussDiagonal:77","TrussConnectionAngle:104",104
+N,L21',-1,972,1,0.000,0,0,0,0.000,"",555,1.625,"TrussChord:388; TrussVertical:97; TrussDiagonal:70","",0
+N,L21',1,972,1,0.000,0,0,0,0.000,"",555,1.625,"TrussChord:388; TrussVertical:97; TrussDiagonal:70","TrussConnectionAngle:110",110
+N,U21',-1,673,1,0.000,0,0,0,0.000,"",484,1.625,"TrussChord:331; TrussVertical:84; TrussDiagonal:69","",0
+N,U21',1,673,1,0.000,0,0,0,0.000,"",484,1.625,"TrussChord:331; TrussVertical:84; TrussDiagonal:69","TrussConnectionAngle:107",107
+S,L0,-1,473,1,0.000,0,0,0,0.000,"",6,0.688,"TrussChord:247; TrussVertical:88; TrussDiagonal:54","TrussConnectionAngle:54",54
+S,L0,1,473,1,0.000,0,0,0,0.000,"",6,0.688,"TrussChord:247; TrussVertical:88; TrussDiagonal:54","",0
+S,U0,-1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+S,U0,1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+S,L1,-1,256,1,0.000,0,0,0,0.000,"",2,0.687,"TrussChord:162; TrussVertical:54","TrussConnectionAngle:60",60
+S,L1,1,256,1,0.000,0,0,0,0.000,"",2,0.688,"TrussChord:162; TrussVertical:54","",0
+S,U1,-1,664,1,0.000,0,0,0,0.000,"",2,0.687,"TrussChord:356; TrussDiagonal:88; TrussVertical:54","",0
+S,U1,1,664,1,0.000,0,0,0,0.000,"",2,0.688,"TrussChord:356; TrussDiagonal:88; TrussVertical:54","",0
+S,L2,-1,819,1,0.000,0,0,0,0.000,"",26,1.000,"TrussChord:392; TrussDiagonal:143; TrussVertical:79","TrussConnectionAngle:114",114
+S,L2,1,819,1,0.000,0,0,0,0.000,"",26,1.000,"TrussChord:392; TrussDiagonal:143; TrussVertical:79","",0
+S,U2,-1,291,1,0.000,0,0,0,0.000,"",1,0.687,"TrussChord:186; TrussVertical:48","",0
+S,U2,1,291,1,0.000,0,0,0,0.000,"",1,0.688,"TrussChord:186; TrussVertical:48","",0
+S,L3,-1,256,1,0.000,0,0,0,0.000,"",4,0.688,"TrussChord:163; TrussVertical:54","TrussConnectionAngle:60",60
+S,L3,1,256,1,0.000,0,0,0,0.000,"",4,0.687,"TrussChord:163; TrussVertical:54","",0
+S,U3,-1,854,1,0.000,0,0,0,0.000,"",13,1.000,"TrussChord:389; TrussDiagonal:164; TrussVertical:78","",0
+S,U3,1,854,1,0.000,0,0,0,0.000,"",13,1.000,"TrussChord:389; TrussDiagonal:164; TrussVertical:78","",0
+S,L4,-1,890,1,0.000,0,0,0,0.000,"",18,1.125,"TrussChord:405; TrussDiagonal:180; TrussVertical:78","TrussConnectionAngle:119",119
+S,L4,1,890,1,0.000,0,0,0,0.000,"",18,1.125,"TrussChord:405; TrussDiagonal:180; TrussVertical:78","",0
+S,U4,-1,295,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+S,U4,1,295,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+S,L5,-1,321,1,0.000,0,0,0,0.000,"",1,1.125,"TrussChord:216; TrussVertical:54","TrussConnectionAngle:60",60
+S,L5,1,321,1,0.000,0,0,0,0.000,"",1,1.125,"TrussChord:216; TrussVertical:54","",0
+S,U5,-1,994,1,0.000,0,0,0,0.000,"",30,1.875,"TrussChord:428; TrussDiagonal:226; TrussVertical:97","",0
+S,U5,1,994,1,0.000,0,0,0,0.000,"",30,1.875,"TrussChord:428; TrussDiagonal:226; TrussVertical:97","",0
+S,L6,-1,1069,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:450; TrussDiagonal:248; TrussVertical:95","TrussConnectionAngle:126",126
+S,L6,1,1069,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:450; TrussDiagonal:247; TrussVertical:96","",0
+S,U6,-1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:159; TrussVertical:48","",0
+S,U6,1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:159; TrussVertical:48","",0
+S,L7,-1,278,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","TrussConnectionAngle:63",63
+S,L7,1,278,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","",0
+S,U7,-1,925,1,0.000,0,0,0,0.000,"",15,1.937,"TrussChord:422; TrussDiagonal:222; TrussVertical:92","",0
+S,U7,1,925,1,0.000,0,0,0,0.000,"",15,1.937,"TrussChord:422; TrussDiagonal:228; TrussVertical:86","",0
+S,L8,-1,1007,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:238; TrussVertical:94","TrussConnectionAngle:114",114
+S,L8,1,1007,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:250; TrussVertical:82","",0
+S,U8,-1,337,1,0.000,0,0,0,0.000,"",262,1.250,"TrussChord:192; TrussVertical:70","",0
+S,U8,1,337,1,0.000,0,0,0,0.000,"",262,1.250,"TrussChord:192; TrussVertical:70","",0
+S,L9,-1,453,1,0.000,0,0,0,0.000,"",329,0.750,"TrussChord:245; TrussVertical:84","TrussConnectionAngle:83",83
+S,L9,1,453,1,0.000,0,0,0,0.000,"",329,0.750,"TrussChord:245; TrussVertical:84","",0
+S,U9,-1,1364,1,0.000,0,0,0,0.000,"",42,1.938,"TrussChord:439; TrussDiagonal:358; TrussVertical:180","",0
+S,U9,1,1364,1,0.000,0,0,0,0.000,"",42,1.938,"TrussChord:439; TrussDiagonal:384; TrussVertical:154","",0
+S,L10,-1,1690,2,0.000,0,0,0,0.000,"",27,1.000,"TrussChord:547; TrussDiagonal:437; TrussVertical:194","TrussConnectionAngle:120",120
+S,L10,1,1690,2,0.000,0,0,0,0.000,"",27,1.000,"TrussChord:547; TrussDiagonal:409; TrussVertical:222","",0
+S,U10,-1,398,1,0.000,0,0,0,0.000,"",312,1.125,"TrussChord:232; TrussVertical:80","",0
+S,U10,1,398,1,0.000,0,0,0,0.000,"",312,1.125,"TrussChord:232; TrussVertical:80","",0
+S,L11,-1,469,3,0.000,0,0,0,0.000,"",120,1.125,"TrussChord:241; TrussVertical:120","TrussConnectionAngle:42",42
+S,L11,1,469,3,0.000,0,0,0,0.000,"",120,1.125,"TrussChord:241; TrussVertical:120","",0
+S,U11,-1,1962,1,0.000,0,0,0,0.000,"",29,1.938,"TrussDiagonal:567; TrussChord:560; TrussVertical:236","TrussConnectionAngle:110",110
+S,U11,1,1962,1,0.000,0,0,0,0.000,"",29,1.937,"TrussChord:560; TrussDiagonal:455; TrussVertical:348","",0
+S,L12,-1,1537,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:545; TrussDiagonal:245; TrussVertical:228","TrussConnectionAngle:121",121
+S,L12,1,1537,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:545; TrussVertical:260; TrussDiagonal:213","",0
+S,U12,-1,1311,1,0.000,0,0,0,0.000,"",15,1.937,"TrussChord:483; TrussDiagonal:211; TrussVertical:191","TrussConnectionAngle:122",122
+S,U12,1,1311,1,0.000,0,0,0,0.000,"",15,1.938,"TrussChord:483; TrussVertical:221; TrussDiagonal:181","",0
+S,L13,-1,1723,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:607; TrussDiagonal:225; TrussVertical:191","TrussConnectionAngle:175; TrussFloorBeam:41",216
+S,L13,1,1723,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:607; TrussDiagonal:213; TrussVertical:203","",0
+S,U13,-1,1150,1,0.000,0,0,0,0.000,"",47,2.000,"TrussChord:402; TrussDiagonal:211; TrussVertical:191","TrussConnectionAngle:102",102
+S,U13,1,1150,1,0.000,0,0,0,0.000,"",37,2.000,"TrussChord:402; TrussVertical:199; TrussDiagonal:193","",0
+S,L14,-1,1552,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:496; TrussDiagonal:201; TrussVertical:185; TrussHanger:63","",0
+S,L14,1,1552,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:496; TrussDiagonal:206; TrussVertical:180; TrussHanger:63","",0
+S,U14,-1,942,1,0.000,0,0,0,0.000,"",33,2.000,"TrussChord:402; TrussDiagonal:168; TrussVertical:143","TrussConnectionAngle:116",116
+S,U14,1,942,1,0.000,0,0,0,0.000,"",18,2.000,"TrussChord:402; TrussDiagonal:152; TrussVertical:144","",0
+S,W14,-1,266,1,0.000,0,0,20,0.750,"LxTrussHanger:20",50,0.487,"TrussChord:50","",0
+S,W14,1,266,1,0.000,0,0,20,0.750,"RxTrussHanger:20",50,0.487,"TrussChord:50","",0
+S,L15,-1,1419,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:440; TrussDiagonal:204; TrussVertical:180","TrussConnectionAngle:68",68
+S,L15,1,1419,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:440; TrussDiagonal:217; TrussVertical:167","",0
+S,U15,-1,885,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:372; TrussDiagonal:153; TrussVertical:149","TrussConnectionAngle:120",120
+S,U15,1,885,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:372; TrussVertical:159; TrussDiagonal:143","",0
+S,L16,-1,1066,1,0.000,0,0,0,0.000,"",13,1.500,"TrussChord:381; TrussDiagonal:150; TrussVertical:136","TrussConnectionAngle:110",110
+S,L16,1,1066,1,0.000,0,0,0,0.000,"",13,1.500,"TrussChord:381; TrussDiagonal:143; TrussVertical:143","",0
+S,U16,-1,713,1,0.000,0,0,0,0.000,"",11,1.500,"TrussChord:319; TrussVertical:128; TrussDiagonal:113","TrussConnectionAngle:113",113
+S,U16,1,713,1,0.000,0,0,0,0.000,"",11,1.500,"TrussChord:319; TrussVertical:122; TrussDiagonal:119","",0
+S,L17,-1,991,1,0.000,0,0,0,0.000,"",30,1.500,"TrussChord:357; TrussVertical:135; TrussDiagonal:132","TrussConnectionAngle:103",103
+S,L17,1,991,1,0.000,0,0,0,0.000,"",30,1.500,"TrussChord:357; TrussDiagonal:137; TrussVertical:130","",0
+S,U17,-1,682,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:309; TrussVertical:125; TrussDiagonal:114","TrussConnectionAngle:104",104
+S,U17,1,682,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:309; TrussVertical:126; TrussDiagonal:113","",0
+S,L18,-1,1002,1,0.000,0,0,0,0.000,"",37,1.500,"TrussChord:383; TrussVertical:131; TrussDiagonal:127","TrussConnectionAngle:105",105
+S,L18,1,1002,1,0.000,0,0,0,0.000,"",37,1.500,"TrussChord:383; TrussVertical:130; TrussDiagonal:128","",0
+S,U18,-1,692,1,0.000,0,0,0,0.000,"",24,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:115","TrussConnectionAngle:109",109
+S,U18,1,692,1,0.000,0,0,0,0.000,"",24,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:115","",0
+S,L19,-1,1002,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:372; TrussDiagonal:123; TrussVertical:120","TrussConnectionAngle:102",102
+S,L19,1,1002,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:372; TrussDiagonal:123; TrussVertical:120","",0
+S,U19,-1,681,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:322; TrussVertical:112; TrussDiagonal:94","TrussConnectionAngle:112",112
+S,U19,1,681,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:322; TrussVertical:112; TrussDiagonal:94","",0
+S,L20,-1,976,1,0.000,0,0,0,0.000,"",14,1.687,"TrussChord:397; TrussDiagonal:82; TrussVertical:82","TrussConnectionAngle:112",112
+S,L20,1,976,1,0.000,0,0,0,0.000,"",14,1.687,"TrussChord:397; TrussDiagonal:82; TrussVertical:82","",0
+S,U20,-1,682,1,0.000,0,0,0,0.000,"",5,1.125,"TrussChord:346; TrussDiagonal:73; TrussVertical:72","TrussConnectionAngle:104",104
+S,U20,1,682,1,0.000,0,0,0,0.000,"",5,1.125,"TrussChord:346; TrussDiagonal:73; TrussVertical:72","",0
+S,L21,-1,980,1,0.000,0,0,0,0.000,"",546,1.750,"TrussChord:387; TrussVertical:84; TrussDiagonal:75","TrussConnectionAngle:109",109
+S,L21,1,980,1,0.000,0,0,0,0.000,"",546,1.750,"TrussChord:387; TrussVertical:84; TrussDiagonal:75","",0
+S,U21,-1,677,1,0.000,0,0,0,0.000,"",473,1.625,"TrussChord:337; TrussVertical:72; TrussDiagonal:64","TrussConnectionAngle:106",106
+S,U21,1,677,1,0.000,0,0,0,0.000,"",473,1.625,"TrussChord:337; TrussVertical:72; TrussDiagonal:64","",0
+S,L22,-1,1932,2,0.000,0,0,0,0.000,"",5,0.500,"TrussChord:635; TrussDiagonal:167; TrussVertical:84","TrussConnectionAngle:48",48
+S,L22,1,1932,2,0.000,0,0,0,0.000,"",5,0.500,"TrussChord:635; TrussDiagonal:167; TrussVertical:84","",0
+S,U22,-1,238,1,0.000,0,0,0,0.000,"",0,0.000,"","TrussConnectionAngle:48",48
+S,U22,1,238,1,0.000,0,0,0,0.000,"",0,0.000,"","",0
+S,L0',-1,477,1,0.000,0,0,0,0.000,"",7,0.687,"TrussChord:247; TrussVertical:77; TrussDiagonal:54","TrussConnectionAngle:36",36
+S,L0',1,477,1,0.000,0,0,0,0.000,"",7,0.688,"TrussChord:247; TrussVertical:77; TrussDiagonal:54","",0
+S,U0',-1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+S,U0',1,249,1,0.000,0,0,0,0.000,"",2,0.375,"TrussChord:126; TrussVertical:48","",0
+S,L1',-1,256,1,0.000,0,0,0,0.000,"",3,0.687,"TrussChord:163; TrussVertical:54","TrussConnectionAngle:60",60
+S,L1',1,256,1,0.000,0,0,0,0.000,"",3,0.688,"TrussChord:163; TrussVertical:54","",0
+S,U1',-1,665,1,0.000,0,0,0,0.000,"",17,0.688,"TrussChord:356; TrussDiagonal:90; TrussVertical:63","",0
+S,U1',1,665,1,0.000,0,0,0,0.000,"",17,0.687,"TrussChord:356; TrussDiagonal:90; TrussVertical:63","",0
+S,L2',-1,817,1,0.000,0,0,0,0.000,"",22,1.000,"TrussChord:393; TrussDiagonal:138; TrussVertical:79","TrussConnectionAngle:111",111
+S,L2',1,817,1,0.000,0,0,0,0.000,"",22,1.000,"TrussChord:393; TrussDiagonal:138; TrussVertical:79","",0
+S,U2',-1,290,1,0.000,0,0,0,0.000,"",9,0.688,"TrussChord:183; TrussVertical:56","",0
+S,U2',1,290,1,0.000,0,0,0,0.000,"",9,0.688,"TrussChord:183; TrussVertical:56","",0
+S,L3',-1,256,1,0.000,0,0,0,0.000,"",3,0.687,"TrussChord:163; TrussVertical:54","TrussConnectionAngle:59",59
+S,L3',1,256,1,0.000,0,0,0,0.000,"",3,0.688,"TrussChord:163; TrussVertical:54","",0
+S,U3',-1,852,1,0.000,0,0,0,0.000,"",11,1.000,"TrussChord:389; TrussDiagonal:160; TrussVertical:78","",0
+S,U3',1,852,1,0.000,0,0,0,0.000,"",11,1.000,"TrussChord:389; TrussDiagonal:160; TrussVertical:78","",0
+S,L4',-1,900,1,0.000,0,0,0,0.000,"",31,1.125,"TrussChord:409; TrussDiagonal:178; TrussVertical:91","TrussConnectionAngle:118",118
+S,L4',1,900,1,0.000,0,0,0,0.000,"",31,1.125,"TrussChord:409; TrussDiagonal:178; TrussVertical:91","",0
+S,U4',-1,293,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+S,U4',1,293,1,0.000,0,0,0,0.000,"",2,0.750,"TrussChord:184; TrussVertical:48","",0
+S,L5',-1,322,1,0.000,0,0,0,0.000,"",10,1.125,"TrussChord:216; TrussVertical:63","TrussConnectionAngle:60",60
+S,L5',1,322,1,0.000,0,0,0,0.000,"",10,1.125,"TrussChord:216; TrussVertical:63","",0
+S,U5',-1,998,1,0.000,0,0,0,0.000,"",16,1.875,"TrussChord:424; TrussDiagonal:229; TrussVertical:84","",0
+S,U5',1,998,1,0.000,0,0,0,0.000,"",16,1.875,"TrussChord:424; TrussDiagonal:229; TrussVertical:84","",0
+S,L6',-1,1068,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:451; TrussDiagonal:247; TrussVertical:96","TrussConnectionAngle:126",126
+S,L6',1,1068,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:451; TrussDiagonal:249; TrussVertical:94","",0
+S,U6',-1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:158; TrussVertical:48","",0
+S,U6',1,252,1,0.000,0,0,0,0.000,"",48,1.000,"SplicePlate:158; TrussVertical:48","",0
+S,L7',-1,277,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","TrussConnectionAngle:63",63
+S,L7',1,277,1,0.000,0,0,0,0.000,"",54,1.000,"SplicePlate:172; TrussVertical:54","",0
+S,U7',-1,924,1,0.000,0,0,0,0.000,"",25,1.937,"TrussChord:422; TrussDiagonal:226; TrussVertical:98","",0
+S,U7',1,924,1,0.000,0,0,0,0.000,"",25,1.938,"TrussChord:422; TrussDiagonal:223; TrussVertical:101","",0
+S,L8',-1,1009,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:249; TrussVertical:84","TrussConnectionAngle:113",113
+S,L8',1,1009,1,0.000,0,0,0,0.000,"",6,1.000,"TrussChord:409; TrussDiagonal:239; TrussVertical:94","",0
+S,U8',-1,336,1,0.000,0,0,0,0.000,"",261,1.250,"TrussChord:191; TrussVertical:70","",0
+S,U8',1,336,1,0.000,0,0,0,0.000,"",261,1.250,"TrussChord:191; TrussVertical:70","",0
+S,L9',-1,447,1,0.000,0,0,0,0.000,"",337,1.750,"TrussChord:241; TrussVertical:96","TrussConnectionAngle:84",84
+S,L9',1,447,1,0.000,0,0,0,0.000,"",337,1.750,"TrussChord:241; TrussVertical:96","",0
+S,U9',-1,1364,1,0.000,0,0,0,0.000,"",45,1.938,"TrussChord:439; TrussDiagonal:386; TrussVertical:153","",0
+S,U9',1,1364,1,0.000,0,0,0,0.000,"",45,1.937,"TrussChord:439; TrussDiagonal:359; TrussVertical:180","",0
+S,L10',-1,1691,2,0.000,0,0,0,0.000,"",43,1.000,"TrussChord:547; TrussDiagonal:408; TrussVertical:238","TrussConnectionAngle:120",120
+S,L10',1,1691,2,0.000,0,0,0,0.000,"",43,1.000,"TrussChord:547; TrussDiagonal:438; TrussVertical:208","",0
+S,U10',-1,400,1,0.000,0,0,0,0.000,"",316,1.125,"TrussChord:235; TrussVertical:81","",0
+S,U10',1,400,1,0.000,0,0,0,0.000,"",316,1.125,"TrussChord:235; TrussVertical:81","",0
+S,L11',-1,470,3,0.000,0,0,0,0.000,"",110,1.125,"TrussChord:241; TrussVertical:110","TrussConnectionAngle:32",32
+S,L11',1,470,3,0.000,0,0,0,0.000,"",110,1.125,"TrussChord:241; TrussVertical:110","",0
+S,U11',-1,1960,1,0.000,0,0,0,0.000,"",32,1.938,"TrussChord:564; TrussDiagonal:457; TrussVertical:347","TrussConnectionAngle:112",112
+S,U11',1,1960,1,0.000,0,0,0,0.000,"",32,1.938,"TrussDiagonal:565; TrussChord:564; TrussVertical:239","",0
+S,L12',-1,1531,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:542; TrussVertical:260; TrussDiagonal:211","TrussConnectionAngle:121",121
+S,L12',1,1531,1,0.000,0,0,0,0.000,"",9,1.500,"TrussChord:542; TrussDiagonal:245; TrussVertical:226","",0
+S,U12',-1,1314,1,0.000,0,0,0,0.000,"",16,1.938,"TrussChord:485; TrussVertical:245; TrussDiagonal:170","TrussConnectionAngle:122",122
+S,U12',1,1314,1,0.000,0,0,0,0.000,"",16,1.938,"TrussChord:485; TrussVertical:209; TrussDiagonal:206","",0
+S,L13',-1,1726,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:609; TrussDiagonal:215; TrussVertical:204","TrussConnectionAngle:175; TrussConnectionPlate:30; TrussFloorBeam:11",216
+S,L13',1,1726,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:609; TrussDiagonal:225; TrussVertical:194","",0
+S,U13',-1,1149,1,0.000,0,0,0,0.000,"",28,2.000,"TrussChord:401; TrussVertical:193; TrussDiagonal:192","TrussConnectionAngle:102",102
+S,U13',1,1149,1,0.000,0,0,0,0.000,"",45,2.000,"TrussChord:401; TrussDiagonal:209; TrussVertical:193","",0
+S,L14',-1,1555,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:499; TrussDiagonal:206; TrussVertical:179; TrussHanger:63","",0
+S,L14',1,1555,1,0.000,0,0,0,0.000,"",14,1.500,"TrussChord:499; TrussDiagonal:201; TrussVertical:184; TrussHanger:63","",0
+S,U14',-1,949,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:409; TrussVertical:152; TrussDiagonal:150","TrussConnectionAngle:115",115
+S,U14',1,949,1,0.000,0,0,0,0.000,"",12,1.500,"TrussChord:409; TrussDiagonal:168; TrussVertical:134","",0
+S,W14',-1,266,1,0.000,0,0,20,0.750,"LxTrussHanger:20",50,0.487,"TrussChord:50","",0
+S,W14',1,266,1,0.000,0,0,20,0.750,"RxTrussHanger:20",50,0.487,"TrussChord:50","",0
+S,L15',-1,1418,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:438; TrussDiagonal:214; TrussVertical:170","TrussConnectionAngle:62",62
+S,L15',1,1418,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:438; TrussDiagonal:204; TrussVertical:180","",0
+S,U15',-1,873,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:369; TrussVertical:158; TrussDiagonal:140","TrussConnectionAngle:120",120
+S,U15',1,873,1,0.000,0,0,0,0.000,"",17,1.500,"TrussChord:369; TrussDiagonal:153; TrussVertical:145","",0
+S,L16',-1,1065,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:381; TrussDiagonal:144; TrussVertical:143","TrussConnectionAngle:110",110
+S,L16',1,1065,1,0.000,0,0,0,0.000,"",15,1.500,"TrussChord:381; TrussDiagonal:151; TrussVertical:136","",0
+S,U16',-1,716,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:314; TrussVertical:124; TrussDiagonal:121","TrussConnectionAngle:112",112
+S,U16',1,716,1,0.000,0,0,0,0.000,"",7,1.500,"TrussChord:314; TrussVertical:129; TrussDiagonal:116","",0
+S,L17',-1,989,1,0.000,0,0,0,0.000,"",27,1.500,"TrussChord:358; TrussDiagonal:137; TrussVertical:126","TrussConnectionAngle:99",99
+S,L17',1,989,1,0.000,0,0,0,0.000,"",27,1.500,"TrussChord:358; TrussDiagonal:132; TrussVertical:131","",0
+S,U17',-1,682,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:309; TrussVertical:126; TrussDiagonal:114","TrussConnectionAngle:104",104
+S,U17',1,682,1,0.000,0,0,0,0.000,"",8,1.500,"TrussChord:309; TrussVertical:125; TrussDiagonal:115","",0
+S,L18',-1,1001,1,0.000,0,0,0,0.000,"",38,1.500,"TrussChord:383; TrussVertical:130; TrussDiagonal:128","TrussConnectionAngle:104",104
+S,L18',1,1001,1,0.000,0,0,0,0.000,"",38,1.500,"TrussChord:383; TrussVertical:131; TrussDiagonal:127","",0
+S,U18',-1,694,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:117","TrussConnectionAngle:109",109
+S,U18',1,694,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:310; TrussVertical:126; TrussDiagonal:117","",0
+S,L19',-1,1001,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:373; TrussDiagonal:124; TrussVertical:120","TrussConnectionAngle:101",101
+S,L19',1,1001,1,0.000,0,0,0,0.000,"",10,1.500,"TrussChord:373; TrussDiagonal:124; TrussVertical:120","",0
+S,U19',-1,684,1,0.000,0,0,0,0.000,"",17,1.125,"TrussChord:320; TrussVertical:126; TrussDiagonal:91","TrussConnectionAngle:111",111
+S,U19',1,684,1,0.000,0,0,0,0.000,"",17,1.125,"TrussChord:320; TrussVertical:126; TrussDiagonal:91","",0
+S,L20',-1,967,1,0.000,0,0,0,0.000,"",18,1.687,"TrussChord:394; TrussVertical:94; TrussDiagonal:83","TrussConnectionAngle:109",109
+S,L20',1,967,1,0.000,0,0,0,0.000,"",18,1.688,"TrussChord:394; TrussVertical:94; TrussDiagonal:83","",0
+S,U20',-1,682,1,0.000,0,0,0,0.000,"",27,1.125,"TrussChord:342; TrussVertical:84; TrussDiagonal:77","TrussConnectionAngle:104",104
+S,U20',1,682,1,0.000,0,0,0,0.000,"",27,1.125,"TrussChord:342; TrussVertical:84; TrussDiagonal:77","",0
+S,L21',-1,972,1,0.000,0,0,0,0.000,"",555,1.625,"TrussChord:388; TrussVertical:97; TrussDiagonal:70","TrussConnectionAngle:110",110
+S,L21',1,972,1,0.000,0,0,0,0.000,"",555,1.625,"TrussChord:388; TrussVertical:97; TrussDiagonal:70","",0
+S,U21',-1,673,1,0.000,0,0,0,0.000,"",484,1.625,"TrussChord:331; TrussVertical:84; TrussDiagonal:69","TrussConnectionAngle:107",107
+S,U21',1,673,1,0.000,0,0,0,0.000,"",484,1.625,"TrussChord:331; TrussVertical:84; TrussDiagonal:69","",0

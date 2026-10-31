@@ -242,6 +242,56 @@ public sealed partial class MiscItemsGenerator
             string asm = e.Name;
             Asm(MiscGroup.CrashCushion, asm, $"Crash cushion end post at {e.Support}: {Sh(e.Length)} concrete wedge, {Sh(e.HeightRailEnd)} to {Sh(e.HeightAtEnd)} high, {Sh(e.EndWidth)} end", "crash cushion");
             AddMarks(asm, "end post", e.Bars);
+            if (e.RailRows is { Count: >= 2 } rr)
+            {
+                if (e.RailHalfProfile is not { Count: >= 2 } hp) Warn($"{asm}: rail part rows given without the rail half section; rail part not built.");
+                else
+                {
+                    // rail part (Section C-C): two halves on the two toe lines, mirrored, flat top between = filled solid; rows across from the end of slab to the wedge start
+                    var rows2 = rr.OrderBy(r => r.Station).ToList();
+                    var half = hp.ToList();
+                    Vec3[] RailRing(EndPostPlanRow r)
+                    {
+                        double sl = r.Station, sr = r.RightStation ?? r.Station;
+                        var a = Pt(sl, r.LeftOffset); var b = Pt(sr, r.RightOffset);
+                        var u = (b - a).Normalized();
+                        double za = Ztop(sl, r.LeftOffset), zb = Ztop(sr, r.RightOffset);
+                        var ring = new List<Vec3>();
+                        foreach (var q in half) ring.Add((a + u * q.R).WithZ(za + q.H));
+                        for (int i = half.Count - 1; i >= 0; i--) ring.Add((b - u * half[i].R).WithZ(zb + half[i].H));
+                        return ring.ToArray();
+                    }
+                    var rings = rows2.Select(RailRing).ToArray();
+                    // 2D section of the first row for the loft orientation (across, up)
+                    var r0 = rings[0];
+                    var o0 = r0[0]; var dr = r0[^1] - r0[0]; var ax = new Vec3(dr.X, dr.Y, 0).Normalized();
+                    var sec2 = r0.Select(v => new Vec2(Vec3.Dot(v - o0, ax), v.Z - o0.Z)).ToList();
+                    var rm = new Mesh();
+                    MeshBuilder.AddLoft(rm, sec2, rings);
+                    double rl = rows2[^1].Station - rows2[0].Station;
+                    Add(MiscGroup.CrashCushion, MiscKind.EndPostConcrete, asm, asm + " rail part", $"End post rail part (two barrier halves filled solid between) {Sh(rl)} long from the end of slab ({e.Source})", rm, "Class C concrete");
+                }
+            }
+            if (e.PlanRows is { Count: >= 2 } rows)
+            {
+                // dimensioned plan outline: one ring per row, the four corners on the deck top, heights by the distance along the alignment from the first row
+                var rs = rows.OrderBy(r => r.Station).ToList();
+                double s0r = rs[0].Station;
+                var sq = new[] { new Vec2(0, 0), new Vec2(1, 0), new Vec2(1, 1), new Vec2(0, 1) };
+                double Hh(double d) => d <= e.TaperLength ? e.HeightRailEnd + (e.HeightAtEnd - e.HeightRailEnd) * d / Math.Max(e.TaperLength, 1e-6) : e.HeightAtEnd;
+                Vec3[] RowRing(EndPostPlanRow r)
+                {
+                    double h = Hh(r.Station - s0r);
+                    var a = Pt(r.Station, r.LeftOffset).WithZ(Ztop(r.Station, r.LeftOffset)); var b = Pt(r.Station, r.RightOffset).WithZ(Ztop(r.Station, r.RightOffset));
+                    return new[] { a, b, b + new Vec3(0, 0, h), a + new Vec3(0, 0, h) };
+                }
+                var pm = new Mesh();
+                MeshBuilder.AddLoft(pm, sq, rs.Select(RowRing).ToArray());
+                double plen = rs[^1].Station - s0r;
+                Add(MiscGroup.CrashCushion, MiscKind.EndPostConcrete, asm, asm + " concrete", $"End post {Sh(plen)} long from the plan outline ({e.Source}); {Sh(e.HeightRailEnd)} to {Sh(e.HeightAtEnd)} high", pm, "Class C concrete");
+                if (e.CushionLength is null) Warn($"{asm}: crash cushion unit (I.M. 455) has no geometry in the plans: envelope not built.");
+                continue;
+            }
             if (e.Station is not { } sta || e.Offset is not { } off || e.DirectionDegrees is not { } dd || e.PierEndWidth is not { } w0)
             {
                 Warn($"{asm}: " + UnresolvedFlag.Text("I-80 PDF 229 / 230 end post details", "end post position from the CL pier, wedge direction and plan width at the pier end", "the details show the end post shape only, these are not dimensioned (the Ramp G wedge is also skewed 27d27'55\")", "Wedge and cushion placeholder NOT placed; the bar list is scheduled."));

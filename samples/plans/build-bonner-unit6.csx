@@ -196,8 +196,7 @@ foreach (var (n, sta) in bentSta)
 }
 U("p.371 (Unit 5 sheets), p.395", "bent 29 substructure (cap, columns, footing C-18, piles)", "bent 29 is shared with Unit 5 and detailed on the Unit 5 sheets; the Unit 5 model builds it",
   "Bent 29 is a support line only in this model (no substructure); its Unit 6 side bearings (E1 + P32 on the Unit 5 bent 29 cap) are modeled.");
-U("p.409, p.457", "deck ends at bents 29 and 35 (modular joint at bent 29, CL joint at bent 35)", "the joint gap / device and the deck end relative to the bent control line are on the joint sheets, which were not extracted",
-  "Deck ends on the bent 29 and bent 35 control lines; no joint, no blockout.");
+// Deck ends + joints (bent 29 modular, bent 35 Transflex), parapet joints and end posts: joints-parapet-bonner-unit6.csx (called below).
 
 // ================================================================ 3. deck (typical section p404, p409-410)
 br.Deck.LeftEdgeOffset = -F(21, 3.5); br.Deck.RightEdgeOffset = F(21, 3.5);                 // 42'-7" out to out, symmetric about -L-
@@ -205,9 +204,17 @@ br.Deck.Thickness = In(9);                                                      
 br.Deck.Haunch = In(5);                                                                      // default only: every span has its own build-ups below
 br.Deck.StayInPlaceForms = false;
 br.Deck.Reinforcement.Enabled = false;
-br.Deck.Barrier.Type = BarrierType.None; br.Deck.Barrier.Left = false; br.Deck.Barrier.Right = false;
-G("Deck reinforcing (A101 / B / K / S / U / E / G / H bars, bill of material p455 = 299,412 lb stainless) - not placed (shapes not transcribed).");
-G("1'-2\" concrete parapets and rails (p448-454), bent / end diaphragms (2'-4\" / 1'-10\", p409, p415), pour sequence and closures (p457), deck drains - not modeled.");
+// 1'-2" x 2'-6" concrete parapet (p448 partial plans: inside face 20'-0" from -L- = clear roadway 40'-0", deck 42'-7" out to out -> outside face 1 1/2" inside the
+// deck edge; p450 Sections A-A / B-B: 2'-6" high, 3/4" chamfers), plumb; R = inward from the deck edge, H = above the deck top.
+br.Deck.Barrier.Type = BarrierType.Custom; br.Deck.Barrier.Left = true; br.Deck.Barrier.Right = true;
+br.Deck.Barrier.ProfileName = "NCDOT 1'-2\" concrete parapet (p448 / p450)";
+br.Deck.Barrier.Profile = new()
+{
+    new() { R = In(1.5), H = 0 }, new() { R = In(15.5), H = 0 }, new() { R = In(15.5), H = In(30), Chamfer = In(0.75) }, new() { R = In(1.5), H = In(30), Chamfer = In(0.75) },
+};
+U("p.404, p.448-454", "2-bar metal rail on the parapet, parapet cover plates (3/4\" in a recess) and concrete inserts", "the rail is an NCDOT standard ('end of rail details' bound under separate cover) not in this set; the cover plates sit in a recess of the parapet face, which the barrier plate input (wrapping the whole section) does not represent",
+  "Not built (see docs/plan-data/bonner-b2500/fib-unit6/REMAINING.md).");
+G("Deck / diaphragm / parapet bars: diaphragm marks other than K302 (E / G / K / S / U), K302 of the expansion joint diaphragms, H bars and parapet B8-B11 are schedule-only bar-list rows; pour sequence / closures (p.457) not modeled - docs/plan-data/bonner-b2500/fib-unit6/REMAINING.md.");
 
 // ================================================================ 4. girders: FIB-96 (p438), strands (p439), girder data (girders.csv p428-431)
 br.Girders.Count = 4;
@@ -354,13 +361,28 @@ br.Girders.SpanLayouts = new();
 for (int k = 0; k < 6; k++)
     br.Girders.SpanLayouts.Add(new GirderSpanLayout { Span = k, Count = 4, Begin = End(k == 0 ? F(3, 2) : F(1, 2), buildBack[k]), End = End(k == 5 ? F(1, 4) : F(1, 2), buildAhead[k]) });
 U("p.404", "build-up between the bearings", "only the values at the CL bearings are tabulated ('varies along length of girder')", "The haunch follows the straight beam between the two tabulated bearing values (no camber).");
-G("Girder mild reinforcing S1-S8, V1, WWF (p428-431: counts and lengths per girder, 3,854 - 3,947 lb) - not placed: bar shapes and positions not transcribed.");
+// Girder mild reinforcing S1 / S5 / S6 / S8: beam-rebar-bonner-unit6.csx (called below); S2 / S3 / S4 / S7 / V1 / WWF reported by it.
 G("Embedded plates B-1, anchor bolts / grout pockets, 1 1/2\" formed web holes, end bevels (p438-444) - not modeled.");
 
 Doc.Project.Bridges.Add(br);
 
+// ---------------------------------------------------------------- details (run from the repo root): diaphragms, joints / parapet, deck bars, beam bars
+foreach (var f in new[] { "diaphragms-bonner-unit6.csx", "joints-parapet-bonner-unit6.csx", "rail-bonner-unit6.csx", "deck-rebar-bonner-unit6.csx", "parapet-rebar-bonner-unit6.csx", "beam-rebar-bonner-unit6.csx" })
+{
+    var dr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", f), Doc, Args);
+    Print(dr.Output.TrimEnd());
+    if (!dr.Success) Print($"ERROR in {f}: " + dr.Error);
+}
+
 // ================================================================ 5. regenerate, save, report
 var rep = Doc.Regenerate();
+// diaphragm bars need the generated girders (bottoms at the bents): placed after the first regeneration, then regenerate again
+{
+    var dr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", "diaphragm-rebar-bonner-unit6.csx"), Doc, Args);
+    Print(dr.Output.TrimEnd());
+    if (!dr.Success) Print("ERROR in diaphragm-rebar-bonner-unit6.csx: " + dr.Error);
+    rep = Doc.Regenerate();
+}
 Print($"Regenerated {rep.Bridges} bridge(s) in {rep.Elapsed.TotalSeconds:0.0} s; {rep.Warnings.Count} warnings, {rep.Errors.Count} errors");
 foreach (var e in rep.Errors) Print("ERROR " + e);
 var ps = Doc.Prestressed(BridgeName);
@@ -373,5 +395,8 @@ Print("UNRESOLVED (script):");
 foreach (var u in unresolved) Print("  " + u);
 Print("GAP (not modeled):");
 foreach (var g in gaps) Print("  " + g);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "b2500-s4" in sheet-links-bonner-unit6.json.
+{ const string pdf = @"C:\SBMData\B-2500 Bonner - Revision 3 Combined Plan Set - Unofficial.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save(outPath);
 Print($"Saved {outPath}");

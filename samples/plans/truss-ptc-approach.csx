@@ -137,6 +137,7 @@ foreach (var u in units)
 
     var t = new TrussDefinition
     {
+        PartPerPiece = true,   // main span review BW-M1 / user 2026-10-27: every ply / angle / cover plate / gusset layer its own element (sub-element of its member / joint stack)
         Name = u.Bridge.Replace("PTC ", "") + " (approach)", Source = "PTC DRB-4 (as-built 1954-57)", DefaultMaterial = "Structural steel (C / S not given)",
         Materials = { ["C"] = "Structural carbon steel (C)", ["S"] = "Structural silicon steel (S)" },   // p.47 / p.57: (C) carbon, (S) silicon
         PlanSteelWeightLb = u.PlanLb, PlanSteelWeightSource = "p.42 items 2 + 5 (carbon + silicon approach truss spans, one unit)",

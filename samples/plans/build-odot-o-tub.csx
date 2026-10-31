@@ -467,5 +467,8 @@ foreach (var d in st.Diagnostics.Where(d => d.Severity == SBM.Core.Framing.Diagn
 Print($"Steel: {st.Parts.Count} parts, {st.Assemblies.Count} assemblies, {st.Bolts.Count} bolts, {st.Studs.Count} studs, {st.SteelMass / 0.45359237:N0} lb");
 Print("GAPS (program features missing; closest input used):");
 foreach (var s in gaps) Print("  GAP " + s);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "vol2-phase2b" in sheet-links-odot-o.json.
+{ const string pdf = @"C:\SBMData\Vol 2_Phase 2B Bridge Combined.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save();
 Print($"Saved {Doc.FilePath}");

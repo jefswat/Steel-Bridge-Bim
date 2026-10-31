@@ -15,6 +15,8 @@ public sealed class CableStayedModel
     public SubstructureModel? Substructure { get; set; }
     /// <summary>Pylon frame (origin = base point, X / Y / Z).</summary>
     public Frame3 PylonFrame { get; set; }
+    /// <summary>Frames of all pylons (first = <see cref="PylonFrame"/>).</summary>
+    public List<Frame3> PylonFrames { get; } = new();
     public List<CsLegCurve> Legs { get; } = new();
     public List<CsStay> Stays { get; } = new();
     /// <summary>Deck CL stations: begin / end, support stations (name), pylon station.</summary>
@@ -24,6 +26,8 @@ public sealed class CableStayedModel
     /// <summary>Deck section (offset right +, height above the CL grade) and its properties.</summary>
     public List<Vec2> DeckSection { get; } = new();
     public CsSectionProps DeckProps { get; set; } = new();
+    /// <summary>Deck weight per length when it is not the section area x density (edge girder deck: steel + slab), N/m; 0 = from <see cref="DeckProps"/>.</summary>
+    public double DeckWeightPerLength { get; set; }
     public CsAnalysisModel Analysis { get; } = new();
     public CsForceReport Forces { get; set; } = new();
     public List<CsClearanceResult> Clearances { get; } = new();
@@ -35,6 +39,8 @@ public sealed class CsLegCurve
 {
     public required string Name { get; init; }
     public required Bridge.CsPylonLeg Definition { get; init; }
+    /// <summary>Pylon number (index into <see cref="Bridge.CableStayedDefinition.AllPylons"/> / <see cref="CableStayedModel.PylonFrames"/>).</summary>
+    public int Pylon { get; init; }
     /// <summary>World points along the curve (dense) and their cumulative lengths.</summary>
     public required Vec3[] Points { get; init; }
     public required double[] S { get; init; }
@@ -151,6 +157,8 @@ public sealed class CsForceReport
     public double BaseMomentLongTotal { get; set; }
     public double BaseMomentTransTotal { get; set; }
     public double PylonSelfWeight { get; set; }
+    /// <summary>Base statics per pylon (the fields above = the first pylon).</summary>
+    public List<CsPylonBase> Pylons { get; } = new();
     public List<string> Notes { get; } = new();
 }
 
@@ -175,3 +183,6 @@ public sealed class CsLegBalance
 }
 
 public sealed record CsClearanceResult(string Name, double Required, double Provided, double AtStation, bool Ok);
+
+/// <summary>Base statics of one pylon (stays + its self weight about its frame origin), world N / N m; long + = toward its frame +X.</summary>
+public sealed record CsPylonBase(string Support, Vec3 ForceDead, Vec3 ForceTotal, double MomentLongDead, double MomentLongTotal, double MomentTransDead, double MomentTransTotal, double SelfWeight);

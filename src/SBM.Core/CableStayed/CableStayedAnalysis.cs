@@ -12,7 +12,7 @@ namespace SBM.Core.CableStayed;
 /// </summary>
 public static class CableStayedAnalysis
 {
-    private const double G = 9.80665;
+    internal const double G = 9.80665;
 
     // ------------------------------------------------------------------ section properties
 
@@ -92,7 +92,7 @@ public static class CableStayedAnalysis
         var ad = d.Analysis;
         double Es = ad.SteelModulus, Ec = ad.ConcreteModulus;
         bool steelDeck = d.Deck.Material == CsMaterial.Steel;
-        double deckRho = steelDeck ? ad.SteelDensity : ad.ConcreteDensity;
+        double deckRho = m.DeckWeightPerLength > 0 ? m.DeckWeightPerLength / G / Math.Max(1e-9, m.DeckProps.A) : steelDeck ? ad.SteelDensity : ad.ConcreteDensity;
         var rigid = new CsSectionProps { A = 1, Iy = 1, Iz = 1, J = 1, Depth = 0, Width = 0 };
         int Node(string name, Vec3 p) { var n = new CsNode { Id = an.Nodes.Count + 1, Name = name, P = p }; an.Nodes.Add(n); return n.Id; }
         int mid = 0;
@@ -125,20 +125,31 @@ public static class CableStayedAnalysis
 
         // pylon: trunk, legs, cross beams
         var pf = m.PylonFrame;
-        int baseNode = -1, trunkTop = -1;
-        if (m.Legs.Count > 0)
+        var pylons = d.AllPylons;
+        var trunkTops = new List<int>();
+        for (int p = 0; p < m.PylonFrames.Count; p++)
         {
-            baseNode = Node("PY base", pf.Origin);
-            an.Supports.Add(new CsSupport { Node = baseNode, Name = "pylon base", Fixed = new[] { true, true, true, true, true, true } });
-            var py = d.Pylon;
+            var pfp = m.PylonFrames[p];
+            string tag = p == 0 ? "PY" : $"PY{p + 1}";
+            int baseNode = Node($"{tag} base", pfp.Origin);
+            an.Supports.Add(new CsSupport { Node = baseNode, Name = p == 0 ? "pylon base" : $"pylon {p + 1} base", Fixed = new[] { true, true, true, true, true, true } });
+            var py = pylons[p];
+            int top = baseNode;
             if (py.TrunkHeight > 0)
             {
-                trunkTop = Node("PY trunk top", pf.ToWorld(py.TrunkTopX, py.TrunkTopY, py.TrunkHeight));
+                top = Node($"{tag} trunk top", pfp.ToWorld(py.TrunkTopX, py.TrunkTopY, py.TrunkHeight));
                 var ts = RectProps(py.TrunkSection, 0.5);
-                Member("trunk", "trunk", baseNode, trunkTop, ts, py.TrunkSection.Material == CsMaterial.Steel ? Es : Ec, py.TrunkSection.Material == CsMaterial.Steel ? ad.SteelDensity : ad.ConcreteDensity, wAxis: pf.Y);
+                Member(p == 0 ? "trunk" : $"trunk {p + 1}", "trunk", baseNode, top, ts, py.TrunkSection.Material == CsMaterial.Steel ? Es : Ec, py.TrunkSection.Material == CsMaterial.Steel ? ad.SteelDensity : ad.ConcreteDensity, wAxis: pfp.Y);
             }
-            else trunkTop = baseNode;
+            trunkTops.Add(top);
         }
+        int trunkTop = trunkTops.Count > 0 ? trunkTops[0] : -1;
+        // cross beams with global leg numbers and world heights
+        var cbAt = new List<(int la, int lb, double z, CsCrossBeam cb, int p)>();
+        for (int p = 0, l0 = 0; p < pylons.Count; l0 += pylons[p].Legs.Count, p++)
+            foreach (var cb in pylons[p].CrossBeams)
+                if (cb.LegA >= 0 && cb.LegB >= 0 && cb.LegA < pylons[p].Legs.Count && cb.LegB < pylons[p].Legs.Count)
+                    cbAt.Add((l0 + cb.LegA, l0 + cb.LegB, pylons[p].BaseElevation + cb.Height, cb, p));
         var legNodes = new List<SortedDictionary<double, int>>();
         for (int li = 0; li < m.Legs.Count; li++)
         {
@@ -146,7 +157,7 @@ public static class CableStayedAnalysis
             var fr = new SortedSet<double> { 0, 1 };
             for (int k = 1; k < 12; k++) fr.Add(k / 12.0);
             foreach (var s in m.Stays.Where(s => s.Leg == li)) fr.Add(Math.Round(s.PylonFraction, 9));
-            foreach (var cb in d.Pylon.CrossBeams.Where(x => x.LegA == li || x.LegB == li)) fr.Add(FractionAtHeight(leg, d.Pylon.BaseElevation + cb.Height));
+            foreach (var cb in cbAt.Where(x => x.la == li || x.lb == li)) fr.Add(FractionAtHeight(leg, cb.z));
             var nodes = new SortedDictionary<double, int>();
             foreach (var u in fr) nodes[u] = Node($"{leg.Name} {u:0.###}", leg.At(u));
             legNodes.Add(nodes);
@@ -165,22 +176,23 @@ public static class CableStayedAnalysis
         for (int li = 0; li < legNodes.Count; li++)
         {
             var start = an.Nodes[legNodes[li][0] - 1];
+            int pl = m.Legs[li].Pylon;
             int other = -1; double bd = 1.5;
             for (int lj = 0; lj < legNodes.Count; lj++)
-                if (lj != li)
+                if (lj != li && m.Legs[lj].Pylon == pl)
                     foreach (var id in new[] { legNodes[lj][0], legNodes[lj][1] })
                     { double dd = (an.Nodes[id - 1].P - start.P).Length; if (dd < bd) { bd = dd; other = id; } }
             if (other > 0) Member($"{m.Legs[li].Name} root", "link", other, start.Id, rigid, Es * 100, 0);
-            else if (start.P.Z - pf.Origin.Z < 0.5) an.Supports.Add(new CsSupport { Node = start.Id, Name = $"{m.Legs[li].Name} foot", Fixed = new[] { true, true, true, true, true, true } });
-            else if (trunkTop > 0) Member($"{m.Legs[li].Name} root", "link", trunkTop, start.Id, rigid, Es * 100, 0);
+            else if (start.P.Z - m.PylonFrames[pl].Origin.Z < 0.5) an.Supports.Add(new CsSupport { Node = start.Id, Name = $"{m.Legs[li].Name} foot", Fixed = new[] { true, true, true, true, true, true } });
+            else if (trunkTops[pl] > 0) Member($"{m.Legs[li].Name} root", "link", trunkTops[pl], start.Id, rigid, Es * 100, 0);
         }
         int cbi = 0;
-        foreach (var cb in d.Pylon.CrossBeams)
+        foreach (var (la, lb, z, cb, p) in cbAt)
         {
             cbi++;
-            if (cb.LegA >= legNodes.Count || cb.LegB >= legNodes.Count) continue;
-            double ua = FractionAtHeight(m.Legs[cb.LegA], d.Pylon.BaseElevation + cb.Height), ub = FractionAtHeight(m.Legs[cb.LegB], d.Pylon.BaseElevation + cb.Height);
-            Member($"cross beam {cbi}", "crossbeam", legNodes[cb.LegA][ua], legNodes[cb.LegB][ub], RectProps(cb.Section, 0.5), Es, ad.SteelDensity, wAxis: pf.X);
+            if (la >= legNodes.Count || lb >= legNodes.Count) continue;
+            double ua = FractionAtHeight(m.Legs[la], z), ub = FractionAtHeight(m.Legs[lb], z);
+            Member($"cross beam {cbi}", "crossbeam", legNodes[la][ua], legNodes[lb][ub], RectProps(cb.Section, 0.5), Es, ad.SteelDensity, wAxis: m.PylonFrames[p].X);
         }
         int NearestPylonNode(Vec3 p, double within)
         {
@@ -204,9 +216,12 @@ public static class CableStayedAnalysis
             else if (Math.Min(s.From.Z, s.To.Z) < 0.3) an.Supports.Add(new CsSupport { Node = low, Name = $"strut {si} base (pylon footing)", Fixed = new[] { true, true, true, true, true, true } });
         }
         // deck on the pylon
-        var pylonSup = m.Supports.FirstOrDefault(x => x.Pylon);
-        if (d.Pylon.DeckBearsOnPylon && pylonSup.Name != null && trunkTop > 0 && pylonSup.Station > m.DeckBegin && pylonSup.Station < m.DeckEnd)
-            Member("deck bearing at pylon", "link", SpineAt(pylonSup.Station), trunkTop, rigid, Es * 100, 0);
+        for (int p = 0; p < trunkTops.Count; p++)
+        {
+            var pylonSup = m.Supports.FirstOrDefault(x => x.Pylon && x.Name.Equals(pylons[p].Support, StringComparison.OrdinalIgnoreCase));
+            if (pylons[p].DeckBearsOnPylon && pylonSup.Name != null && trunkTops[p] > 0 && pylonSup.Station > m.DeckBegin && pylonSup.Station < m.DeckEnd)
+                Member(p == 0 ? "deck bearing at pylon" : $"deck bearing at pylon {p + 1}", "link", SpineAt(pylonSup.Station), trunkTops[p], rigid, Es * 100, 0);
+        }
 
         // stays + deck anchor links
         foreach (var s in m.Stays)
@@ -267,7 +282,7 @@ public static class CableStayedAnalysis
         m.Forces = r;
         var ad = d.Analysis;
         bool steelDeck = d.Deck.Material == CsMaterial.Steel;
-        r.DeckSelfWeight = m.DeckProps.A * (steelDeck ? ad.SteelDensity : ad.ConcreteDensity) * G;
+        r.DeckSelfWeight = m.DeckWeightPerLength > 0 ? m.DeckWeightPerLength : m.DeckProps.A * (steelDeck ? ad.SteelDensity : ad.ConcreteDensity) * G;
         r.BarrierWeight = d.Deck.BarrierHeight > 0 ? 2 * d.Deck.BarrierHeight * d.Deck.BarrierThickness * d.Deck.BarrierDensity * G : 0;
         r.SuperimposedDead = ad.SuperimposedDeadLoad;
         double topW = m.DeckSection.Where(p => Math.Abs(p.Y - m.DeckSection.Max(q => q.Y)) < 1e-6).Select(p => p.X).DefaultIfEmpty(0).Max()
@@ -277,7 +292,7 @@ public static class CableStayedAnalysis
 
         // vertical supports of the deck along the alignment: piers / abutments, the pylon (when the deck bears on it), stay anchor stations
         var sup = new SortedDictionary<double, List<CsStay>>();
-        foreach (var s in m.Supports) if ((!s.Pylon || d.Pylon.DeckBearsOnPylon) && s.Station >= m.DeckBegin - 1e-6 && s.Station <= m.DeckEnd + 1e-6) sup.TryAdd(Math.Round(s.Station, 6), new());
+        foreach (var s in m.Supports) if ((!s.Pylon || d.AllPylons.Any(py => py.DeckBearsOnPylon && s.Name.Equals(py.Support, StringComparison.OrdinalIgnoreCase))) && s.Station >= m.DeckBegin - 1e-6 && s.Station <= m.DeckEnd + 1e-6) sup.TryAdd(Math.Round(s.Station, 6), new());
         foreach (var s in m.Stays.Where(s => !double.IsNaN(s.Station)))
         {
             var k = Math.Round(s.Station, 6);
@@ -302,67 +317,78 @@ public static class CableStayedAnalysis
         foreach (var s in m.Stays.Where(s => double.IsNaN(s.Station)))
             r.Notes.Add($"{s.Name}: ground anchored back stay - its force follows from the pylon balance, not from a tributary deck length (not estimated).");
 
-        // pylon: stay pulls + self weight -> base resultant (about the frame origin)
-        var pf = m.PylonFrame;
-        Vec3 fD = Vec3.Zero, mD = Vec3.Zero, fT = Vec3.Zero, mT = Vec3.Zero;
-        void Add(Vec3 p, Vec3 force, bool dead)
+        // each pylon: stay pulls + self weight -> base resultant (about its frame origin)
+        for (int p = 0; p < m.PylonFrames.Count; p++)
         {
-            var arm = p - pf.Origin;
-            if (dead) { fD += force; mD += Vec3.Cross(arm, force); }
-            fT += force; mT += Vec3.Cross(arm, force);
-        }
-        double wPylon = 0;
-        for (int li = 0; li < m.Legs.Count; li++)
-        {
-            var leg = m.Legs[li];
-            var sec = leg.Definition.Section;
-            double rho = sec.Material == CsMaterial.Steel ? ad.SteelDensity : ad.ConcreteDensity;
-            double wLeg = 0;
-            const int n = 60;
-            for (int k = 0; k < n; k++)
+            var pf = m.PylonFrames[p];
+            var py = d.AllPylons[p];
+            int l0 = d.FirstLegOf(p);
+            Vec3 fD = Vec3.Zero, mD = Vec3.Zero, fT = Vec3.Zero, mT = Vec3.Zero;
+            void Add(Vec3 pt, Vec3 force, bool dead)
             {
-                double u = (k + 0.5) / n;
-                double wgt = RectProps(sec, u).A * rho * G * leg.Length / n;
-                wLeg += wgt;
-                Add(leg.At(u), new Vec3(0, 0, -wgt), true);
+                var arm = pt - pf.Origin;
+                if (dead) { fD += force; mD += Vec3.Cross(arm, force); }
+                fT += force; mT += Vec3.Cross(arm, force);
             }
-            wPylon += wLeg;
-            Vec3 sD = Vec3.Zero, sT = Vec3.Zero;
-            foreach (var s in m.Stays.Where(s => s.Leg == li))
+            double wPylon = 0;
+            for (int li = 0; li < m.Legs.Count; li++)
             {
-                var sf = r.Stays.FirstOrDefault(x => x.Stay == s.Name);
-                if (sf == null) continue;
-                var dir = (s.Lower - s.Upper).Normalized();
-                Add(s.Upper, dir * sf.Dead, true);
-                Add(s.Upper, dir * (sf.Total - sf.Dead), false);
-                sD += dir * sf.Dead; sT += dir * sf.Total;
+                var leg = m.Legs[li];
+                if (leg.Pylon != p) continue;
+                var sec = leg.Definition.Section;
+                double rho = sec.Material == CsMaterial.Steel ? ad.SteelDensity : ad.ConcreteDensity;
+                double wLeg = 0;
+                const int n = 60;
+                for (int k = 0; k < n; k++)
+                {
+                    double u = (k + 0.5) / n;
+                    double wgt = RectProps(sec, u).A * rho * G * leg.Length / n;
+                    wLeg += wgt;
+                    Add(leg.At(u), new Vec3(0, 0, -wgt), true);
+                }
+                wPylon += wLeg;
+                Vec3 sD = Vec3.Zero, sT = Vec3.Zero;
+                foreach (var s in m.Stays.Where(s => s.Leg == li))
+                {
+                    var sf = r.Stays.FirstOrDefault(x => x.Stay == s.Name);
+                    if (sf == null) continue;
+                    var dir = (s.Lower - s.Upper).Normalized();
+                    Add(s.Upper, dir * sf.Dead, true);
+                    Add(s.Upper, dir * (sf.Total - sf.Dead), false);
+                    sD += dir * sf.Dead; sT += dir * sf.Total;
+                }
+                r.Legs.Add(new CsLegBalance { Leg = leg.Name, SelfWeight = wLeg, StayForceDead = sD, StayForceTotal = sT });
             }
-            r.Legs.Add(new CsLegBalance { Leg = leg.Name, SelfWeight = wLeg, StayForceDead = sD, StayForceTotal = sT });
+            if (py.TrunkHeight > 0)
+            {
+                var ts = py.TrunkSection;
+                double wt = RectProps(ts, 0.5).A * (ts.Material == CsMaterial.Steel ? ad.SteelDensity : ad.ConcreteDensity) * G * py.TrunkHeight;
+                wPylon += wt;
+                Add(pf.ToWorld(py.TrunkTopX / 2, py.TrunkTopY / 2, py.TrunkHeight / 2), new Vec3(0, 0, -wt), true);
+            }
+            foreach (var cb in py.CrossBeams)
+            {
+                if (cb.LegA < 0 || cb.LegB < 0 || cb.LegA >= py.Legs.Count || cb.LegB >= py.Legs.Count || l0 + Math.Max(cb.LegA, cb.LegB) >= m.Legs.Count) continue;
+                var la = m.Legs[l0 + cb.LegA]; var lb = m.Legs[l0 + cb.LegB];
+                var pa = la.At(FractionAtHeight(la, py.BaseElevation + cb.Height));
+                var pb = lb.At(FractionAtHeight(lb, py.BaseElevation + cb.Height));
+                double wc = RectProps(cb.Section, 0.5).A * ad.SteelDensity * G * (pb - pa).Length;
+                wPylon += wc;
+                Add((pa + pb) * 0.5, new Vec3(0, 0, -wc), true);
+            }
+            // the pylon frame is X along, Y RIGHT, Z up (left-handed): tipping toward +X = rotation about Z x X, toward +Y = about Z x Y
+            var longAxis = Vec3.Cross(pf.Z, pf.X).Normalized();
+            var transAxis = Vec3.Cross(pf.Z, pf.Y).Normalized();
+            var pb0 = new CsPylonBase(py.Support, fD, fT, Vec3.Dot(mD, longAxis), Vec3.Dot(mT, longAxis), Vec3.Dot(mD, transAxis), Vec3.Dot(mT, transAxis), wPylon);
+            r.Pylons.Add(pb0);
+            if (p == 0)
+            {
+                r.PylonSelfWeight = wPylon;
+                r.BaseForceDead = fD; r.BaseMomentDead = mD; r.BaseForceTotal = fT; r.BaseMomentTotal = mT;
+                r.BaseMomentLongDead = pb0.MomentLongDead; r.BaseMomentTransDead = pb0.MomentTransDead;
+                r.BaseMomentLongTotal = pb0.MomentLongTotal; r.BaseMomentTransTotal = pb0.MomentTransTotal;
+            }
         }
-        var py = d.Pylon;
-        if (py.TrunkHeight > 0)
-        {
-            var ts = py.TrunkSection;
-            double wt = RectProps(ts, 0.5).A * (ts.Material == CsMaterial.Steel ? ad.SteelDensity : ad.ConcreteDensity) * G * py.TrunkHeight;
-            wPylon += wt;
-            Add(pf.ToWorld(py.TrunkTopX / 2, py.TrunkTopY / 2, py.TrunkHeight / 2), new Vec3(0, 0, -wt), true);
-        }
-        foreach (var cb in py.CrossBeams)
-        {
-            if (cb.LegA >= m.Legs.Count || cb.LegB >= m.Legs.Count) continue;
-            var pa = m.Legs[cb.LegA].At(FractionAtHeight(m.Legs[cb.LegA], py.BaseElevation + cb.Height));
-            var pb = m.Legs[cb.LegB].At(FractionAtHeight(m.Legs[cb.LegB], py.BaseElevation + cb.Height));
-            double wc = RectProps(cb.Section, 0.5).A * ad.SteelDensity * G * (pb - pa).Length;
-            wPylon += wc;
-            Add((pa + pb) * 0.5, new Vec3(0, 0, -wc), true);
-        }
-        r.PylonSelfWeight = wPylon;
-        r.BaseForceDead = fD; r.BaseMomentDead = mD; r.BaseForceTotal = fT; r.BaseMomentTotal = mT;
-        // the pylon frame is X along, Y RIGHT, Z up (left-handed): tipping toward +X = rotation about Z x X, toward +Y = about Z x Y
-        var longAxis = Vec3.Cross(pf.Z, pf.X).Normalized();
-        var transAxis = Vec3.Cross(pf.Z, pf.Y).Normalized();
-        r.BaseMomentLongDead = Vec3.Dot(mD, longAxis); r.BaseMomentTransDead = Vec3.Dot(mD, transAxis);
-        r.BaseMomentLongTotal = Vec3.Dot(mT, longAxis); r.BaseMomentTransTotal = Vec3.Dot(mT, transAxis);
         r.Notes.Add("Tributary deck lengths between vertical supports (piers, abutments, the pylon bearing when set, stay anchor stations); stays at one station share its load equally; stay force = vertical share / sin(angle).");
         r.Notes.Add("Pylon base = statics of the stay pulls and the pylon self weight about the base point (struts, deck bearing on the pylon and pier columns not included). Longitudinal overturning + = tips the pylon toward the pylon frame +X (the main span for the osprey concept); transverse + = toward +Y (right); zero longitudinal DL moment = a balanced lean.");
         if (d.Struts.Count > 0) r.Notes.Add("The struts carry part of the pylon load to their footings; they are in the wireframe but not in this statics estimate.");

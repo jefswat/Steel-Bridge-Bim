@@ -1,9 +1,9 @@
 # Plan bend diagrams vs model bar shapes -> docs/plan-data/bend-diagram-comparison.md (tables) + temp/bend/compare.json
 import json, re, csv, sys, collections, math
-sys.path.insert(0, r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\tools')
+sys.path.insert(0, r'C:\SBM\.worktrees\bends\tools')
 import abut_hand
-W = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends' + '\\'
-ROOT = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler' + '\\'
+W = r'C:\SBM\.worktrees\bends' + '\\'
+ROOT = r'C:\SBM' + '\\'
 DUMP = sys.argv[1] if len(sys.argv) > 1 else W + r'temp\bend\dump1.txt'
 OUT = sys.argv[2] if len(sys.argv) > 2 else W + r'temp\bend\compare.md'
 SIZES = {'#3': .375, '#4': .5, '#5': .625, '#6': .75, '#7': .875, '#8': 1.0, '#9': 1.128, '#10': 1.27, '#11': 1.41, '#14': 1.693, '#18': 2.257}

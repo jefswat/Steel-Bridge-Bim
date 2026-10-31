@@ -178,7 +178,12 @@ foreach (var (uname, pg) in units)
         double edge = side < 0 ? eL : eR;
         double inw = -side;                                          // toward the CL
         double oc = edge + inw * (endCov + I(3));                    // CS centre line (2" + 6"/2 from the edge)
-        double csEnd = endCov + d4 / 2;
+        // end stirrups clear of the deck ends by 2" at their nearest point (agent review NHT curbs C02): the second hook tail one bar diameter along the curb,
+        // and at a skewed end (Pier 10 / 11, 19.58 deg) the stirrup's corner half its width x tan(skew) closer than its centre line
+        double hw0 = I(3) - d4 / 2, tanSk = 0;
+        foreach (bool bg in new[] { true, false })
+            tanSk = Math.Max(tanSk, Math.Abs(Cross(oc + hw0, 0, bg) - Cross(oc - hw0, 0, bg)) / (2 * hw0));
+        double csEnd = endCov + d4 / 2 + d4 + hw0 * tanSk;
         int nCS = (int)Math.Ceiling(EdgeLen(oc, csEnd) / I(9) - 1e-9);
         var pc = Divide(oc, csEnd, nCS);
         foreach (var p in pc)
@@ -201,7 +206,7 @@ foreach (var (uname, pg) in units)
         foreach (double o in dOffs)
             foreach (var b in Split(Line(o, endCov, p => Top(p) - t + I(2) + d4 + d4 / 2), F(60), F(1, 7))) D.Bars.Add(PlanBarSet.Encode(b));
     }
-    CS.Note = "closed 6\" x 8 1/2\" (BARS CS) with 4 1/2\" hook tails, outer leg 2\" from the slab edge, 2\" clear below the curb top (curb 4\" high DERIVED from 8 1/2\" + 2\" + 2\" - 8 1/2\" slab), equal spaces <= 9\" between 2\" from the deck ends";
+    CS.Note = "closed 6\" x 8 1/2\" (BARS CS) with 4 1/2\" hook tails, outer leg 2\" from the slab edge, 2\" clear below the curb top (curb 4\" high DERIVED from 8 1/2\" + 2\" + 2\" - 8 1/2\" slab), equal spaces <= 9\" between end stirrups 2\" clear of the deck ends at their nearest corner / hook tail (skewed ends: + half the width x tan(skew))";
     C.Note = "2 per curb in the CS top corners; lines split <= 60'-0 with 1'-7\" laps";
     D.Note = "3 per side: the CS bottom corners and 5\" inboard (section); lines split <= 60'-0 with 1'-7\" laps; bottom clear 2\" (CS)";
     sets.Add(CS); sets.Add(C); sets.Add(D);

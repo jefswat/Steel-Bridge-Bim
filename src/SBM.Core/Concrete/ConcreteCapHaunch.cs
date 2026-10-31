@@ -213,6 +213,7 @@ public sealed partial class ConcreteGenerator
             // the order of the cut lines must hold across the width
             if (ns.Any(n => B(n) - A(n) < -1e-6)) { Warn($"{sl.Name} cap haunch: the {lines[i].kind} and {lines[i + 1].kind} lines cross within the haunch width; piece at S {FtIn(mid0)} skipped."); continue; }
             double c = SteelC(mid0);
+            int thin0 = thin;
             double len = ns.Max(n => B(n) - A(n));
             int ni = Math.Max(2, (int)Math.Ceiling(len / 0.5)) + 1;
             var top = new Vec3[ni, ns.Length];
@@ -233,6 +234,52 @@ public sealed partial class ConcreteGenerator
                 }
             }
             var piece = GridSolid(top, bot);
+            // exact geometry ON: the piece as an exact block (along the cap between its cut lines, across the haunch width; top = deck soffit,
+            // bottom = cap steel surface); not where the soffit was held 1/16" above the steel (the mesh is then not the exact surface)
+            if (_geo != null && thin == thin0)
+            {
+                // the soffit steps where the deck edge crosses a piece under a deck widening (widening bottom vs slab soffit; the generator does
+                // not cut the piece there): the exact description splits the piece at that line into blocks (the mesh is unchanged)
+                var bounds = new List<Func<double, double>> { A };
+                foreach (int side in new[] { -1, 1 })
+                {
+                    if (wid[side] == null) continue;
+                    int sd = side;
+                    Func<double, double> E = n => SolveS(n, d => EdgeAt(sd, d), Guess(EdgeAt(sd, dSup)));
+                    try { if (ns.All(n => E(n) > A(n) + 1e-4 && E(n) < B(n) - 1e-4)) bounds.Add(E); }
+                    catch (InvalidOperationException) { }
+                }
+                bounds.Add(B);
+                bounds = bounds.OrderBy(f => f(0)).ToList();
+                int n0 = piece.Nurbs?.Count ?? 0;
+                string? why = null;
+                double dev = 0;
+                for (int k = 0; k + 1 < bounds.Count; k++)
+                {
+                    var Ak = bounds[k]; var Bk = bounds[k + 1];
+                    Func<double, Vec3> Row(double v, bool bottom)
+                    {
+                        double n = -W + 2 * W * v, a0 = Ak(n), b0 = Bk(n), e = 1e-7 * Math.Sign(b0 - a0);
+                        // the soffit one-sided at the block's own ends (a step at a split line belongs to the neighbouring block)
+                        return u =>
+                        {
+                            double s = a0 + (b0 - a0) * u, se = u <= 0 ? s + e : u >= 1 ? s - e : s;
+                            return cap.Plan(s, n).WithZ(bottom ? cap.SurfaceZ(s, c) : Soffit(se, n));
+                        };
+                    }
+                    var nb = NurbsSlab.Create(1, _ => 1, (_, _, v) => Row(v, false), 0, _fitTol, out string w, 32, (_, _, v) => Row(v, true));
+                    if (nb == null) { why = w; break; }
+                    piece.AddNurbs(nb.ToSolid("cap haunch"), 0, k == 0 ? piece.TriangleCount : 0);
+                    dev = Math.Max(dev, nb.MaxDeviation);
+                }
+                if (why != null)
+                {
+                    piece.DropNurbsFrom(n0);
+                    _nurbs!.Fallback("cap haunch", $"{sl.Name}, piece S {FtIn(A(0))} .. {FtIn(B(0))} ({lines[i].kind} - {lines[i + 1].kind}): {why}");
+                }
+                else _nurbs!.Built("cap haunch", dev);
+            }
+            else if (_geo != null) _nurbs!.Fallback("cap haunch", "soffit held 1/16\" above the cap steel");
             res.Pieces.Add(piece);
             res.Mesh.Append(piece);
         }

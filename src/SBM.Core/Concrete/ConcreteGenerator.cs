@@ -43,6 +43,12 @@ public sealed class ExpansionJointResult
 public readonly record struct EndBlockHit(double X, double Drop, bool OnDeck, bool Inside, double AboveSoffit);
 
 /// <summary>Steel found inside a deck end block: embedded as the plans show, or an unintended clash. Heights are above the block soffit (m).</summary>
+/// <summary>A separately cast / placed piece of the deck slab: Kind "precast panel" or "closure pour".</summary>
+public sealed record DeckPart(string Name, string Kind, Mesh Mesh, Assumption? Assumption = null)
+{
+    public bool IsPanel => Kind == "precast panel";
+}
+
 public sealed record DeckEndClash(string Support, string Member, bool Intended, int Count, double MaxAboveSoffit, string Note);
 
 /// <summary>The thickened deck end ("end dam diaphragm") at an expansion joint: solid + the analytic outline used for clash checks.</summary>
@@ -96,6 +102,8 @@ public sealed class DeckEndBlockResult
 public sealed class ConcreteModel
 {
     public List<ExpansionJointResult> Joints { get; } = new();
+    /// <summary>OPTIONAL approach slabs beyond the deck ends (<see cref="SupportDefinition.ApproachSlab"/>).</summary>
+    public List<ApproachSlabResult> ApproachSlabs { get; } = new();
     public Mesh? Deck { get; set; }
     public Mesh? Haunches { get; set; }
     /// <summary>Steel embedded in or clashing with the deck end blocks (filled by <c>DeckEndBlockCheck</c> once the steel exists).</summary>
@@ -103,8 +111,14 @@ public sealed class ConcreteModel
     public List<(string Name, Mesh Mesh)> Barriers { get; } = new();
     /// <summary>Closed solids a barrier mesh is made of (custom barriers with zones: one per section length) - IFC items; absent = the mesh is one solid.</summary>
     public Dictionary<string, List<Mesh>> BarrierPieces { get; } = new();
+    /// <summary>OPTIONAL per barrier (by name): its own material and status flag (truss concrete line items: curb + parapet); absent = the bridge's concrete, no flag.</summary>
+    public Dictionary<string, (string Material, Assumption? Assumption)> BarrierInfo { get; } = new();
     /// <summary>Deck slab widenings under barrier zones (plan "deck bump-outs"), part of the deck slab.</summary>
     public List<(string Name, Mesh Mesh)> DeckBumps { get; } = new();
+    /// <summary>OPTIONAL deck PARTS (precast deck panels, cast-in-place closure pours): separate elements of the deck slab (IFC IfcBuildingElementPart
+    /// aggregated into the deck IfcSlab; the slab itself has no own body when <see cref="Deck"/> is null).</summary>
+    public List<DeckPart> DeckParts { get; } = new();
+    public double DeckPartVolume => DeckParts.Sum(p => Math.Abs(p.Mesh.Volume()));
     public double DeckBumpVolume => DeckBumps.Sum(b => Math.Abs(b.Mesh.Volume()));
     /// <summary>Concrete haunches over integral steel pier caps (<c>IntegralSteelCapDefinition.Haunch</c>), part of the deck placement.</summary>
     public List<CapHaunchResult> CapHaunches { get; } = new();
@@ -178,7 +192,7 @@ public sealed partial class ConcreteGenerator
 
     private void Run()
     {
-        var tasks = new List<Action> { BuildDeckSolid, BuildHaunches, BuildBarriers, BuildJoints, BuildCapHaunches };
+        var tasks = new List<Action> { BuildDeckSolid, BuildHaunches, BuildBarriers, BuildJoints, BuildCapHaunches, BuildApproachSlabs };
         Parallel.ForEach(tasks, t => t());
         _m.CapHaunches.Sort((x, y) => string.CompareOrdinal(x.Support, y.Support));
         var bars = new ConcurrentBag<(string series, RebarSize size, BarShape shape, string loc, bool epoxy, BarPlacement placement)>();
@@ -377,7 +391,7 @@ public sealed partial class ConcreteGenerator
                 if (ov <= a + 1e-6 || ov >= b - 1e-6) continue;
                 var ca = cols[j]; var cb = cols[j + 1];
                 double f = (ov - a) / (b - a);
-                cols.Insert(j + 1, d => ca(d) + (cb(d) - ca(d)) * f);
+                cols.Insert(j + 1, d => { double a = ca(d); return a + (cb(d) - a) * f; });
                 break;
             }
         }
@@ -397,7 +411,7 @@ public sealed partial class ConcreteGenerator
             Func<double, double> hi = d => gr ? RightAtD(d) - w : RightAtD(d) - ri;
             list.Add(d => LeftAtD(d) + li);
             if (gl) list.Add(lo);
-            for (int k = 1; k < ni; k++) { double t = (double)k / ni; list.Add(d => lo(d) + (hi(d) - lo(d)) * t); }
+            for (int k = 1; k < ni; k++) { double t = (double)k / ni; list.Add(d => { double a = lo(d); return a + (hi(d) - a) * t; }); }
             if (gr) list.Add(hi);
             list.Add(d => RightAtD(d) - ri);
             return list;
@@ -456,9 +470,9 @@ public sealed partial class ConcreteGenerator
         var (b0, e0) = Ends(0, InsetB, InsetE);
         int ni = AlongSamples(e0 - b0) + 1;
         if (Deck.Overhang?.Unresolved is { Length: > 0 } ut) Warn(ut);
-        if (SlopedOverhang == null && _geo != null && NurbsDeck(offs.Select(o => (Func<double, double>)(_ => o)).ToList(), ref ni, out var nt, out var nb) is { } slab)
+        if (_geo != null && NurbsDeck(offs.Select(o => (Func<double, double>)(_ => o)).ToList(), ref ni, out var nt, out var nb) is { } slab)
         {
-            _m.Deck = GridSolid(nt, nb);
+            _m.Deck = WeldCollapsed(GridSolid(nt, nb), 1e-6);   // collapsed cells beyond skewed / kinked ends removed: closed mesh
             _m.Deck.AddNurbs(slab.ToSolid("deck slab"), 0);
             AddJointShelves();
             return;
@@ -490,7 +504,7 @@ public sealed partial class ConcreteGenerator
         int ni = AlongSamples(e0 - b0) + 1;
         if (_geo != null && NurbsDeck(cols, ref ni, out var nt, out var nb) is { } slab)
         {
-            _m.Deck = GridSolid(nt, nb);
+            _m.Deck = WeldCollapsed(GridSolid(nt, nb), 1e-6);   // collapsed cells beyond skewed / kinked ends removed: closed mesh
             _m.Deck.AddNurbs(slab.ToSolid("deck slab"), 0);
             AddJointShelves();
             return;
@@ -673,7 +687,7 @@ public sealed partial class ConcreteGenerator
     }
 
     /// <summary>Slab of the deck-end zone between two insets from the deck end face (+ toward the deck); top/bottom are drops below finished grade.</summary>
-    private Mesh EndSlab(bool begin, double inset0, double inset1, double topDrop, double botDrop, double li = 0, double ri = 0)
+    private Mesh EndSlab(bool begin, double inset0, double inset1, double topDrop, double botDrop, double li = 0, double ri = 0, string kind = "deck end slab")
     {
         var cols = JointColumns(li, ri);
         int nk = cols.Count;
@@ -689,7 +703,10 @@ public sealed partial class ConcreteGenerator
                 top[i, k] = p.WithZ(z - topDrop);
                 bot[i, k] = p.WithZ(z - botDrop);
             }
-        return GridSolid(top, bot);
+        var g = GridSolid(top, bot);
+        // exact geometry ON: the exact block (the mesh is unchanged)
+        if (_geo != null) RecordEndBlock(g, 0, g.TriangleCount, begin, new[] { inset0, inset1 }, _ => topDrop, _ => botDrop, li, ri, kind);
+        return g;
     }
 
     /// <summary>Where the blockout is shallower than the slab the deck keeps a shelf under it (the primary deck is cut back by the full blockout width).</summary>
@@ -699,7 +716,7 @@ public sealed partial class ConcreteGenerator
         {
             var j = begin ? JointB : JointE;
             if (j == null || j.BlockoutWidth <= 1e-9 || EffectiveBlockoutDepth(j) >= Deck.Thickness - 1e-6) continue;
-            _m.Deck!.Append(EndSlab(begin, 0, j.BlockoutWidth, EffectiveBlockoutDepth(j), Deck.Thickness));
+            _m.Deck!.Append(EndSlab(begin, 0, j.BlockoutWidth, EffectiveBlockoutDepth(j), Deck.Thickness, kind: "joint shelf"));
         }
     }
 
@@ -743,6 +760,7 @@ public sealed partial class ConcreteGenerator
         }
         var mesh = new Mesh();
         MeshBuilder.AddLoft(mesh, section, rings);
+        if (_geo != null) RecordEndBlockSection(mesh, begin, soffit, bt, slab, d, bli, bri);
         var origin = begin ? DR.BeginLinePoint : DR.EndLinePoint;
         var normal = begin ? DR.BeginLineDirection.Left : -DR.EndLineDirection.Left;
         (double, bool) DeckAt(Vec3 p)
@@ -777,7 +795,7 @@ public sealed partial class ConcreteGenerator
                 Warn($"Expansion joint at {sup.Name}: set-down is not smaller than the blockout depth.");
             double depth = block != null ? j.BlockoutDepth : Math.Min(j.BlockoutDepth, Deck.Thickness);
             // No blockout width = the plans give no blockout (the deck is not cut back; no blockout concrete).
-            var blockout = j.BlockoutWidth > 1e-9 ? EndSlab(begin, 0, j.BlockoutWidth, 0, depth) : new Mesh();
+            var blockout = j.BlockoutWidth > 1e-9 ? EndSlab(begin, 0, j.BlockoutWidth, 0, depth, kind: "joint blockout") : new Mesh();
             Mesh? body = null;
             double length = 0;
             double li = Deck.Barrier.Left ? (j.EdgeInset ?? barrierBase) : 0, ri = Deck.Barrier.Right ? (j.EdgeInset ?? barrierBase) : 0;
@@ -785,8 +803,8 @@ public sealed partial class ConcreteGenerator
             {
                 // Device envelope: fills the opening between the deck-end faces from just below top of slab (set-down) to the blockout depth;
                 // centred on the deck-end line when the plans dimension the slab to the CL joint without an opening (BodyCentered, placeholder).
-                body = j.BodyCentered ? EndSlab(begin, j.GapAt50F / 2, -j.GapAt50F / 2, Math.Min(j.SetDown, depth * 0.5), depth, li, ri)
-                    : EndSlab(begin, 0, -j.GapAt50F, Math.Min(j.SetDown, depth * 0.5), depth, li, ri);
+                body = j.BodyCentered ? EndSlab(begin, j.GapAt50F / 2, -j.GapAt50F / 2, Math.Min(j.SetDown, depth * 0.5), depth, li, ri, "joint device")
+                    : EndSlab(begin, 0, -j.GapAt50F, Math.Min(j.SetDown, depth * 0.5), depth, li, ri, "joint device");
             }
             if (j.Body || j.PlanLength != null)
             {

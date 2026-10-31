@@ -207,15 +207,19 @@ public static class ModelDatabase
     // ================================================================== build
 
     /// <summary>Computes only the model object → GlobalId map (no database): for the app to resolve picked objects.</summary>
-    public static TagIndex BuildTagIndex(BridgeProject project, IReadOnlyList<IfcBridgeData> bridges)
+    public static TagIndex BuildTagIndex(BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, IReadOnlyList<SBM.Core.Road.RoadModel>? roads = null,
+        IReadOnlyList<SBM.Core.Wall.RetainingWallModel>? walls = null, IReadOnlyList<SBM.Core.Grading.GradingModel>? gradings = null,
+        IReadOnlyList<SBM.Core.Utility.UtilityModel>? utilities = null)
     {
         var res = new DatabaseBuildResult();
-        new Builder(new Writer(null, res), project, keysOnly: true).Run(bridges);
+        new Builder(new Writer(null, res), project, keysOnly: true).Run(bridges, roads, walls, gradings, utilities);
         return res.Tags;
     }
 
     /// <summary>Writes the element registry of the model to <paramref name="path"/> (replacing the elements; sheets, links and QC are kept).</summary>
-    public static DatabaseBuildResult Write(string path, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, string? modelFile = null, bool vacuum = false)
+    public static DatabaseBuildResult Write(string path, BridgeProject project, IReadOnlyList<IfcBridgeData> bridges, string? modelFile = null, bool vacuum = false,
+        IReadOnlyList<SBM.Core.Road.RoadModel>? roads = null, IReadOnlyList<SBM.Core.Wall.RetainingWallModel>? walls = null,
+        IReadOnlyList<SBM.Core.Grading.GradingModel>? gradings = null, IReadOnlyList<SBM.Core.Utility.UtilityModel>? utilities = null)
     {
         var sw = Stopwatch.StartNew();
         var result = new DatabaseBuildResult { Path = path };
@@ -228,7 +232,7 @@ public static class ModelDatabase
             using (var tx = cn.BeginTransaction())
             {
                 using var w = new Writer(cn, result, tx);
-                new Builder(w, project, false).Run(bridges);
+                new Builder(w, project, false).Run(bridges, roads, walls, gradings, utilities);
                 tx.Commit();
             }
             Exec(cn, IndexSql);
@@ -316,6 +320,9 @@ public static class ModelDatabase
         private static object N(string s) => s.Length == 0 ? DBNull.Value : s;
         private static object D(double d) => double.IsNaN(d) || double.IsInfinity(d) ? DBNull.Value : Math.Round(d, 6);
 
+        /// <summary>A further model object (e.g. the haunch mesh of the deck slab row) that resolves to an element already added.</summary>
+        public void AlsoTag(object? tag, string globalId) { if (tag != null) _res.Tags.Add(tag, globalId); }
+
         public void Add(Row r)
         {
             if (r.Tag != null) _res.Tags.Add(r.Tag, r.GlobalId);
@@ -385,6 +392,7 @@ public static class ModelDatabase
         private string _bridgeGroup = "", _bridge = "", _unit = "";
 
         private readonly bool _keysOnly;
+        private IReadOnlyList<SBM.Core.Road.RoadModel>? _roads;
         public Builder(Writer w, BridgeProject project, bool keysOnly) { _w = w; _project = project; _key = project.Name; _keysOnly = keysOnly; }
 
         private Row New(string gid, string parent, string level, string category, string ifcClass, string name) => new()
@@ -413,8 +421,10 @@ public static class ModelDatabase
             r.StaBegin = lo; r.StaEnd = hi;
         }
 
-        public void Run(IReadOnlyList<IfcBridgeData> bridges)
+        public void Run(IReadOnlyList<IfcBridgeData> bridges, IReadOnlyList<SBM.Core.Road.RoadModel>? roads = null, IReadOnlyList<SBM.Core.Wall.RetainingWallModel>? walls = null,
+            IReadOnlyList<SBM.Core.Grading.GradingModel>? gradings = null, IReadOnlyList<SBM.Core.Utility.UtilityModel>? utilities = null)
         {
+            _roads = roads;
             string projId = Id(IfcKeys.Project(_key));
             string siteId = Id(_key + "/site");
             _w.Add(New(projId, "", "project", "project", "IFCPROJECT", _project.Name));
@@ -449,6 +459,265 @@ public static class ModelDatabase
                     }
                 }
                 Bridge(b, parent);
+            }
+            if (roads != null) foreach (var rm in roads.Where(r => r.Parts.Count > 0)) Road(rm, siteId);
+            if (walls != null) foreach (var wm in walls.Where(x => x.IsBuilt)) Wall(wm, siteId);
+            if (gradings != null) foreach (var gm in gradings.Where(x => x.IsBuilt)) Grading(gm, siteId);
+            if (utilities != null) foreach (var um in utilities.Where(x => x.IsBuilt)) Utility(um, siteId);
+        }
+
+        /// <summary>Utility network = the IFC tree: network (IFCDISTRIBUTIONSYSTEM) > structures (IFCDISTRIBUTIONCHAMBERELEMENT) + pipes (IFCPIPESEGMENT);
+        /// GlobalIds = <see cref="IfcKeys"/>.Utility*.</summary>
+        private void Utility(SBM.Core.Utility.UtilityModel um, string siteId)
+        {
+            var d = um.Definition;
+            _bridgeGroup = d.Name; _bridge = d.Name; _unit = ""; _al = null;
+            string nk = IfcKeys.Utility(_key, d.Name);
+            string nid = Id(nk);
+            var nr = New(nid, siteId, "unit", "utility network", "IFCDISTRIBUTIONSYSTEM", d.Name);
+            if (!_keysOnly)
+                nr.Props = new Json().Add("system", d.System.ToString()).Add("owner", d.Owner).Add("source", d.Source)
+                    .Add("pipe_length_m", um.Pipes.Where(p => p.IsBuilt).Sum(p => p.Length), 3).Add("structures", um.Structures.Count(s => s.IsBuilt)).ToString();
+            _w.Add(nr);
+            foreach (var s in um.Structures.Where(s => s.IsBuilt))
+            {
+                var r = New(Id(IfcKeys.UtilityStructure(nk, s.Definition.Name)), nid, "element", "utility structure", "IFCDISTRIBUTIONCHAMBERELEMENT", s.Definition.Name);
+                r.Tag = s;
+                if (!_keysOnly)
+                {
+                    r.Material = s.Definition.Material; r.Volume = s.Volume; r.Box = s.Mesh!.Bounds();
+                    r.Props = new Json().Add("kind", s.Definition.Kind.ToString()).Add("rim_m", s.Rim, 4).Add("rim_source", s.RimSource).Add("sump_m", s.Sump, 4)
+                        .Add("description", s.Definition.Description).Add("openings", s.Openings.Count).ToString();
+                }
+                _w.Add(r);
+                string sk = IfcKeys.UtilityStructure(nk, s.Definition.Name);
+                foreach (var part in s.Parts.Where(p => p.Kind != "cone"))
+                {
+                    var pr = New(Id(IfcKeys.UtilityPart(sk, part.Kind)), r.GlobalId, "element", "utility structure " + part.Kind, "IFCDISCRETEACCESSORY", part.Name);
+                    pr.Tag = part.Mesh;
+                    if (!_keysOnly) { pr.Material = s.Definition.Frame?.Material ?? ""; pr.Volume = part.Volume; pr.Box = part.Mesh.Bounds(); pr.Props = new Json().Add("designation", s.Definition.Frame?.Designation ?? "").ToString(); }
+                    _w.Add(pr);
+                }
+                foreach (var part in s.Parts.Where(p => p.Kind == "cone")) _w.AlsoTag(part.Mesh, r.GlobalId);
+            }
+            foreach (var p in um.Pipes.Where(p => p.IsBuilt))
+            {
+                var r = New(Id(IfcKeys.UtilityPipe(nk, p.Definition.Name)), nid, "element", "utility pipe", "IFCPIPESEGMENT", p.Definition.Name);
+                r.Tag = p;
+                if (!_keysOnly)
+                {
+                    r.Material = p.Definition.Material; r.Volume = p.Volume; r.Box = p.Mesh!.Bounds(); r.Length = p.Length;
+                    var j = new Json().Add("from", p.Definition.From).Add("to", p.Definition.To).Add("shape", p.Definition.Shape.ToString())
+                        .Add("invert_start_m", p.Start.Z, 4).Add("invert_end_m", p.End.Z, 4).Add("slope", p.Slope, 6);
+                    if (p.MinCover is double c) j.Add("min_cover_m", c, 4);
+                    if (p.Definition.Hangers is { } hd) j.Add("hung_from", hd.Bridge).Add("hangers", um.Hangers.Count(h => h.Pipe == p));
+                    r.Props = j.ToString();
+                }
+                _w.Add(r);
+                string pk = IfcKeys.UtilityPipe(nk, p.Definition.Name);
+                int hi = 0;
+                foreach (var h in um.Hangers.Where(h => h.Pipe == p))
+                {
+                    hi++;
+                    if (h.Mesh.IsEmpty) continue;
+                    var hr = New(Id(IfcKeys.UtilityHanger(pk, hi)), r.GlobalId, "element", "pipe hanger", "IFCDISCRETEACCESSORY", h.Name);
+                    hr.Tag = h;
+                    if (!_keysOnly) { hr.Material = p.Definition.Hangers!.Material; hr.Box = h.Mesh.Bounds(); hr.Length = h.Length; hr.Props = new Json().Add("type", p.Definition.Hangers!.Type).Add("hangs_from", h.Above).Add("source", p.Definition.Hangers!.Source).ToString(); }
+                    _w.Add(hr);
+                }
+            }
+            foreach (var db in um.DuctBanks)
+            {
+                string dk = IfcKeys.UtilityDuctBank(nk, db.Definition.Name);
+                var r = New(Id(dk), nid, "element", "duct bank", "IFCELEMENTASSEMBLY", db.Definition.Name);
+                r.Tag = db;
+                if (!_keysOnly)
+                {
+                    r.Material = db.Definition.Material; r.Volume = db.ConcreteVolume; r.Box = db.Encasement.Bounds(); r.Length = db.Length;
+                    r.Props = new Json().Add("from", db.Definition.From).Add("to", db.Definition.To).Add("rows", db.Definition.Rows).Add("columns", db.Definition.Columns)
+                        .Add("conduit_d_m", db.Definition.ConduitDiameter, 4).Add("conduit_length_m", db.ConduitLength, 3).ToString();
+                }
+                _w.Add(r);
+                _w.AlsoTag(db.Encasement, r.GlobalId);
+                foreach (var c in db.Conduits) _w.AlsoTag(c, r.GlobalId);
+            }
+        }
+
+        /// <summary>Grading = the IFC tree: grading (IFCELEMENTASSEMBLY) > graded surface (IFCGEOGRAPHICELEMENT) + protection (IFCCOURSE); GlobalIds = <see cref="IfcKeys"/>.Grading*.</summary>
+        private void Grading(SBM.Core.Grading.GradingModel gm, string siteId)
+        {
+            var d = gm.Definition;
+            _bridgeGroup = d.Name; _bridge = d.Name; _unit = "";
+            _al = d.AlignmentName.Length > 0 ? _project.Alignments.FirstOrDefault(a => string.Equals(a.Name, d.AlignmentName, StringComparison.OrdinalIgnoreCase)) : null;
+            string gk = IfcKeys.Grading(_key, d.Name);
+            string gid = Id(gk);
+            var gr = New(gid, siteId, "unit", "grading", "IFCELEMENTASSEMBLY", d.Name);
+            if (!_keysOnly)
+            {
+                var j = new Json().Add("source", d.Source).Add("closed", d.Closed).Add("surface_area_m2", gm.SurfaceArea, 3);
+                if (gm.CutVolume is double c) j.Add("cut_m3", c, 3);
+                if (gm.FillVolume is double f) j.Add("fill_m3", f, 3);
+                gr.Props = j.ToString();
+            }
+            _w.Add(gr);
+            var sr = New(Id(IfcKeys.GradingSurface(gk)), gid, "element", "graded surface", "IFCGEOGRAPHICELEMENT", d.Name + " graded surface");
+            sr.Tag = gm.Surfaces.First();
+            if (!_keysOnly) { var b = Box3.Empty; foreach (var s in gm.Surfaces) { var sb = s.Bounds(); b.Add(sb.Min); b.Add(sb.Max); } sr.Box = b; }
+            _w.Add(sr);
+            foreach (var pr in gm.Protection)
+            {
+                var r = New(Id(IfcKeys.GradingProtection(gk, pr.Index)), gid, "element", "slope protection", "IFCCOURSE", pr.Name);
+                r.Tag = pr.Solid;
+                if (!_keysOnly)
+                {
+                    r.Material = pr.Definition.Material.Length > 0 ? pr.Definition.Material : pr.Definition.Kind;
+                    r.Volume = pr.Volume; r.Box = pr.Solid.Bounds();
+                    r.Props = new Json().Add("kind", pr.Definition.Kind).Add("thickness_m", pr.Definition.Thickness, 4).Add("area_m2", pr.Area, 3).Add("source", pr.Definition.Source).ToString();
+                }
+                _w.Add(r);
+            }
+        }
+
+        /// <summary>Retaining wall = the IFC tree: wall (IFCELEMENTASSEMBLY) > per panel stem (IFCWALL) + footing (IFCFOOTING); GlobalIds = <see cref="IfcKeys"/>.Wall*.</summary>
+        private void Wall(SBM.Core.Wall.RetainingWallModel wm, string siteId)
+        {
+            var d = wm.Definition;
+            _bridgeGroup = d.Name; _bridge = d.Name; _unit = "";
+            _al = _project.Alignments.FirstOrDefault(a => string.Equals(a.Name, d.AlignmentName, StringComparison.OrdinalIgnoreCase));
+            string wk = IfcKeys.Wall(_key, d.Name);
+            string wallId = Id(wk);
+            var wr = New(wallId, siteId, "unit", "retaining wall", "IFCELEMENTASSEMBLY", d.Name);
+            SetStation(wr, Math.Min(d.BeginStation, d.EndStation), Math.Max(d.BeginStation, d.EndStation));
+            string mat = d.Material.Length > 0 ? d.Material : "Concrete";
+            if (wm.IsMse)
+            {
+                // MSE: the IFC tree (assembly > facing per joint panel > precast panels; leveling pad, coping, reinforced zone, reinforcements)
+                var mse = d.Mse!;
+                if (!_keysOnly)
+                    wr.Props = new Json().Add("kind", "MSE").Add("alignment", d.AlignmentName).Add("source", mse.Source.Length > 0 ? mse.Source : d.Source).Add("panels", wm.Panels.Count)
+                        .Add("face_area_m2", wm.FaceArea, 3).ToString();
+                _w.Add(wr);
+                var facing = new Dictionary<int, string>();
+                foreach (var el in wm.ExportElements())
+                {
+                    string role = el.Role.ToString().ToLowerInvariant();
+                    string id = Id(IfcKeys.WallElement(wk, role, el.Index));
+                    bool part = el.Role == SBM.Core.Wall.WallElementRole.FacingPanel && facing.ContainsKey(el.Panel);
+                    var (cat, cls) = el.Role switch
+                    {
+                        SBM.Core.Wall.WallElementRole.Facing => ("wall facing", "IFCWALL"),
+                        SBM.Core.Wall.WallElementRole.FacingPanel => ("wall facing panel", "IFCBUILDINGELEMENTPART"),
+                        SBM.Core.Wall.WallElementRole.LevelingPad => ("leveling pad", "IFCFOOTING"),
+                        SBM.Core.Wall.WallElementRole.Coping => ("wall coping", "IFCCOVERING"),
+                        SBM.Core.Wall.WallElementRole.ReinforcedZone => ("reinforced zone", "IFCREINFORCEDSOIL"),
+                        SBM.Core.Wall.WallElementRole.PileSleeve => ("pile sleeve", "IFCBUILDINGELEMENTPART"),
+                        _ => ("soil reinforcement", "IFCMEMBER"),
+                    };
+                    bool holder = el.Role == SBM.Core.Wall.WallElementRole.Facing && el.Solids.Count == 0;
+                    var r = New(id, part ? facing[el.Panel] : wallId, holder ? "part" : "element", cat, cls, el.Name);
+                    if (el.Role == SBM.Core.Wall.WallElementRole.Facing) facing[el.Panel] = id;
+                    if (el.Solids.Count > 0) r.Tag = el.Solids[0];
+                    if (!_keysOnly)
+                    {
+                        bool concrete = el.Role is SBM.Core.Wall.WallElementRole.Facing or SBM.Core.Wall.WallElementRole.FacingPanel or SBM.Core.Wall.WallElementRole.LevelingPad or SBM.Core.Wall.WallElementRole.Coping;
+                        r.Material = el.Role switch
+                        {
+                            SBM.Core.Wall.WallElementRole.Facing or SBM.Core.Wall.WallElementRole.FacingPanel => mse.FacingMaterial.Length > 0 ? mse.FacingMaterial : mat,
+                            SBM.Core.Wall.WallElementRole.ReinforcedZone => "Reinforced backfill",
+                            SBM.Core.Wall.WallElementRole.Reinforcement => mse.Reinforcement?.Material is { Length: > 0 } rm ? rm : "Soil reinforcement",
+                            SBM.Core.Wall.WallElementRole.PileSleeve => mse.Abutments?.FirstOrDefault(a => a.SleeveMaterial.Length > 0)?.SleeveMaterial ?? "Pile sleeve",
+                            _ => mat,
+                        };
+                        r.Volume = el.Volume;
+                        if (concrete) r.Mass = r.Volume * 2400;
+                        SetStation(r, el.FromStation, el.ToStation);
+                        var j = new Json().Add("panel", el.Panel);
+                        if (!double.IsNaN(el.Length)) j.Add("reinforcement_length_m", el.Length, 4);
+                        if (!double.IsNaN(el.Level)) j.Add("level_m", el.Level, 4);
+                        r.Props = j.ToString();
+                    }
+                    _w.Add(r);
+                }
+                return;
+            }
+            if (!_keysOnly)
+                wr.Props = new Json().Add("alignment", d.AlignmentName).Add("source", d.Source).Add("panels", wm.Panels.Count)
+                    .Add("stem_m3", wm.StemVolume, 3).Add("footing_m3", wm.FootingVolume, 3).Add("face_area_m2", wm.FaceArea, 3).ToString();
+            _w.Add(wr);
+            foreach (var p in wm.Panels)
+                foreach (var (stem, list) in new[] { (true, p.Stems), (false, p.Footings) })
+                {
+                    if (list.Count == 0) continue;
+                    var r = New(Id(stem ? IfcKeys.WallStem(wk, p.Index) : IfcKeys.WallFooting(wk, p.Index)), wallId, "element", stem ? "wall stem" : "wall footing",
+                        stem ? "IFCWALL" : "IFCFOOTING", $"{d.Name} {(stem ? "stem" : "footing")} {p.Index}");
+                    r.Tag = list[0];
+                    if (!_keysOnly)
+                    {
+                        r.Material = mat; r.Volume = stem ? p.StemVolume : p.FootingVolume; r.Mass = r.Volume * 2400;
+                        SetStation(r, p.FromStation, p.ToStation);
+                        r.Props = new Json().Add("panel", p.Index).ToString();
+                    }
+                    _w.Add(r);
+                }
+        }
+
+        /// <summary>Roadway corridor = the IFC tree: road (IFCROAD) > component (IFCROADPART) > course (IFCCOURSE) / curb (IFCKERB); GlobalIds = <see cref="IfcKeys"/>.Road*.</summary>
+        private void Road(SBM.Core.Road.RoadModel rm, string siteId)
+        {
+            var d = rm.Definition;
+            _bridgeGroup = d.Name; _bridge = d.Name; _unit = "";
+            _al = _project.Alignments.FirstOrDefault(a => string.Equals(a.Name, d.AlignmentName, StringComparison.OrdinalIgnoreCase));
+            string rk = IfcKeys.Road(_key, d.Name);
+            string roadId = Id(rk);
+            var rr = New(roadId, siteId, "unit", "road", "IFCROAD", d.Name);
+            double s0 = Math.Min(d.BeginStation, d.EndStation), s1 = Math.Max(d.BeginStation, d.EndStation);
+            SetStation(rr, s0, s1);
+            if (!_keysOnly)
+            {
+                var j = new Json().Add("alignment", d.AlignmentName).Add("source", d.Source).Add("volume_m3", rm.Parts.Sum(p => p.Volume), 3)
+                    .Add("top_area_m2", rm.TopArea.Values.Sum(), 3).Add("side_slopes", string.Join(", ", rm.SideSlopes.Keys));
+                if (rm.CutVolume is double cv && rm.FillVolume is double fv) j.Add("earthwork_cut_m3", cv, 3).Add("earthwork_fill_m3", fv, 3);
+                rr.Props = j.ToString();
+            }
+            _w.Add(rr);
+            foreach (var comp in rm.Parts.GroupBy(p => (p.Side, p.Component, Sub: p.Subgrade != null)))
+            {
+                string pk = comp.Key.Sub ? IfcKeys.RoadSubgrade(rk, comp.Key.Side) : IfcKeys.RoadPart(rk, comp.Key.Side, comp.Key.Component);
+                string partId = Id(pk);
+                var first = comp.First();
+                if (comp.Key.Sub)
+                {
+                    var sr = New(partId, roadId, "part", "road subgrade", "IFCROADPART", comp.Key.Side + " subgrade");
+                    SetStation(sr, s0, s1);
+                    _w.Add(sr);
+                    foreach (var p in comp.Where(p => !p.Mesh.IsEmpty))
+                    {
+                        var r = New(Id(IfcKeys.RoadCourse(pk, p.Course)), partId, "element", "subgrade layer",
+                            p.Subgrade == SBM.Core.Road.RoadSubgradeKind.Subbase ? "IFCCOURSE" : "IFCEARTHWORKSFILL", p.Name);
+                        r.Tag = p;
+                        if (!_keysOnly)
+                        {
+                            r.Material = p.Material; r.Volume = p.Volume; StationOf(r, p.Mesh.Bounds());
+                            r.Props = new Json().Add("subgrade_kind", p.Subgrade.ToString()).ToString();
+                        }
+                        _w.Add(r);
+                    }
+                    continue;
+                }
+                var pr = New(partId, roadId, "part", "road " + first.Kind.ToString().ToLowerInvariant(), "IFCROADPART", comp.Key.Side + " " + comp.Key.Component);
+                SetStation(pr, s0, s1);
+                if (!_keysOnly && rm.TopArea.TryGetValue(comp.Key.Side + " " + comp.Key.Component, out double ta))
+                    pr.Props = new Json().Add("component_kind", first.Kind.ToString()).Add("top_area_m2", ta, 3).ToString();
+                _w.Add(pr);
+                foreach (var p in comp.Where(p => !p.Mesh.IsEmpty))
+                {
+                    bool curb = p.Course == "";
+                    var r = New(Id(curb ? IfcKeys.RoadKerb(pk) : IfcKeys.RoadCourse(pk, p.Course)), partId, "element", curb ? "curb" : "pavement course",
+                        curb ? "IFCKERB" : "IFCCOURSE", p.Name);
+                    r.Tag = p;
+                    if (!_keysOnly) { r.Material = p.Material; r.Volume = p.Volume; StationOf(r, p.Mesh.Bounds()); }
+                    _w.Add(r);
+                }
             }
         }
 
@@ -603,6 +872,12 @@ public static class ModelDatabase
                     case AssemblyKind.Pylon: parent = CsGroup(); cat = "pylon"; break;
                     case AssemblyKind.StayGroup: parent = CsGroup(); cat = "stay group"; break;
                     case AssemblyKind.CsDeck: parent = CsGroup(); cat = "deck"; break;
+                    case AssemblyKind.CsEdgeGirder: parent = CsGroup(); cat = "edge girder field section"; break;
+                    case AssemblyKind.CsFloorbeam: parent = CsGroup(); cat = "floorbeam"; break;
+                    case AssemblyKind.CsFieldSplice: parent = CsGroup(); cat = "field splice"; break;
+                    case AssemblyKind.CsAnchorage: parent = CsGroup(); cat = "stay anchorage"; break;
+                    case AssemblyKind.CsStringer: parent = CsGroup(); cat = "longitudinal support"; break;
+                    case AssemblyKind.PylonAnchorTray: parent = CsGroup(); cat = "tower anchorage tray"; break;
                     case AssemblyKind.ArchKnuckle: parent = ArchGroup(); cat = "knuckle"; break;
                     case AssemblyKind.ArchDeckForm: parent = ArchGroup(); cat = "deck form"; break;
                     case AssemblyKind.ArchSplice: parent = ArchGroup(); cat = "arch field splice"; sub = asm.Description.Contains("tie") ? "tie splice" : "rib splice"; break;
@@ -679,6 +954,15 @@ public static class ModelDatabase
                                 if (cf.Groups["span"].Success) props.Add("span", int.Parse(cf.Groups["span"].Value));
                             }
                             if (sub.StartsWith("Support")) props.Add("at_support", true);
+                            // OPTIONAL standard cross frame / twist report (meters, degrees); the Description above is left as it is (CfName parses it).
+                            if (steel.CrossFrameFit?.Row(asm.Mark) is { } fr)
+                            {
+                                if (fr.Standard != "")
+                                    props.Add("std_standard", fr.Standard).Add("std_family", fr.Family).Add("std_applied", fr.Applied).Add("std_depth", fr.Depth)
+                                        .Add("std_top_wp", fr.TopWorkPoint).Add("std_defined_end", fr.DefinedEnd).Add("headroom", fr.Headroom).Add("max_depth", fr.MaxDepth)
+                                        .Add("shift_left", fr.ShiftTopL).Add("shift_right", fr.ShiftTopR);
+                                props.Add("twist_deg", fr.TwistDegrees, 4).Add("twist_gap_max", fr.MaxGapBuilt);
+                            }
                         }
                         break;
                 }
@@ -701,15 +985,59 @@ public static class ModelDatabase
                 return asmGroups[(asmMark, kind)] = id;
             }
 
+            // standard cross frames: hole group shift (top group, m, + = up) per connection plate and frame (a through-web pair plate carries two)
+            Dictionary<string, List<double>>? plateShift = null;
+            Dictionary<string, List<string>>? hsFrames = null;
+            if (steel.CrossFrameFit is { } fitRep)
+                foreach (var fr in fitRep.Rows.Where(x => x.Applied))
+                    foreach (var (plate, sh) in new[] { (fr.LeftPlate, fr.ShiftTopL), (fr.RightPlate, fr.ShiftTopR) })
+                    {
+                        if (plate == "" || double.IsNaN(sh)) continue;
+                        plateShift ??= new(); hsFrames ??= new();
+                        if (!plateShift.TryGetValue(plate, out var l)) { plateShift[plate] = l = new(); hsFrames[plate] = new(); }
+                        l.Add(sh); hsFrames[plate].Add(fr.Mark);
+                    }
+
             // parts, with quantities and station extent computed per assembly from the parts' bounding boxes afterwards (kept simple: per part)
+            // OPTIONAL sub-elements (SteelPart.Member, truss PartPerPiece): level "member" row (= the IFC member / gusset stack assembly) between the group and the pieces
+            var memberRows = new Dictionary<string, string>();
+            ILookup<string, SteelPart>? memberLookup = null;
             foreach (var part in steel.Parts)
             {
                 string gid = Id(IfcKeys.Part(bk, part.Mark));
                 asmInfo.TryGetValue(part.Assembly, out var ai);
                 string partParent = part.Category == PartCategory.Weld && ai != null ? AsmGroup(part.Assembly, "welds", "welds", "weld group")
-                    : ai != null && steel.Truss != null && steel.Truss.PanelOf.TryGetValue(part.Mark, out var panel) ? AsmGroup(part.Assembly, "panel/" + panel, panel, panel.StartsWith("Joint") ? "truss joint" : "truss panel")
+                    : ai != null && steel.Truss != null && (steel.Truss.PanelOf.TryGetValue(part.Mark, out var panel) || part.Member != null && steel.Truss.PanelOf.TryGetValue(part.Member, out panel)) ? AsmGroup(part.Assembly, "panel/" + panel, panel, panel.StartsWith("Joint") ? "truss joint" : "truss panel")
                     : ai?.GlobalId ?? superId;
+                if (part.Member is { } mem)
+                {
+                    if (!memberRows.TryGetValue(mem, out var mid))
+                    {
+                        bool stack = part.Category is PartCategory.TrussGusset or PartCategory.FillerPlate or PartCategory.SplicePlate;
+                        mid = Id(IfcKeys.Member(bk, mem));
+                        var mr = New(mid, partParent, "member", stack ? "gusset stack" : PartCategoryName(part.Category), "IFCELEMENTASSEMBLY", mem);
+                        mr.Mark = mem; mr.Support = ai?.Support ?? ""; mr.Girder = ai?.Girder ?? "";
+                        if (!_keysOnly)
+                        {
+                            memberLookup ??= steel.Parts.Where(q => q.Member != null && !q.Mesh.IsEmpty).ToLookup(q => q.Member!);
+                            var kids = memberLookup[mem].ToList();
+                            // mass / volume of the pieces in the properties only (the pieces carry the quantities; no double counting in sums over rows)
+                            mr.Length = kids.Count > 0 ? kids.Max(q => q.Length) : 0;
+                            if (kids.Count > 0)
+                            {
+                                foreach (var q in kids) { var b2 = q.Mesh.Bounds(); mr.Box.Add(b2.Min); mr.Box.Add(b2.Max); }
+                                StationOf(mr, mr.Box);
+                            }
+                            mr.Props = new Json().Add("pieces", kids.Count).Add("piece_kinds", string.Join(", ", kids.Select(q => q.Piece).Distinct()))
+                                .Add("mass_pieces", kids.Sum(q => q.Mass)).Add("volume_pieces", kids.Sum(q => q.Volume)).ToString();
+                        }
+                        _w.Add(mr);
+                        memberRows[mem] = mid;
+                    }
+                    partParent = mid;
+                }
                 var r = New(gid, partParent, "part", PartCategoryName(part.Category), IfcClassOf(part), part.Mark);
+                if (part.Piece != null) r.Subtype = part.Piece;
                 r.InIfc = !part.Mesh.IsEmpty;
                 r.Mark = part.Mark; r.Material = part.Material; r.Support = ai?.Support ?? ""; r.Girder = ai?.Girder ?? "";
                 r.Tag = part;
@@ -725,6 +1053,9 @@ public static class ModelDatabase
                     .Add("role", part.Role == MemberRole.None ? null : part.Role.ToString()).Add("lb_per_ft", part.NominalWeightLbPerFt, 3);
                 if (part.Assumption is { } pas && (SteelModel.IsRailing(part.Category) || IsCapPart(part) || SteelModel.IsJointHardware(part.Category) || pas.DimensionOnly)) pjs.Add("status", pas.Status).Add("reason", pas.Reason).Add("assumed", pas.Basis);
                 if (part.Fabrication is { IsEmpty: false } fab) foreach (var (fn, fv) in fab.Fields()) pjs.Add("fab_" + fn.ToLowerInvariant(), fv);
+                if (part.Fits is { Count: > 0 } fits) foreach (var (fn, fv) in PartFit.Fields(fits)) pjs.Add(fn.ToLowerInvariant(), fv);
+                if (plateShift != null && plateShift.TryGetValue(part.Mark, out var hs))
+                    for (int k = 0; k < hs.Count; k++) pjs.Add(k == 0 ? "hole_shift" : $"hole_shift_{k + 1}", hs[k]).Add(k == 0 ? "hole_shift_frame" : $"hole_shift_frame_{k + 1}", hsFrames![part.Mark][k]);
                 r.Props = pjs.ToString();
                 _w.Add(r);
             }
@@ -811,20 +1142,25 @@ public static class ModelDatabase
             PartCategory.TrussShoeExpansion => "expansion shoe", PartCategory.TrussConnectionAngle => "connection angle",
             PartCategory.TrussConnectionPlate => "connection plate",
             PartCategory.Pylon => "pylon", PartCategory.PylonCrossBeam => "pylon cross beam", PartCategory.PylonStrut => "strut",
-            PartCategory.StayCable => "stay cable", PartCategory.CsDeck => "deck segment", _ => c.ToString(),
+            PartCategory.StayCable => "stay cable", PartCategory.CsDeck => "deck segment", PartCategory.CsFloorbeamPlate => "floorbeam plate",
+            PartCategory.StayAnchorPipe => "stay anchor pipe", PartCategory.StayAnchorPlate => "stay anchor plate", PartCategory.CsStringerPlate => "longitudinal support plate",
+            PartCategory.PylonAnchorPlate => "anchorage tray plate", PartCategory.PylonGuidePipe => "stay guide pipe",
+            _ => c.ToString(),
         };
 
         private static bool IsCapPart(SteelPart p) => p.Category is PartCategory.EndPlate or PartCategory.ConnectorPlate or PartCategory.DiaphragmPlate
             or PartCategory.ContinuityPlate or PartCategory.CoverPlate or PartCategory.HandholeCover or PartCategory.HandholeBacking or PartCategory.MeshScreen;
 
-        private static string IfcClassOf(SteelPart p) => p.Category switch
+        private static string IfcClassOf(SteelPart p) => p.Member != null && p.Piece is "web ply" or "web plate" or "cover plate" or "plate" or "envelope" or "lacing" ? "IFCPLATE"
+            : p.Member != null && p.Piece is "angle" or "channel" or "rolled shape" or "round bar" ? "IFCMEMBER"
+            : p.Category switch
         {
             PartCategory.Angle or PartCategory.Channel or PartCategory.InspectionBracket or PartCategory.InspectionCable
                 or PartCategory.WalkwayStringer or PartCategory.WalkwayPost or PartCategory.RolledTee
                 or PartCategory.ArchRib or PartCategory.Hanger or PartCategory.ArchBracing or PartCategory.RailPost or PartCategory.RailMember
                 or PartCategory.TrussChord or PartCategory.TrussDiagonal or PartCategory.TrussVertical or PartCategory.TrussHanger or PartCategory.TrussBracing
                 or PartCategory.TrussStringer or PartCategory.Suspender or PartCategory.TrussConnectionAngle
-                or PartCategory.PylonStrut or PartCategory.StayCable => "IFCMEMBER",
+                or PartCategory.PylonStrut or PartCategory.StayCable or PartCategory.StayAnchorPipe or PartCategory.PylonGuidePipe => "IFCMEMBER",
             PartCategory.TrussFloorBeam or PartCategory.TrussGirder or PartCategory.PylonCrossBeam or PartCategory.CsDeck => "IFCBEAM",
             PartCategory.Pylon => "IFCCOLUMN",
             PartCategory.TrussShoeFixed or PartCategory.TrussShoeExpansion => "IFCBEARING",
@@ -855,7 +1191,29 @@ public static class ModelDatabase
                 r.Box = c.Deck.Bounds(); if (c.Haunches is { IsEmpty: false } h) { var hb = h.Bounds(); r.Box.Add(hb.Min); r.Box.Add(hb.Max); }
                 StationOf(r, r.Box);
                 r.Props = new Json().Add("thickness_m", def.Deck.Thickness).Add("deck_volume_m3", c.DeckVolume).Add("haunch_volume_m3", c.HaunchVolume).ToString();
+                r.Tag = c.Deck;
                 _w.Add(r);
+                _w.AlsoTag(c.Haunches, slabId);
+                foreach (var bump in c.DeckBumps) _w.AlsoTag(bump.Mesh, slabId);
+            }
+            if (c.DeckParts.Count > 0)
+            {
+                // precast panels / closure pours (same GlobalId keys as the IFC parts), children of the deck slab
+                if (slabId.Length == 0)
+                {
+                    slabId = Id(IfcKeys.DeckSlab(bk));
+                    var r = New(slabId, deckPartId, "element", "deck slab", "IFCSLAB", "Deck slab");
+                    r.Material = concMat; r.Volume = c.DeckPartVolume; r.Mass = r.Volume * 2400;
+                    _w.Add(r);
+                }
+                foreach (var dp in c.DeckParts.Where(x => !x.Mesh.IsEmpty))
+                {
+                    var r = New(Id(IfcKeys.DeckPiece(bk, dp.Name)), slabId, "element", dp.Kind, "IFCBUILDINGELEMENTPART", dp.Name);
+                    r.Material = concMat; r.Volume = Math.Abs(dp.Mesh.Volume()); r.Mass = r.Volume * 2400;
+                    r.Box = dp.Mesh.Bounds(); StationOf(r, r.Box);
+                    r.Tag = dp.Mesh;
+                    _w.Add(r);
+                }
             }
             // concrete haunches over integral steel pier caps (same GlobalId key as the IFC IfcBuildingElementPart)
             foreach (var ch in c.CapHaunches.Where(x => !x.Mesh.IsEmpty))
@@ -867,6 +1225,7 @@ public static class ModelDatabase
                     .Add("pieces", ch.Pieces.Count).Add("source", ch.Source);
                 foreach (var (bay, dep) in ch.BayDepths) hj.Add("depth_cl_" + bay.ToLowerInvariant().Replace(' ', '_'), dep);
                 r.Props = hj.ToString();
+                r.Tag = ch.Mesh;
                 _w.Add(r);
             }
             // Groups at the granularity the plans use: one deck-reinforcing group per unit, one barrier group (concrete + its bars) per unit.
@@ -898,8 +1257,14 @@ public static class ModelDatabase
                 bool curb = def.Deck.Barrier.IsCurb;
                 var r = New(Id(IfcKeys.Barrier(bk, name)), BarrierGroup(), "element", curb ? "curb" : "barrier", curb ? "IFCKERB" : "IFCRAILING", name);
                 r.Material = concMat; r.Volume = Math.Abs(mesh.Volume()); r.Mass = r.Volume * 2400; r.Box = mesh.Bounds();
+                if (c.BarrierInfo.TryGetValue(name, out var binfo))
+                {
+                    if (binfo.Material.Length > 0) r.Material = binfo.Material;
+                    if (binfo.Assumption is { } bas) r.Props = new Json().Add("status", bas.Status).Add("reason", bas.Reason).Add("assumed", bas.Basis).ToString();
+                }
                 StationOf(r, r.Box);
                 r.Subtype = def.Deck.Barrier.Type.ToString();
+                r.Tag = mesh;
                 _w.Add(r);
             }
             int jn = 0;
@@ -914,6 +1279,7 @@ public static class ModelDatabase
                     r.Support = jr.Support; r.Subtype = type; r.Material = concMat; r.Volume = jr.BlockoutVolume; r.Mass = r.Volume * 2400;
                     r.Box = jr.Blockout.Bounds(); StationOf(r, r.Box);
                     r.Props = new Json().Add("end", jr.AtBegin ? "begin" : "end").Add("joint_index", jn - 1).ToString();
+                    r.Tag = jr.Blockout;
                     _w.Add(r);
                 }
                 if (jr.EndBlock is { } eb && !eb.Mesh.IsEmpty && eb.Definition.Source is { Length: > 0 })
@@ -937,7 +1303,36 @@ public static class ModelDatabase
                     if (jr.Definition.PlanLength is double jpl) dj.Add("plan_length_m", jpl);
                     if (jr.Assumption is { } jas) dj.Add("status", jas.Status).Add("reason", jas.Reason).Add("assumed", jas.Basis);
                     d.Props = dj.ToString();
+                    d.Tag = jr.Body;
                     _w.Add(d);
+                }
+            }
+            // approach slabs: under the deck part, or under the road that owns them (same rule as the IFC export)
+            foreach (var asr in c.ApproachSlabs)
+            {
+                string ak = IfcKeys.ApproachSlab(bk, asr.Support);
+                var road = asr.Definition.Owner == SBM.Core.Bridge.ApproachSlabOwner.Road
+                    ? _roads?.FirstOrDefault(r => r.Parts.Count > 0 && string.Equals(r.Definition.AlignmentName, def.AlignmentName, StringComparison.OrdinalIgnoreCase)
+                        && Math.Min(r.Definition.BeginStation, r.Definition.EndStation) <= asr.StationMax + 0.01 && Math.Max(r.Definition.BeginStation, r.Definition.EndStation) >= asr.StationMin - 0.01)
+                    : null;
+                string parent = road != null ? Id(IfcKeys.Road(_key, road.Definition.Name)) : deckPartId;
+                string mat = asr.Definition.Material.Length > 0 ? asr.Definition.Material : concMat;
+                var r = New(Id(ak), parent, "element", "approach slab", "IFCSLAB", asr.Name);
+                r.Tag = asr; r.Support = asr.Support;
+                if (!_keysOnly)
+                {
+                    r.Material = mat; r.Volume = asr.Volume; r.Mass = r.Volume * 2400; r.Box = asr.Mesh.Bounds(); StationOf(r, r.Box);
+                    var j = new Json().Add("end", asr.AtBegin ? "begin" : "end").Add("owner", asr.Definition.Owner?.ToString() ?? "UNRESOLVED").Add("source", asr.Definition.Source);
+                    if (asr.Assumption is { } a) j.Add("status", a.Status).Add("reason", a.Reason);
+                    r.Props = j.ToString();
+                }
+                _w.Add(r);
+                if (asr.Sleeper is { IsEmpty: false } sm)
+                {
+                    var sr = New(Id(IfcKeys.SleeperSlab(ak)), parent, "element", "sleeper slab", "IFCSLAB", "Sleeper slab at " + asr.Support);
+                    sr.Support = asr.Support;
+                    if (!_keysOnly) { sr.Material = mat; sr.Volume = asr.SleeperVolume; sr.Mass = sr.Volume * 2400; sr.Box = sm.Bounds(); StationOf(sr, sr.Box); }
+                    _w.Add(sr);
                 }
             }
             Bars(c.Bars, c.Marks, (bar, m) => bar.Group == "Rail" ? BarrierRebar() : bar.Group == "Diaphragm" ? DiaphragmRebar() : DeckRebar(), i => IfcKeys.DeckBar(bk, i), def.Deck.Reinforcement.SteelYieldKsi, "");
@@ -947,11 +1342,11 @@ public static class ModelDatabase
         /// <summary>One row per bar placement (GlobalId = the IFC bar's); <paramref name="parentOf"/> picks the group a bar belongs to.</summary>
         private void Bars(IEnumerable<BarPlacement> bars, IEnumerable<BarMark> marks, Func<BarPlacement, BarMark, string> parentOf, Func<int, string> key, double fy, string support)
         {
-            var mk = marks.GroupBy(m => m.Mark).ToDictionary(g => g.Key, g => g.First());
+            var mk = new SBM.Core.Concrete.BarMarkLookup(marks);
             int n = 0;
             foreach (var bar in bars)
             {
-                var m = mk[bar.Mark];
+                var m = mk[bar];
                 var r = New(Id(key(n++)), parentOf(bar, m), "bar", "rebar", "IFCREINFORCINGBAR", "");
                 r.Mark = string.IsNullOrEmpty(m.Unit) ? m.Mark : $"{m.Unit} {m.Mark}";
                 r.Support = support; r.Tag = bar;
@@ -1125,6 +1520,9 @@ public static class ModelDatabase
                     SBM.Core.Misc.MiscGroup.Drainage => ("deck drainage", "drainage"),
                     SBM.Core.Misc.MiscGroup.SignSupport => ("sign supports", "sign supports"),
                     SBM.Core.Misc.MiscGroup.CrashCushion => ("crash cushion end posts", "crash cushion"),
+                    SBM.Core.Misc.MiscGroup.ExpansionJoint => ("expansion joints", "expansion joint"),
+                    SBM.Core.Misc.MiscGroup.SolarPlatform => ("solar array platforms", "solar array platform"),
+                    SBM.Core.Misc.MiscGroup.Access => ("access hardware", "access hardware"),
                     _ => ("lighting", "lighting"),
                 };
                 return groups[g] = Group($"{bk}/misc-grp/{g}", superId, $"{who} {title}", cat);
@@ -1164,6 +1562,20 @@ public static class ModelDatabase
                     SBM.Core.Misc.MiscKind.CushionPlaceholder => ("crash cushion (by others)", "IFCBUILDINGELEMENTPROXY"),
                     SBM.Core.Misc.MiscKind.PoleBaseConcrete => ("pole base", "IFCFOOTING"),
                     SBM.Core.Misc.MiscKind.JunctionBox => ("junction box", "IFCJUNCTIONBOX"),
+                    SBM.Core.Misc.MiscKind.JointDevice => ("expansion joint device (by others)", "IFCDISCRETEACCESSORY"),
+                    SBM.Core.Misc.MiscKind.JointEndPost => ("parapet end post", "IFCRAILING"),
+                    SBM.Core.Misc.MiscKind.JointCoverPlate => ("joint cover plate", "IFCPLATE"),
+                    SBM.Core.Misc.MiscKind.PlatformMember => ("platform member", "IFCMEMBER"),
+                    SBM.Core.Misc.MiscKind.PlatformPlate => ("platform plate", "IFCPLATE"),
+                    SBM.Core.Misc.MiscKind.PlatformGrating => ("platform grating", "IFCPLATE"),
+                    SBM.Core.Misc.MiscKind.SolarArray => ("solar array (by others)", "IFCSOLARDEVICE"),
+                    SBM.Core.Misc.MiscKind.Battery => ("battery box (by others)", "IFCELECTRICFLOWSTORAGEDEVICE"),
+                    SBM.Core.Misc.MiscKind.Luminaire => ("luminaire", "IFCLIGHTFIXTURE"),
+                    SBM.Core.Misc.MiscKind.OutletBox => ("receptacle", "IFCOUTLET"),
+                    SBM.Core.Misc.MiscKind.Panelboard => ("panelboard", "IFCELECTRICDISTRIBUTIONBOARD"),
+                    SBM.Core.Misc.MiscKind.ElectricalBox => ("junction box", "IFCJUNCTIONBOX"),
+                    SBM.Core.Misc.MiscKind.VerminScreen => ("vermin screen", "IFCPLATE"),
+                    SBM.Core.Misc.MiscKind.AccessDoor => ("access door", "IFCPLATE"),
                     _ => ("conduit", "IFCCABLECARRIERSEGMENT"),
                 };
                 string parent = asm.TryGetValue(el.Assembly, out var pid) ? pid : GroupOf(el.Group);
@@ -1197,6 +1609,9 @@ public static class ModelDatabase
             var gp = new Json().Add("segments", sm.Segments.Count).Add("typical", types.GetValueOrDefault("Typical")).Add("bent_halves", types.GetValueOrDefault("BentHalf"))
                 .Add("closure_joints", types.GetValueOrDefault("Closure")).Add("end_segments", types.GetValueOrDefault("End")).Add("tendons", sm.Tendons.Count)
                 .Add("bearings", sm.Bearings.Count).Add("box_concrete_cy", Math.Round(sm.ConcreteVolume / cy, 1)).Add("source", sm.Definition.Source);
+            if (sm.Blocks.Count > 0 || sm.Openings.Count > 0)
+                gp.Add("blocks", sm.Blocks.Count).Add("block_concrete_cy", Math.Round(sm.BlockVolume / cy, 1)).Add("openings", sm.Openings.Count)
+                  .Add("opening_concrete_cy", Math.Round(sm.OpeningVolume / cy, 2)).Add("net_box_concrete_cy", Math.Round(sm.NetConcreteVolume / cy, 1));
             string gid = Group($"{bk}/grp/segmental", superId, $"{bridgeName} segmental box", "segmental box", props: gp.ToString());
             var asm = new Dictionary<string, string>();
             foreach (var bent in sm.Segments.Where(x => x.Bent != "").Select(x => x.Bent).Distinct())
@@ -1223,6 +1638,56 @@ public static class ModelDatabase
                 var pj = new Json().Add("span", s.Span).Add("depth_start_ft", Math.Round(s.Depth0 / 0.3048, 4)).Add("depth_end_ft", Math.Round(s.Depth1 / 0.3048, 4))
                     .Add("length_along_L_ft", Math.Round(s.AlignmentLength / 0.3048, 4)).Add("chord_length_ft", Math.Round(s.ChordLength / 0.3048, 4)).Add("description", s.Description);
                 if (s.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
+                r.Props = pj.ToString();
+                _w.Add(r);
+            }
+            // OPTIONAL details: blocks (children of their segment) and openings (voids of their segment)
+            foreach (var bl in sm.Blocks)
+            {
+                string cat = bl.Kind switch
+                {
+                    SBM.Core.Bridge.SegmentalBlockKind.AnchorBlock => "anchor block", SBM.Core.Bridge.SegmentalBlockKind.DeviationBlock => "deviation block",
+                    SBM.Core.Bridge.SegmentalBlockKind.ShearKey => "shear key", _ => "erection PT bar block",
+                };
+                var r = New(Id(IfcKeys.SegBlock(bk, bl.Name)), Id(IfcKeys.Segment(bk, bl.Segment)), "element", cat, "IFCBUILDINGELEMENTPART", bl.Name);
+                r.Tag = bl; r.Mark = bl.Type; r.Subtype = bl.Label;
+                if (_keysOnly) { _w.Add(r); continue; }
+                r.Material = $"Precast segmental box concrete, f'c = {sm.Definition.ConcreteStrengthKsi:0.0#} ksi"; r.Volume = bl.Volume; r.Mass = bl.Volume * 2400;
+                r.Box = bl.Mesh.Bounds(); StationOf(r, r.Box);
+                var pj = new Json().Add("segment", bl.Segment).Add("side", bl.Side < 0 ? "left" : "right").Add("serves", bl.Label).Add("description", bl.Description);
+                if (bl.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
+                r.Props = pj.ToString();
+                _w.Add(r);
+            }
+            foreach (var hw in sm.PtHardware)
+            {
+                string cat = hw.Kind switch
+                {
+                    SBM.Core.Segmental.SegmentalHardwareKind.TemporaryPtBar => "temporary PT bar", SBM.Core.Segmental.SegmentalHardwareKind.PermanentPtBar => "permanent PT bar",
+                    SBM.Core.Segmental.SegmentalHardwareKind.DeviationPipe => "deviation pipe", SBM.Core.Segmental.SegmentalHardwareKind.VerticalPtBar => "vertical PT bar",
+                    _ => "future PT pipe",
+                };
+                var r = New(Id(IfcKeys.SegHardware(bk, hw.Name)), Id(IfcKeys.Segment(bk, hw.Segment)), "element", cat, hw.IsPipe ? "IFCTENDONCONDUIT" : "IFCTENDON", hw.Name);
+                r.Tag = hw; r.Subtype = hw.Kind.ToString();
+                if (_keysOnly) { _w.Add(r); continue; }
+                r.Material = hw.Material; r.Length = hw.Length;
+                double area = Math.PI / 4 * (hw.OuterDiameter * hw.OuterDiameter - hw.InnerDiameter * hw.InnerDiameter);
+                r.Volume = area * hw.Length; r.Mass = r.Volume * 7850;
+                r.Box = hw.Mesh.Bounds(); StationOf(r, r.Box);
+                var pj = new Json().Add("segment", hw.Segment).Add("side", hw.Side < 0 ? "left" : "right").Add("outside_diameter_in", Math.Round(hw.OuterDiameter / 0.0254, 3))
+                    .Add("length_ft", Math.Round(hw.Length / 0.3048, 3)).Add("description", hw.Description);
+                if (hw.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
+                r.Props = pj.ToString();
+                _w.Add(r);
+            }
+            foreach (var op in sm.Openings)
+            {
+                var r = New(Id(IfcKeys.SegOpening(bk, op.Name)), Id(IfcKeys.Segment(bk, op.Segment)), "element", op.Temporary ? "temporary opening" : "opening", "IFCOPENINGELEMENT", op.Name);
+                r.Tag = op; r.Subtype = op.Kind.ToString();
+                if (_keysOnly) { _w.Add(r); continue; }
+                r.Volume = op.RemovedVolume; r.Box = op.Mesh.Bounds(); StationOf(r, r.Box);
+                var pj = new Json().Add("segment", op.Segment).Add("kind", op.Kind.ToString()).Add("temporary", op.Temporary).Add("removed_cy", Math.Round(op.RemovedVolume / cy, 3)).Add("description", op.Description);
+                if (op.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
                 r.Props = pj.ToString();
                 _w.Add(r);
             }

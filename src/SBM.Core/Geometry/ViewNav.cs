@@ -81,6 +81,14 @@ public static class ViewNav
         return (vw / 2 + Vec3.Dot(d, r) / pix, vh / 2 - Vec3.Dot(d, u) / pix);
     }
 
+    /// <summary>North arrow: screen directions (pixels, x right, y DOWN) of a unit plan vector to grid north (+Y) and to east (+X), as the
+    /// camera sees them. A horizontal arrow drawn with these is foreshortened like the ground (length 1 straight down, shorter when tilted).</summary>
+    public static ((double x, double y) north, (double x, double y) east) NorthArrow(OrthoView v)
+    {
+        var (r, u) = Basis(v.Look, v.Up);
+        return ((r.Y, -u.Y), (r.X, -u.X));
+    }
+
     /// <summary>Pan: moves the eye so whatever was under <paramref name="from"/> is now under <paramref name="to"/>.</summary>
     public static OrthoView Pan(OrthoView v, (double x, double y) from, (double x, double y) to, double vw, double vh)
     {

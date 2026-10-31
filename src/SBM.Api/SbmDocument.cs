@@ -57,6 +57,7 @@ public sealed class SbmDocument
     /// <summary>Existing ground elevation (attached terrain references) at a plan point, or null outside the terrain.</summary>
     public double? GroundAt(Vec2 p)
     {
+        if (_terrains == null) EnsureTerrain();
         foreach (var t in _terrains ?? new List<TerrainModel>())
             if (t.TryElevation(p, out double z)) return z;
         return null;
@@ -103,7 +104,32 @@ public sealed class SbmDocument
 
     public static SbmDocument Sample() => new(SampleProject.Create(), null);
 
-    public static SbmDocument Open(string path) => new(BridgeProject.Load(path), Path.GetFullPath(path));
+    public static SbmDocument Open(string path)
+    {
+        var d = new SbmDocument(BridgeProject.Load(path), Path.GetFullPath(path));
+        if (LodOverride != null) { d._savedLod = d.Project.Lod; d._lodOverridden = true; d.Project.Lod = LodOverride; }
+        return d;
+    }
+
+    /// <summary>OPTIONAL level of detail applied to every document opened from now on, IN MEMORY only (command line `--lod`): <see cref="Save"/>
+    /// writes the file's own <see cref="BridgeProject.Lod"/> back, never this override.</summary>
+    public static LodSettings? LodOverride { get; set; }
+    private bool _lodOverridden;
+    private LodSettings? _savedLod;
+
+    /// <summary>Parses a level of detail: "300" (every group) or "300,Fasteners=200,Welds=400" / "Fasteners=200" (default 400).</summary>
+    public static LodSettings ParseLod(string text)
+    {
+        var lod = new LodSettings();
+        foreach (var part in text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            int eq = part.IndexOf('=');
+            if (eq < 0) { lod.Default = int.Parse(part, System.Globalization.CultureInfo.InvariantCulture); continue; }
+            var g = Enum.Parse<LodGroup>(part[..eq].Trim().Replace("Groups.", ""), ignoreCase: true);
+            (lod.Groups ??= new())[g] = int.Parse(part[(eq + 1)..], System.Globalization.CultureInfo.InvariantCulture);
+        }
+        return lod;
+    }
 
     /// <summary>Wraps an existing in-memory project (used by the desktop app's script runner).</summary>
     public static SbmDocument Attach(BridgeProject project, string? path = null) => new(project, path);
@@ -115,7 +141,13 @@ public sealed class SbmDocument
     public void Save(string? path = null)
     {
         path ??= FilePath ?? throw new InvalidOperationException("No file path; pass one to Save.");
-        Project.Save(path);
+        if (_lodOverridden)
+        {
+            var active = Project.Lod;
+            Project.Lod = _savedLod;   // the command-line level is never written into the file
+            try { Project.Save(path); } finally { Project.Lod = active; }
+        }
+        else Project.Save(path);
         FilePath = Path.GetFullPath(path);
     }
 
@@ -157,9 +189,56 @@ public sealed class SbmDocument
 
     public IReadOnlyList<string> ImportLandXml(string path)
     {
-        var res = LandXmlReader.Read(path);
+        var xdoc = System.Xml.Linq.XDocument.Load(path);
+        var res = LandXmlReader.Read(xdoc);
         Project.Alignments.AddRange(res.Alignments);
-        return res.Messages;
+        var msgs = res.Alignments.Count == 0 ? res.Messages.Where(m => !m.StartsWith("No alignments")).ToList() : res.Messages.ToList();
+        // pipe networks (storm drainage ...): a network with the name of an existing one replaces it
+        var pn = SBM.IO.LandXml.LandXmlPipeNetworks.Read(xdoc, Path.GetFileName(path));
+        foreach (var n in pn.Networks)
+        {
+            int k = Project.Utilities.FindIndex(x => string.Equals(x.Name, n.Name, StringComparison.OrdinalIgnoreCase));
+            if (k >= 0) { Project.Utilities[k] = n; msgs.Add($"{n.Name}: replaces the network of the same name."); }
+            else Project.Utilities.Add(n);
+        }
+        msgs.AddRange(pn.Messages);
+        int fl = xdoc.Descendants().Count(x => x.Name.LocalName == "PlanFeature");
+        if (fl > 0) msgs.Add($"{fl} feature lines in the file: import them as a road with ImportCorridor / sbm import-corridor.");
+        if (res.Alignments.Count == 0 && pn.Networks.Count == 0) msgs.Add("No alignments or pipe networks were found in the file.");
+        return msgs;
+    }
+
+    /// <summary>
+    /// Imports corridor feature lines (LandXML PlanFeatures, Civil 3D) as a road on an alignment of the project (<see cref="SBM.Core.Road.RoadDefinition.FeatureLines"/>):
+    /// the road is built between the lines. <paramref name="lines"/> = feature line names to take (null = all; names match case-insensitively, '*' at the end = prefix).
+    /// <paramref name="asTemplate"/>: convert to the parametric Left / Right template when every line keeps a constant offset (else kept as feature lines, reported).
+    /// A road with the same name is replaced. Returns the messages.
+    /// </summary>
+    public List<string> ImportCorridor(string path, string alignmentName, string? roadName = null, IReadOnlyList<string>? lines = null,
+        IReadOnlyList<SBM.Core.Road.RoadCourse>? courses = null, bool asTemplate = false)
+    {
+        var a = Alignment(alignmentName);
+        var r = SBM.IO.LandXml.LandXmlFeatureLines.Read(path);
+        var msgs = r.Messages.ToList();
+        bool Pick(string n) => lines == null || lines.Any(x => x.EndsWith('*') ? n.StartsWith(x[..^1], StringComparison.OrdinalIgnoreCase) : string.Equals(x, n, StringComparison.OrdinalIgnoreCase));
+        var picked = r.Lines.Where(l => Pick(l.Name)).ToList();
+        if (lines != null) foreach (var x in lines.Where(x => !x.EndsWith('*') && !r.Lines.Any(l => string.Equals(l.Name, x, StringComparison.OrdinalIgnoreCase)))) msgs.Add($"feature line '{x}' is not in the file.");
+        if (picked.Count < 2) { msgs.Add($"{picked.Count} feature lines picked - a road needs at least 2; nothing imported."); return msgs; }
+        var road = new SBM.Core.Road.RoadDefinition
+        {
+            Name = roadName ?? Path.GetFileNameWithoutExtension(path), AlignmentName = a.Name, SampleSpacing = 2.0,
+            Source = $"{Path.GetFileName(path)} feature lines", FeatureLines = picked, FeatureLineCourses = courses is { Count: > 0 } ? courses.ToList() : null,
+        };
+        if (asTemplate)
+        {
+            var (t, notes) = SBM.Core.Road.RoadGenerator.ToTemplate(road, a);
+            msgs.AddRange(notes);
+            if (t != null) { road = t; msgs.Add("converted to the parametric template."); }
+        }
+        int k = Project.Roads.FindIndex(x => string.Equals(x.Name, road.Name, StringComparison.OrdinalIgnoreCase));
+        if (k >= 0) { Project.Roads[k] = road; msgs.Add($"{road.Name}: replaces the road of the same name."); } else Project.Roads.Add(road);
+        msgs.Add($"{road.Name}: {picked.Count} feature lines ({string.Join(", ", picked.Select(l => l.Name))}) on {a.Name}.");
+        return msgs;
     }
 
     /// <summary>
@@ -211,11 +290,27 @@ public sealed class SbmDocument
     // ------------------------------------------------------------------ regeneration & results
 
     /// <summary>Regenerates changed bridges (framing + 3D steel); unchanged bridges are reused from cache.</summary>
-    public RegenerationReport Regenerate(bool includeSteel = true)
+    public RegenerationReport Regenerate(bool includeSteel = true) => Regenerate(includeSteel, null);
+
+    /// <summary>The output the next exports regenerate for (<see cref="LodSettings.Outputs"/> caps); null = the project levels.</summary>
+    private LodOutput? _output;
+
+    /// <summary>Runs <paramref name="f"/> with the models at the level cap of <paramref name="output"/> (no cap = unchanged).</summary>
+    private T AtOutput<T>(LodOutput output, Func<T> f)
+    {
+        if (Project.Lod?.Outputs?.ContainsKey(output) != true) return f();
+        var prev = _output;
+        var models = _models;
+        _output = output;
+        try { return f(); }
+        finally { _output = prev; if (models != null) _models = models; }   // the document keeps the models at the project levels
+    }
+
+    private RegenerationReport Regenerate(bool includeSteel, LodOutput? output)
     {
         var sw = Stopwatch.StartNew();
         EnsureTerrain();
-        _models = _cache.Regenerate(Project, includeSteel);
+        _models = _cache.Regenerate(Project, includeSteel, output ?? _output);
         var warn = new List<string>();
         var err = new List<string>();
         foreach (var m in _models.OfType<BridgeModel>())
@@ -273,6 +368,8 @@ public sealed class SbmDocument
 
     public BridgeFraming Framing(string? bridgeName = null) => Model(bridgeName).Framing;
     public SteelModel Steel(string? bridgeName = null) => Model(bridgeName).Steel ?? throw new InvalidOperationException("3D steel was not generated (framing errors).");
+    /// <summary>Standard cross frame depth / hole shift / twist report of a bridge (null when neither CrossFrameDefinition.Standard nor ReportTwist is set).</summary>
+    public CrossFrameFitReport? CrossFrameFit(string? bridgeName = null) => Model(bridgeName).Steel?.CrossFrameFit;
     public SBM.Core.Substructure.SubstructureModel Substructure(string? bridgeName = null) => Model(bridgeName).Substructure ?? throw new InvalidOperationException("Substructure was not generated (framing errors).");
     /// <summary>TxDOT prestressed girders (bridges whose girder kind is TxDotPrestressed).</summary>
     public SBM.Core.Prestressed.PrestressedModel Prestressed(string? bridgeName = null) => Model(bridgeName).Prestressed ?? throw new InvalidOperationException("This bridge has no prestressed girders (or framing errors).");
@@ -414,11 +511,101 @@ public sealed class SbmDocument
 
     /// <param name="chordTolerance">ReferenceView only: max sagitta (m) of hole / profile-arc polygons; 0 = 1/32 in.</param>
     /// <param name="forCheck">Checking export: the originator's interpretation is stripped (see IfcCheckFilter, docs/API.md); geometry is identical.</param>
-    public IfcExportResult ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric, double chordTolerance = 0, bool forCheck = false, bool keepDesignations = false)
+    /// <summary>The project's roadway corridors (<see cref="BridgeProject.Roads"/>), generated on the loaded terrain (side slopes need it).
+    /// A road whose alignment is not in the project is skipped with an error diagnostic.</summary>
+    public List<SBM.Core.Road.RoadModel> Roads()
+    {
+        bool needBridges = Project.Roads.Any(r => r.Clearances is { Count: > 0 } || r.BeginAtBridge != null || r.EndAtBridge != null);
+        if (needBridges) Regenerate();
+        var list = SBM.Core.Road.RoadGenerator.All(Project, _terrains is { Count: > 0 } ? GroundAt : null, needBridges ? _models : null);
+        if (needBridges) foreach (var r in list) r.Clearances.AddRange(SBM.Core.Road.RoadClearanceCheck.Check(r, _models, r.Diagnostics));
+        return list;
+    }
+
+    /// <summary>The project's retaining walls (<see cref="BridgeProject.Walls"/>); a wall whose alignment is missing gets an error diagnostic.</summary>
+    /// <remarks>An MSE wall with abutments (<see cref="SBM.Core.Wall.MseWallDefinition.Abutments"/>) regenerates the bridges for the interface check (pile sleeves, facing clearance).</remarks>
+    public List<SBM.Core.Wall.RetainingWallModel> Walls()
+    {
+        var list = SBM.Core.Wall.RetainingWallGenerator.All(Project);
+        if (Project.Walls.Any(w => w.Mse?.Abutments is { Count: > 0 }))
+        {
+            Regenerate();
+            SBM.Core.Wall.MseAbutmentCheck.Run(list, _models);
+        }
+        return list;
+    }
+
+    /// <summary>The project's grading features (<see cref="BridgeProject.Gradings"/>) on the loaded terrain (none = slopes UNRESOLVED).</summary>
+    public List<SBM.Core.Grading.GradingModel> Gradings()
+    {
+        EnsureTerrain();
+        return SBM.Core.Grading.GradingGenerator.All(Project, _terrains is { Count: > 0 } ? GroundAt : null);
+    }
+
+    /// <summary>The project's utility networks (<see cref="BridgeProject.Utilities"/>) on the finished ground (rims not given, cover checks).</summary>
+    /// <param name="finish">also hang the bridge-hung runs and run the clash / clearance check against the generated bridges, walls and roads (regenerates the bridges).</param>
+    public List<SBM.Core.Utility.UtilityModel> Utilities(bool finish = true)
+    {
+        var fg = FinishedGround();
+        var list = SBM.Core.Utility.UtilityGenerator.All(Project, p => fg.Query(p));
+        if (finish && list.Count > 0)
+        {
+            if (Project.Bridges.Count > 0) Regenerate();
+            var obstacles = SBM.Core.Utility.UtilityClashCheck.Obstacles(Project.Bridges.Count > 0 ? _models : null,
+                Project.Walls.Count > 0 ? Walls() : null, Project.Roads.Count > 0 ? Roads() : null);
+            SBM.Core.Utility.UtilityGenerator.Finish(list, obstacles, Units);
+        }
+        return list;
+    }
+
+    /// <summary>Finished ground: the road surfaces (top faces of courses / curbs + side slopes), then the grading surfaces, then the existing ground.</summary>
+    public SBM.Core.Grading.FinishedGround FinishedGround()
+    {
+        EnsureTerrain();
+        var roads = Project.Roads.Count > 0 ? Roads() : new();
+        var gr = Project.Gradings.Count > 0 ? Gradings() : new();
+        return new SBM.Core.Grading.FinishedGround(_terrains is { Count: > 0 } ? GroundAt : null, new (string, IEnumerable<SBM.Core.Solids.Mesh>)[]
+        {
+            ("road", roads.SelectMany(r => r.Parts.Select(p => p.Mesh).Concat(r.SideSlopes.Values))),
+            ("grading", gr.SelectMany(g => g.Surfaces)),
+        });
+    }
+
+    /// <summary>
+    /// Writes the merged finished ground (roads, then grading, then the existing ground) as one LandXML TIN surface sampled on a grid of <paramref name="spacing"/> (m)
+    /// over the road / grading / wall / utility extents grown by <paramref name="margin"/> (m), or over <paramref name="extents"/>. Returns the messages.
+    /// </summary>
+    public List<string> ExportFinishedGround(string path, double spacing, double margin, Box2? extents = null, string? name = null)
+    {
+        var fg = FinishedGround();
+        var b = extents ?? fg.SurfaceExtents;
+        if (extents == null)
+        {
+            foreach (var w in Project.Walls.Count > 0 ? Walls() : new())
+                foreach (var m in w.Panels.SelectMany(p => p.Stems.Concat(p.Footings)).Concat(w.Elements.SelectMany(e => e.Solids)))
+                { var mb = m.Bounds(); b.Add(new Vec2(mb.Min.X, mb.Min.Y)); b.Add(new Vec2(mb.Max.X, mb.Max.Y)); }
+            foreach (var n in Project.Utilities)
+                foreach (var st in n.Structures.Where(x => !double.IsNaN(x.X) && !double.IsNaN(x.Y))) b.Add(new Vec2(st.X, st.Y));
+        }
+        if (b.IsEmpty) throw new InvalidOperationException("No roads, grading, walls or utilities to bound the surface - give the extents.");
+        if (extents == null) { b.MinX -= margin; b.MinY -= margin; b.MaxX += margin; b.MaxY += margin; }
+        var (tin, src) = fg.ToTin(b, spacing);
+        SBM.IO.LandXml.LandXmlWriter.WriteSurface(path, name ?? (Project.Name + " finished ground"), tin, Units);
+        var msgs = new List<string> { $"{tin.Positions.Count:N0} points, {tin.TriangleCount:N0} triangles at {spacing:0.###} m over {b.Width:0.#} x {b.MaxY - b.MinY:0.#} m -> {path}" };
+        msgs.AddRange(src.OrderByDescending(kv => kv.Value).Select(kv => $"  {kv.Key}: {kv.Value:N0} points"));
+        if (!src.ContainsKey("existing ground")) msgs.Add("  no existing ground loaded: the TIN covers the road / grading surfaces only.");
+        return msgs;
+    }
+
+    public IfcExportResult ExportIfc(string path, IfcGeometryMode geometry = IfcGeometryMode.Parametric, double chordTolerance = 0, bool forCheck = false, bool keepDesignations = false) =>
+        AtOutput(LodOutput.Ifc, () => ExportIfcCore(path, geometry, chordTolerance, forCheck, keepDesignations));
+
+    private IfcExportResult ExportIfcCore(string path, IfcGeometryMode geometry, double chordTolerance, bool forCheck, bool keepDesignations)
     {
         Regenerate();
         var data = _models.OfType<BridgeModel>().Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null || m.Framing.Definition.SupportLinesOnly).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
-        return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance, forCheck, keepDesignations));
+        return IfcExporter.Export(path, Project, data, new IfcExportOptions(geometry, chordTolerance, forCheck, keepDesignations, Project.Roads.Count > 0 ? Roads() : null, Project.Walls.Count > 0 ? Walls() : null,
+            Project.Gradings.Count > 0 ? Gradings() : null, Project.Utilities.Count > 0 ? Utilities() : null, _output is { } lo ? Project.Lod?.ForOutput(lo) : Project.Lod));
     }
 
     /// <summary>Writes a Rhino 3DM file (rhino3dm): exact extrusions / B-reps where the model records them, meshes elsewhere, fastener blocks,
@@ -434,16 +621,16 @@ public sealed class SbmDocument
     /// <param name="exactCurved">Regenerate with exact NURBS for the curved parts (deck, haunches, barriers, curved girder plates) for this export when
     /// the project setting is off (the setting is restored afterwards and the model is not saved). False = the model as it is set.</param>
     public SBM.IO.Rhino3dm.Rhino3dmResult Export3dm(string path, IReadOnlyList<string>? bridges = null, bool detail = true, bool meshOnly = false,
-        bool terrain = false, bool barSolids = false, int fileVersion = 8, bool centerlines = false, bool exactCurved = true)
+        bool terrain = false, bool barSolids = false, int fileVersion = 8, bool centerlines = false, bool exactCurved = true, string? layers = null)
     {
         bool flip = exactCurved && !meshOnly && !Project.Geometry.ExactCurvedGeometry;
         if (flip) Project.Geometry.ExactCurvedGeometry = true;
-        try { return Export3dmCore(path, bridges, detail, meshOnly, terrain, barSolids, fileVersion, centerlines); }
+        try { return AtOutput(LodOutput.Rhino, () => Export3dmCore(path, bridges, detail, meshOnly, terrain, barSolids, fileVersion, centerlines, layers)); }
         finally { if (flip) Project.Geometry.ExactCurvedGeometry = false; }
     }
 
     private SBM.IO.Rhino3dm.Rhino3dmResult Export3dmCore(string path, IReadOnlyList<string>? bridges, bool detail, bool meshOnly,
-        bool terrain, bool barSolids, int fileVersion, bool centerlines)
+        bool terrain, bool barSolids, int fileVersion, bool centerlines, string? layers)
     {
         Regenerate();
         var all = _models.OfType<BridgeModel>().ToList();
@@ -461,21 +648,33 @@ public sealed class SbmDocument
         {
             Bridges = bridges, Detail = detail, MeshOnly = meshOnly, BarSolids = barSolids, Terrain = terr, BasePoint = bp,
             Source = FilePath != null ? Path.GetFileName(FilePath) : null, FileVersion = fileVersion,
+            Layers = layers != null ? new System.Text.RegularExpressions.Regex(layers, System.Text.RegularExpressions.RegexOptions.IgnoreCase) : null,
             Centerlines = centerlines
                 ? Centerlines(null, e => bridges is not { Count: > 0 } || bridges.Any(b => b.Equals(e.Ref.Bridge, StringComparison.OrdinalIgnoreCase)))
                     .Where(r => r.Line.Note == null)
                     .Select(r => new SBM.IO.Rhino3dm.Rhino3dmCenterline(r.Ref.Bridge, r.Ref.Mark, r.Ref.Assembly, r.Category, r.Ref.GlobalId, r.Line.Geometric, r.Line.Centroid)).ToList()
                 : null,
+            // roads / walls / grading / utilities: written only for a whole-model export (no bridge subset)
+            Civil = bridges is { Count: > 0 } || (Project.Roads.Count + Project.Walls.Count + Project.Gradings.Count + Project.Utilities.Count) == 0 ? null
+                : new SBM.IO.Rhino3dm.Rhino3dmCivil(Project.Roads.Count > 0 ? Roads() : null, Project.Walls.Count > 0 ? Walls() : null,
+                    Project.Gradings.Count > 0 ? Gradings() : null, Project.Utilities.Count > 0 ? Utilities() : null),
         };
         return SBM.IO.Rhino3dm.Rhino3dmExporter.Export(path, Project, all, o);
     }
 
     /// <summary>Writes the companion SQLite database (element registry with IFC GlobalIds and hierarchy, plan sheets, sheet links, QC).</summary>
-    public SBM.IO.Database.CompanionResult ExportDatabase(string? path = null, SBM.IO.Database.DatabaseOptions? options = null)
+    public SBM.IO.Database.CompanionResult ExportDatabase(string? path = null, SBM.IO.Database.DatabaseOptions? options = null) =>
+        AtOutput(LodOutput.Database, () => ExportDatabaseCore(path, options));
+
+    private SBM.IO.Database.CompanionResult ExportDatabaseCore(string? path, SBM.IO.Database.DatabaseOptions? options)
     {
         Regenerate();
         options ??= new SBM.IO.Database.DatabaseOptions();
         options.ModelFile ??= FilePath;
+        if (Project.Roads.Count > 0) options.Roads ??= Roads();
+        if (Project.Walls.Count > 0) options.Walls ??= Walls();
+        if (Project.Gradings.Count > 0) options.Gradings ??= Gradings();
+        if (Project.Utilities.Count > 0) options.Utilities ??= Utilities();
         path ??= FilePath != null ? SBM.IO.Database.CompanionDatabase.DefaultPath(FilePath) : throw new InvalidOperationException("Pass a database path.");
         var data = _models.OfType<BridgeModel>().Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList();
         return SBM.IO.Database.CompanionDatabase.Build(path, Project, data, options);

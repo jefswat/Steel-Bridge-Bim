@@ -150,6 +150,17 @@ public static class SheetSet
             new Panel(new ViewSpec("Steel notes", _ => SteelDetailViews.Notes(ctx), ScaleFamily.Architectural, PaperSpace: true), W * 0.72, 0, W, H * 0.5),
         }));
 
+        // OPTIONAL standard cross frames: one prototype frame per family (two per sheet) and the hole shift table.
+        if (ctx.Steel?.CrossFrameFit is { Families.Count: > 0 } cfFit)
+        {
+            var fams = cfFit.Families.Where(fm => fm.Marks.Count > 0 && !double.IsNaN(fm.Depth) && !double.IsNaN(fm.TopWorkPoint)).ToList();
+            foreach (var fm in fams)
+                specs.Add(new SheetSpec("Standard cross frames", $"Standard cross frame {fm.Id}: one shop frame for {fm.Marks.Count} frames (same type and work point spacing)",
+                    new[] { Full(new ViewSpec($"Standard cross frame {fm.Id}", s => SteelDetailViews.StandardCrossFrame(WithScale(ctx, s), fm), ScaleFamily.Architectural)) }));
+            foreach (var (title, view) in TableViews.CrossFrameHoleShifts(ctx, W, H))
+                specs.Add(new SheetSpec("Cross frame hole shifts", "Hole positions on the connection plates for the standard frames", new[] { Full(new ViewSpec(title, _ => view, ScaleFamily.Architectural, PaperSpace: true)) }));
+        }
+
         // Field splice details (one per distinct type, two per sheet) and the schedule.
         var spliceGroups = SpliceViews.Groups(ctx);
         foreach (var gr in spliceGroups)

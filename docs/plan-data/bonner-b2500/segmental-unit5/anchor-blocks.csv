@@ -1,0 +1,56 @@
+block,parameter,printed,value_in,basis,pdf_page,sheet,tag
+BOTTOM SLAB ANCHOR BLOCK,serves,"22-0.6"" strand anchor (SDI 22.6-PC)",,bottom slab continuity tendons B (16 / 20 strands per pt-tendon-schedule.csv),297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,position across,at the web / bottom slab corner inside the box (both webs; mirrored about CL girder),,View A-A,297,S3-49,RASTER+VECTOR
+BOTTOM SLAB ANCHOR BLOCK,joint to block start (outer corner at the anchor end),"4'-0""",48,plan dimension from the segment joint the anchor faces,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,anchor face set-back,VARIES,,"anchor face square to the tendon: in plan 4.0-5.3"" inside the 4'-0"" line (web side deeper), in elevation inclined ~12 deg from vertical (scaled); tendon curved PC-PI-PT R = 23'-0""",297,S3-49,TEXT (VARIES) / VECTOR (scaled)
+BOTTOM SLAB ANCHOR BLOCK,anchor-end corner chamfer (plan),,4 x 4.5,"vector outline: 20 x 22.5 px at 5 px/in (1"" = 1'-0"" plan); not dimensioned",297,S3-49,VECTOR (scaled) UNRESOLVED
+BOTTOM SLAB ANCHOR BLOCK,length (block start to taper end),"8'-6""",102,plan dimension,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,taper end to next joint,"1'-6""",18,plan dimension (4'-0 + 8'-6 + 1'-6 = 14'-0 typical segment),297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,width at the anchor end (from the web face at block top),"2'-10""",34,plan + View A-A,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,width at the start of the plan taper,"2'-5 1/2""",29.5,plan,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,straight length (anchor end to start of plan taper),,76.5,"vector: 569.7 -> 952.1 px at 5 px/in; not dimensioned",297,S3-49,VECTOR (scaled) UNRESOLVED
+BOTTOM SLAB ANCHOR BLOCK,plan taper length (to zero width at the web),,25.5,vector (102 - 76.5),297,S3-49,VECTOR (scaled) UNRESOLVED
+BOTTOM SLAB ANCHOR BLOCK,anchor CL from web face at block top,"1'-7""",19,View A-A,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,anchor CL to block outer edge,"1'-3""",15,View A-A,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,block top above anchor CL,"11""",11,View A-A,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,anchor CL above top of bottom slab (at the block outer face),"1'-1""",13,View A-A,297,S3-49,TEXT
+BOTTOM SLAB ANCHOR BLOCK,section shape at the anchor,"top level from web face 2'-10"" wide, vertical outer face 2'-0"" high, bottom = bottom slab top / web fillet",,"View A-A vectors: outer face 90 px = 24"" at 3.75 px/in",297,S3-49,VECTOR
+BOTTOM SLAB ANCHOR BLOCK,top in elevation,slopes from the anchor end down to the bottom slab top at the taper end (straight),,"elevation vectors; height at Section B-B ~1'-3 3/4"" scaled",297,S3-49,VECTOR (scaled) UNRESOLVED
+TOP SLAB ANCHOR BLOCK,serves,"12-0.6"" strand anchor (SDI 12.6-PC)",,top slab closure tendons C (12 strands),298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,position across,under the top slab at the web / top slab corner inside the box (both webs),,Section A-A,298,S3-50,RASTER+VECTOR
+TOP SLAB ANCHOR BLOCK,joint to anchor face (at block bottom),"3'-5""",41,elevation,298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,block length at the bottom,"6'-9""",81,elevation,298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,block end to next joint,"3'-10""",46,elevation (3'-5 + 6'-9 + 3'-10 = 14'-0),298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,other dimension chain (top),"3'-4"" / 5'-0"" / 5'-8""",,"elevation top chain (rebar / P.I. stations); 3'-4 + 5'-0 + 5'-8 = 14'-0",298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,end away from the anchor,vertical (square) face,,elevation vectors x = 864.2,298,S3-50,VECTOR
+TOP SLAB ANCHOR BLOCK,anchor face,"inclined ~15 deg from vertical in elevation (normal to the tendon); tendon PC-PI-PT R = 16'-0""",,elevation vectors,298,S3-50,VECTOR (scaled)
+TOP SLAB ANCHOR BLOCK,top of slab to block bottom at the free (inner) edge,"2'-11 1/4""",35.25,Section A-A / elevation,298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,top of slab to anchor CL,"2'-7 1/4""",31.25,Section A-A,298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,inner vertical face height (haunch underside to block bottom),"1'-8""",20,Section A-A,298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,bottom face,"square (90 deg) to the web, 3'-2 1/4"" from the web inside face to the inner vertical face",38.25,Section A-A,298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,anchor CL from CL girder,"8'-10 1/2""",106.5,Section A-A (8'-10 1/2 + 1'-8 1/2 chain),298,S3-50,TEXT
+TOP SLAB ANCHOR BLOCK,inner vertical face from CL girder,,85.3,"vector x = 1597 vs CL ~1917 px at 3.75 px/in; not dimensioned",298,S3-50,VECTOR (scaled) UNRESOLVED
+TOP SLAB ANCHOR BLOCK,bottom face to the web at the web side,,,"elevation shows a second bottom line (y 471.8 vs 425.1 = 9 1/3"" lower) = where the sloped bottom meets the web",298,S3-50,VECTOR
+TEMP PT BAR BLOCK TYPE A (top),position,under the top slab at the web / top slab corner (Section B-B); bars 1 3/4 in.,,"bars at 10'-7"" - 2'-10"" and 10'-7"" - 11"" from CL girder (chain 1'-11"" + 11"" ending 10'-7"" from CL girder)",300,S3-52,TEXT (positions DERIVED from the chain)
+TEMP PT BAR BLOCK TYPE A (top),length along,"1'-6"" (TYP.)",18,elevations,300,S3-52,TEXT
+TEMP PT BAR BLOCK TYPE A (top),joint to block,"2'-11""",35,elevations (block 2'-11 from the joint at the stressing / bulkhead side),300,S3-52,TEXT
+TEMP PT BAR BLOCK TYPE A (top),section,"bottom face 3'-3"" long; dims 2'-8 1/4"", 2'-0 1/2"", 1'-5"", 8"", 9 3/4""",,"Section B-B; geometric meaning of each vertical dim not resolved from the text",300,S3-52,TEXT UNRESOLVED
+TEMP PT BAR BLOCK TYPE A (top),bar ducts,"2 3/4"" dia duct for 1 3/4"" dia PT bar; min. bar length 14'-0"" between segments (11'-7"" D1-U1, 14'-6"" bent-U1, 13'-3"" at bent)",,elevations,300,S3-52,TEXT
+TEMP PT BAR BLOCK TYPE B (bottom),position,"on the bottom slab top, 2 bars at 2'-6"" and 3'-2"" from CL girder (8"" stagger), both sides",,Section E-E + staggered pattern (8"" STAGGER),299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE B (bottom),size across,"1'-8"" (6"" + 8"" + 6"" about the bars)",20,Section E-E,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE B (bottom),length along,"2'-0"" (TYP.)",24,typical bottom PT bar elevation,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE B (bottom),joint to block,"2'-11""",35,elevation,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE B (bottom),heights,"bars 6 1/2"" above the bottom slab soffit; block top 6"" above the bars = 1'-0 1/2"" above the soffit",12.5,Section E-E,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE B (bottom),stressing clearance,"3'-0"" min (TYP.) to the next segment",36,elevation note *,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE C (bottom),where,segments D1 and U1 only,,Section D-D,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE C (bottom),bar position,"6'-6"" from CL girder; 14'-6"" from the bar to the top slab",78,Section D-D,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE C (bottom),section,"inner vertical face 9"" inside the bar, top 9"" above the bar, bottom on the bottom slab fillet (VARIES), outer end against the web; 1'-6 5/8"" MIN. height at the block face",,Section D-D,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE C (bottom),length along,"2'-0"" (TYP.)",24,bent-U1 / D1-U1 elevations,299,S3-51,TEXT
+TEMP PT BAR BLOCK TYPE C (bottom),joint to block,"2'-11""",35,elevations,299,S3-51,TEXT
+PERMANENT PT BAR (bent),bars,"2 3/4"" duct for permanent 1 3/4"" dia PT bar (min. length 9'-11 1/2""), in the bent segment bottom; anchor plates in pockets filled after stressing",,"Section C-C: 6'-6"" / 3'-4"" from CL girder, 6'-4"", 3'-4"", 1'-5"", 4'-9""",299,S3-51,TEXT UNRESOLVED (pocket outline)
+DEVIATION BLOCK spans 20-22,where,at the CL closure joint (CL deviation block = CL closure joint); 3'-0 long (1'-6 each side of CL),36,Section B-B,302,S3-54,TEXT
+DEVIATION BLOCK spans 20-22,section,"web thickening on the inside face from the top slab haunch to the bottom slab; inside face parallel to the web; printed widths 1'-8"" (9"" + 1'-0"" / 7"") at the top, 2'-10"" / 3'-7"" at the bottom",,"Section along CL deviation block; vector: horizontal width web outside face to block face = 44.4"" (2.5 px/in) at mid height",302,S3-54,TEXT + VECTOR (scaled) UNRESOLVED (dimension references)
+DEVIATION BLOCK spans 20-22,tendon heights,"5'-5"" top of deck to P1 P.I.; 9"" P1 to P2; 2'-10"" P2 to the soffit",,Section along CL (9'-0 depth),302,S3-54,TEXT
+DEVIATION BLOCK spans 23-28,section,"printed widths 1'-6"" (3"" + 1'-0"") at the top, 2'-4"" / 3'-1"" at the bottom; same heights 5'-5"" / 9"" / 2'-10""",,Section along CL deviation block (spans 23-28),302,S3-54,TEXT UNRESOLVED (dimension references)
+DEVIATION BLOCK (all),pipes,"4"" dia galvanized steel pipe Sch. 40 for FUTURE PT (strands / anchors / wedges not in contract), bend R = 22'-0"", 4'-0"" long, protection caps both ends; values per span in deviation-pipes.csv",,notes 1-3,302,S3-54,TEXT
+DEVIATION BLOCK (all),conduit,"3 1/2"" dia electrical conduit holes (right of CL only)",,section,302,S3-54,TEXT

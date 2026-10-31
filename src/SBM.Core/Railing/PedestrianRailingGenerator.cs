@@ -268,6 +268,10 @@ public static class PedestrianRailingGenerator
                     // listed stations as given; the rest of the run (beyond the outermost listed posts) follows the equal-spacing rule
                     foreach (double x in fixedD) ps.Add(SAt(x));
                     double lo = fdLo + pd.EndDistance, hi = fdHi - pd.EndDistance;
+                    // an end stretch shorter than one spacing past the outermost listed post is a rail overhang (PTC p.108 wing ends: the rail runs 2'-7 past the
+                    // last post) - no rule post there (agent review P15, 2026-10-30)
+                    if (fixedD[0] - fdLo < pd.Spacing - 1e-6) lo = fixedD[0];
+                    if (fdHi - fixedD[^1] < pd.Spacing - 1e-6) hi = fixedD[^1];
                     if (fixedD[0] - lo > 1e-3)
                     {
                         int n = (int)Math.Ceiling((fixedD[0] - lo) / pd.Spacing - 1e-9);

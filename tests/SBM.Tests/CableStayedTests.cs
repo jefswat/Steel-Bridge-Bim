@@ -155,4 +155,122 @@ public class CableStayedTests
         double soffit = cs.DeckSection.Min(p => p.Y);
         Assert.True(c.Provided <= doc.Alignment("CL").Profile.ElevationAt(Ft(1100)) + soffit - Ft(40) + 1e-6);
     }
+
+    [Fact]
+    public void TwoTower_TuningForkEdgeGirdersRocketLaunchers_SymmetricBasesAndRoundTrip()
+    {
+        var doc = SbmDocument.New("cs2 test");
+        var al = doc.AddAlignment("CL", 0, new[] { new PiRow(1000, 1000), new PiRow(1000, 1000 + Ft(3000)) });
+        al.Profile = new VerticalProfile { Vpis = { new Vpi(0, Ft(100)), new Vpi(Ft(3000), Ft(100)) } };
+        var br = new BridgeDefinition { Name = "CS2", AlignmentName = "CL" };
+        br.FieldSplices.Clear(); br.Girders.Count = 0; br.LateralBracing.Enabled = false;
+        foreach (var (n, t, sta) in new[] { ("A1", SupportType.Abutment, 500.0), ("PA", SupportType.Pier, 800.0), ("TA", SupportType.Pier, 1100.0),
+                                              ("TB", SupportType.Pier, 1820.0), ("PB", SupportType.Pier, 2120.0), ("A2", SupportType.Abutment, 2400.0) })
+            br.Supports.Add(new SupportDefinition { Name = n, Type = t, Station = Ft(sta), Substructure = new SubstructureDefinition { Enabled = false } });
+        var cs = CableStayedConcepts.TwoTower("TA", Ft(1100), 0, Ft(100), "TB", Ft(1820), 0, Ft(100), Ft(290), Ft(290), unitFrom: Ft(800), unitTo: Ft(2120));
+        cs.Piers.BaseElevation = 0;
+        br.CableStayed = cs;
+        doc.Project.Bridges.Add(br);
+        doc.Regenerate();
+        var m = doc.Model("CS2").Steel!;
+        var csm = m.CableStayed!;
+        Assert.Equal(2, csm.PylonFrames.Count);
+        Assert.Equal(4, csm.Legs.Count);
+        Assert.Equal(new[] { 0, 0, 1, 1 }, csm.Legs.Select(l => l.Pylon));
+        Assert.Equal(52, csm.Stays.Count);                                       // 2 towers x 2 planes x (7 main + 6 side) at 45 ft
+        // tuning fork: hollow concrete legs (4 walls + top each) and one concrete strut below the deck per tower, no steel tower parts
+        var subUnits = doc.Model("CS2").Substructure!.Units;
+        foreach (var tn in new[] { "TA", "TB" })
+        {
+            var u = subUnits.Single(x => x.Name == tn);
+            Assert.Equal(2 * 5, u.Solids.Count(x => x.Name.Contains(" leg ")));
+            Assert.Single(u.Solids, x => x.Name.Contains("strut below the deck"));
+            Assert.All(u.Solids, x => Assert.True(x.Mesh.Volume() > 0, x.Name));
+        }
+        Assert.DoesNotContain(m.Parts, p => p.Category is PartCategory.Pylon or PartCategory.PylonCrossBeam);
+        // anchorage trays: one per stay level per leg (7 levels: 6 opposing pairs + the lowest main-span stay), each stay ends on a bearing plate inside its tray
+        var trays = m.Assemblies.Where(a => a.Kind == AssemblyKind.PylonAnchorTray).ToList();
+        Assert.Equal(4 * 7, trays.Count);
+        Assert.Equal(4 * 6, trays.Count(a => a.Description.Contains(" / ")));
+        Assert.Equal(52, m.Parts.Count(p => p.Category == PartCategory.PylonGuidePipe));
+        foreach (var st in csm.Stays)
+        {
+            var leg = csm.Legs[st.Leg];
+            var c = leg.Points.OrderBy(p => Math.Abs(p.Z - st.Upper.Z)).First();
+            var pfr = csm.PylonFrames[leg.Pylon];
+            var sec = leg.Definition.Section;
+            double frac = (st.Upper.Z - leg.Points[0].Z) / (leg.Points[^1].Z - leg.Points[0].Z);
+            Assert.True(Math.Abs(Vec3.Dot(st.Upper - c, pfr.X)) < sec.DepthAt(frac) / 2 - sec.Wall + 1e-6, st.Name);   // inside the leg's void along the bridge
+            Assert.True(Math.Abs(Vec3.Dot(st.Upper - c, pfr.Y)) < sec.WidthAt(frac) / 2 - sec.Wall + 1e-6, st.Name);   // and across
+        }
+        var eg = cs.Deck.EdgeGirders!;
+        double topOfDeck = Ft(100), strutTop = csm.Legs[0].Points[0].Z + cs.Pylon.CrossBeams[0].Height + cs.Pylon.CrossBeams[0].Section.Depth / 2;
+        Assert.True(strutTop < topOfDeck - eg.Depth, "the only cross member is below the deck");
+        Assert.Equal(CsMaterial.Concrete, cs.Pylon.CrossBeams[0].Section.Material);
+        // floorbeams every 15 ft from each tower (main span 720 = 48 x 15) + the unit ends; anchorages at floorbeams every 45 ft
+        var fbSta = m.Assemblies.Where(a => a.Kind == AssemblyKind.CsFloorbeam).Select(a => a.Description).ToList();
+        Assert.Equal(89, fbSta.Count);                                           // 800 .. 2120 ft at 15 ft, both ends on the grid
+        foreach (var st in csm.Stays)
+        {
+            double fromTower = Math.Min(Math.Abs(st.Station - Ft(1100)), Math.Abs(st.Station - Ft(1820)));
+            Assert.Equal(0, fromTower / Ft(45) - Math.Round(fromTower / Ft(45)), 6);
+        }
+        // one rocket launcher per stay; the stay ends at the bearing plate below the deck point
+        Assert.Equal(52, m.Assemblies.Count(a => a.Kind == AssemblyKind.CsAnchorage));
+        Assert.Equal(52, m.Parts.Count(p => p.Category == PartCategory.StayAnchorPipe));
+        Assert.All(csm.Stays, st => Assert.True(st.Lower.Z < topOfDeck - eg.SlabThickness - 1, $"{st.Name} {st.Lower} {st.Upper} {st.Station}"));
+        // field splices: one line per stay anchor station and side = 26 lines x 2 sides; 27 girder field sections per side
+        int lines = m.Assemblies.Count(a => a.Kind == AssemblyKind.CsFieldSplice) / 2;
+        Assert.InRange(lines, 20, 26);                                            // one per anchorage, the outermost ones may fall outside the unit
+        Assert.Equal(2 * (lines + 1), m.Assemblies.Count(a => a.Kind == AssemblyKind.CsEdgeGirder));
+        Assert.DoesNotContain(csm.Diagnostics, d => d.Message.Contains("overlaps the floorbeam"));
+        Assert.All(m.Parts.Where(p => p.Category is PartCategory.FlangePlate or PartCategory.WebPlate or PartCategory.SplicePlate or PartCategory.CsFloorbeamPlate or PartCategory.CsStringerPlate
+            or PartCategory.StayAnchorPipe or PartCategory.StayAnchorPlate), p => Assert.True(p.Mesh.Volume() > 0, p.Mark));
+        // precast deck: panels between the members, closure pours over both edge girders + the CL longitudinal support (through) and every floorbeam
+        var conc = doc.Model("CS2").Concrete!;
+        Assert.Null(conc.Deck);
+        Assert.Equal(88 * 2, conc.DeckParts.Count(p => p.IsPanel));            // 88 bays x 2 panels across (one longitudinal closure on the CL)
+        Assert.Equal(3 + 89 * 2, conc.DeckParts.Count(p => !p.IsPanel));       // 3 longitudinal closures + 89 floorbeams x 2
+        Assert.All(conc.DeckParts, p => Assert.True(p.Mesh.Volume() > 0, p.Name));
+        double slabVol = (eg.SlabLeft + eg.SlabRight) * eg.SlabThickness * Ft(2120 - 800);
+        Assert.Equal(slabVol, conc.DeckPartVolume, slabVol * 0.002);             // panels + closures fill the slab exactly
+        Assert.Equal(88, m.Assemblies.Count(a => a.Kind == AssemblyKind.CsStringer));
+        // rocket launchers span the girder: pipe + bearing plate + stem + mounting plate + anchor top / bottom flanges; the pipe runs past both flanges
+        foreach (var asm in m.Assemblies.Where(a => a.Kind == AssemblyKind.CsAnchorage))
+        {
+            var ps = m.Parts.Where(p => p.Assembly == asm.Mark).ToList();
+            Assert.Equal(6, ps.Count);
+            var pipe = ps.Single(p => p.Category == PartCategory.StayAnchorPipe).Mesh.Bounds();
+            double tosZ = topOfDeck - eg.TopOfSteelBelowGrade, botZ = tosZ - eg.TopFlangeThickness - eg.WebDepth - eg.BottomFlangeThickness;
+            Assert.True(pipe.Max.Z > tosZ + 1 && pipe.Min.Z < botZ - 0.3, asm.Mark);
+            var stem = ps.Single(p => p.Mark.EndsWith("-ST")).Mesh.Bounds();
+            Assert.True(stem.Max.Z - stem.Min.Z > 0.8 * eg.WebDepth, asm.Mark);
+        }
+        Assert.True(csm.DeckWeightPerLength > 0);
+        // every stay hangs from its own tower: nearest to its pylon base in plan
+        foreach (var s in csm.Stays)
+        {
+            int own = csm.Legs[s.Leg].Pylon;
+            Assert.True((s.Upper.XY - csm.PylonFrames[own].Origin.XY).Length < (s.Upper.XY - csm.PylonFrames[1 - own].Origin.XY).Length, s.Name);
+        }
+        // symmetric bridge: equal and opposite longitudinal base moments, both pylons have footings
+        var f = csm.Forces;
+        Assert.Equal(2, f.Pylons.Count);
+        Assert.Equal(f.Pylons[0].MomentLongDead, -f.Pylons[1].MomentLongDead, 3);
+        Assert.Equal(f.BaseMomentLongDead, f.Pylons[0].MomentLongDead, 9);
+        var units = doc.Model("CS2").Substructure!.Units;
+        Assert.Contains(units, u => u.Name == "TA" && u.Solids.Any(s => s.Kind == SBM.Core.Substructure.SubElementKind.Footing));
+        Assert.Contains(units, u => u.Name == "TB" && u.Solids.Any(s => s.Kind == SBM.Core.Substructure.SubElementKind.Footing));
+        // the second pylon survives the file round trip; a single-pylon definition writes no MorePylons
+        var path = Path.Combine(Path.GetTempPath(), $"cs2-{Guid.NewGuid():N}.sbm");
+        try
+        {
+            doc.Save(path);
+            var back = SbmDocument.Open(path).Project.Bridges.Single(b => b.Name == "CS2").CableStayed!;
+            Assert.Single(back.MorePylons!);
+            Assert.Equal("TB", back.MorePylons![0].Support);
+            Assert.DoesNotContain("MorePylons", System.Text.Json.JsonSerializer.Serialize(CableStayedConcepts.Conventional("P", 0, 0, 30, 100, 50), new System.Text.Json.JsonSerializerOptions { NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals }));
+        }
+        finally { File.Delete(path); }
+    }
 }

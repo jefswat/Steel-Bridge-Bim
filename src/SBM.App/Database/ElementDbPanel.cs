@@ -155,7 +155,23 @@ public sealed partial class ElementDbPanel : UserControl
         }
         _body.Children.Add(crumbs);
         int kids = db.ChildCount(globalId);
-        if (kids > 0)
+        if (kids > 0 && e.Level == "member")
+        {
+            // built-up member / joint gusset stack: every sub-element (ply, angle, cover plate, gusset layer, fill); a row click highlights that piece
+            _body.Children.Add(Header($"Sub-elements ({kids})"));
+            var list = new StackPanel();
+            foreach (var c in db.Children(globalId, 1000))
+            {
+                var row = new TextBlock { FontSize = 11, Foreground = Link, Cursor = Cursors.Hand, Margin = new Thickness(0, 1, 0, 1), TextWrapping = TextWrapping.Wrap,
+                    Text = $"{c.Name}   {c.Subtype}{(c.MassKg is > 0 ? $"   {c.MassKg:N0} kg" : "")}", ToolTip = "Show this sub-element and highlight it" };
+                string id = c.GlobalId;
+                row.MouseLeftButtonUp += (_, _) => NavigateRequested?.Invoke(id);
+                list.Children.Add(row);
+            }
+            _body.Children.Add(list);
+            sum.Append($" | {kids} sub-elements");
+        }
+        else if (kids > 0)
         {
             var ch = db.Children(globalId, 12);
             var kp = new WrapPanel { Margin = new Thickness(0, 2, 0, 0) };

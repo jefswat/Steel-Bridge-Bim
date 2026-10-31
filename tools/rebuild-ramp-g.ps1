@@ -1,7 +1,7 @@
 # Re-runs the Ramp G script chain on a model file (default: a test copy in temp\) and logs everything.
 param([string]$Model = "temp\rampg-rebuild-test.sbm", [switch]$FromOriginal)
 $ErrorActionPreference = "Continue"
-Set-Location "C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler"
+Set-Location "C:\SBM"
 if ($FromOriginal) { Copy-Item "samples\plans\I-80 WB and Ramp G.sbm" $Model -Force }
 $cli = (Get-ChildItem src\SBM.Cli\bin\Debug -Recurse -Filter sbm.exe | Select-Object -First 1).FullName
 $log = [IO.Path]::ChangeExtension($Model, ".log")

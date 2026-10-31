@@ -56,23 +56,41 @@ public static partial class TrussGenerator
             int nParts = 0; double mass = 0;
             foreach (var it in items)
             {
-                var (_, _, A) = Resolve(it.PointA, _d.Planes.FirstOrDefault()?.Name ?? "");
-                var (_, _, B) = Resolve(it.PointB, _d.Planes.FirstOrDefault()?.Name ?? "");
-                if (A is not { } a || B is not { } b) { Warn($"Truss: plane item {it.Name} - point {it.PointA} or {it.PointB} not defined; not built{Src}."); continue; }
-                var d2 = new Vec2(b.X - a.X, b.Y - a.Y);
-                double L = d2.Length;
-                if (L < 1e-6) { Warn($"Truss: plane item {it.Name} - its two points are plumb over each other; not built{Src}."); continue; }
-                var u = new Vec3(d2.X / L, d2.Y / L, 0);
-                var w = Vec3.Cross(u, Up).Normalized();
+                Vec3 a, u, w, vAx = Up;
+                double L = 0;
+                if (it.Frame is { } fr)
+                {
+                    // OPTIONAL explicit frame: origin at (station, offset, elevation), U = the tangent turned toward the right
+                    var t2 = Vec2.FromAngle(_al.AngleAt(fr.Station));
+                    double th = fr.AngleDegrees * Math.PI / 180;
+                    var u2 = t2 * Math.Cos(th) + t2.Right * Math.Sin(th);
+                    a = _al.PointAt(fr.Station, fr.Offset).WithZ(fr.Elevation);
+                    u = new Vec3(u2.X, u2.Y, 0).Normalized();
+                    if (fr.Horizontal) { vAx = Vec3.Cross(Up, u).Normalized(); w = Up; }
+                    else w = Vec3.Cross(u, Up).Normalized();
+                    if (it.Mirror) Warn($"Truss: plane item {it.Name} - Mirror is not used with an explicit frame{Src}.");
+                }
+                else
+                {
+                    var (_, _, A) = Resolve(it.PointA, _d.Planes.FirstOrDefault()?.Name ?? "");
+                    var (_, _, B) = Resolve(it.PointB, _d.Planes.FirstOrDefault()?.Name ?? "");
+                    if (A is not { } pa || B is not { } pb) { Warn($"Truss: plane item {it.Name} - point {it.PointA} or {it.PointB} not defined; not built{Src}."); continue; }
+                    a = pa;
+                    var d2 = new Vec2(pb.X - pa.X, pb.Y - pa.Y);
+                    L = d2.Length;
+                    if (L < 1e-6) { Warn($"Truss: plane item {it.Name} - its two points are plumb over each other; not built{Src}."); continue; }
+                    u = new Vec3(d2.X / L, d2.Y / L, 0);
+                    w = Vec3.Cross(u, Up).Normalized();
+                }
                 Assumption? asu = it.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(it.Unresolved + Src, "piece as listed / scaled") : null;
                 if (asu != null) Warn(it.Unresolved);
-                string asm = Asm(it.Assembly.Length > 0 ? it.Assembly : "BR-PORTALS", AssemblyKind.TrussBracing, $"{_d.Name} - {(it.AssemblyDescription.Length > 0 ? it.AssemblyDescription : "Portals")}");
+                string asm = Asm(it.Assembly.Length > 0 ? it.Assembly : "BR-PORTALS", it.AssemblyKind ?? AssemblyKind.TrussBracing, $"{_d.Name} - {(it.AssemblyDescription.Length > 0 ? it.AssemblyDescription : "Portals")}");
                 var notes = new List<string>();
                 var path = it.Kind == TrussPlaneItemKind.Sweep ? FilletPath(it.Path, it.ArcStepDegrees > 0 ? it.ArcStepDegrees : 5, notes) : new List<Vec2>();
                 foreach (var nt in notes) Warn($"Truss: plane item {it.Name} - {nt}{Src}.");
-                foreach (bool mir in it.Mirror ? new[] { false, true } : new[] { false })
+                foreach (bool mir in it.Mirror && it.Frame == null ? new[] { false, true } : new[] { false })
                 {
-                    Vec3 W(double uu, double vv, double ww) => a + u * (mir ? L - uu : uu) + Up * vv + w * ww;
+                    Vec3 W(double uu, double vv, double ww) => a + u * (mir ? L - uu : uu) + vAx * vv + w * ww;
                     var mesh = new Mesh();
                     double len = 0;
                     if (it.Kind == TrussPlaneItemKind.Plate)
@@ -102,7 +120,7 @@ public static partial class TrussGenerator
                     }
                     if (mesh.IsEmpty) continue;
                     string mark = it.Name + (mir ? "-M" : "");
-                    var part = new SteelPart { Mark = mark, Category = CategoryOf(it.Role), Assembly = asm, Mesh = mesh, Material = Material(it.Material),
+                    var part = new SteelPart { Mark = mark, Category = it.Category ?? CategoryOf(it.Role), Assembly = asm, Mesh = mesh, Material = Material(it.Material), Density = it.Density ?? 0,
                         Length = len, Assumption = asu, Description = $"{(it.Label.Length > 0 ? it.Label : it.Name)}{(it.Source.Length > 0 ? $" ({it.Source})" : "")}" };
                     Model.Steel.Parts.Add(part);
                     if (it.Panel.Length > 0) Model.PanelOf[mark] = it.Panel;

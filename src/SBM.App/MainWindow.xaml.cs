@@ -46,6 +46,8 @@ public partial class MainWindow : Window
         _vm.SheetsRequested += () => ModeSheets.IsChecked = true;
         View.CameraChanged += (_, _) => KeepCameraInRange();
         InitNavigation();
+        InitNorthArrow();
+        InitClickViews();
         InitMeasure();
         InitDatabase();
         View.PreviewMouseLeftButtonDown += OnViewportMouseDown;
@@ -209,6 +211,7 @@ public partial class MainWindow : Window
                     }
                     t2.Stop();
                     if (args.Contains("--noterrain")) SetTerrainVisible(false); // terrain may have finished loading after the first call
+                    if (args.Contains("--clickviews")) OpenClickViews(); // with --pickafter: plan / elevation / section at the picked point -> _click_*.png
                     // --pickafter fx,fy / --hideafter fx,fy: like --pick / --hide but once the near-view rebar is in place.
                     foreach (var opt in new[] { "--hideafter", "--pickafter" })
                     {
@@ -218,6 +221,11 @@ public partial class MainWindow : Window
                         Pick(new Point(pp2[0] * View.ActualWidth, pp2[1] * View.ActualHeight));
                         ViewModels.MainViewModel.Log("PICKAFTER: " + string.Join(" | ", _vm.SelectedProperties.Select(r => $"{r.Name}={r.Value}")) + $" (smooth bars {_lodSkip.Count})" + PickHitReport());
                         if (opt == "--hideafter" && _selectedTag != null) { HideElement(_selectedTag, _selectedTitle); ViewModels.MainViewModel.Log($"HIDEAFTER: {_hiddenList.Count} hidden: {string.Join(", ", _hiddenList.Select(h => h.label))}"); }
+                    }
+                    if (args.Contains("--clickviews") && _clickViews != null)
+                    {
+                        if (_clickTask != null) await _clickTask;
+                        _clickViews.RenderToPng(System.IO.Path.ChangeExtension(System.IO.Path.GetFullPath(path), null));
                     }
                     SnapshotIsolate(args);
                     LogDetailVisibility();
@@ -734,12 +742,16 @@ public partial class MainWindow : Window
 
     /// <summary>Reference models live outside the regenerated scene; they are only rebuilt when references change.</summary>
     private readonly Dictionary<string, List<Element3D>> _refModels = new();
+    /// <summary>Aerial images: the flat plan-view quads and the draped 3D surfaces they belong to.</summary>
+    private readonly HashSet<Element3D> _planImageModels = new(), _drapedImageModels = new();
 
     private void OnReferencesReady(List<ReferenceRender> renders)
     {
         foreach (var list in _refModels.Values)
             foreach (var m in list) { View.Items.Remove(m); if (m is LineGeometryModel3D lm0) _rawLineColor.Remove(lm0); }
         _refModels.Clear();
+        _planImageModels.Clear();
+        _drapedImageModels.Clear();
         _refRadius = 0;
         foreach (var r in renders)
         {
@@ -767,6 +779,31 @@ public partial class MainWindow : Window
                 models.Add(rm);
                 var bb = r.Mesh.Bound;
                 _refRadius = Math.Max(_refRadius, (bb.Maximum - bb.Minimum).Length() / 2);
+                if (r.PlanImage is { } q)
+                {
+                    // Plan view: the aerial as one flat textured quad UNDER everything (below the lowest terrain point, so plan linework,
+                    // contours and foundations draw over it). The draped surface stays the 3D view's.
+                    float z = bb.Minimum.Z - 30;
+                    var quad = new HelixToolkit.SharpDX.MeshGeometry3D
+                    {
+                        Positions = new HelixToolkit.Vector3Collection { new(q.x0, q.y0, z), new(q.x1, q.y0, z), new(q.x1, q.y1, z), new(q.x0, q.y1, z) },
+                        Normals = new HelixToolkit.Vector3Collection { System.Numerics.Vector3.UnitZ, System.Numerics.Vector3.UnitZ, System.Numerics.Vector3.UnitZ, System.Numerics.Vector3.UnitZ },
+                        TextureCoordinates = new HelixToolkit.Vector2Collection { new(q.u0, q.v0), new(q.u1, q.v0), new(q.u1, q.v1), new(q.u0, q.v1) },
+                        Indices = new HelixToolkit.IntCollection { 0, 1, 2, 0, 2, 3 },
+                    };
+                    quad.UpdateBounds();
+                    var flat = new PhongMaterial
+                    {
+                        DiffuseColor = mat.DiffuseColor, SpecularColor = new HelixToolkit.Maths.Color4(0, 0, 0, 1),
+                        AmbientColor = new HelixToolkit.Maths.Color4(0.75f, 0.75f, 0.75f, 1f), DiffuseMap = mat.DiffuseMap,
+                    };
+                    var pm = NewSolidModel(quad, flat, a < 0.999, null);
+                    pm.CullMode = SharpDX.Direct3D11.CullMode.None;
+                    pm.IsHitTestVisible = false;
+                    models.Add(pm);
+                    _planImageModels.Add(pm);
+                    _drapedImageModels.Add(rm);
+                }
             }
             if (r.Lines != null)
                 models.Add(ThemedLine(new LineGeometryModel3D { Geometry = r.Lines, Thickness = 1, IsHitTestVisible = false }, Color.FromRgb(def.R, def.G, def.B)));
@@ -814,7 +851,9 @@ public partial class MainWindow : Window
             var mode = _vm.ReferenceLayerModes.FirstOrDefault(m => m.name == name);
             bool modeOk = _planMode ? !mode.threeDOnly : !mode.planOnly;
             bool visible = modeOk && _vm.IsLayerVisible(name);
-            foreach (var m in list) m.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            // aerial: flat quad in plan, draped surface in 3D
+            foreach (var m in list)
+                m.Visibility = visible && (_planImageModels.Contains(m) ? _planMode : !_drapedImageModels.Contains(m) || !_planMode) ? Visibility.Visible : Visibility.Collapsed;
         }
         foreach (var (name, list) in _layerModels)
         {
@@ -863,6 +902,9 @@ public partial class MainWindow : Window
             menu.Items.Add(mi);
         }
         menu.Items.Add(new System.Windows.Controls.Separator());
+        var na = new System.Windows.Controls.MenuItem { Header = "North arrow", IsCheckable = true, IsChecked = _northArrowOn, ToolTip = "Grid north (+Y of the plan coordinates) in the top right of the viewport" };
+        na.Click += (_, _) => { _northArrowOn = na.IsChecked; UpdateNorthArrow(); };
+        menu.Items.Add(na);
         var box = new System.Windows.Controls.TextBox { Text = _compassAngle.ToString("0.#"), Width = 50, Margin = new Thickness(6, 0, 0, 0) };
         box.LostFocus += (_, _) => { if (double.TryParse(box.Text.Trim('°'), out double v) && v > 0 && v < 90) _compassAngle = v; else box.Text = _compassAngle.ToString("0.#"); };
         box.KeyDown += (_, ke) => { if (ke.Key == Key.Enter) { if (double.TryParse(box.Text.Trim('°'), out double v) && v > 0 && v < 90) _compassAngle = v; menu.IsOpen = false; } };

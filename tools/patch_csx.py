@@ -1,6 +1,6 @@
 # Append the plan bend-diagram shape (";S=shape:d1,d2,..:pin", inches) to every plan bar line of pier-rebar-*.csx that has a decoded diagram.
 import json, re, sys, csv
-W = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends' + '\\'
+W = r'C:\SBM\.worktrees\bends' + '\\'
 R = json.load(open(W + r'temp\bend\plan_shapes.json'))
 by = {}
 for r in R:

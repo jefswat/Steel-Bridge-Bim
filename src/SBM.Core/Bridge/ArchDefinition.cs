@@ -875,6 +875,9 @@ public sealed class ArchCurbDefinition
     public double InnerOffset { get; set; }
     public double Width { get; set; } = In(10);
     public double Height { get; set; } = In(4);
+    /// <summary>OPTIONAL chamfer of the two top edges (m; 0 = square corners, as before).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double Chamfer { get; set; }
 }
 
 /// <summary>PT tendon (data only in v1): local polyline of its centreline.</summary>

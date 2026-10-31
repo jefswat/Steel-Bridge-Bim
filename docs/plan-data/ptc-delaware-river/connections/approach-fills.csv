@@ -1,0 +1,10 @@
+structure,joint,member,qty,width_in,thk_in,material,page,confidence,note
+approach3 (unit A),U1,U0-U1,2,14.5,0.3125,C,50,high,"2-Fills 14 1/2 x 5/16 (C) (agent review approach A07, re-read 250-400 dpi)"
+approach3 (unit A),U1,U1-L2,2,14.5,0.75,S,50,high,"2-Fills 14 1/2 x 3/4 (A07)"
+approach3 (unit A),U1,L0-U1,0,0,0,,50,high,"no fill printed on L0-U1 at U1 (A07): none built"
+approach3 (unit A),L1,U1-L1,2,10,0.1875,C,50,high,"2-Fills 10 x 3/16 (C) (A08)"
+approach3 (unit A),L2,L2-U3,2,15.5,0.5,C,50,high,"2-Fills 15 1/2 x 1/2 (C) (A08)"
+approach3 (unit A),L2,U2-L2,2,12,0.8125,C,50,high,"2-Fills 12 x 13/16 (A08)"
+approach3 (unit A),U2,U2-L2,2,12,0.8125,C,50,high,"2-Fills 12 x 13/16 (A08)"
+approach3 (unit A),U3,L2-U3,2,15.5,0.75,C,50,high,"2-Fills 15 1/2 x 3/4 (C) each diagonal (A08)"
+approach3 (unit A),U3,U3-L4,2,15.5,0.75,C,50,high,"2-Fills 15 1/2 x 3/4 (C) each diagonal (A08)"

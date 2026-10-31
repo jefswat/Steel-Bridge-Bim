@@ -19,7 +19,7 @@ namespace SBM.Core.Segmental;
 ///   to the CL depth over the transition length and a solid pier diaphragm; closure joints / end segments constant;
 /// - tendons: straight runs joint to joint in their duct (row A / B below the top, row C above the soffit), so they follow the box.
 /// </summary>
-public sealed class SegmentalGenerator
+public sealed partial class SegmentalGenerator
 {
     private readonly BridgeFraming _f;
     private readonly SegmentalDefinition _d;
@@ -66,6 +66,9 @@ public sealed class SegmentalGenerator
         BuildTransverse();
         BuildBearings();
         BuildPiers();
+        BuildDetails();
+        BuildMisc();
+        if (_d.SectionBars is { Count: > 0 }) BuildSectionBars();
         Report();
     }
 
@@ -493,7 +496,7 @@ public sealed class SegmentalGenerator
                 var ol = p.FootingOutline.Select(v => v.ToVec2()).ToList();
                 if (MeshBuilder.SignedArea(ol) < 0) ol.Reverse();
                 MeshBuilder.AddExtrusion(m, ol, fr, p.FootingBottom, p.FootingTop);
-                unit.Solids.Add(new SubSolid(SubElementKind.Footing, $"{b.Name} footing", $"CIP footing on {p.PileCount} 36\" sq PS piles (piles not modeled)", m));
+                unit.Solids.Add(new SubSolid(SubElementKind.Footing, $"{b.Name} footing", $"CIP footing on {p.PileCount} 36\" sq PS piles" + (_d.Misc?.Foundation(b.Name)?.Piles.Count > 0 ? "" : " (piles not modeled)"), m));
                 var minS = ol.Min(v => v.X); var maxS = ol.Max(v => v.X); var minN = ol.Min(v => v.Y); var maxN = ol.Max(v => v.Y);
                 unit.Foundations.Add(new FoundationInfo { Type = FoundationType.PileCap, S = (minS + maxS) / 2, N = (minN + maxN) / 2, TopZ = p.FootingTop, BottomZ = p.FootingBottom, SizeS = maxS - minS, SizeN = maxN - minN });
             }
@@ -501,9 +504,10 @@ public sealed class SegmentalGenerator
             if (!double.IsNaN(p.ColumnS) && !double.IsNaN(p.ColumnN) && !double.IsNaN(p.FootingTop) && !double.IsNaN(capBottom))
             {
                 var m = new Mesh();
-                MeshBuilder.AddBox(m, fr, -p.ColumnS / 2, p.ColumnS / 2, -p.ColumnN / 2, p.ColumnN / 2, p.FootingTop, capBottom);
+                double cs = ColumnOffsetS(b.Name);
+                MeshBuilder.AddBox(m, fr, cs - p.ColumnS / 2, cs + p.ColumnS / 2, -p.ColumnN / 2, p.ColumnN / 2, p.FootingTop, capBottom);
                 unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{b.Name} column", $"CIP column base to EL {p.ColumnBaseTop / Ft(1):0.00} + precast hollow column segments, envelope {p.ColumnS / Ft(1):0.##} x {p.ColumnN / Ft(1):0.##} ft{flag}", m));
-                unit.Columns.Add(new ColumnInfo(0, 0, 0, capBottom, p.FootingTop, ColumnShape.Rectangular, p.ColumnS, p.ColumnN));
+                unit.Columns.Add(new ColumnInfo(0, cs, 0, capBottom, p.FootingTop, ColumnShape.Rectangular, p.ColumnS, p.ColumnN));
             }
             if (p.CapOutline.Count >= 3 && !double.IsNaN(p.CapTop) && !double.IsNaN(p.CapHeight))
             {

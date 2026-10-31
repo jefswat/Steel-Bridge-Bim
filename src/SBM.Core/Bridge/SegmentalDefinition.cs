@@ -117,7 +117,18 @@ public sealed class TendonDefinition
     public bool AboveSoffit { get; set; }
     /// <summary>Plan text this layout / duct position is assumed from (raised as UNRESOLVED on the tendon).</summary>
     public string Unresolved { get; set; } = "";
-    public TendonDefinition Clone() => (TendonDefinition)MemberwiseClone();
+    /// <summary>OPTIONAL duct lane of the tendon at every joint (<see cref="SegmentalDefinition.DuctLanes"/> names); null = the straight duct above.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalTendonLane>? Lanes { get; set; }
+    /// <summary>OPTIONAL deviation profile (lane changes within the segments, deviation to the anchorage); null = straight joint-to-joint runs.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SegmentalTendonProfile? Profile { get; set; }
+    public TendonDefinition Clone()
+    {
+        var c = (TendonDefinition)MemberwiseClone();
+        c.Lanes = Lanes?.Select(l => l.Clone()).ToList(); c.Profile = Profile?.Clone();
+        return c;
+    }
 }
 
 /// <summary>Transverse tendons of a segment type (S3-24 / S3-30 / S3-34).</summary>
@@ -246,6 +257,39 @@ public sealed class SegmentalDefinition
     public List<string> Unresolved { get; set; } = new();
     /// <summary>Plan-vs-plan differences (Info).</summary>
     public List<string> Reported { get; set; } = new();
+    /// <summary>OPTIONAL concrete details (null = none, omitted from the .sbm; see SegmentalDetails.cs): block shapes and their placements, openings,
+    /// parapet, segment bill bars.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalBlockType>? BlockTypes { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalBlockPlacement>? Blocks { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalOpeningDefinition>? Openings { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SegmentalParapetDefinition? Parapet { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalBarDefinition>? Bars { get; set; }
+    /// <summary>OPTIONAL match-cast joint keys (web shear keys, top / bottom slab alignment keys); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalKeyDefinition>? Keys { get; set; }
+    /// <summary>OPTIONAL reinforcing from face-referenced section paths in every segment (SegmentalSectionBars.cs); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalSectionBarSet>? SectionBars { get; set; }
+    /// <summary>OPTIONAL PT bars (temporary erection / permanent bent bars) between the blocks of two segments; null = none (SegmentalDetails.cs).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalPtBarDefinition>? PtBars { get; set; }
+    /// <summary>OPTIONAL PT bars fixed inside one segment (vertical PT bars of bent / end segments); null = none (SegmentalDetails.cs).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalFixedBarDefinition>? FixedBars { get; set; }
+    /// <summary>OPTIONAL bent steel pipes for future PT (deviation block pipes, diaphragm pipes); null = none (SegmentalDetails.cs).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalPipeDefinition>? Pipes { get; set; }
+    /// <summary>OPTIONAL duct lanes = the holes in the bulkhead / match-cast faces the longitudinal tendons pass through (SegmentalDetails.cs).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalDuctLane>? DuctLanes { get; set; }
+    /// <summary>OPTIONAL misc items: pile groups, deck drains, expansion joints (SegmentalMisc.cs); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SegmentalMiscDefinition? Misc { get; set; }
 
     public SegmentalBent? Bent(string name) => Bents.FirstOrDefault(b => b.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
@@ -258,6 +302,9 @@ public sealed class SegmentalDefinition
         Transverse = Transverse.Select(t => t.Clone()).ToList(), StrandDiameter = StrandDiameter, StrandArea = StrandArea,
         StrandWeightLbPerFt = StrandWeightLbPerFt, ConcreteStrengthKsi = ConcreteStrengthKsi, StrandMaterial = StrandMaterial,
         Unresolved = Unresolved.ToList(), Reported = Reported.ToList(),
+        BlockTypes = BlockTypes?.Select(x => x.Clone()).ToList(), Blocks = Blocks?.Select(x => x.Clone()).ToList(),
+        Openings = Openings?.Select(x => x.Clone()).ToList(), Parapet = Parapet?.Clone(), Bars = Bars?.Select(x => x.Clone()).ToList(), Keys = Keys?.Select(x => x.Clone()).ToList(), SectionBars = SectionBars?.Select(x => x.Clone()).ToList(),
+        PtBars = PtBars?.Select(x => x.Clone()).ToList(), FixedBars = FixedBars?.Select(x => x.Clone()).ToList(), Pipes = Pipes?.Select(x => x.Clone()).ToList(), DuctLanes = DuctLanes?.Select(x => x.Clone()).ToList(), Misc = Misc?.Clone(),
     };
 
     public List<string> Validate(int spanCount)

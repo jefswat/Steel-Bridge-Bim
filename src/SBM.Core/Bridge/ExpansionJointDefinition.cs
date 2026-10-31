@@ -69,6 +69,10 @@ public sealed class ExpansionJointDefinition
     /// <summary>OPTIONAL walkway cover plate over the joint (e.g. TxDOT BS-EJCP); built only with <see cref="Body"/>. Null = none, omitted from the .sbm.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public JointCoverPlateDefinition? CoverPlate { get; set; }
+    /// <summary>OPTIONAL barrier cover (slider) plates over the joint (e.g. Iowa modular joint details: 3/8 in bent plate wrapping the barrier, set in a recess);
+    /// built only with <see cref="Body"/>. Null = none, omitted from the .sbm.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public JointBarrierPlateDefinition? BarrierPlate { get; set; }
 
     public bool Active => Type != ExpansionJointType.None;
 
@@ -86,6 +90,7 @@ public sealed class ExpansionJointDefinition
         c.EndBlock = EndBlock?.Clone();
         c.Armor = Armor?.Clone();
         c.CoverPlate = CoverPlate?.Clone();
+        c.BarrierPlate = BarrierPlate?.Clone();
         return c;
     }
 }
@@ -223,4 +228,33 @@ public sealed class DeckEndBlockDefinition
         double run = ChamferRun ?? (d - slab);
         return new() { new(0, d), new(FlatLength, d), new(FlatLength + run, slab) };
     }
+}
+
+/// <summary>
+/// Barrier cover (slider) plate at an expansion joint (OPTIONAL <see cref="ExpansionJointDefinition.BarrierPlate"/>): a plate bent to the barrier section (every
+/// face of the bridge's barrier profile except its base), its outer face <see cref="Depress"/> inside the concrete faces (recessed), stopping
+/// <see cref="BottomClear"/> above the base on both sides; along the barrier from <see cref="LengthOut"/> beyond the deck-end face (over the opening, onto the
+/// next unit) to <see cref="LengthIn"/> into this deck. Fasteners (cap screws, bent bolts) and the recess in the concrete are not modeled. Lengths in meters.
+/// </summary>
+public sealed class JointBarrierPlateDefinition
+{
+    public double Thickness { get; set; } = In(0.375);
+    public double Depress { get; set; } = In(0.25);
+    public double BottomClear { get; set; } = In(0.25);
+    public double LengthIn { get; set; }
+    public double LengthOut { get; set; }
+    /// <summary>OPTIONAL lengths of the right-hand plate when they differ from the left (skewed joints); null = <see cref="LengthIn"/> / <see cref="LengthOut"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? RightLengthIn { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? RightLengthOut { get; set; }
+    public bool Left { get; set; } = true;
+    public bool Right { get; set; } = true;
+    public string Material { get; set; } = "ASTM A36, galvanized";
+    public string Source { get; set; } = "";
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Basis { get; set; }
+    public JointBarrierPlateDefinition Clone() => (JointBarrierPlateDefinition)MemberwiseClone();
 }

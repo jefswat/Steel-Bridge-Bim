@@ -90,7 +90,7 @@ public sealed partial class SteelModelGenerator
         if (!framing.HasErrors && framing.Girders.Count > 0)
         {
             if (framing.Definition.Girders.IsTub) g.RunTub();   // OPTIONAL tub girders (TubGirderGenerator.cs); the I-girder path below is unchanged
-            else g.Run();
+            else { g.Run(); g.FinishCrossFrameFit(); }   // OPTIONAL standard cross frame / twist report (null when not asked for)
         }
         g._model.Assemblies.AddRange(g._assemblies.OrderBy(a => a.Kind).ThenBy(a => a.Mark, MarkComparer.Instance));
         g._model.CrossFrameDetails.AddRange(g._cfDetails.OrderBy(c => c.Mark, MarkComparer.Instance));
@@ -164,6 +164,9 @@ public sealed partial class SteelModelGenerator
             string key = SectionMark(st.Girder, st.GirderDistance) + StiffenerCode(st.Kind);
             stiffNo[i] = counters[key] = counters.GetValueOrDefault(key) + 1;
         }
+        _stiffMarks = new string[_f.Stiffeners.Count];
+        for (int i = 0; i < _f.Stiffeners.Count; i++)
+            if (stiffNo[i] > 0) _stiffMarks[i] = $"{SectionMark(_f.Stiffeners[i].Girder, _f.Stiffeners[i].GirderDistance)}-{StiffenerCode(_f.Stiffeners[i].Kind)}{stiffNo[i]}";
         for (int i = 0; i < _f.Stiffeners.Count; i++) { var ss = _f.Stiffeners[i]; int no = stiffNo[i]; members.Add(() => BuildStiffener(ss, no)); }
         foreach (var b in _f.Bearings)
         {
@@ -362,6 +365,15 @@ public sealed partial class SteelModelGenerator
         return (w - across * Vec3.Dot(w, across)).Normalized();
     }
 
+    /// <summary>Up axis of a connection / bearing plate: the OPTIONAL orientation input, else plumb for bearing stiffeners and normal to the flanges
+    /// for the others (unchanged rule).</summary>
+    private static Vec3 PlateUp(CrossFramePlaneOrientation? plane, bool plumbByDefault, GirderPath path, double s, Vec3 across) => plane switch
+    {
+        CrossFramePlaneOrientation.Plumb => Up,
+        CrossFramePlaneOrientation.NormalToFlanges or CrossFramePlaneOrientation.NormalToBottomFlange => FlangeNormal(path, s, across),
+        _ => plumbByDefault ? Up : FlangeNormal(path, s, across),
+    };
+
     // ================================================================== girders
 
     /// <summary>Discontinuous girder end cope at its cross girder (OPTIONAL CrossGirderSection.DiscontinuousCopeLength): s where the flanges stop,
@@ -411,14 +423,8 @@ public sealed partial class SteelModelGenerator
             // OPTIONAL integral steel cap at this section's end / start: the top flange stops short of the cap flange, the web is coped under it.
             var capE = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC - c.Half - s1) < 1e-6);
             var capS = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC + c.Half - s0) < 1e-6);
-            double tf0 = capS != null ? Math.Max(s0, capS.SC + capS.TopEnd) : s0, tf1 = capE != null ? Math.Min(s1, capE.SC - capE.TopEnd) : s1;
-            // OPTIONAL discontinuous girder end at a cross girder: flanges stop at the cope, a web tab carries the end angles (sheet 121 A-A / E-E)
+            var (tf0, tf1, bf1) = FlangeRange(g, s0, s1);
             var xgCope = XgCope(g);
-            double bf1 = s1;
-            if (xgCope is { } xc0 && s1 > xc0.sc)
-            {
-                tf1 = Math.Min(tf1, Math.Max(s0, xc0.sc)); bf1 = Math.Max(s0, xc0.sc);
-            }
             var copes = new List<(double a, double b, double depth, CapCut cut)>();
             if (capE != null && tf1 < s1 - 1e-6) copes.Add((tf1, s1, CopeDepth(path, capE), capE));
             if (capS != null && tf0 > s0 + 1e-6) copes.Add((s0, tf0, CopeDepth(path, capS), capS));
@@ -531,6 +537,41 @@ public sealed partial class SteelModelGenerator
         }
     }
 
+    /// <summary>Top flange run (tf0..tf1) and bottom flange end (bf1) of the field section s0..s1: the top flange stops short of an integral cap's flange,
+    /// both flanges stop at a discontinuous girder's cope (OPTIONAL, sheet 121 A-A / E-E).</summary>
+    private (double tf0, double tf1, double bf1) FlangeRange(GirderResult g, double s0, double s1)
+    {
+        var capE = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC - c.Half - s1) < 1e-6);
+        var capS = CapCutsOf(g.Index).FirstOrDefault(c => Math.Abs(c.SC + c.Half - s0) < 1e-6);
+        double tf0 = capS != null ? Math.Max(s0, capS.SC + capS.TopEnd) : s0, tf1 = capE != null ? Math.Min(s1, capE.SC - capE.TopEnd) : s1;
+        double bf1 = s1;
+        if (XgCope(g) is { } xc0 && s1 > xc0.sc)
+        {
+            tf1 = Math.Min(tf1, Math.Max(s0, xc0.sc)); bf1 = Math.Max(s0, xc0.sc);
+        }
+        return (tf0, tf1, bf1);
+    }
+
+    /// <summary>Mark of the girder plate ("TF" / "BF" / "W") at girder distance s, numbered as <see cref="BuildGirder"/> numbers them; null if none.</summary>
+    private string? GirderPlateMark(int girder, double s, string kind)
+    {
+        var g = _f.Girders[girder];
+        foreach (var (s0, s1, mark) in _sections[girder])
+        {
+            if (s > s1 + 1e-6) continue;
+            var (tf0, tf1, bf1) = FlangeRange(g, s0, s1);
+            var pieces = kind switch { "TF" => _top[girder].PiecesWithin(tf0, tf1), "BF" => _bot[girder].PiecesWithin(s0, bf1), _ => _web[girder].PiecesWithin(s0, s1) };
+            int n = 1;
+            foreach (var (a, b, _) in pieces)
+            {
+                if (s >= a - 1e-6 && s <= b + 1e-6) return $"{mark}-{kind}{n}";
+                n++;
+            }
+            return null;
+        }
+        return null;
+    }
+
     /// <summary>Depth of the girder web cope under an integral cap's top flange (girder top of web down to the cap top of web less the clearance).</summary>
     private static double CopeDepth(GirderPath path, CapCut c)
     {
@@ -618,7 +659,8 @@ public sealed partial class SteelModelGenerator
 
         var u = new Vec3(s.Direction.X, s.Direction.Y, 0);
         // Bearing stiffeners are plumb; connection plates and intermediate stiffeners are normal to the flanges.
-        var y = s.Kind == StiffenerKind.Bearing ? Up : FlangeNormal(g.Path, s.GirderDistance, u);
+        // OPTIONAL cross frame plane inputs (CrossFrameDefinition.IntermediatePlane / BearingStiffenerPlane) override the kind's rule.
+        var y = PlateUp(s.Plane, s.Kind == StiffenerKind.Bearing, g.Path, s.GirderDistance, u);
         var frame = new Frame3(p, u, y, Vec3.Cross(u, y));
         double sin = Math.Abs(Vec2.Cross(t, s.Direction));
         double xf = tw / 2 / Math.Max(sin, 0.2);
@@ -643,6 +685,34 @@ public sealed partial class SteelModelGenerator
         var holes = StiffenerHoles(s.Girder, s.GirderDistance)
             .Select(hh => (x: Vec3.Dot(hh.c - p, frame.X), yy: Vec3.Dot(hh.c - p, frame.Y), hh.d)).ToList();
 
+        // Fit conditions of the two ends: ONLY plan inputs (user rule 2026-10-27: nothing assumed). An end with entries but no Welded gets no flange weld;
+        // an end without entries keeps the generated welds and, where AASHTO LRFD sets a requirement, gets a POTENTIAL NONCOMPLIANCE flag.
+        var support = s.Support >= 0 ? _def.SupportAt(s.Support) : null;
+        var fitKind = s.Kind switch
+        {
+            StiffenerKind.Bearing => s.Jacking ? StiffenerFitKind.Jacking : StiffenerFitKind.Bearing,
+            StiffenerKind.ConnectionPlate => StiffenerFitKind.ConnectionPlate,
+            _ => StiffenerFitKind.Intermediate,
+        };
+        var topFits = StiffenerFits.Of(sd, support, fitKind, StiffenerEnd.Top);
+        var botFits = StiffenerFits.Of(sd, support, fitKind, StiffenerEnd.Bottom);
+        if (!weldBottom && botFits.Count > 0 && _fitWarned.TryAdd("gap-bottom", 0))
+            Warn($"{g.Name}: intermediate stiffener bottom-end fit given, but the model stops intermediate stiffeners {In(sd.IntermediateBottomGap)} short of the bottom flange - not applied.");
+        if (!weldBottom) botFits = Array.Empty<StiffenerEndFit>();
+        bool weldTop = topFits.Count == 0 || topFits.Any(x => x.Condition == FitCondition.Welded);
+        bool weldBot = weldBottom && (botFits.Count == 0 || botFits.Any(x => x.Condition == FitCondition.Welded));
+
+        // Skewed plate: it meets the plumb web at an angle, so a square-cut web edge leaves a wedge gap on one face and overlaps the web on the other
+        // (+-tp/2 sin(skew)); the flange ends of a plumb bearing stiffener on a grade likewise miss the sloped flange. Such plates are cut so the web edge
+        // lies in the web face plane and the ends in the flange face planes (bevelled edges, full contact). Square plates are unchanged.
+        var right3 = new Vec3(t.Right.X, t.Right.Y, 0);
+        var nR = Vec3.Dot(u, right3) >= 0 ? right3 : -right3;   // web normal toward +u
+        var gr3 = new Vec3(t.X, t.Y, g.Path.GradeAt(s.GirderDistance)).Normalized();
+        var fnW = (Up - gr3 * Vec3.Dot(Up, gr3)).Normalized();   // true flange normal
+        // bevel when the square-cut web edge misses the web face (skew) OR the square-cut ends miss the flange faces (a plumb plate on a grade, also at zero
+        // skew: tp x grade / 2 at each end - user decision 2026-10-28 "bevel it")
+        bool bevel = Math.Abs(Vec3.Dot(frame.Z, nR)) * tp / 2 > BevelTolerance || Math.Abs(Vec3.Dot(frame.Z, fnW)) * tp / 2 > BevelTolerance;
+
         var mesh = new Mesh();
         var welds = new Mesh();
         double weldLen = 0;
@@ -650,23 +720,55 @@ public sealed partial class SteelModelGenerator
         {
             if (side == 1 && s.Side is not (StiffenerSide.Both or StiffenerSide.Right)) continue;
             if (side == -1 && s.Side is not (StiffenerSide.Both or StiffenerSide.Left)) continue;
-            var poly = new List<Vec2> { new(xf, -c), new(xf + c, 0) };
-            if (clipTop) { poly.Add(new Vec2(xe, 0)); poly.Add(new Vec2(xf + w, -(xf + w - xe))); }   // 45 deg back to the top flange edge (p.32 Sect. A-A)
-            else poly.Add(new Vec2(xf + w, 0));
-            poly.Add(new Vec2(xf + w, -h));
-            if (weldBottom) { poly.Add(new Vec2(xf + c, -h)); poly.Add(new Vec2(xf, -h + c)); }
-            else poly.Add(new Vec2(xf, -h));
-            var pts = poly.Select(q => new Vec2(q.X * side, q.Y)).ToList();
+            // per face z (frame coordinates, x already signed): outline, web-edge end points, flange weld runs
+            var faces = new Dictionary<int, StiffenerFace>();
+            foreach (int face in new[] { -1, 1 })
+            {
+                if (bevel) { faces[face] = BevelOutline(frame, side, face * tp / 2, nR, fnW, tw, xf, w, h, c, weldBottom, clipTop, xe); continue; }
+                var poly = new List<Vec2> { new(xf, -c), new(xf + c, 0) };
+                if (clipTop) { poly.Add(new Vec2(xe, 0)); poly.Add(new Vec2(xf + w, -(xf + w - xe))); }   // 45 deg back to the top flange edge (p.32 Sect. A-A)
+                else poly.Add(new Vec2(xf + w, 0));
+                poly.Add(new Vec2(xf + w, -h));
+                if (weldBottom) { poly.Add(new Vec2(xf + c, -h)); poly.Add(new Vec2(xf, -h + c)); }
+                else poly.Add(new Vec2(xf, -h));
+                Vec2 S(double x0, double y0) => new(x0 * side, y0);
+                faces[face] = new StiffenerFace(poly.Select(q => new Vec2(q.X * side, q.Y)).ToList(), S(xf, 0), S(xf, -h), S(xf + c, 0), S(clipTop ? xe : xf + w, 0), S(xf + c, -h), S(xf + w, -h));
+            }
             var hs = holes.Where(hh => hh.x * side > xf && hh.x * side < xf + w && hh.yy < 0 && hh.yy > -h)
                 .Select(hh => new Hole(new Vec2(hh.x, hh.yy), hh.d)).ToList();
-            PlateBuilder.AddPlanar(mesh, pts, hs, frame, -tp / 2, tp / 2);
+            if (!bevel) PlateBuilder.AddPlanar(mesh, faces[-1].Poly, hs, frame, -tp / 2, tp / 2);
+            else
+            {
+                var p0 = faces[-1].Poly;
+                var p1 = faces[1].Poly;
+                // (x, y) on the z = -tp/2 face -> the point at z: outline vertices move to their z = +tp/2 position linearly, points on an outline edge
+                // (hole bridges of the triangulation) with the edge, hole loops stay square to the plate
+                Vec3 Map(double x0, double y0, double z0)
+                {
+                    double f = (z0 + tp / 2) / tp;
+                    var q = new Vec2(x0, y0);
+                    for (int k = 0; k < p0.Count; k++)
+                    {
+                        var a0 = p0[k]; var b0 = p0[(k + 1) % p0.Count];
+                        var ab = b0 - a0;
+                        double l2 = Vec2.Dot(ab, ab);
+                        double u = l2 < 1e-18 ? 0 : Math.Clamp(Vec2.Dot(q - a0, ab) / l2, 0, 1);
+                        if ((a0 + ab * u - q).Length > 1e-9) continue;
+                        var s0 = p1[k] - a0; var s1 = p1[(k + 1) % p0.Count] - b0;
+                        var d = s0 + (s1 - s0) * u;
+                        return frame.ToWorld(x0 + d.X * f, y0 + d.Y * f, z0);
+                    }
+                    return frame.ToWorld(x0, y0, z0);
+                }
+                PlateBuilder.AddPrismWatertight(mesh, p0, hs, Map, -tp / 2, tp / 2);
+            }
 
             double a = sd.WeldSize;
             var along = u * side;
             var tang3 = new Vec3(t.X, t.Y, 0);
             // Weld termination: the stiffener-to-web weld stops short of the corner clips (hold-back past the clip, or the plans' distance from the toe of
             // the flange-to-web weld, Iowa X = 5T min 2 1/4") or of the free plate end (intermediate stiffener gap); the flange welds stop the hold-back
-            // short of the clip and of the stiffener's outer edge.
+            // short of the clip and of the stiffener's outer edge. Bevelled plates: the roots lie on the bevelled contact lines of each face.
             double hb = HoldBack(a);
             double webEnd = c + hb;
             if (_def.Welds is { StiffenerWebEndFactor: > 0 } or { StiffenerWebEndMin: > 0 })
@@ -675,23 +777,104 @@ public sealed partial class SteelModelGenerator
             {
                 var nrm = frame.Z * face;
                 var webLeg = Vec3.Dot(tang3, nrm) >= 0 ? tang3 : -tang3;
-                var off = nrm * (tp / 2);
-                weldLen += welds.AddHeld(frame.ToWorld(side * xf, 0, 0) + off, frame.ToWorld(side * xf, -h, 0) + off, webLeg, along, a, webEnd, weldBottom ? webEnd : hb);
+                var fc = faces[face];
+                double z = face * tp / 2;
+                Vec3 W(Vec2 q) => frame.ToWorld(q.X, q.Y, z);
+                weldLen += welds.AddHeld(W(fc.WebTop), W(fc.WebBottom), webLeg, along, a, webEnd, weldBottom ? webEnd : hb);
                 // clipped outer top corner (Nebraska p.32): the flange weld stops at the clip, held back from it
-                weldLen += welds.AddHeld(frame.ToWorld(side * (xf + c), 0, 0) + off, frame.ToWorld(side * (clipTop ? xe : xf + w), 0, 0) + off, -frame.Y, nrm, a, hb, hb);
-                if (weldBottom)
-                    weldLen += welds.AddHeld(frame.ToWorld(side * (xf + c), -h, 0) + off, frame.ToWorld(side * (xf + w), -h, 0) + off, frame.Y, nrm, a, hb, hb);
+                if (weldTop) weldLen += welds.AddHeld(W(fc.TopA), W(fc.TopB), -frame.Y, nrm, a, hb, hb);
+                if (weldBot) weldLen += welds.AddHeld(W(fc.BotA), W(fc.BotB), frame.Y, nrm, a, hb, hb);
             }
         }
         if (mesh.IsEmpty) return;
+
+        // per-face fit records (plan inputs only); ends without one where AASHTO sets a requirement: POTENTIAL NONCOMPLIANCE flag, nothing assumed
+        var fits = new List<PartFit>();
+        var flags = new List<string>();
+        void AddFits(IReadOnlyList<StiffenerEndFit> list, StiffenerEnd end, string flange)
+        {
+            string face = end == StiffenerEnd.Top ? "top end" : "bottom end";
+            string? against = GirderPlateMark(s.Girder, s.GirderDistance, flange);
+            foreach (var r in list) fits.Add(new PartFit(face, r.Condition, against, r.Source));
+            if ((end == StiffenerEnd.Bottom && !weldBottom) || StiffenerFits.Requirement(fitKind, end) is not { } req
+                || (list.Count > 0 && StiffenerFits.Satisfies(fitKind, end, list.Select(x => x.Condition)))) return;
+            string pages = list.Count > 0 ? string.Join(", ", list.Select(x => x.Source).Distinct())
+                : "inputs checked: Stiffeners.EndFits" + (s.Support >= 0 ? ", Supports[].BearingStiffenerFits" : "");
+            string why = list.Count > 0
+                ? $"the plan fit given ({string.Join(", ", list.Select(x => PartFit.Words(x.Condition).ToLowerInvariant()))}) may not satisfy {req.Article}: {req.Requirement}"
+                : $"no fit condition is given for it, so it may not satisfy {req.Article}: {req.Requirement}";
+            string text = UnresolvedFlag.Text(pages, $"{label.ToLowerInvariant()} {face} fit", why,
+                list.Count > 0 ? "Recorded as given; geometry as generated." : "No fit condition recorded (none assumed); geometry as generated.")
+                .Replace("UNRESOLVED", StiffenerFits.NoncomplianceStatus);
+            flags.Add(text);
+            if (_fitWarned.TryAdd(text, 0)) Warn($"{g.Name}: {text}");
+        }
+        AddFits(topFits, StiffenerEnd.Top, "TF");
+        AddFits(botFits, StiffenerEnd.Bottom, "BF");
+        Assumption? partFlag = flags.Count == 0 ? null
+            : new Assumption(StiffenerFits.NoncomplianceStatus, string.Join(" ", flags), "nothing assumed: no fit condition recorded") { DimensionOnly = true };
+
         string desc = Pl(w, tp) + (clipTop ? $" (outer top corner clipped to the {In(topW)} top flange)" : "") + (s.SkewAngle > Numerics.DegToRad(0.5) ? $", skewed {Numerics.RadToDeg(s.SkewAngle):F1}°" : "")
-                      + (s.Side == StiffenerSide.Both ? " (pair)" : "");
-        _parts.Add(new SteelPart { Mark = $"{mark}-{code}{n}", Category = cat, Assembly = mark, Description = desc, Mesh = mesh, Length = h });
+                      + (bevel ? ", bevelled to the web / flange faces" : "") + (s.Side == StiffenerSide.Both ? " (pair)" : "");
+        _parts.Add(new SteelPart { Mark = $"{mark}-{code}{n}", Category = cat, Assembly = mark, Description = desc, Mesh = mesh, Length = h, Fits = fits.Count > 0 ? fits : null, Assumption = partFlag });
+        if (welds.IsEmpty) return;
         _parts.Add(new SteelPart
         {
             Mark = $"{mark}-{code}{n}-W", Category = PartCategory.Weld, Assembly = mark, Mesh = welds, Material = "E70XX", Length = weldLen,
             Description = $"Fillet weld {In(sd.WeldSize)}, {label.ToLowerInvariant()}{HoldNote(sd.WeldSize)}", Assumption = WeldFlag(sd.WeldSize),
         });
+    }
+
+    /// <summary>Web-edge mismatch (m) of a square-cut skewed stiffener below which the plate is left square (0.01 mm).</summary>
+    internal const double BevelTolerance = 1e-5;
+
+    private readonly ConcurrentDictionary<string, byte> _fitWarned = new();
+
+    /// <summary>One plate face of a stiffener (frame x signed by the side): outline, web-edge weld root ends, top / bottom flange weld runs.</summary>
+    private readonly record struct StiffenerFace(List<Vec2> Poly, Vec2 WebTop, Vec2 WebBottom, Vec2 TopA, Vec2 TopB, Vec2 BotA, Vec2 BotB);
+
+    /// <summary>
+    /// Outline of a bevelled stiffener on the plate face at frame z: the web edge is the line where the face meets the web face plane (normal
+    /// <paramref name="nR"/> toward +u, tw/2 from the web CL), the top end the line on the top flange underside (normal <paramref name="fn"/> through the frame
+    /// origin = top of web), a welded bottom end the line on the bottom flange top (h lower); the free outer edge stays square at x = xf + w, a free
+    /// (intermediate) bottom end at y = -h. Corner clips keep their legs c along the contact lines.
+    /// </summary>
+    private static StiffenerFace BevelOutline(Frame3 fr, int side, double z, Vec3 nR, Vec3 fn,
+        double tw, double xf, double w, double h, double c, bool weldBottom, bool clipTop, double xe)
+    {
+        // lines A x' + B y = C in side-local coordinates (x' = side x)
+        var X = fr.X * side;
+        var nW = nR * side;   // web face normal toward this plate
+        var lw = (A: Vec3.Dot(X, nW), B: Vec3.Dot(fr.Y, nW), C: tw / 2 - Vec3.Dot(fr.Z, nW) * z);
+        var lt = (A: Vec3.Dot(X, fn), B: Vec3.Dot(fr.Y, fn), C: -Vec3.Dot(fr.Z, fn) * z);
+        var lb = weldBottom ? (A: lt.A, B: lt.B, C: -h * fn.Z - Vec3.Dot(fr.Z, fn) * z) : (A: 0.0, B: 1.0, C: -h);
+        var lo = (A: 1.0, B: 0.0, C: xf + w);
+        static Vec2 Cut((double A, double B, double C) l1, (double A, double B, double C) l2)
+        {
+            double det = l1.A * l2.B - l2.A * l1.B;
+            return new Vec2((l1.C * l2.B - l2.C * l1.B) / det, (l1.A * l2.C - l2.A * l1.C) / det);
+        }
+        static Vec2 Dir((double A, double B, double C) l, bool outward)
+        {
+            var d = new Vec2(l.B, -l.A);
+            d = d * (1 / d.Length);
+            return outward ? (d.X < 0 ? d * -1 : d) : (d.Y > 0 ? d * -1 : d);   // +x' or downward
+        }
+        var ct = Cut(lw, lt);
+        var cb = Cut(lw, lb);
+        var dw = Dir(lw, false);
+        var dt = Dir(lt, true);
+        var db = Dir(lb, true);
+        var poly = new List<Vec2> { ct + dw * c, ct + dt * c };
+        Vec2 tEnd;
+        if (clipTop) { var pe = Cut(lt, (1.0, 0.0, xe)); poly.Add(pe); poly.Add(new Vec2(xf + w, pe.Y - (xf + w - xe))); tEnd = pe; }
+        else { tEnd = Cut(lt, lo); poly.Add(tEnd); }
+        var bo = Cut(lb, lo);
+        poly.Add(bo);
+        if (weldBottom) { poly.Add(cb + db * c); poly.Add(cb - dw * c); }
+        else poly.Add(cb);
+        Vec2 S(Vec2 q) => new(q.X * side, q.Y);
+        return new StiffenerFace(poly.Select(S).ToList(), S(ct), S(cb), S(ct + dt * c), S(tEnd), S(cb + db * c), S(bo));
     }
 
     // ================================================================== shear studs

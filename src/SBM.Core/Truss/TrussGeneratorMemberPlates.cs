@@ -25,7 +25,7 @@ public static partial class TrussGenerator
                 bool across = face is TrussPlateFace.Top or TrussPlateFace.Bottom;
                 foreach (var pc in sec.Pieces)
                 {
-                    if (present != null ? !present(pc) : (pc.Length > 0 || !double.IsNaN(pc.Start) || pc.BetweenGussets)) continue;   // only the pieces present under the plate
+                    if (present != null ? !present(pc) : (pc.Length > 0 || !double.IsNaN(pc.Start) || pc.BetweenGussets || pc.InlaidAt is { Count: > 0 })) continue;   // only the pieces present under the plate
                     var poly = pc.Polygon;
                     var xs = new List<double>();
                     for (int a = 0, b = poly.Length - 1; a < poly.Length; b = a++)
@@ -136,6 +136,7 @@ public static partial class TrussGenerator
                             Mark = mark, Category = p.Fill ? PartCategory.FillerPlate : PartCategory.SplicePlate, Assembly = asm, Mesh = mesh, Material = Material(p.Material), Length = a1 - a0, Assumption = asu,
                             Description = $"{(p.Label.Length > 0 ? p.Label : (p.Fill ? "fill" : "splice") + " PL")} {TrussSections.FormatIn(p.Width)} x {TrussSections.FormatIn(p.Thickness)} x {TrussSections.FormatIn(a1 - a0)} ({p.Face}) on {m.Mark} at {jdef.Point}"
                                 + (web ? " (pair)" : ""),
+                            Member = _d.PartPerPiece ? JointStack(pl.Name, jdef.Point) : null, Piece = _d.PartPerPiece ? (p.Fill ? "fill" : "splice plate") : null,
                         });
                         Model.PanelOf[mark] = $"Joint {jdef.Point}";
                         Model.SplicePlates++;

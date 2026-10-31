@@ -1,5 +1,5 @@
 import pymupdf as fitz, re, collections, sys
-ROOT = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\dist\SteelBridgeModeler' + '\\'
+ROOT = r'C:\SBM\dist\SteelBridgeModeler' + '\\'
 for f, pgs in (('B00168 - CBIS-ESI-Westbound I-80 - Design 116.pdf', range(18, 95)), ('B00169 - CBIS-ESI-Ramp G - Design 316.pdf', None)):
     d = fitz.open(ROOT + f)
     cnt = collections.Counter()

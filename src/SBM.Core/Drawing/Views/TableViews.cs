@@ -103,6 +103,25 @@ public static class TableViews
         return Paged(ctx, "GIRDER SPACING AT THE SUPPORT LINES", cols.ToArray(), rows, notes, areaW, areaH, "Girder spacing");
     }
 
+    /// <summary>OPTIONAL standard cross frames: hole group shift of every frame end on its connection plate (from the model's report), sorted by girder line.</summary>
+    public static List<(string title, SheetView view)> CrossFrameHoleShifts(ViewContext ctx, double areaW, double areaH)
+    {
+        var u = ctx.Units;
+        var rep = ctx.Steel?.CrossFrameFit;
+        if (rep == null || !rep.Rows.Any(r => r.Applied)) return new();
+        string Sh(double m) => double.IsNaN(m) ? "-" : $"{(m >= 0 ? "+" : "-")}{u.FormatLength(Math.Abs(m), LengthKind.Short)} ({Dec(u, m)})";
+        var rows = rep.Rows.Where(r => r.Applied).OrderBy(r => r.LeftGirder).ThenBy(r => r.LeftS)
+            .Select(r => new[] { r.Mark, r.Family, $"{ctx.GirderName(r.LeftGirder)}-{ctx.GirderName(r.RightGirder)}", (r.Span + 1).ToString(), u.FormatStation(r.Station),
+                r.LeftPlate, Sh(r.ShiftTopL), r.RightPlate, Sh(r.ShiftTopR), $"{r.TwistDegrees:0.000}", Dec(u, r.MaxGapBuilt), double.IsNaN(r.Headroom) ? "-" : Dec(u, r.Headroom) }).ToList();
+        var cols = new[] { new Col("FRAME", 0.7), new Col("FAMILY", 0.6), new Col("BAY", 0.7), new Col("SPAN", 0.45), new Col("STATION", 1.0), new Col("LEFT PLATE", 1.1),
+            new Col("SHIFT L", 1.25), new Col("RIGHT PLATE", 1.1), new Col("SHIFT R", 1.25), new Col("TWIST DEG", 0.75), new Col("GAP", 0.65), new Col("HEADROOM", 0.85) };
+        var notes = new List<string> { "HOLES IN THE CONNECTION PLATES ARE LOCATED PER THIS TABLE; NO SLOTTED HOLES. SHIFT = HOLE GROUP POSITION ALONG THE PLATE FROM THE STANDARD PATTERN (+ = UP), ROUNDED, WITH THE EXACT VALUE.",
+            "TWIST = ANGLE BETWEEN THE TWO CONNECTION PLATES ABOUT THE FRAME LINE; GAP = LARGEST FAR-GUSSET GAP ALONG A BOLT; HEADROOM = DEEPEST FRAME THAT FITS THERE LESS THE STANDARD DEPTH (NEGATIVE = DOES NOT FIT)." };
+        foreach (var s in rep.Standards.Where(s => s.Applied))
+            notes.Add($"STANDARD {s.Name.ToUpperInvariant()}: TOP WP {u.FormatLength(s.TopWorkPoint, LengthKind.Short)} BELOW THE REFERENCE AT THE DEFINED END, DEPTH {u.FormatLength(s.Depth, LengthKind.Short)}; DEEPEST COMMON DEPTH {Dec(u, s.MaxCommonDepth)} AT {s.GoverningMark}.");
+        return Paged(ctx, "STANDARD CROSS FRAMES - HOLE SHIFT TABLE", cols, rows, notes, areaW, areaH, "Cross frame hole shifts");
+    }
+
     private static string Dec(UnitSystem u, double m) => u.IsUS ? $"{m / 0.0254:0.00}\"" : $"{m * 1000:0.0} mm";
     private static string Pct(double slope) => double.IsNaN(slope) ? "-" : $"{slope * 100:0.###}%";
 

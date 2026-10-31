@@ -102,8 +102,14 @@ public sealed class MeasureModel
                 if (c.Haunches is { IsEmpty: false } h) res.Add(new MeasureElement { Ref = Ref(bn, "haunch", "Haunches"), Mesh = h, Category = "Haunch", Description = "haunches", IsConcrete = true });
                 foreach (var (name, mesh) in c.Barriers) if (!mesh.IsEmpty) res.Add(new MeasureElement { Ref = Ref(bn, "barrier", name), Mesh = mesh, Category = "Barrier", Description = name, IsConcrete = true });
                 foreach (var (name, mesh) in c.DeckBumps) if (!mesh.IsEmpty) res.Add(new MeasureElement { Ref = Ref(bn, "deck", name), Mesh = mesh, Category = "Deck", Description = name, IsConcrete = true });
+                foreach (var dp in c.DeckParts) if (!dp.Mesh.IsEmpty) res.Add(new MeasureElement { Ref = Ref(bn, "deck", dp.Name), Mesh = dp.Mesh, Category = "Deck", Description = dp.Name, IsConcrete = true });
                 foreach (var ch in c.CapHaunches)
                     if (!ch.Mesh.IsEmpty) res.Add(new MeasureElement { Ref = Ref(bn, "caphaunch", ch.Name, ch.Support), Mesh = ch.Mesh, Category = "CapHaunch", Description = ch.Name, IsConcrete = true });
+                foreach (var a in c.ApproachSlabs)
+                {
+                    res.Add(new MeasureElement { Ref = Ref(bn, "approach", a.Name, a.Support), Mesh = a.Mesh, Category = "ApproachSlab", Description = a.Name, IsConcrete = true });
+                    if (a.Sleeper is { IsEmpty: false } sm) res.Add(new MeasureElement { Ref = Ref(bn, "approach", "Sleeper slab at " + a.Support, a.Support), Mesh = sm, Category = "SleeperSlab", Description = "sleeper slab", IsConcrete = true });
+                }
                 foreach (var j in c.Joints)
                 {
                     if (!j.Blockout.IsEmpty) res.Add(new MeasureElement { Ref = Ref(bn, "joint", $"Joint blockout {j.Support}"), Mesh = j.Blockout, Category = "JointBlockout", Description = "joint blockout", IsConcrete = true });
@@ -144,9 +150,9 @@ public sealed class MeasureModel
             string bn = m.Definition.Name;
             if (m.Concrete is { } c)
             {
-                var marks = c.Marks.GroupBy(x => x.Mark).ToDictionary(g => g.Key, g => g.First());
+                var marks = new BarMarkLookup(c.Marks);
                 for (int i = 0; i < c.Bars.Count; i++)
-                    if (marks.TryGetValue(c.Bars[i].Mark, out var mk))
+                    if (marks.Find(c.Bars[i]) is { } mk)
                         res.Add(new BarItem { Ref = Ref(bn, "deckbar", c.Bars[i].Mark, c.Bars[i].Group, i, null), Bar = c.Bars[i], Mark = mk, Model = m, Host = "deck" });
             }
             if (m.Substructure is { } sub)

@@ -181,7 +181,11 @@ public static partial class TrussGenerator
         {
             if (_d.BracingGussets is not { Count: > 0 } defs) return;
             var parts = Model.Steel.Parts;
-            int nPlates = 0, nAngles = 0, nRiv = 0, nOut = 0, nNoSteel = 0;
+            int nPlates = 0, nAngles = 0, nRiv = 0, nOut = 0, nNoSteel = 0, nToStack = 0, nFills = 0, nBridged = 0, nProbed = 0, nLone = 0;
+            double fillMax = 0, bridgedMax = 0, probedMax = 0;
+            var loneKind = new int[3];
+            var loneAt = new Dictionary<string, int>();
+            var loneEx = new List<string>();
             var missed = new List<string>();
             foreach (var bg in defs)
             {
@@ -221,7 +225,7 @@ public static partial class TrussGenerator
                         // apart), one member = its own flange plane; normal up; u = the tangent projected into it
                         Vec3 best = default; double bl = 0;
                         var chords = InPlaneAt(pl, ptName, P).Where(o => IsChord(o.Def.Role) && o.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)).ToList();
-                        if (chords.Count > 0 && (conn.Count > 1 || bg.EdgeAngle.Length > 0))
+                        if (chords.Count > 0 && (conn.Count > 1 || bg.EdgeAngle.Length > 0) && !(bg.MemberPlane && conn.Count > 1))
                         {
                             var cd = chords.Select(o => Vec3.Dot(o.Axis, tan) >= 0 ? o.Axis : -o.Axis).Aggregate(Vec3.Zero, (a, b) => a + b).Normalized();
                             best = Vec3.Cross(cd, Normal(pl, st)); bl = best.Length;
@@ -299,7 +303,23 @@ public static partial class TrussGenerator
                         sIn = Math.Sign(conn.Sum(c => Vec3.Dot(c.ends ? Away(c.m, c.start) : c.m.Axis, nT) * (c.ends ? 1 : 0)));
                         if (sIn == 0) sIn = -Math.Sign(_d.Planes.First(p => p.Name.Equals(pl, StringComparison.OrdinalIgnoreCase)).Offset);
                         var n2 = new Vec2(Vec3.Dot(nT, u), Vec3.Dot(nT, v)) * sIn;
-                        if (n2.Length > 0.2) outline = ClipHalf(outline, n2 / n2.Length, (H0 + gap) / n2.Length);
+                        if (n2.Length > 0.2)
+                        {
+                            outline = ClipHalf(outline, n2 / n2.Length, (H0 + gap) / n2.Length);
+                            // PlateToStack: the plate reaches the stack (Gap from its face) under the edge angle: the outline part next to the stack is
+                            // carried to that line (members stopping short of the stack leave the plate envelope short of it otherwise)
+                            if (bg.PlateToStack && outline.Count >= 3)
+                            {
+                                var nu = n2 / n2.Length; double lim = (H0 + gap) / n2.Length;
+                                double dmin = outline.Min(q => q.X * nu.X + q.Y * nu.Y);
+                                if (dmin > lim + 1e-4)
+                                {
+                                    var ext = outline.Concat(outline.Where(q => q.X * nu.X + q.Y * nu.Y < dmin + 0.15).Select(q => q - nu * (q.X * nu.X + q.Y * nu.Y - lim))).ToList();
+                                    outline = MeshBuilder.ConvexHull(ext);
+                                    nToStack++;
+                                }
+                            }
+                        }
                     }
                     (double z0, double z1) ZOf(TrussBracingPlateSide side)
                     {
@@ -311,7 +331,7 @@ public static partial class TrussGenerator
                     // members crossing the plate that are not connected to it (a floor beam through a lateral apex): the plate stops clear of their side
                     // face, on the side of the members ending here
                     var ending = conn.Where(c => c.ends).ToList();
-                    (Vec3 inw, double c, int rank, double area)? crossEdge = null;
+                    (Vec3 inw, double c, int rank, double area, Inst o)? crossEdge = null;
                     Vec2 crossN2 = default;
                     if (ending.Count > 0 && bg.Outline is not { Count: >= 3 })
                     {
@@ -335,17 +355,35 @@ public static partial class TrussGenerator
                             if (sg == 0) continue;
                             var nrm = ac2 * sg;
                             double before = Math.Abs(MeshBuilder.SignedArea(outline));
-                            outline = ClipHalf(outline, nrm, f2.X * nrm.X + f2.Y * nrm.Y + ho + gap);
+                            outline = ClipHalf(outline, nrm, f2.X * nrm.X + f2.Y * nrm.Y + ho + bg.CrossingFaceOffset + gap);
                             double removed = before - (outline.Count >= 3 ? Math.Abs(MeshBuilder.SignedArea(outline)) : 0);
-                            double cFace = f2.X * nrm.X + f2.Y * nrm.Y + ho;
+                            double cFace = f2.X * nrm.X + f2.Y * nrm.Y + ho + bg.CrossingFaceOffset;
                             // candidates for the edge angle: clipped, or (EdgeAngleOnCrossing) a face within 0.5 m of the plate
                             bool near = bg.EdgeAngleOnCrossing && outline.Count >= 3 && outline.Min(q => q.X * nrm.X + q.Y * nrm.Y) - cFace < 0.5;
                             if ((removed > 1e-6 || near) && (crossEdge == null || Rank(o.Def.Role) > crossEdge.Value.rank || Rank(o.Def.Role) == crossEdge.Value.rank && removed > crossEdge.Value.area))
                             {
-                                crossEdge = ((u * nrm.X + v * nrm.Y).Normalized(), cFace, Rank(o.Def.Role), removed);
+                                crossEdge = ((u * nrm.X + v * nrm.Y).Normalized(), cFace, Rank(o.Def.Role), removed, o);
                                 crossN2 = nrm;
                             }
                             if (outline.Count >= 3 && Math.Abs(MeshBuilder.SignedArea(outline)) < before - 1e-6) Info($"Truss: bracing plate at {where} stops {L(gap)} clear of {o.Mark} (crosses the plate, not connected to it){Src}.");
+                        }
+                    }
+                    // ProbeFaces: the crossing member's face where the plate edge / edge angle meets it, from its built parts (the section box includes partial
+                    // cover plates that stop short of the member end)
+                    if (bg.ProbeFaces && bg.EdgeAngleOnCrossing && crossEdge is { } cp && outline.Count >= 3)
+                    {
+                        var e3 = Vec3.Cross(cp.inw, n).Normalized();
+                        var e2p = new Vec2(Vec3.Dot(e3, u), Vec3.Dot(e3, v));
+                        double zl = sides.Min(sd => ZOf(sd).z0), zh = sides.Max(sd => ZOf(sd).z1);
+                        string pre = cp.o.Mark + "-";
+                        if (ProbeFace(P, cp.inw, cp.c, e3, outline.Min(q => q.X * e2p.X + q.Y * e2p.Y), outline.Max(q => q.X * e2p.X + q.Y * e2p.Y), n, zl - In(4), zh + In(4),
+                                pp => pp.Member == cp.o.Mark || pp.Mark.StartsWith(pre, StringComparison.OrdinalIgnoreCase)
+                                    || pp.Mark.StartsWith($"{pl}-BG{ptName}-", StringComparison.OrdinalIgnoreCase)) is { } pc)
+                        {
+                            // (plates / fills of other bracing plates at the same point lie on the crossing member: the angle sits on them)
+                            if (pc + bg.CrossingFaceOffset > cp.c + 1e-4) outline = ClipHalf(outline, crossN2, pc + bg.CrossingFaceOffset + gap);
+                            if (Math.Abs(pc + bg.CrossingFaceOffset - cp.c) > In(1.0 / 32)) { nProbed++; probedMax = Math.Max(probedMax, Math.Abs(pc - cp.c)); }
+                            crossEdge = (cp.inw, pc + bg.CrossingFaceOffset, cp.rank, cp.area, cp.o);
                         }
                     }
                     // the edge angle lies on the crossing member: the plate reaches down to Gap from its face (its outline projected onto that line is added)
@@ -361,6 +399,37 @@ public static partial class TrussGenerator
                             outline = MeshBuilder.ConvexHull(ext);
                         }
                     }
+                    // ProbeFaces: the stack face under the edge angle from the built parts (gusset / chord faces where the plate meets the stack); the plate is
+                    // clipped / carried to Gap from that face
+                    double? stackH = null;
+                    if (bg.ProbeFaces && bg.EdgeAngle.Length > 0 && inPlane.Count > 0 && !bg.NoStackClip && outline.Count >= 3 && (!bg.EdgeAngleOnCrossing || bg.EdgeAngleAlsoOnStack))
+                    {
+                        var n2 = new Vec2(Vec3.Dot(nT, u), Vec3.Dot(nT, v)) * sIn;
+                        var e3 = Vec3.Cross(nT, n);
+                        if (n2.Length > 0.2 && e3.Length > 0.2)
+                        {
+                            e3 = e3.Normalized();
+                            var e2p = new Vec2(Vec3.Dot(e3, u), Vec3.Dot(e3, v));
+                            double zl = sides.Min(sd => ZOf(sd).z0), zh = sides.Max(sd => ZOf(sd).z1);
+                            var ang0 = TrussSections.ParseAngle(bg.EdgeAngle);
+                            double leg = ang0?.a ?? In(6);
+                            var connMarks = conn.Select(c => c.m.Mark).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                            stackH = ProbeFace(P, nT * sIn, H0, e3, outline.Min(q => q.X * e2p.X + q.Y * e2p.Y), outline.Max(q => q.X * e2p.X + q.Y * e2p.Y), n, zl - leg, zh + leg,
+                                pp => !pp.Mark.Contains("-BG") && !(pp.Member != null && connMarks.Contains(pp.Member)) && !connMarks.Any(cm => pp.Mark.StartsWith(cm + "-", StringComparison.OrdinalIgnoreCase)));
+                            if (stackH is { } hs)
+                            {
+                                if (Math.Abs(hs - H0) > In(1.0 / 32)) { nProbed++; probedMax = Math.Max(probedMax, Math.Abs(hs - H0)); }
+                                var nu = n2 / n2.Length; double lim = (hs + gap) / n2.Length;
+                                outline = ClipHalf(outline, nu, lim);
+                                if (bg.PlateToStack && outline.Count >= 3)
+                                {
+                                    double dmin = outline.Min(q => q.X * nu.X + q.Y * nu.Y);
+                                    if (dmin > lim + 1e-4)
+                                        outline = MeshBuilder.ConvexHull(outline.Concat(outline.Where(q => q.X * nu.X + q.Y * nu.Y < dmin + 0.15).Select(q => q - nu * (q.X * nu.X + q.Y * nu.Y - lim))).ToList());
+                                }
+                            }
+                        }
+                    }
                     if (outline.Count < 3 || Math.Abs(MeshBuilder.SignedArea(outline)) < 1e-4) { Warn($"Truss: bracing plate at {where} - no plate area left; not built{Src}."); continue; }
                     if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
                     Assumption? asu = bg.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(bg.Unresolved + Src, "plate envelope of the member laps / as listed") : null;
@@ -370,6 +439,8 @@ public static partial class TrussGenerator
                     double area = Math.Abs(MeshBuilder.SignedArea(outline));
                     var newMeshes = new List<Mesh>();
                     var plates = new List<(TrussBracingPlateSide side, double z0, double z1)>();
+                    // edge angle plate legs on a plate's member-side face (plate uv: keep q . dir >= c): the fills on that face stop clear of them (recheck N07)
+                    var angleClips = new List<(TrussBracingPlateSide side, Vec2 dir, double c)>();
                     foreach (var side in sides)
                     {
                         bool below = side == TrussBracingPlateSide.Below;
@@ -385,14 +456,19 @@ public static partial class TrussGenerator
                         bool onCross = bg.EdgeAngleOnCrossing && crossEdge != null;
                         if (bg.EdgeAngleOnCrossing && crossEdge == null && bg.EdgeAngle.Length > 0)
                             Warn($"Truss: bracing plate at {where} - no member crosses the plate edge for the edge angle {bg.EdgeAngle}; angle not built{Src}.");
-                        if (bg.EdgeAngle.Length > 0 && (onCross || inPlane.Count > 0 && !bg.EdgeAngleOnCrossing))
+                        // modes: on the crossing member / on the stack; EdgeAngleAlsoOnStack = both (a sway plate under a floor beam beside a truss post)
+                        var modes = new List<bool>();
+                        if (bg.EdgeAngle.Length > 0 && (onCross || inPlane.Count > 0 && !bg.EdgeAngleOnCrossing)) modes.Add(onCross);
+                        if (bg.EdgeAngle.Length > 0 && onCross && bg.EdgeAngleAlsoOnStack && inPlane.Count > 0 && !bg.NoStackClip) modes.Add(false);
+                        for (int mi = 0; mi < modes.Count; mi++)
                         {
+                            onCross = modes[mi];
                             var ang = TrussSections.ParseAngle(bg.EdgeAngle);
                             if (ang == null && SteelCatalog.FindAngle(bg.EdgeAngle) is { } ac) ang = (ac.LegA, ac.LegB, ac.Thickness);
                             if (ang is not { } a) { Warn($"Truss: bracing plate at {where} - edge angle '{bg.EdgeAngle}' not understood; not built{Src}."); continue; }
                             var nFace = onCross ? crossEdge!.Value.inw : nT;
                             double sFace = onCross ? 1 : sIn;
-                            double H = onCross ? crossEdge!.Value.c : H0;
+                            double H = onCross ? crossEdge!.Value.c : stackH ?? H0;
                             var e = Vec3.Cross(nFace, n);
                             if (e.Length < 0.2) continue;
                             e = e.Normalized();
@@ -402,13 +478,29 @@ public static partial class TrussGenerator
                             double zf = below != outer ? z1 : z0;                 // the plate face the angle lies on (n)
                             var e2 = new Vec2(Vec3.Dot(e, u), Vec3.Dot(e, v));
                             double eLo = outline.Min(q => q.X * e2.X + q.Y * e2.Y), eHi = outline.Max(q => q.X * e2.X + q.Y * e2.Y);
+                            // second angle on the stack beside the angle on the crossing member: it stops gap clear of that angle's plate leg
+                            if (!onCross && modes.Count > 1 && crossEdge is { } cx)
+                            {
+                                double ec = Vec3.Dot(e, cx.inw);
+                                if (Math.Abs(ec) > 0.3)
+                                {
+                                    double tLim = (cx.c + a.b + gap - H * Vec3.Dot(nFace * sFace, cx.inw) - zf * Vec3.Dot(n, cx.inw)) / ec;
+                                    if (ec > 0) eLo = Math.Max(eLo, tLim); else eHi = Math.Min(eHi, tLim);
+                                }
+                                if (eHi - eLo < In(3)) continue;
+                            }
                             var heel = P + inw * H + n * zf + e * eLo;
+                            if (!outer)
+                            {
+                                var iw2 = new Vec2(Vec3.Dot(inw, u), Vec3.Dot(inw, v));
+                                if (iw2.Length > 0.3) angleClips.Add((side, iw2 / iw2.Length, (H + a.b + gap) * iw2.Length));
+                            }
                             double tA = a.t;
                             var sec = new[] { new Vec2(0, 0), new Vec2(a.b, 0), new Vec2(a.b, tA), new Vec2(tA, tA), new Vec2(tA, a.a), new Vec2(0, a.a) };   // x = along inw, y = along outN
                             var ring = sec.Select(q => heel + inw * q.X + outN * q.Y).ToArray();
                             var amesh = new Mesh();
                             MeshBuilder.AddLoft(amesh, sec, new[] { ring, ring.Select(p => p + e * (eHi - eLo)).ToArray() });
-                            string am = mark + "-EA";
+                            string am = mark + (mi == 0 ? "-EA" : "-EA" + (mi + 1));
                             parts.Add(new SteelPart { Mark = am, Category = PartCategory.TrussConnectionAngle, Assembly = asm, Mesh = amesh, Material = Material(bg.Material.Length > 0 ? bg.Material : conn[0].m.Sec.Definition.Material),
                                 Length = eHi - eLo, Assumption = asu, Description = $"edge angle {bg.EdgeAngle} x {L(eHi - eLo)} of the bracing plate at {ptName}" });
                             Model.PanelOf[am] = $"Joint {ptName}";
@@ -420,12 +512,62 @@ public static partial class TrussGenerator
                                 {
                                     double ea = eLo + len / 2 + (k - (bg.EdgeRivets - 1) / 2.0) * pitchE;
                                     // leg on the stack: shank along nT through the leg and the stack; leg on the plate: shank along n through the leg and the plate
-                                    _bracingRivets.Add((P + inw * (H + tA / 2) + n * zf + outN * ((tA + a.a) / 2) + e * ea, inw, bg, asu, where, asm));
-                                    _bracingRivets.Add((P + inw * (H + (tA + a.b) / 2) + n * zf + outN * (tA / 2) + e * ea, n, bg, asu, where, asm));
+                                    _bracingRivets.Add((P + inw * (H + tA / 2) + n * zf + outN * ((tA + a.a) / 2) + e * ea, inw, bg, asu, where, asm, 1));
+                                    _bracingRivets.Add((P + inw * (H + (tA + a.b) / 2) + n * zf + outN * (tA / 2) + e * ea, n, bg, asu, where, asm, 2));
                                 }
                             }
                         }
                     }
+                    // MemberFills: a fill between each plate and a connected member whose face stands off the plate (the plate lies on the outermost
+                    // member face; shallower / tilted members leave a gap), lap rectangle of the member clipped to the plate outline, thickness = the gap
+                    // at the member's face nearest the plate over the lap
+                    if (bg.MemberFills)
+                        foreach (var (side, z0, z1) in plates)
+                        {
+                            bool below = side == TrussBracingPlateSide.Below;
+                            int fi = 0;
+                            foreach (var (m, ends, start) in conn)
+                            {
+                                // tapered (beveled) fill: from the plate face to the member's face plane over the lap (the member may lie in another plane)
+                                var toward = below ? -n : n;
+                                double yf0 = Vec3.Dot(m.Y, toward) > 0 ? m.Sec.YMax : m.Sec.YMin;
+                                // only a FLAT member face gets a fill (a skewed box such as a portal strut has no face plane at its extreme corner)
+                                var facePts = m.Sec.Pieces.SelectMany(pc => pc.Polygon).Where(q => Math.Abs(q.Y - yf0) < 0.001).ToList();
+                                if (facePts.Count < 2 || facePts.Max(q => q.X) - facePts.Min(q => q.X) < 0.5 * (m.Sec.XMax - m.Sec.XMin)) continue;
+                                double yf = yf0 + m.Def.OffsetZ;
+                                var F0 = m.A + m.Y * yf;
+                                double den = Vec3.Dot(n, m.Y);
+                                if (Math.Abs(den) < 0.5) continue;
+                                double zp = below ? z1 : z0;
+                                var dd = ends ? Away(m, start) : m.Axis;
+                                var (dp, ac, h) = InPlane(m, dd);
+                                double a0 = ends ? (start ? m.SA : m.SB) : -LapOf(m) / 2, a1 = a0 + LapOf(m);
+                                var rect = new List<Vec2> { UV(P + dp * a0 - ac * h), UV(P + dp * a1 - ac * h), UV(P + dp * a1 + ac * h), UV(P + dp * a0 + ac * h) };
+                                if (MeshBuilder.SignedArea(rect) < 0) rect.Reverse();
+                                for (int k = 0; k < outline.Count && rect.Count >= 3; k++)
+                                {
+                                    var e0 = outline[k]; var e1 = outline[(k + 1) % outline.Count];
+                                    var nn = new Vec2(-(e1.Y - e0.Y), e1.X - e0.X); double ln = nn.Length; if (ln < 1e-9) continue; nn = nn / ln;
+                                    rect = ClipHalf(rect, nn, e0.X * nn.X + e0.Y * nn.Y);
+                                }
+                                foreach (var (cs, cd, cc) in angleClips)
+                                    if (cs == side && rect.Count >= 3) rect = ClipHalf(rect, cd, cc);
+                                if (rect.Count < 3 || Math.Abs(MeshBuilder.SignedArea(rect)) < 1e-4) continue;
+                                var top = rect.Select(q => P + u * q.X + v * q.Y + n * zp).ToArray();
+                                var gaps = top.Select(Q => Vec3.Dot(F0 - Q, m.Y) / den * (below ? 1 : -1)).ToArray();
+                                double gmax = gaps.Max(), gmin = gaps.Min();
+                                if (gmax < In(1.0 / 16)) continue;
+                                var bot = top.Select((Q, k) => Q + n * ((below ? 1 : -1) * Math.Max(gaps[k], 0.0005))).ToArray();
+                                var fmesh = new Mesh();
+                                MeshBuilder.AddLoft(fmesh, rect.ToArray(), new[] { top, bot });
+                                string fm = $"{pl}-BG{ptName}{bg.Suffix}{(sides.Length > 1 ? (below ? "-B" : "-T") : "")}-F{++fi}";
+                                string th = gmax - Math.Max(0, gmin) < In(1.0 / 32) ? L(gmax) : $"{L(Math.Max(0, gmin))} - {L(gmax)} (beveled)";
+                                parts.Add(new SteelPart { Mark = fm, Category = PartCategory.FillerPlate, Assembly = asm, Mesh = fmesh, Material = Material(bg.Material.Length > 0 ? bg.Material : conn[0].m.Sec.Definition.Material),
+                                    Length = LapOf(m), Assumption = asu, Description = $"fill {th} between the bracing plate at {ptName} and {m.Mark} (plate in the plane of the connected members)" });
+                                Model.PanelOf[fm] = $"Joint {ptName}";
+                                nFills++; fillMax = Math.Max(fillMax, gmax);
+                            }
+                        }
                     // member rivets (per plate)
                     if (bg.RivetDiameter > 0)
                         foreach (var (m, ends, start) in conn)
@@ -435,6 +577,13 @@ public static partial class TrussGenerator
                             var (dp, ac, h) = InPlane(m, ends ? Away(m, start) : m.Axis);
                             double g1 = bg.RivetGage > 0 ? bg.RivetGage : Math.Max(In(1.5), h / 2), g2 = bg.RivetGage2;
                             var gages = g2 > 0 ? new[] { g2, -g2, g1, -g1 } : new[] { g1, -g1 };
+                            // RivetGageEdge: the lines spread evenly across the member's own width at the plate, the outer ones this far from its sides
+                            if (bg.RivetGageEdge > 0)
+                            {
+                                int nl = g2 > 0 ? 4 : 2; double gm = Math.Max(0, h - bg.RivetGageEdge);
+                                var gl = Enumerable.Range(0, nl).Select(k => -gm + 2 * gm * k / (nl - 1)).ToList();
+                                gages = gl.OrderByDescending(x => Math.Abs(x)).ThenBy(x => x).ToArray();
+                            }
                             int perLine = (int)Math.Ceiling(cnt / (double)gages.Length);
                             double s0 = ends ? (start ? m.SA : m.SB) + 1.5 * bg.RivetDiameter : -(perLine - 1) * pitch / 2;
                             int placed = 0;
@@ -447,7 +596,7 @@ public static partial class TrussGenerator
                                     var q2 = UV(q);
                                     if (EdgeDistance(outline, q2) < 1.25 * bg.RivetDiameter) { nOut++; placed++; continue; }
                                     foreach (var (side, z0, z1) in plates)
-                                        _bracingRivets.Add((q + n * ((z0 + z1) / 2), side == TrussBracingPlateSide.Below ? n : -n, bg, asu, where, asm));
+                                        _bracingRivets.Add((q + n * ((z0 + z1) / 2), side == TrussBracingPlateSide.Below ? n : -n, bg, asu, where, asm, 0));
                                     placed++;
                                 }
                         }
@@ -469,9 +618,26 @@ public static partial class TrussGenerator
                         if (parts[i].Mesh is not { IsEmpty: false } || b.Max.X < lo.X || b.Min.X > hi.X || b.Max.Y < lo.Y || b.Min.Y > hi.Y || b.Max.Z < lo.Z || b.Min.Z > hi.Z) continue;
                         pr.Add(parts[i].Mesh, i, lo, hi);
                     }
-                    foreach (var (p, dir, bg, asu, where, asmR) in l)
+                    foreach (var (p, dir, bg, asu, where, asmR, rk) in l)
                     {
                         if (pr.At(p, dir, 0.6) is not { } iv) { nNoSteel++; if (missed.Count < 3) missed.Add(where); continue; }
+                        // RivetGapTolerance: the grip continues (toward the members) across air gaps up to the tolerance - a flat plate over members whose
+                        // planes differ slightly (kinked lateral panels) is drawn up by the rivet; the gaps bridged are reported
+                        if (bg.RivetGapTolerance > 0)
+                        {
+                            double t1 = iv.t1, gsum = 0;
+                            foreach (var nx in pr.Intervals(p, dir, 0.6).Where(x => x.t0 > t1 - 1e-9).OrderBy(x => x.t0))
+                            {
+                                double gp = nx.t0 - t1;
+                                if (gp > bg.RivetGapTolerance) break;
+                                if (gp > 1e-5) gsum += gp;
+                                t1 = Math.Max(t1, nx.t1);
+                            }
+                            if (gsum > 1e-5) { nBridged++; bridgedMax = Math.Max(bridgedMax, gsum); }
+                            iv = (iv.t0, t1);
+                        }
+                        // ProbeFaces: a rivet position whose steel is one part only (nothing behind the plate / angle leg it starts in) is not placed
+                        if (bg.ProbeFaces && iv.t1 - iv.t0 <= pr.OnePartThickness(p, dir) + In(1.0 / 32)) { if (loneEx.Count < 8 && rk == 0) { var nx = pr.Intervals(p, dir, 0.6).FirstOrDefault(x => x.t0 > iv.t1 + 1e-6); loneEx.Add($"{where} k{rk} next steel {(nx.t1 > 0 ? L(nx.t0 - iv.t1) : "none")}"); } nLone++; loneKind[rk]++; loneAt[$"{where}#{rk}"] = loneAt.GetValueOrDefault($"{where}#{rk}") + 1; continue; }
                         var rasu = RivetFlag(bg.Unresolved.Length > 0 ? bg.Unresolved : null, "bracing connection rivets at the drawn count, pitch / gage scaled") ?? asu;
                         _pendingConn.Add((p + dir * iv.t1, -dir, Math.Abs(dir.Z) > 0.9 ? Tangent(StationOf(p)) : Up, iv.t1 - iv.t0, bg.RivetDiameter, asmR, bg.RivetMaterial, rasu));
                         nRiv++;
@@ -479,10 +645,45 @@ public static partial class TrussGenerator
                 }
                 _bracingRivets.Clear();
             }
+            if (nBridged > 0) Warn($"Truss CHECK bracing rivets: {nBridged} rivets grip across air gaps up to the bracing plate's gap tolerance (largest {L(bridgedMax)}; plate and member planes differ slightly - drawn up by the rivet){Src}.");
+            if (nProbed > 0) Info($"Truss: bracing plate edges / edge angles set on the probed member faces at {nProbed} places (largest move {L(probedMax)} from the section box){Src}.");
+            if (nLone > 0) Warn($"Truss CHECK bracing rivets: {nLone} rivet positions pass one part only ({string.Join("; ", loneEx)}) (no member / stack behind the plate or angle leg there: member rivets {loneKind[0]}, angle leg on the stack / crossing member {loneKind[1]}, angle leg on the plate {loneKind[2]}; most at {string.Join(", ", loneAt.OrderByDescending(k => k.Value).Take(3).Select(k => k.Key + " " + k.Value))}); not placed{Src}.");
+            if (nToStack > 0 || nFills > 0) Info($"Truss: bracing plates carried to the joint stack under the edge angle {nToStack}, fills between plate and member {nFills} (largest {L(fillMax)}){Src}.");
             Info($"Truss: bracing connection plates - {nPlates} plates, {nAngles} edge angles, {nRiv} rivets{(nOut > 0 ? $" ({nOut} rivet positions within 1 1/4 d of the plate edge, not placed)" : "")}{(nNoSteel > 0 ? $" ({nNoSteel} rivet positions not in steel, skipped; e.g. {string.Join("; ", missed)})" : "")}{Src}.");
         }
 
-        private readonly List<(Vec3 p, Vec3 dir, TrussBracingGussetDefinition bg, Assumption? asu, string where, string asm)> _bracingRivets = new();
+        private readonly List<(Vec3 p, Vec3 dir, TrussBracingGussetDefinition bg, Assumption? asu, string where, string asm, int kind)> _bracingRivets = new();
+
+        /// <summary>Face of the steel (parts passing <paramref name="filter"/>) seen from the plate side along -<paramref name="inw"/>: the largest distance
+        /// along <paramref name="inw"/> from <paramref name="P"/> at which a ray started 0.15 m beyond <paramref name="c"/> meets steel, over a 5 x 5 grid on
+        /// the edge line (e) x plate normal (n) ranges; null = no steel met within 0.6 m.</summary>
+        private double? ProbeFace(Vec3 P, Vec3 inw, double c, Vec3 e, double e0, double e1, Vec3 n, double n0, double n1, Func<SteelPart, bool> filter)
+        {
+            var parts = Model.Steel.Parts;
+            var pts = new List<Vec3>();
+            for (int i = 0; i < 5; i++) for (int j = 0; j < 5; j++) pts.Add(P + inw * (c + 0.15) + e * (e0 + (e1 - e0) * (i + 0.5) / 5) + n * (n0 + (n1 - n0) * j / 4));
+            var lo = new Vec3(pts.Min(q => q.X) - 0.8, pts.Min(q => q.Y) - 0.8, pts.Min(q => q.Z) - 0.8);
+            var hi = new Vec3(pts.Max(q => q.X) + 0.8, pts.Max(q => q.Y) + 0.8, pts.Max(q => q.Z) + 0.8);
+            var pr = new SteelLineProbe();
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (parts[i].Mesh is not { IsEmpty: false } mm || !filter(parts[i])) continue;
+                var b = mm.Bounds();
+                if (b.Max.X < lo.X || b.Min.X > hi.X || b.Max.Y < lo.Y || b.Min.Y > hi.Y || b.Max.Z < lo.Z || b.Min.Z > hi.Z) continue;
+                pr.Add(mm, i, lo, hi);
+            }
+            if (pr.Count == 0) return null;
+            double? best = null;
+            foreach (var S in pts)
+                foreach (var iv in pr.Intervals(S, -inw, 0.6))
+                {
+                    if (iv.t1 <= 0) continue;
+                    double f = c + 0.15 - Math.Max(0, iv.t0);
+                    if (best == null || f > best) best = f;
+                    break;
+                }
+            return best;
+        }
 
         /// <summary>Keeps the part of a convex polygon with p . nrm >= c.</summary>
         private static List<Vec2> ClipHalf(List<Vec2> poly, Vec2 nrm, double c)

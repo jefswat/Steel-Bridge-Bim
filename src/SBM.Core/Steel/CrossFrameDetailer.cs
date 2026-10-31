@@ -21,15 +21,19 @@ public sealed partial class SteelModelGenerator
         public required Vec3 Origin { get; init; }
         public required Vec3 U { get; init; }
         public required Vec3 Wt { get; init; }
+        /// <summary>OPTIONAL z read at <see cref="Origin"/> (null = Origin.Z, the frame plane's convention): per-end plate planes of a warped frame keep
+        /// the frame's 2D coordinates.</summary>
+        public double? Z0 { get; init; }
         public Vec3 N => Vec3.Cross(Wt, U).Normalized();
-        public Vec3 W(Vec2 xz, double v) => Origin + U * xz.X + N * v + Wt * (xz.Y - Origin.Z);
+        public Vec3 W(Vec2 xz, double v) => Origin + U * xz.X + N * v + Wt * (xz.Y - (Z0 ?? Origin.Z));
         public Vec3 Dir(Vec2 xz) => U * xz.X + Wt * xz.Y;
         /// <summary>Plane coordinates of a world point (x, z, v).</summary>
         public (Vec2 xz, double v) Local(Vec3 p)
         {
             var d = p - Origin;
-            return (new Vec2(Vec3.Dot(d, U), Origin.Z + Vec3.Dot(d, Wt)), Vec3.Dot(d, N));
+            return (new Vec2(Vec3.Dot(d, U), (Z0 ?? Origin.Z) + Vec3.Dot(d, Wt)), Vec3.Dot(d, N));
         }
+        public FramePlaneGeom Geom => new(Origin, U, Wt) { Z0 = Z0 };
     }
 
     private enum EndKind { LeftGirder, RightGirder, Center }
@@ -123,13 +127,81 @@ public sealed partial class SteelModelGenerator
         double span = u2.Length;
         if (span < 0.3) return;
         u2 /= span;
+        if (cf.PlaneDirection is { } pdir) { u2 = pdir; span = Vec2.Dot(pr.XY - pl.XY, pdir); }   // plates on the frame plane: its horizontal direction
         var u3 = new Vec3(u2.X, u2.Y, 0);
-        // Support frames are plumb; intermediate frames are normal to the flanges (average of the two girders).
-        var wt = cf.AtSupport ? Up
+        // Support frames are plumb; intermediate frames are normal to the flanges (average of the two girders). OPTIONAL plane inputs
+        // (CrossFrameDefinition.IntermediatePlane / SupportPlane) replace the rule; their connection plates follow the same inputs (BuildStiffener).
+        var orient = cf.AtSupport ? def.SupportPlane : def.IntermediatePlane;
+        var wt = (orient == CrossFramePlaneOrientation.Plumb || (orient == null && cf.AtSupport)) ? Up
             : (FlangeNormal(gl.Path, cf.LeftGlobalDistance, u3) + FlangeNormal(gr.Path, cf.RightGlobalDistance, u3)).Normalized();
         wt = (wt - u3 * Vec3.Dot(wt, u3)).Normalized();
         var plane = new FramePlane { Origin = pl, U = u3, Wt = wt };
-        // Right girder's top of web in plane coordinates (its "elevation" along the tilted up axis).
+
+        // OPTIONAL standard frame (CrossFrameDefinition.Standard / CrossFrameStyle.Standard) and twist report (ReportTwist): the two connection plates
+        // as BuildStiffener builds them; a standard with the DefinedEnd plane option is built on the defined end's plate.
+        // Default (no legacy switch PlatesAtEachTopOfWeb): the framing placed the plates on the frame plane; the frame plane mode (FramePlane, default
+        // Midway; a standard's own Plane wins) is applied to every frame, and the ends are the plates as built (their own plan direction for pairs).
+        bool legacy = def.PlatesAtEachTopOfWeb;
+        var std = StandardFor(cf, st);
+        bool applyStd = std != null && !double.IsNaN(std.TopWorkPoint) && !double.IsNaN(std.Depth);
+        var mode = legacy ? (applyStd && std!.Plane is { } lp && lp != StandardFramePlane.Warped ? lp : StandardFramePlane.Averaged)
+            : applyStd && std!.Plane is { } sp ? sp : def.FramePlane ?? StandardFramePlane.Midway;
+        bool warped = !legacy && mode == StandardFramePlane.Warped;
+        PlateEndGeometry? endL = null, endR = null;
+        Vec3 uxL = u3, uxR = u3;
+        bool definedRight = false;
+        double refL = 0, refR = 0;
+        if (std != null || def.ReportTwist || !legacy)
+        {
+            var plateOrient = cf.AtSupport ? def.BearingStiffenerPlane : def.IntermediatePlane;
+            PlateEndGeometry End(GirderResult g, Vec3 p, double s) =>
+                new(p - Up * DapDrop(g.Index, s), PlateUp(plateOrient, cf.AtSupport, g.Path, s, u3), TrueFlangeNormal(g.Path, s), p - Up * Sec.WebDepth,
+                    _top[g.Index].Thickness(s));
+            if (legacy)
+            {
+                endL = End(gl, pl, cf.LeftGlobalDistance);
+                endR = End(gr, pr, cf.RightGlobalDistance);
+            }
+            else
+            {
+                (endL, uxL) = PlateEnd(gl, cf.LeftGlobalDistance, cf.AtSupport, u3) ?? (End(gl, pl, cf.LeftGlobalDistance), u3);
+                (endR, uxR) = PlateEnd(gr, cf.RightGlobalDistance, cf.AtSupport, u3) ?? (End(gr, pr, cf.RightGlobalDistance), u3);
+            }
+            var refKind = std?.Reference ?? StandardFrameReference.TopOfWeb;
+            double Ref(FramePlane pp, PlateEndGeometry e) => pp.Local(e.Origin).xz.Y + (refKind == StandardFrameReference.TopOfSteel ? e.TopFlangeThickness : 0);
+            refL = Ref(plane, endL); refR = Ref(plane, endR);
+            definedRight = std == null && !legacy ? cf.ReferenceRight : (std?.DefinedEnd ?? StandardDefinedEnd.Taller) switch
+            {
+                StandardDefinedEnd.Right => true,
+                StandardDefinedEnd.Left => false,
+                _ => refR > refL + 1e-9,
+            };
+            bool onePlane = legacy ? applyStd && mode != StandardFramePlane.Averaged : mode is StandardFramePlane.DefinedEnd or StandardFramePlane.Midway;
+            if (onePlane)
+            {
+                // default (plates on the frame plane): Midway keeps the frame orientation input's up axis (the plane the plates were placed on) and only moves
+                // the plane midway between the two plate origins (0 when both plates are on it); legacy Midway = the mean of the two plates' up axes
+                var fp = mode != StandardFramePlane.Midway ? StandardCrossFrames.Fitted(pl, u3, definedRight ? endR : endL)
+                    : legacy ? StandardCrossFrames.Midway(pl, u3, endL, endR)
+                    : new FramePlaneGeom(pl + plane.N * ((plane.Local(endL.Origin).v + plane.Local(endR.Origin).v) / 2), u3, plane.Wt);
+                plane = new FramePlane { Origin = fp.Origin, U = u3, Wt = fp.Wt };
+                refL = Ref(plane, endL); refR = Ref(plane, endR);
+            }
+        }
+        // Warped (OPTIONAL mode): each end in its own connection plate's plane (x along the plate's plan direction, z along its up axis, both read in the
+        // frame plane's 2D coordinates at the plate origin); members roll between them.
+        var planeL = plane;
+        var planeR = plane;
+        const double maxPlanAngle = 0.5;   // a plate turned more than this in plan from the frame line is not warped onto; links (frames between two
+        if (cf.AtSupport && cf.SupportIndex < 0) warped = false;   // support lines) stay in their one plane (their stiffener planes are an UNRESOLVED item)
+        if (warped && Math.Min(Math.Abs(Vec3.Dot(uxL, u3)), Math.Abs(Vec3.Dot(uxR, u3))) < Math.Cos(maxPlanAngle * Math.PI / 180)) warped = false;
+        if (warped)
+        {
+            planeL = PlatePlane(plane, endL!, uxL);
+            planeR = PlatePlane(plane, endR!, uxR);
+        }
+        // Left / right girders' top of web in plane coordinates (their "elevation" along the tilted up axis; the left one = pl.Z in the default plane).
+        double plZ = plane.Local(pl).xz.Y;
         double prZ = plane.Local(pr).xz.Y;
 
         var connPlate = cf.AtSupport ? (cf.SupportIndex >= 0 ? _def.SupportAt(cf.SupportIndex).BearingStiffener : null) ?? _def.Stiffeners.BearingStiffener : _def.Stiffeners.ConnectionPlate;   // the support's own bearing stiffener (Nebraska N abutment 12 1/2 x 1 1/8)
@@ -155,10 +227,47 @@ public sealed partial class SteelModelGenerator
             return;
         }
 
-        var A = new Vec2(xbl, pl.Z - topWp);
-        var B = new Vec2(xbl, pl.Z - d + botWp);
-        var C = new Vec2(xbr, prZ - topWp);
-        var D = new Vec2(xbr, prZ - d + botWp);
+        Vec2 A, B, C, D;
+        if (applyStd)
+        {
+            // Standard frame: level chords in the frame plane, top WP TopWorkPoint below the defined end's reference, one depth everywhere.
+            double zT = (definedRight ? refR : refL) - std!.TopWorkPoint, zB = zT - std.Depth;
+            A = new Vec2(xbl, zT); B = new Vec2(xbl, zB); C = new Vec2(xbr, zT); D = new Vec2(xbr, zB);
+        }
+        else
+        {
+            A = new Vec2(xbl, plZ - topWp);
+            B = new Vec2(xbl, plZ - d + botWp);
+            C = new Vec2(xbr, prZ - topWp);
+            D = new Vec2(xbr, prZ - d + botWp);
+        }
+        // Bolts of the two ends (report) and where their holes go: standard frames and (default) every frame put each hole where the bolt axis meets the
+        // plate's mid-plane (the projection in BuildStiffener then hides nothing); legacy non-standard frames keep the frame point. Warped frames: the end
+        // planes ARE the plates' planes (hole on the mid-plane, gap 0). Plate / channel diaphragms are one rigid plate: never warped (axis hit).
+        var boltsL = new List<Vec2>();
+        var boltsR = new List<Vec2>();
+        var fpl = new FramePlaneGeom(plane.Origin, plane.U, plane.Wt);
+        bool axisHit = applyStd || !legacy;
+        bool warpThis = warped && cf.Type is not (ResolvedCrossFrameType.Diaphragm or ResolvedCrossFrameType.PlateDiaphragm);
+        if (!warpThis) { planeL = plane; planeR = plane; }
+        Vec3 HolePoint(Vec2 b, bool right) => warpThis ? (right ? planeR : planeL).W(b, 0)
+            : axisHit ? StandardCrossFrames.HoleCentre(fpl, b, right ? endR! : endL!) : plane.W(b, 0);
+        Vec3 BoltPoint(Vec2 b, bool right) => warpThis ? (right ? planeR : planeL).W(b, -tp / 2)
+            : axisHit ? fpl.W(b, StandardCrossFrames.AxisHit(fpl, b, right ? endR! : endL!, -tp / 2)) : plane.W(b, -tp / 2);
+        FramePlane EndPlane(bool right) => right ? planeR : planeL;
+        void Record(Vec2 b, bool right) => (right ? boltsR : boltsL).Add(b);
+        var rolls = new List<(string code, double roll, double tip)>();
+        void Report()
+        {
+            if (endL == null || endR == null || (std == null && !def.ReportTwist)) return;
+            var row = FitRow(cf, st, std, applyStd, fpl, warpThis ? planeL.Geom : fpl, warpThis ? planeR.Geom : fpl, mode, pl, endL, endR, refL, refR, definedRight, xbl, xbr, tp, boltsL, boltsR);
+            if (rolls.Count > 0)
+            {
+                var w = rolls.OrderByDescending(r => Math.Abs(r.roll)).First();
+                row.RollDegrees = w.roll; row.RollMember = w.code; row.LegTipDeviation = rolls.Max(r => r.tip);
+            }
+            _cfFit.Add(row);
+        }
 
         string mark = cf.Mark;
         _assemblies.Add(new SteelAssembly
@@ -171,7 +280,7 @@ public sealed partial class SteelModelGenerator
         var weldMesh = new Mesh();
         var det = new CrossFrameDetail2D
         {
-            Mark = mark, AtSupport = cf.AtSupport, Type = cf.Type, Span = span, LeftWebTop = pl.Z, RightWebTop = prZ, LeftWebFace = xfl, RightWebFace = xfr,
+            Mark = mark, AtSupport = cf.AtSupport, Type = cf.Type, Span = span, LeftWebTop = plZ, RightWebTop = prZ, LeftWebFace = xfl, RightWebFace = xfr,
             PlateWidth = wcp, PlateThickness = tp, GussetThickness = tg, WorkPoints = new[] { A, B, C, D }, WeldLap = def.WeldLap, WeldSize = def.MemberWeldSize,
             ChannelName = cf.Type == ResolvedCrossFrameType.Diaphragm ? def.DiaphragmChannel : "",
             BoltDiameter = bg.Diameter, StyleName = st?.Name ?? "",
@@ -180,12 +289,14 @@ public sealed partial class SteelModelGenerator
 
         if (cf.Type == ResolvedCrossFrameType.Diaphragm)
         {
-            BuildDiaphragm(cf, plane, A, B, C, D, xcl - clr + Inch(0.5), xcr + clr - Inch(0.5), tp, nb, e, pitch, det);
+            BuildDiaphragm(cf, plane, A, B, C, D, xcl - clr + Inch(0.5), xcr + clr - Inch(0.5), tp, nb, e, pitch, det, HolePoint, BoltPoint, Record);
+            Report();
             return;
         }
         if (cf.Type == ResolvedCrossFrameType.PlateDiaphragm && st != null)
         {
-            BuildPlateDiaphragm(cf, st, plane, A, B, C, D, xbl, xbr, xcl, xcr, tp, e, bg, det);
+            BuildPlateDiaphragm(cf, st, plane, A, B, C, D, xbl, xbr, xcl, xcr, tp, e, bg, det, HolePoint, BoltPoint, Record);
+            Report();
             return;
         }
 
@@ -258,6 +369,15 @@ public sealed partial class SteelModelGenerator
             }
         }
 
+        // Warped frames: the end planes (left / right plate, centre = mean of the two at the centre work point).
+        FramePlane? planeCenter = null;
+        FramePlane PlaneOfEnd(EndKind k) => k switch
+        {
+            EndKind.LeftGirder => planeL,
+            EndKind.RightGirder => planeR,
+            _ => planeCenter ??= CenterPlane(planeL, planeR, center ?? new Vec2((xbl + xbr) / 2, (A.Y + B.Y + C.Y + D.Y) / 4)),
+        };
+
         // Clear the connection stiffeners at girder ends, then compute cut lengths.
         foreach (var m in members)
         {
@@ -301,8 +421,11 @@ public sealed partial class SteelModelGenerator
             int o = m.Front ? 1 : -1;
             double vBase = m.Front ? vF : vB;
             var mesh = new Mesh();
+            var mm = warpThis ? WarpedMember(m, PlaneOfEnd(m.End1), PlaneOfEnd(m.End2)) : null;
+            Vec3 MapM(double t, double q, double v) => mm != null ? mm.Map(t, q, v) : plane.W(m.At(t, q), v);
             void Loft(Vec2[] sec, double t0, double t1)
             {
+                if (mm != null) { MeshBuilder.AddLoft(mesh, sec, mm.Rings(sec, t0, t1), !mm.Twisted); return; }
                 Vec3[] Ring(double t) => sec.Select(q => plane.W(m.At(t, q.X), q.Y)).ToArray();
                 MeshBuilder.AddLoft(mesh, sec, new[] { Ring(t0), Ring(t1) });
             }
@@ -312,7 +435,7 @@ public sealed partial class SteelModelGenerator
                 if (crossing is { } xp && m.Role == MemberRole.Diagonal)
                 {
                     double tc = Vec2.Dot(xp - m.Wp1, m.A), mc = Vec2.Dot(xp - m.Wp1, m.M);
-                    AddAngleWithHole(mesh, m, plane, vBase, o, new Hole(new Vec2(tc, mc), hole));
+                    AddAngleWithHole(mesh, m, MapM, vBase, o, new Hole(new Vec2(tc, mc), hole), mm == null || !mm.Twisted);
                 }
                 else Loft(SteelCatalog.AnglePolygon(m.Angle, m.Heel, m.LegDir, vBase, o), m.T0, m.T1);
             }
@@ -349,6 +472,7 @@ public sealed partial class SteelModelGenerator
                 Length = m.T1 - m.T0, Description = m.SectionName, Material = "ASTM A709 Gr. 36",
                 NominalWeightLbPerFt = (m.Angle?.WeightPerFootLb ?? m.Channel?.WeightPerFootLb ?? m.Beam?.WeightPerFootLb ?? m.Tee?.WeightPerFootLb ?? 0) * (m.Pair ? 2 : 1),
             });
+            if (mm != null) rolls.Add((m.Code, mm.RollDegrees, mm.TipDeviation));
             if (m.Beam != null) continue;                    // bolted through its web, no gusset laps
 
             foreach (var (t0, t1, key) in new[] { (m.T0, m.T0 + lap, m.Gusset1), (m.T1 - lap, m.T1, m.Gusset2) })
@@ -356,11 +480,12 @@ public sealed partial class SteelModelGenerator
                 double lo = m.Tee != null ? m.LapLo + Inch(0.25) : m.MLo - margin;     // a tee's flange stays below the gusset
                 AddPts(key, new[] { m.At(t0, lo), m.At(t0, m.MHi + margin), m.At(t1, lo), m.At(t1, m.MHi + margin) });
                 // Fillet welds along both long edges of the lap (angle heel and toe / channel web edges), each channel of a pair.
-                var mDir = plane.Dir(m.M);
+                var mDir = mm != null ? mm.MDir((t0 + t1) / 2) : plane.Dir(m.M);
+                var nDir = mm != null ? mm.NDir((t0 + t1) / 2) : plane.N;
                 foreach (var (vb, oo) in m.Pair ? new[] { (vF, 1), (vB, -1) } : new[] { (vBase, o) })
                 {
-                    weldLen += weldMesh.AddHeld(plane.W(m.At(t0, m.LapLo), vb), plane.W(m.At(t1, m.LapLo), vb), mDir * -1, plane.N * oo, ws, cfHb, cfHb);
-                    weldLen += weldMesh.AddHeld(plane.W(m.At(t0, m.MHi), vb), plane.W(m.At(t1, m.MHi), vb), mDir, plane.N * oo, ws, cfHb, cfHb);
+                    weldLen += weldMesh.AddHeld(MapM(t0, m.LapLo, vb), MapM(t1, m.LapLo, vb), mDir * -1, nDir * oo, ws, cfHb, cfHb);
+                    weldLen += weldMesh.AddHeld(MapM(t0, m.MHi, vb), MapM(t1, m.MHi, vb), mDir, nDir * oo, ws, cfHb, cfHb);
                 }
             }
         }
@@ -379,8 +504,9 @@ public sealed partial class SteelModelGenerator
                 double t0 = tc0 + off - st.TiePlateLength / 2, t1 = tc0 + off + st.TiePlateLength / 2;
                 if (t0 < bot.T0 || t1 > bot.T1) { Warn($"{mark}: tie plate at {_u.FormatLength(off)} from the bay centre is beyond the bottom chord."); continue; }
                 var tm = new Mesh();
+                var bm = warpThis ? WarpedMember(bot, PlaneOfEnd(bot.End1), PlaneOfEnd(bot.End2)) : null;
                 Vec3[] Ring(double t) => sec.Select(q => plane.W(bot.At(t, q.X), q.Y)).ToArray();
-                MeshBuilder.AddLoft(tm, sec, new[] { Ring(t0), Ring(t1) });
+                MeshBuilder.AddLoft(tm, sec, bm != null ? bm.Rings(sec, t0, t1) : new[] { Ring(t0), Ring(t1) }, bm == null || !bm.Twisted);
                 _parts.Add(new SteelPart { Mark = $"{mark}-TP{k++}", Category = PartCategory.FillerPlate, Assembly = mark, Mesh = tm, Length = st.TiePlateLength,
                     Description = $"Tie plate {Pl(vb2 - va, tpl)} x {In(st.TiePlateLength)}" });
             }
@@ -390,7 +516,7 @@ public sealed partial class SteelModelGenerator
         // bolted through its own web instead (no top gussets).
         var wps = new Dictionary<string, (Vec2 wp, double webTop, int girder, double s)>
         {
-            ["TL"] = (A, pl.Z, cf.Bay, cf.LeftGlobalDistance), ["BL"] = (B, pl.Z, cf.Bay, cf.LeftGlobalDistance),
+            ["TL"] = (A, plZ, cf.Bay, cf.LeftGlobalDistance), ["BL"] = (B, plZ, cf.Bay, cf.LeftGlobalDistance),
             ["TR"] = (C, prZ, cf.RightGirder, cf.RightGlobalDistance), ["BR"] = (D, prZ, cf.RightGirder, cf.RightGlobalDistance),
         };
         foreach (var (key, (wp, webTop, girder, s)) in wps)
@@ -409,14 +535,16 @@ public sealed partial class SteelModelGenerator
                 for (int i = 0; i < rows; i++)
                     bpts.Add(new Vec2(wp.X + sideX * col * gage, wp.Y + (key[0] == 'B' ? st?.BottomBoltOffset ?? 0 : 0) + (i - (rows - 1) / 2.0) * rowPitch));
             det.Bolts.AddRange(bpts);
+            bool rightEnd = key[1] == 'R';
             foreach (var b in bpts)
             {
                 _bolts.Add(new BoltInstance
                 {
-                    Frame = Frame3.FromXZ(plane.W(b, -tp / 2), plane.U, plane.N),
+                    Frame = Frame3.FromXZ(BoltPoint(b, rightEnd), EndPlane(rightEnd).U, EndPlane(rightEnd).N),
                     Grip = grip, Length = boltLen, Assembly = mark, Diameter = bg.Diameter,
                 });
-                AddStiffenerHole(girder, s, plane.W(b, 0), hole);
+                AddStiffenerHole(girder, s, HolePoint(b, rightEnd), hole);
+                Record(b, rightEnd);
             }
             if (beamHere) continue;
             AddPts(key, bpts.SelectMany(b => new[] { b + new Vec2(-e, -e), b + new Vec2(e, -e), b + new Vec2(e, e), b + new Vec2(-e, e) }));
@@ -426,7 +554,7 @@ public sealed partial class SteelModelGenerator
                 Warn($"{mark}: top gusset at G{girder + 1} reaches the top flange; lower the top work point.");
             if (key[0] == 'B' && zBot < webTop - d + Inch(0.5))
                 Warn($"{mark}: bottom gusset at G{girder + 1} reaches the bottom flange; raise the bottom work point.");
-            AddGusset(mark, $"G{key}", hull, bpts.Select(b => new Hole(b, hole)).ToList(), plane, vB, vF, tg);
+            AddGusset(mark, $"G{key}", hull, bpts.Select(b => new Hole(b, hole)).ToList(), EndPlane(rightEnd), vB, vF, tg);
             det.Gussets.Add(($"G{key}", hull.ToArray()));
         }
 
@@ -451,7 +579,7 @@ public sealed partial class SteelModelGenerator
                 var nrm = -chordM.M; double c0 = -(Vec2.Dot(chordM.Wp1, chordM.M) + chordM.MLo);
                 chull = PlateBuilder.ClipHalfPlane(chull, nrm, c0);
             }
-            AddGusset(mark, "GC", chull, Array.Empty<Hole>(), plane, vB, vF, tg);
+            AddGusset(mark, "GC", chull, Array.Empty<Hole>(), warpThis ? PlaneOfEnd(EndKind.Center) : plane, vB, vF, tg);
             det.Gussets.Add(("GC", chull.ToArray()));
         }
 
@@ -464,16 +592,18 @@ public sealed partial class SteelModelGenerator
             det.Filler = filler;
             det.Bolts.Add(xc);
             var fm = new Mesh();
-            PlateBuilder.AddPrism(fm, filler, new[] { new Hole(xc, hole) }, (a, b, v) => plane.W(new Vec2(a, b), v), _ => vB, _ => vF);
+            var xpl = warpThis ? CenterPlane(planeL, planeR, xc) : plane;
+            PlateBuilder.AddPrism(fm, filler, new[] { new Hole(xc, hole) }, (a, b, v) => xpl.W(new Vec2(a, b), v), _ => vB, _ => vF);
             _parts.Add(new SteelPart { Mark = $"{mark}-F1", Category = PartCategory.FillerPlate, Assembly = mark, Mesh = fm, Length = 2 * hs,
                 Description = $"Filler {Pl(2 * hs, tg)} x {In(2 * hs)}" });
             double g = d1.Angle.Thickness + tg + d2.Angle.Thickness;
-            _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(plane.W(xc, vB - d2.Angle.Thickness), plane.U, plane.N), Grip = g,
+            _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(xpl.W(xc, vB - d2.Angle.Thickness), xpl.U, xpl.N), Grip = g,
                 Length = bg.LengthForGrip(g), Assembly = mark, Diameter = bg.Diameter });
         }
 
         _parts.Add(new SteelPart { Mark = $"{mark}-W", Category = PartCategory.Weld, Assembly = mark, Mesh = weldMesh, Material = "E70XX",
             Length = weldLen, Description = $"Fillet weld {In(ws)}, members to gussets{HoldNote(ws)}", Assumption = WeldFlag(ws) });
+        Report();
     }
 
     /// <summary>
@@ -481,7 +611,8 @@ public sealed partial class SteelModelGenerator
     /// plates), flange plates welded along its top and bottom edges between the stiffeners. Top / bottom = work points.
     /// </summary>
     private void BuildPlateDiaphragm(CrossFrameResult cf, CrossFrameStyle st, FramePlane plane, Vec2 a, Vec2 b, Vec2 c, Vec2 d,
-        double xbl, double xbr, double xcl, double xcr, double tp, double e, BoltGeometry bg, CrossFrameDetail2D det)
+        double xbl, double xbr, double xcl, double xcr, double tp, double e, BoltGeometry bg, CrossFrameDetail2D det,
+        Func<Vec2, bool, Vec3> holePoint, Func<Vec2, bool, Vec3> boltPoint, Action<Vec2, bool> record)
     {
         double tw = st.WebPlateThickness, bf = st.FlangePlateWidth, tf = st.FlangePlateThickness;
         double vB = tp / 2, vc = vB + tw / 2;
@@ -495,7 +626,7 @@ public sealed partial class SteelModelGenerator
         double webH = Math.Min(Zt(xbl) - Zb(xbl), Zt(xbr) - Zb(xbr)) - 2 * tf;
         double pitch = st.DiaphragmBoltPitch > 0 ? st.DiaphragmBoltPitch : (webH - 2 * st.DiaphragmBoltEnd) / (n - 1);
         var holes = new List<Hole>();
-        foreach (var (x, wp, girder, s) in new[] { (xbl, (a + b) * 0.5, cf.Bay, cf.LeftGlobalDistance), (xbr, (c + d) * 0.5, cf.RightGirder, cf.RightGlobalDistance) })
+        foreach (var (x, wp, girder, s, right) in new[] { (xbl, (a + b) * 0.5, cf.Bay, cf.LeftGlobalDistance, false), (xbr, (c + d) * 0.5, cf.RightGirder, cf.RightGlobalDistance, true) })
         {
             double zc = (Zt(x) + Zb(x)) / 2;
             for (int i = 0; i < n; i++)
@@ -503,9 +634,10 @@ public sealed partial class SteelModelGenerator
                 var bp = new Vec2(x, zc + (i - (n - 1) / 2.0) * pitch);
                 holes.Add(new Hole(bp, hole));
                 det.Bolts.Add(bp);
-                _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(plane.W(bp, -tp / 2), plane.U, plane.N), Grip = grip,
+                _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(boltPoint(bp, right), plane.U, plane.N), Grip = grip,
                     Length = bg.LengthForGrip(grip), Assembly = cf.Mark, Diameter = bg.Diameter });
-                AddStiffenerHole(girder, s, plane.W(bp, 0), hole);
+                AddStiffenerHole(girder, s, holePoint(bp, right), hole);
+                record(bp, right);
             }
         }
         if ((n - 1) * pitch > webH - 2 * e)
@@ -532,18 +664,20 @@ public sealed partial class SteelModelGenerator
     }
 
     /// <summary>Angle built as connected leg (with a bolt hole) + outstanding leg, for members bolted through the leg.</summary>
-    private static void AddAngleWithHole(Mesh mesh, Member m, FramePlane plane, double vBase, int o, Hole hole)
+    private static void AddAngleWithHole(Mesh mesh, Member m, Func<double, double, double, Vec3> map, double vBase, int o, Hole hole, bool exact = true)
     {
         var a = m.Angle!;
         double heel = m.Heel, toe = heel + m.LegDir * a.LegA, legEnd = heel + m.LegDir * a.Thickness;
-        Vec3 Map(double t, double mm, double v) => plane.W(m.At(t, mm), v);
+        Vec3 Map(double t, double mm, double v) => map(t, mm, v);
         // Connected leg: outline (t, m), thickness v.
-        PlateBuilder.AddPrism(mesh, new[] { new Vec2(m.T0, Math.Min(heel, toe)), new Vec2(m.T1, Math.Min(heel, toe)), new Vec2(m.T1, Math.Max(heel, toe)), new Vec2(m.T0, Math.Max(heel, toe)) },
-            new[] { hole }, (t, mm, v) => Map(t, mm, v), _ => vBase, _ => vBase + o * a.Thickness);
+        var conn = new[] { new Vec2(m.T0, Math.Min(heel, toe)), new Vec2(m.T1, Math.Min(heel, toe)), new Vec2(m.T1, Math.Max(heel, toe)), new Vec2(m.T0, Math.Max(heel, toe)) };
+        if (exact) PlateBuilder.AddPrism(mesh, conn, new[] { hole }, (t, mm, v) => Map(t, mm, v), _ => vBase, _ => vBase + o * a.Thickness);
+        else PlateBuilder.AddPrismWatertight(mesh, conn, new[] { hole }, (t, mm, v) => Map(t, mm, v), vBase, vBase + o * a.Thickness);   // twisted (warped frame)
         // Outstanding leg: outline (t, v), thickness m.
         double v0 = vBase + o * a.Thickness, v1 = vBase + o * a.LegB;
-        PlateBuilder.AddPrism(mesh, new[] { new Vec2(m.T0, Math.Min(v0, v1)), new Vec2(m.T1, Math.Min(v0, v1)), new Vec2(m.T1, Math.Max(v0, v1)), new Vec2(m.T0, Math.Max(v0, v1)) },
-            Array.Empty<Hole>(), (t, v, mm) => Map(t, mm, v), _ => Math.Min(heel, legEnd), _ => Math.Max(heel, legEnd));
+        var outst = new[] { new Vec2(m.T0, Math.Min(v0, v1)), new Vec2(m.T1, Math.Min(v0, v1)), new Vec2(m.T1, Math.Max(v0, v1)), new Vec2(m.T0, Math.Max(v0, v1)) };
+        if (exact) PlateBuilder.AddPrism(mesh, outst, Array.Empty<Hole>(), (t, v, mm) => Map(t, mm, v), _ => Math.Min(heel, legEnd), _ => Math.Max(heel, legEnd));
+        else PlateBuilder.AddPrismWatertight(mesh, outst, Array.Empty<Hole>(), (t, v, mm) => Map(t, mm, v), Math.Min(heel, legEnd), Math.Max(heel, legEnd));
         // AISC root fillet between the legs.
         double r = a.RootRadius;
         if (r > 0)
@@ -558,7 +692,7 @@ public sealed partial class SteelModelGenerator
             }
             sec.Reverse(1, sec.Count - 1);
             Vec3[] Ring(double t) => sec.Select(q => Map(t, q.X, q.Y)).ToArray();
-            MeshBuilder.AddLoft(mesh, sec.ToArray(), new[] { Ring(m.T0), Ring(m.T1) });
+            MeshBuilder.AddLoft(mesh, sec.ToArray(), new[] { Ring(m.T0), Ring(m.T1) }, exact);
         }
     }
 
@@ -573,7 +707,8 @@ public sealed partial class SteelModelGenerator
     }
 
     private void BuildDiaphragm(CrossFrameResult cf, FramePlane plane, Vec2 a, Vec2 b, Vec2 c, Vec2 d, double x0, double x1,
-        double tp, int nb, double e, double pitch, CrossFrameDetail2D det)
+        double tp, int nb, double e, double pitch, CrossFrameDetail2D det,
+        Func<Vec2, bool, Vec3> holePoint, Func<Vec2, bool, Vec3> boltPoint, Action<Vec2, bool> record)
     {
         var ch = SteelCatalog.Channel(_def.CrossFrames.DiaphragmChannel);
         var l = Vec2.Lerp(a, b, 0.5);
@@ -592,7 +727,7 @@ public sealed partial class SteelModelGenerator
 
         int n = Math.Max(2, Math.Min(nb + 1, (int)Math.Floor((ch.Depth - 2 * ch.FlangeThickness - 2 * e) / pitch) + 1));
         double grip = tp + ch.WebThickness;
-        foreach (var (wp, girder, s) in new[] { (a, cf.Bay, cf.LeftGlobalDistance), (c, cf.RightGirder, cf.RightGlobalDistance) })
+        foreach (var (wp, girder, s, right) in new[] { (a, cf.Bay, cf.LeftGlobalDistance, false), (c, cf.RightGirder, cf.RightGlobalDistance, true) })
         {
             double t = (wp.X - l.X) / dir.X;
             var cpt = l + dir * t;
@@ -600,9 +735,10 @@ public sealed partial class SteelModelGenerator
             {
                 var bp = cpt + m * ((i - (n - 1) / 2.0) * pitch);
                 det.Bolts.Add(bp);
-                _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(plane.W(bp, -tp / 2), plane.U, plane.N), Grip = grip,
+                _bolts.Add(new BoltInstance { Frame = Frame3.FromXZ(boltPoint(bp, right), plane.U, plane.N), Grip = grip,
                     Length = _model.Bolt.LengthForGrip(grip), Assembly = cf.Mark, Diameter = _model.Bolt.Diameter });
-                AddStiffenerHole(girder, s, plane.W(bp, 0), HoleDia);
+                AddStiffenerHole(girder, s, holePoint(bp, right), HoleDia);
+                record(bp, right);
             }
         }
     }

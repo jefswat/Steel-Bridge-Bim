@@ -19,7 +19,7 @@ public class ConcreteDiaphragmTests
     private static readonly double Slab = In(8), Haunch = In(2);
 
     /// <summary>Straight, level, no cross slope, square supports: 3 Tx54 beams at -6 / 0 / +6 ft, deck -9 .. +9 ft.</summary>
-    private static SbmDocument Flat(int spans = 1, double skew = 0)
+    internal static SbmDocument Flat(int spans = 1, double skew = 0)
     {
         var doc = SbmDocument.New("diaphragm test");
         doc.AddAlignment("CL", 0, new[] { new PiRow(0, 0), new PiRow(Ft(1000), 0) },

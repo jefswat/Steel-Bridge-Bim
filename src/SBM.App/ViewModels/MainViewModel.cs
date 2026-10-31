@@ -88,6 +88,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _cursorText = "";
     [ObservableProperty] private string _unitsText = "US (ft)";
     [ObservableProperty] private string _exactGeometryText = "Exact curves: Off";
+    [ObservableProperty] private string _lodText = "LOD 400";
     /// <summary>Viewport memory line in the status bar (estimate / budget and what was reduced).</summary>
     [ObservableProperty] private string _vramText = "";
     [ObservableProperty] private bool _isBusy;
@@ -148,6 +149,8 @@ public sealed partial class MainViewModel : ObservableObject
                 if (p.Assumption is { } pa) { R("Status", pa.Status); R("Reason", pa.Reason); R("Assumed", pa.Basis); }
                 if (p.Fabrication is { IsEmpty: false } fab)
                     foreach (var (fn, fv) in fab.Fields()) R("Fabrication: " + fn, fv);
+                if (p.Fits is { Count: > 0 } fits)
+                    foreach (var (_, fv) in PartFit.Fields(fits)) R("Fit condition", fv);
                 var b = p.Mesh.Bounds();
                 R("Top elevation", E(b.Max.Z));
                 R("Bottom elevation", E(b.Min.Z));
@@ -296,6 +299,7 @@ public sealed partial class MainViewModel : ObservableObject
         _redo.Clear();
         UnitsText = Units.IsUS ? "US (ft)" : "SI (m)";
         ExactGeometryText = p.Geometry.ExactCurvedGeometry ? "Exact curves: On" : "Exact curves: Off";
+        LodText = LodLabel(p.Lod);
         UndoCommand.NotifyCanExecuteChanged();
         RedoCommand.NotifyCanExecuteChanged();
         UpdateTitle();
@@ -550,19 +554,63 @@ public sealed partial class MainViewModel : ObservableObject
         _ = RegenerateAsync(false);
     }
 
+    private static string LodLabel(SBM.Core.Project.LodSettings? l) =>
+        l == null ? "LOD 400" : "LOD " + l.Default + (l.Groups is { Count: > 0 } || l.Overrides is { Count: > 0 } ? "*" : "");
+
+    /// <summary>Level of detail of the model (project setting <c>Lod</c>): model level + optional per-group levels; "(model)" = the model level.</summary>
+    [RelayCommand]
+    private void LevelOfDetail()
+    {
+        var cur = _project.Lod ?? new SBM.Core.Project.LodSettings();
+        var levels = SBM.Core.Project.LodSettings.Levels.Select(x => x.ToString()).ToList();
+        var form = new SBM.App.Database.FormDialog("Level of detail",
+            "100 = one envelope per assembly, 200 = no connection parts, 300 = no fasteners / welds / holes / placed bars (bar schedules kept), 350 = 300 + holes, 400 = full model. Per-group levels override the model level; per-bridge overrides are set by script / API (Lod.Overrides).")
+            .Combo("Model", levels, cur.Default.ToString());
+        foreach (var g in Enum.GetValues<SBM.Core.Project.LodGroup>())
+            form.Combo(g.ToString(), new[] { "(model)" }.Concat(levels), cur.Groups != null && cur.Groups.TryGetValue(g, out int v) ? v.ToString() : "(model)");
+        // OPTIONAL cap per output (e.g. the IFC at 300 for coordination while the viewport shows 400)
+        foreach (var o in Enum.GetValues<SBM.Core.Project.LodOutput>())
+            form.Combo(o + " output", new[] { "(no cap)" }.Concat(levels), cur.Outputs != null && cur.Outputs.TryGetValue(o, out int ov) ? ov.ToString() : "(no cap)");
+        form.Owner = System.Windows.Application.Current.MainWindow;
+        if (form.ShowDialog() != true) return;
+        var lod = new SBM.Core.Project.LodSettings { Default = int.Parse(form.Get("Model")), Overrides = cur.Overrides };
+        foreach (var g in Enum.GetValues<SBM.Core.Project.LodGroup>())
+            if (int.TryParse(form.Get(g.ToString()), out int gv)) (lod.Groups ??= new())[g] = gv;
+        foreach (var o in Enum.GetValues<SBM.Core.Project.LodOutput>())
+            if (int.TryParse(form.Get(o + " output"), out int ov) && ov < SBM.Core.Project.LodSettings.Full) (lod.Outputs ??= new())[o] = ov;
+        Checkpoint();
+        _project.Lod = lod.Default == SBM.Core.Project.LodSettings.Full && lod.Groups == null && lod.Overrides == null && lod.Outputs == null ? null : lod;
+        LodText = LodLabel(_project.Lod);
+        _ = RegenerateAsync(false);
+    }
+
     // ------------------------------------------------------------------ alignments
 
     [RelayCommand]
     private void ImportLandXml()
     {
-        var dlg = new OpenFileDialog { Filter = "LandXML (*.xml)|*.xml|All files|*.*", Title = "Import LandXML alignments" };
+        var dlg = new OpenFileDialog { Filter = "LandXML (*.xml)|*.xml|All files|*.*", Title = "Import LandXML alignments / pipe networks" };
         if (dlg.ShowDialog() != true) return;
         try
         {
-            var res = LandXmlReader.Read(dlg.FileName);
-            foreach (var m in res.Messages) Warn(m);
-            if (res.Alignments.Count == 0) return;
+            var xdoc = System.Xml.Linq.XDocument.Load(dlg.FileName);
+            var res = LandXmlReader.Read(xdoc);
+            // pipe networks (storm drainage ...): a network with the name of an existing one replaces it
+            var pn = SBM.IO.LandXml.LandXmlPipeNetworks.Read(xdoc, Path.GetFileName(dlg.FileName));
+            foreach (var m in res.Messages.Where(m => res.Alignments.Count > 0 || pn.Networks.Count == 0 || !m.StartsWith("No alignments"))) Warn(m);
+            foreach (var m in pn.Messages) Warn(m);
+            int fl = xdoc.Descendants().Count(x => x.Name.LocalName == "PlanFeature");
+            if (fl > 0) Info($"{fl} feature lines in the file: import them as a road with sbm import-corridor (or Doc.ImportCorridor in a script).");
+            if (res.Alignments.Count == 0 && pn.Networks.Count == 0) return;
             Checkpoint();
+            foreach (var n in pn.Networks)
+            {
+                int k = _project.Utilities.FindIndex(x => string.Equals(x.Name, n.Name, StringComparison.OrdinalIgnoreCase));
+                if (k >= 0) { _project.Utilities[k] = n; Info($"Pipe network '{n.Name}' replaces the network of the same name."); }
+                else _project.Utilities.Add(n);
+                Info($"Imported pipe network '{n.Name}' ({n.System}): {n.Structures.Count} structures, {n.Pipes.Count} pipes.");
+            }
+            if (res.Alignments.Count == 0) { _ = RegenerateAsync(false); return; }
             if (_project.Alignments.Count == 0 && _project.Bridges.Count == 0)
             {
                 Units.Kind = res.Imperial ? UnitSystemKind.US : UnitSystemKind.SI;
@@ -961,8 +1009,8 @@ public sealed partial class MainViewModel : ObservableObject
         if (groundChanged)
         {
             _regenCache.GroundVersion++;
-            // Foundation tops set from the ground need regeneration.
-            if (_project.Bridges.Any(b => b.Drains.Any(d => d.SplashBasin || d.Outlet == DrainOutlet.PipedToPier)
+            // Foundation tops set from the ground and road side slopes need regeneration.
+            if (_project.Roads.Count > 0 || _project.Gradings.Count > 0 || _project.Utilities.Count > 0 || _project.Bridges.Any(b => b.Drains.Any(d => d.SplashBasin || d.Outlet == DrainOutlet.PipedToPier)
                     || b.Supports.Any(s => s.ResolvedSubstructure is { Enabled: true } sd && double.IsNaN(sd.FoundationTopElevation))))
                 _ = RegenerateAsync(false);
         }
@@ -973,7 +1021,7 @@ public sealed partial class MainViewModel : ObservableObject
         foreach (var r in renders)
         {
             bool terrain = r.Definition.Kind == ReferenceKind.Terrain;
-            modes.Add((r.LayerName, false, terrain));       // terrain surface: 3D only
+            modes.Add((r.LayerName, false, terrain && r.PlanImage == null)); // terrain surface: 3D only; with an aerial the layer also draws in plan (flat quad)
             if (terrain) modes.Add((r.ContourLayerName, true, false)); // contours: plan only
         }
         ReferenceLayerModes = modes;
@@ -1044,15 +1092,32 @@ public sealed partial class MainViewModel : ObservableObject
         if (dlg.ShowDialog() != true) return;
         try
         {
-            var data = Framings.Keys.Where(b => SteelModels.ContainsKey(b) || PrestressedModels.ContainsKey(b))
+            var capped = ModelsForOutput(LodOutput.Ifc);
+            var data = capped != null
+                ? capped.Where(m => m.Steel != null || m.Prestressed != null).Select(m => new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed)).ToList()
+                : Framings.Keys.Where(b => SteelModels.ContainsKey(b) || PrestressedModels.ContainsKey(b))
                 .Select(b => new IfcBridgeData(Framings[b], SteelModels.GetValueOrDefault(b), ConcreteModels.GetValueOrDefault(b), SubstructureModels.GetValueOrDefault(b),
                     PrestressedModels.GetValueOrDefault(b))).ToList();
             var sw = Stopwatch.StartNew();
-            var r = IfcExporter.Export(dlg.FileName, _project, data);
+            var r = IfcExporter.Export(dlg.FileName, _project, data, new IfcExportOptions(Roads: RoadModels.Count > 0 ? RoadModels : null, Walls: WallModels.Count > 0 ? WallModels : null, Gradings: GradingModels.Count > 0 ? GradingModels : null, Utilities: UtilityModels.Count > 0 ? UtilityModels : null,
+                Lod: _project.Lod?.ForOutput(capped != null ? LodOutput.Ifc : LodOutput.Viewport)));
             Info($"Exported IFC 4.3 to {dlg.FileName}: {r.ElementCount:N0} elements, {r.EntityCount:N0} entities in {sw.ElapsedMilliseconds} ms. " +
                  $"Base point E {ValueFormat.Format(Units, ValueKind.Coordinate, r.BasePoint.X)}, N {ValueFormat.Format(Units, ValueKind.Coordinate, r.BasePoint.Y)} (IfcMapConversion).");
         }
         catch (Exception ex) { Error($"IFC export failed: {ex.Message}"); }
+    }
+
+    /// <summary>
+    /// Models for an export whose output has its own level cap (<see cref="LodSettings.Outputs"/>) different from the viewport's: regenerated in a separate cache
+    /// (the viewport cache keeps its entries); null = the export uses the viewport models.
+    /// </summary>
+    private List<BridgeModel>? ModelsForOutput(LodOutput output)
+    {
+        var lod = _project.Lod;
+        if (lod?.Outputs == null || !lod.Outputs.ContainsKey(output) || lod.ForOutput(output).Cap == lod.ForOutput(LodOutput.Viewport).Cap) return null;
+        Info($"Level of detail: the {output} output is capped at {lod.ForOutput(output).Cap} - regenerating for it.");
+        var cache = new RegenerationCache { Ground = _regenCache.Ground };
+        return cache.Regenerate(_project, true, output).OfType<BridgeModel>().ToList();
     }
 
     /// <summary>Rhino 3DM of the generated model (SBM.IO.Rhino3dm): exact extrusions / B-reps, fastener blocks, bar and alignment curves,
@@ -1063,7 +1128,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (Framings.Count == 0) { Warn("There is no model to export. Create a bridge first."); return; }
         var dlg = new SaveFileDialog { Filter = "Rhino 3D model (*.3dm)|*.3dm", FileName = _project.Name + ".3dm" };
         if (dlg.ShowDialog() != true) return;
-        var models = Framings.Keys.Select(b => new BridgeModel(b, Framings[b], SteelModels.GetValueOrDefault(b), true, ConcreteModels.GetValueOrDefault(b),
+        var models = ModelsForOutput(LodOutput.Rhino) ?? Framings.Keys.Select(b => new BridgeModel(b, Framings[b], SteelModels.GetValueOrDefault(b), true, ConcreteModels.GetValueOrDefault(b),
             SubstructureModels.GetValueOrDefault(b), PrestressedModels.GetValueOrDefault(b))).ToList();
         // the IFC export's base point (bridges the IFC writes), so both files share one local frame
         var bp = IfcExporter.BasePoint(_project, models.Where(m => m.Steel != null || m.Prestressed != null || m.Concrete?.Segmental != null || m.Definition.SupportLinesOnly).Select(m => m.Framing));
@@ -1074,7 +1139,9 @@ public sealed partial class MainViewModel : ObservableObject
         try
         {
             var r = await Task.Run(() => SBM.IO.Rhino3dm.Rhino3dmExporter.Export(path, project, models,
-                new SBM.IO.Rhino3dm.Rhino3dmOptions { BasePoint = bp, Source = FilePath != null ? Path.GetFileName(FilePath) : null }));
+                new SBM.IO.Rhino3dm.Rhino3dmOptions { BasePoint = bp, Source = FilePath != null ? Path.GetFileName(FilePath) : null,
+                    Civil = RoadModels.Count + WallModels.Count + GradingModels.Count + UtilityModels.Count == 0 ? null
+                        : new SBM.IO.Rhino3dm.Rhino3dmCivil(RoadModels, WallModels, GradingModels, UtilityModels) }));
             Info($"Exported Rhino 3DM to {path}: {r.Objects:N0} objects ({r.Extrusions + r.MiteredExtrusions:N0} extrusions, {r.ObliqueBreps + r.NurbsBreps + r.ExactBodies:N0} B-reps, " +
                  $"{r.Meshes:N0} meshes, {r.Curves:N0} curves, {r.BlockInstances:N0} fastener blocks), {r.Units}, in {r.Elapsed.TotalSeconds:0.0} s. Rhino origin = base point " +
                  $"E {ValueFormat.Format(Units, ValueKind.Coordinate, bp.X)}, N {ValueFormat.Format(Units, ValueKind.Coordinate, bp.Y)}" +
@@ -1087,6 +1154,15 @@ public sealed partial class MainViewModel : ObservableObject
     // ------------------------------------------------------------------ regeneration
 
     private PlanDrawing? _lastDrawing;
+
+    /// <summary>Road corridors of the last regeneration (<see cref="BridgeProject.Roads"/>; empty when the project has none).</summary>
+    public List<SBM.Core.Road.RoadModel> RoadModels { get; private set; } = new();
+    /// <summary>Retaining walls of the last regeneration (<see cref="BridgeProject.Walls"/>).</summary>
+    public List<SBM.Core.Wall.RetainingWallModel> WallModels { get; private set; } = new();
+    /// <summary>Grading features of the last regeneration (<see cref="BridgeProject.Gradings"/>).</summary>
+    public List<SBM.Core.Grading.GradingModel> GradingModels { get; private set; } = new();
+    /// <summary>Utility networks of the last regeneration (<see cref="BridgeProject.Utilities"/>).</summary>
+    public List<SBM.Core.Utility.UtilityModel> UtilityModels { get; private set; } = new();
 
     /// <summary>Shaded solids of every bridge (bridges in parallel), merged layer by layer; each part keeps its bridge index (far-bridge LOD).</summary>
     private static void AddSolidsPerBridge(SceneData sc, IReadOnlyList<BridgeModel?> models)
@@ -1123,13 +1199,34 @@ public sealed partial class MainViewModel : ObservableObject
                 // Incremental: unchanged bridges come from the cache; changed ones regenerate in parallel
                 // (framing and steel generators also parallelize internally).
                 var bridges = project.Bridges.ToArray();
-                var models = _regenCache.Regenerate(project);
+                var models = _regenCache.Regenerate(project, true, LodOutput.Viewport);
                 var results = models.Select(m => m?.Framing).ToArray();
                 var steel = models.Select(m => m?.Steel).ToArray();
                 var concrete = models.Select(m => m?.Concrete).OfType<SBM.Core.Concrete.ConcreteModel>().ToList();
                 var subs = models.Select(m => m?.Substructure).OfType<SBM.Core.Substructure.SubstructureModel>().ToList();
                 var merged = MergeDrawings(project, bridges, results);
                 foreach (var sub in subs) SubstructurePlanBuilder.Add(merged, sub);
+                var roads = project.Roads.Count > 0 ? SBM.Core.Road.RoadGenerator.All(project, _terrains.Count > 0 ? GroundElevation : null, models) : new();
+                foreach (var r in roads) r.Clearances.AddRange(SBM.Core.Road.RoadClearanceCheck.Check(r, models, r.Diagnostics));
+                RoadPlanBuilder.Add(merged, roads);
+                var walls = project.Walls.Count > 0 ? SBM.Core.Wall.RetainingWallGenerator.All(project) : new();
+                if (walls.Count > 0) SBM.Core.Wall.MseAbutmentCheck.Run(walls, models);
+                WallPlanBuilder.Add(merged, walls);
+                var gradings = project.Gradings.Count > 0 ? SBM.Core.Grading.GradingGenerator.All(project, _terrains.Count > 0 ? GroundElevation : null) : new();
+                GradingPlanBuilder.Add(merged, gradings);
+                // utility networks on the finished ground (roads, then grading, then the existing ground)
+                var utilities = new List<SBM.Core.Utility.UtilityModel>();
+                if (project.Utilities.Count > 0)
+                {
+                    var fg = new SBM.Core.Grading.FinishedGround(_terrains.Count > 0 ? GroundElevation : null, new (string, IEnumerable<SBM.Core.Solids.Mesh>)[]
+                    {
+                        ("road", roads.SelectMany(r => r.Parts.Select(p => p.Mesh).Concat(r.SideSlopes.Values))),
+                        ("grading", gradings.SelectMany(g => g.Surfaces)),
+                    });
+                    utilities = SBM.Core.Utility.UtilityGenerator.All(project, p => fg.Query(p));
+                    SBM.Core.Utility.UtilityGenerator.Finish(utilities, SBM.Core.Utility.UtilityClashCheck.Obstacles(models, walls, roads), project.Units);
+                }
+                UtilityPlanBuilder.Add(merged, utilities);
                 AddProjectedPlans(merged, models, projectedAll);
                 // A stable origin keeps reference models (built separately) aligned with the bridge.
                 var sc = SceneBuilder.Build(merged, origin);
@@ -1145,6 +1242,14 @@ public sealed partial class MainViewModel : ObservableObject
                     AddSolidsPerBridge(sc, models);
                 }
                 sc.DetailSkipped = SceneBuilder.SkipDetail;
+                if (roads.Count > 0) SceneBuilder.AddRoads(sc, roads);
+                sc.Roads = roads;
+                if (walls.Count > 0) SceneBuilder.AddWalls(sc, walls);
+                sc.Walls = walls;
+                if (gradings.Count > 0) SceneBuilder.AddGradings(sc, gradings);
+                sc.Gradings = gradings;
+                if (utilities.Count > 0) SceneBuilder.AddUtilities(sc, utilities, project.Units);
+                sc.Utilities = utilities;
                 return (results, models, merged, sc);
             });
             if (version != _regenVersion) return; // superseded
@@ -1194,6 +1299,19 @@ public sealed partial class MainViewModel : ObservableObject
                     foreach (var n in sub.Notes) Add("Info", $"{project.Bridges[i].Name}: {n}", true);
                 }
             }
+
+            RoadModels = scene.Roads;
+            foreach (var rm in RoadModels)
+                foreach (var d in rm.Diagnostics) Add(d.Severity.ToString(), d.Message, true);
+            WallModels = scene.Walls;
+            foreach (var wm in WallModels)
+                foreach (var d in wm.Diagnostics) Add(d.Severity.ToString(), d.Message, true);
+            GradingModels = scene.Gradings;
+            foreach (var gm in GradingModels)
+                foreach (var d in gm.Diagnostics) Add(d.Severity.ToString(), d.Message, true);
+            UtilityModels = scene.Utilities;
+            foreach (var um in UtilityModels)
+                foreach (var d in um.Diagnostics) Add(d.Severity.ToString(), d.Message, true);
 
             _lastDrawing = drawing;
             Scene = scene;
@@ -1616,6 +1734,11 @@ public sealed partial class MainViewModel : ObservableObject
                 foreach (var ch in cmod.CapHaunches) MaterialRows.Add(new MaterialRow(b.Name, "Concrete", ch.Name, 1, "", $"{ch.Volume / cy:N2} {vu}"));
                 if (cmod.Barriers.Count > 0)
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Barrier ({b.Deck.Barrier.Type})", cmod.Barriers.Count, "", $"{cmod.BarrierVolume / cy:N1} {vu}"));
+                foreach (var asr in cmod.ApproachSlabs)
+                {
+                    MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"{asr.Name}{(asr.Definition.Owner == SBM.Core.Bridge.ApproachSlabOwner.Road ? " (road)" : "")}", 1, "", $"{asr.Volume / cy:N2} {vu}"));
+                    if (asr.Sleeper != null) MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Sleeper slab, {asr.Support}", 1, "", $"{asr.SleeperVolume / cy:N2} {vu}"));
+                }
                 foreach (var jr in cmod.Joints)
                 {
                     MaterialRows.Add(new MaterialRow(b.Name, "Concrete", $"Joint blockout, {jr.Support}", 1, "", $"{jr.BlockoutVolume / cy:N2} {vu}"));

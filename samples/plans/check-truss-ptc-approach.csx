@@ -169,7 +169,7 @@ foreach (var u in units)
     Cmp("next stringer line 4 @ 8'-3 = 33'-0 (p.48 / p.58)", 33, Math.Max(-lines[1], lines[^2]), 0.0005, " ft", "", 4);
     (double o0, double o1, double z0, double z1) Ext(PartCategory? cat, string mark)
     {
-        var p = tm.Steel.Parts.First(q => q.Mark == mark);
+        var p = tm.Steel.WholeMember(mark)!;
         double o0 = 1e9, o1 = -1e9, z0 = 1e9, z1 = -1e9;
         foreach (var v in p.Mesh.Positions) { var so = alU.Inverse(v.XY); o0 = Math.Min(o0, so.Offset); o1 = Math.Max(o1, so.Offset); }
         double tip = o1;
@@ -217,7 +217,7 @@ foreach (var u in units)
     foreach (var (pt, mk) in new[] { ("L0", "N-L0-L2"), ($"L{J(N)}", $"N-L{J(N - 2)}-L{J(N)}") })
     {
         var sh = tm.Shoes.First(s => s.Name == $"N-{pt}");
-        var ch = tm.Steel.Parts.First(p => p.Mark == mk);
+        var ch = tm.Steel.WholeMember(mk)!;
         double pinS = alU.Inverse(sh.Pin.XY).Station;
         var ss = ch.Mesh.Positions.Select(v => alU.Inverse(v.XY).Station).ToList();
         double past = (Math.Abs(ss.Min() - pinS) < Math.Abs(ss.Max() - pinS) ? pinS - ss.Min() : ss.Max() - pinS) / ft;
@@ -238,7 +238,7 @@ foreach (var u in units)
             if (cr == null) { none++; continue; }
             foreach (var pl in new[] { "N", "S" })
             {
-                var part = tm.Steel.Parts.FirstOrDefault(p => p.Mark == $"{pl}-{md.Name}");
+                var part = tm.Steel.WholeMember($"{pl}-{md.Name}");
                 if (part == null) { none++; continue; }
                 string letter = part.Material.Contains("silicon") ? "S" : part.Material.Contains("carbon") ? "C" : "?";
                 if (letter == cr["material"]) ok++;
@@ -266,7 +266,7 @@ foreach (var u in units)
             Cmp($"gross area {rn} ({md.Section})", pa, a, 0.01 * pa, " sq in", "", 2);
             if (cr["plates"] != "")
             {
-                var part = tm.Steel.Parts.FirstOrDefault(p => p.Mark == $"N-{md.Name}");
+                var part = tm.Steel.WholeMember($"N-{md.Name}");
                 var res = tm.Members.FirstOrDefault(x => x.Mark == $"N-{md.Name}");
                 if (part != null && res != null) Row("INFO", $"mean area {part.Mark} (volume / solid length; cover plates end at the gussets)", cr["area_sqin"] + " sq in", $"{part.Mesh.Volume() / res.CutLength / 0.00064516:F2} sq in");
             }

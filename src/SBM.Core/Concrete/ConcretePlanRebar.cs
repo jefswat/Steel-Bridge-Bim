@@ -427,16 +427,22 @@ public sealed partial class ConcreteGenerator
                 if (fromEnd) (a, b) = (Lt - b, Lt - a);
                 sink.Add(new PlanBar(mark, size, loc, nominal, b - a, SubPolyline2D(P, C, a, b)));
             }
-            if (Lt <= z0.StockLength + 1e-6)
+            double s0 = 0;                                              // OPTIONAL first bar of the line (StartMark / StartLength)
+            if (!string.IsNullOrEmpty(z0.StartMark) && z0.StartLength > z0.Lap && Lt > z0.StartLength + z0.StockLength - z0.Lap)
+            {
+                Emit(0, z0.StartLength, z0.StartMark!, z0.StartLength);
+                s0 = z0.StartLength - z0.Lap;
+            }
+            if (s0 == 0 && Lt <= z0.StockLength + 1e-6)
             {
                 bool stock = Math.Abs(Lt - z0.StockLength) <= In(1);
                 Emit(0, Lt, stock ? z0.Mark : closure, stock ? z0.StockLength : 0);
                 return;
             }
-            int npc = (int)Math.Ceiling((Lt - z0.Lap) / (z0.StockLength - z0.Lap) - 1e-9);
+            int npc = (int)Math.Ceiling((Lt - s0 - z0.Lap) / (z0.StockLength - z0.Lap) - 1e-9);
             for (int q = 0; q < npc; q++)
             {
-                double a = q * (z0.StockLength - z0.Lap);
+                double a = s0 + q * (z0.StockLength - z0.Lap);
                 if (q < npc - 1) { Emit(a, a + z0.StockLength, z0.Mark, z0.StockLength); continue; }
                 if (z0.LastIsStock) Emit(Lt - z0.StockLength, Lt, z0.Mark, z0.StockLength);
                 else Emit(a, Lt, closure, 0);

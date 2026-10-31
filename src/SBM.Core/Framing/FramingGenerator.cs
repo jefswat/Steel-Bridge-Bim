@@ -1176,7 +1176,172 @@ public sealed class FramingGenerator
             f.LeftGlobalDistance = SpanStart(f.Bay, f.Span) + f.LeftGirderDistance;
             f.RightGlobalDistance = SpanStart(f.RightGirder, f.Span) + f.RightGirderDistance;
         }
+        if (!cf.PlatesAtEachTopOfWeb) PlatesOnFramePlane(ordered);
         _result.CrossFrames.AddRange(ordered);
+    }
+
+    /// <summary>
+    /// Connection plates on the frame plane (default since 2026-10-27; legacy <see cref="CrossFrameDefinition.PlatesAtEachTopOfWeb"/> skips this).
+    /// A frame's location is defined at the TOP OF WEB of its reference girder; the frame plane (plan direction left -> right web point, up axis = mean
+    /// of the two connection plates' up axes, as the detailer builds it) passes through that point, and the other end's connection plate is moved
+    /// along its girder to where the plane meets that girder's top of web. Frames sharing a plate through the web (same girder, distance within
+    /// 2 cm, parallel: the stiffener pair rule) form a CHAIN that is solved outward from one reference girder, so the shared plate stays one plate.
+    /// Reference girder of a chain: the <see cref="CrossFrameLine.Girder"/> of a framing-plan line; else the standard's defined end (Left = leftmost,
+    /// Right = rightmost, Taller = the girder with the highest top of web in the chain); else the leftmost girder (= the left girder of the bay).
+    /// Support frames / links stay on their bearing stiffeners (plumb frames: already flat). Plumb intermediate frames need no move.
+    /// </summary>
+    private void PlatesOnFramePlane(List<CrossFrameResult> frames)
+    {
+        var cfd = _def.CrossFrames;
+        if (cfd.IntermediatePlane == CrossFramePlaneOrientation.Plumb) return;
+        var inter = frames.Where(f => !f.AtSupport).ToList();
+        if (inter.Count == 0) return;
+        // chains: union of frames that share a plate (left end of one = right end of another)
+        var parent = Enumerable.Range(0, inter.Count).ToArray();
+        int Root(int i) { while (parent[i] != i) i = parent[i] = parent[parent[i]]; return i; }
+        var ends = new List<(int girder, int span, double s, Vec2 dir, int frame, bool left)>();
+        for (int i = 0; i < inter.Count; i++)
+        {
+            ends.Add((inter[i].Bay, inter[i].Span, inter[i].LeftGlobalDistance, inter[i].Direction, i, true));
+            ends.Add((inter[i].RightGirder, inter[i].Span, inter[i].RightGlobalDistance, inter[i].Direction, i, false));
+        }
+        foreach (var grp in ends.GroupBy(e => (e.girder, e.span)))
+        {
+            var l = grp.OrderBy(e => e.s).ThenBy(e => e.frame).ToList();
+            for (int k = 0; k + 1 < l.Count; k++)
+                if (l[k].left != l[k + 1].left && Math.Abs(l[k + 1].s - l[k].s) < 0.02 && Vec2.Dot(l[k].dir, l[k + 1].dir) > 0.9998)
+                    parent[Root(l[k].frame)] = Root(l[k + 1].frame);
+        }
+        var moves = new List<(string mark, double move)>();
+        var atBearing = new List<string>();
+        var chains = Enumerable.Range(0, inter.Count).GroupBy(Root).OrderBy(g => g.Min()).Select(g => g.Select(i => inter[i]).ToList()).ToList();
+        foreach (var chain in chains)
+        {
+            var girders = chain.SelectMany(f => new[] { f.Bay, f.RightGirder }).Distinct().OrderBy(x => x).ToList();
+            int reference = girders[0];
+            var line = chain.FirstOrDefault(f => f.LineGirder >= 0);
+            if (line != null) reference = girders.OrderBy(x => Math.Abs(x - line.LineGirder)).ThenBy(x => x).First();
+            else
+            {
+                var c0 = chain[0];
+                var std = Steel.StandardCrossFrames.For(cfd, cfd.FindStyle(c0.Style), c0.Style, false, "");
+                if (std != null)
+                    reference = std.DefinedEnd switch
+                    {
+                        StandardDefinedEnd.Left => girders[0],
+                        StandardDefinedEnd.Right => girders[^1],
+                        _ => girders.OrderByDescending(gi =>
+                        {
+                            var f = chain.First(x => x.Bay == gi || x.RightGirder == gi);
+                            return _result.Girders[gi].Path.At(f.Bay == gi ? f.LeftGlobalDistance : f.RightGlobalDistance).point.Z;
+                        }).ThenBy(gi => gi).First(),
+                    };
+            }
+            foreach (var f in chain) f.PlaneDirection = f.Direction;     // the plan line's direction = the plane's horizontal direction
+            // outward from the reference girder: frames to its right are anchored at their left end, frames to its left at their right end
+            foreach (var f in chain.Where(f => f.Bay >= reference).OrderBy(f => f.Bay).Concat(chain.Where(f => f.Bay < reference).OrderByDescending(f => f.Bay)))
+            {
+                bool anchorRight = f.Bay < reference;
+                // a chained anchor end takes the already solved position of the shared plate
+                var prev = chain.FirstOrDefault(o => o != f && o.PlatesOnFramePlane && (anchorRight ? o.Bay == f.RightGirder : o.RightGirder == f.Bay));
+                if (prev != null) SetEnd(f, anchorRight, anchorRight ? prev.LeftGlobalDistance : prev.RightGlobalDistance);
+                f.ReferenceRight = anchorRight;
+                f.PlatesOnFramePlane = true;
+                double s0 = anchorRight ? f.LeftGlobalDistance : f.RightGlobalDistance;
+                // a frame end AT a bearing (plan lines through skewed piers: crossings within 6" snap to the bearing) stays at the bearing
+                double local = anchorRight ? f.LeftGirderDistance : f.RightGirderDistance;
+                int go = anchorRight ? f.Bay : f.RightGirder;
+                if (local < 1e-6 || local > _curves[go][f.Span].Length - 1e-6) { atBearing.Add(f.Mark); continue; }
+                double s1 = SolveOnPlane(f, anchorRight);
+                if (double.IsNaN(s1))
+                {
+                    Warn($"{f.Mark}: the frame plane does not meet G{(anchorRight ? f.Bay : f.RightGirder) + 1} within its span; plate left at the plan line's top-of-web crossing.");
+                    continue;
+                }
+                SetEnd(f, !anchorRight, s1);
+                if (anchorRight) f.LeftShift = s1 - s0; else f.RightShift = s1 - s0;
+                moves.Add((f.Mark, s1 - s0));
+            }
+        }
+        if (moves.Count > 0)
+        {
+            var abs = moves.Select(m => Math.Abs(m.move)).OrderBy(x => x).ToList();
+            var worst = moves.OrderByDescending(m => Math.Abs(m.move)).ThenBy(m => m.mark, StringComparer.Ordinal).First();
+            _diag.Enqueue(new Diagnostic(DiagnosticSeverity.Info,
+                $"Cross frame connection plates on the frame plane (location defined at the reference girder's top of web): {moves.Count} far-end plates placed, " +
+                $"move along the girder max {worst.move / 0.0254:0.000} in at {worst.mark}, median {abs[abs.Count / 2] / 0.0254:0.000} in " +
+                $"(legacy placement = CrossFrameDefinition.PlatesAtEachTopOfWeb)."));
+        }
+        if (atBearing.Count > 0)
+            _diag.Enqueue(new Diagnostic(DiagnosticSeverity.Info,
+                $"Cross frame plates on the frame plane: {atBearing.Count} frame end(s) AT a bearing stay at the bearing (the plate is then off the frame plane by the top of " +
+                $"web difference x grade; the twist report lists it): {string.Join(", ", atBearing.Take(20))}{(atBearing.Count > 20 ? ", ..." : "")}."));
+    }
+
+    /// <summary>Sets one end of a frame to global girder distance s (distance from span start, top-of-steel point, global distance).</summary>
+    private void SetEnd(CrossFrameResult f, bool right, double s)
+    {
+        int g = right ? f.RightGirder : f.Bay;
+        var c = _curves[g][f.Span];
+        double local = s - SpanStart(g, f.Span);
+        var p = Point3(c, c.UAt(local));
+        if (right) { f.RightGlobalDistance = s; f.RightGirderDistance = local; f.Right = p; }
+        else { f.LeftGlobalDistance = s; f.LeftGirderDistance = local; f.Left = p; }
+    }
+
+    /// <summary>Girder distance of the non-anchor end where the frame plane meets that girder's top of web: the plane passes through the anchor's top
+    /// of web, contains the frame line's horizontal plan direction and the mean of the two flange normals (secant iteration; the up axis follows the
+    /// moving end). NaN when it leaves the span.</summary>
+    private double SolveOnPlane(CrossFrameResult f, bool anchorRight)
+    {
+        var gl = _result.Girders[f.Bay].Path;
+        var gr = _result.Girders[f.RightGirder].Path;
+        double sa = anchorRight ? f.RightGlobalDistance : f.LeftGlobalDistance;
+        var pathO = anchorRight ? gl : gr;
+        int go = anchorRight ? f.Bay : f.RightGirder;
+        double lo = SpanStart(go, f.Span), hi = lo + _curves[go][f.Span].Length;
+        var pa = (anchorRight ? gr : gl).At(sa).point;
+        var u2 = f.Direction;
+        var u3 = new Vec3(u2.X, u2.Y, 0);
+        double F(double so)
+        {
+            var po = pathO.At(so).point;
+            var (sl, sr) = anchorRight ? (so, sa) : (sa, so);
+            var wt = (Steel.StandardCrossFrames.FlangeNormal(gl, sl, u3) + Steel.StandardCrossFrames.FlangeNormal(gr, sr, u3)).Normalized();
+            wt = (wt - u3 * Vec3.Dot(wt, u3)).Normalized();
+            var n = Vec3.Cross(wt, u3).Normalized();
+            return Vec3.Dot(po - pa, n);
+        }
+        double x0 = anchorRight ? f.LeftGlobalDistance : f.RightGlobalDistance, f0 = F(x0);
+        if (double.IsNaN(f0)) return double.NaN;
+        if (Math.Abs(f0) < 1e-13) return x0;
+        double x1 = x0 + 0.001, f1 = F(x1);
+        for (int it = 0; it < 60 && !(Math.Abs(f1) < 1e-13); it++)
+        {
+            if (double.IsNaN(f1) || Math.Abs(f1 - f0) < 1e-18) break;
+            double x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+            x0 = x1; f0 = f1; x1 = x2; f1 = F(x1);
+        }
+        if (!double.IsNaN(f1) && Math.Abs(f1) <= 1e-9 && x1 >= lo - 1e-6 && x1 <= hi + 1e-6) return x1;
+        // The up axis follows the girder path's sampled grade (piecewise constant), so F can jump by a few microns between samples: bracket and bisect.
+        double xs = anchorRight ? f.LeftGlobalDistance : f.RightGlobalDistance, fs = F(xs);
+        if (double.IsNaN(fs)) return double.NaN;
+        double a = xs, fa = fs, b = double.NaN, fb = double.NaN;
+        for (double step = 0.002; step <= 2.0 && double.IsNaN(b); step *= 1.5)
+            foreach (double sg in new[] { 1.0, -1.0 })
+            {
+                double xt = xs + sg * step, ft = F(xt);
+                if (!double.IsNaN(ft) && Math.Sign(ft) != Math.Sign(fs)) { b = xt; fb = ft; break; }
+            }
+        if (double.IsNaN(b)) return double.NaN;
+        for (int it = 0; it < 80 && Math.Abs(b - a) > 1e-9; it++)
+        {
+            double xm = (a + b) / 2, fm = F(xm);
+            if (Math.Sign(fm) == Math.Sign(fa)) { a = xm; fa = fm; } else { b = xm; fb = fm; }
+        }
+        double r = Math.Abs(fa) <= Math.Abs(fb) ? a : b;
+        if (Math.Abs(F(r)) > 2e-5 || r < lo - 1e-6 || r > hi + 1e-6) return double.NaN;
+        return r;
     }
 
     /// <summary>Frames between two different support lines (<see cref="CrossFrameDefinition.Links"/>).</summary>
@@ -1312,7 +1477,7 @@ public sealed class FramingGenerator
                 {
                     Span = j, Bay = b, RightGirder = bR, AtSupport = false,
                     Type = StyleType(st, cf.IntermediateType, (pr.XY - pl.XY).Length), Style = cf.FindStyle(st) != null ? st : "",
-                    Left = pl, Right = pr, Station = _align.DistanceToStation(d), LeftGirderDistance = sl, RightGirderDistance = sr,
+                    Left = pl, Right = pr, Station = _align.DistanceToStation(d), LeftGirderDistance = sl, RightGirderDistance = sr, LineGirder = g,
                 });
             }
             if (line.Bays != null)
@@ -1345,7 +1510,8 @@ public sealed class FramingGenerator
                     {
                         Girder = i, Kind = StiffenerKind.Bearing, Location = Point3(c0, u0), GirderTangent = t0,
                         Direction = TowardRight(_auxDir[line.Index - NS], t0),
-                        Side = StiffenerSide.Both, Plate = sd.BearingStiffener, GirderDistance = ab.PathDistance,
+                        Side = StiffenerSide.Both, Plate = sd.BearingStiffener, GirderDistance = ab.PathDistance, Support = line.Index,
+                        Plane = _def.CrossFrames.BearingStiffenerPlane,
                     });
                 }
             for (int j = 0; j < NS; j++)
@@ -1363,7 +1529,8 @@ public sealed class FramingGenerator
                 {
                     Girder = i, Kind = StiffenerKind.Bearing, Location = Point3(c, u), GirderTangent = t,
                     Direction = TowardRight(_supDir[j], t),
-                    Side = StiffenerSide.Both, Plate = plate, GirderDistance = sBrg,
+                    Side = StiffenerSide.Both, Plate = plate, GirderDistance = sBrg, Support = j,
+                    Plane = _def.CrossFrames.BearingStiffenerPlane,
                 });
                 // OPTIONAL jacking stiffeners: plumb pairs of the bearing stiffener plate at given distances along the girder from the CL bearing.
                 if (supDef.JackingStiffenerOffsets is { } jso)
@@ -1378,7 +1545,7 @@ public sealed class FramingGenerator
                         {
                             Girder = i, Kind = StiffenerKind.Bearing, Location = Point3(cj, uj), GirderTangent = tj,
                             Direction = TowardRight(_supDir[j], tj),
-                            Side = StiffenerSide.Both, Plate = plate, GirderDistance = sj,
+                            Side = StiffenerSide.Both, Plate = plate, GirderDistance = sj, Support = j, Jacking = true,
                         });
                     }
             }
@@ -1409,6 +1576,7 @@ public sealed class FramingGenerator
                     Girder = i, Kind = StiffenerKind.ConnectionPlate, Location = Point3(c, u), GirderTangent = t,
                     Direction = TowardRight(dir, t),
                     Side = side, Plate = sd.ConnectionPlate, GirderDistance = GirderDistance(i, span, u),
+                    Plane = _def.CrossFrames.IntermediatePlane,
                 });
             }
 

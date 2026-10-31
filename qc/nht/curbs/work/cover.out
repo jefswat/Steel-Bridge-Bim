@@ -1,0 +1,59 @@
+== NHT Unit 1: 154 C/CS violations
+   CS top face side -1 end: n 1 worst 0.248" at sta 2049.65 R-in 5.43" z-rel-deck -1.41" fromBegin 1.7" fromEnd 951.0"; sta range 2049.65..2049.65
+   CS bottom face side -1 mid: n 32 worst 0.454" at sta 2146.26 R-in 2.25" z-rel-deck 1.78" fromBegin 1148.0" fromEnd 145.6"; sta range 2091.60..2152.92
+   CS side face side -1 mid: n 51 worst 0.675" at sta 2144.93 R-in 2.25" z-rel-deck 1.78" fromBegin 1136.7" fromEnd 163.3"; sta range 2094.98..2154.92
+   CS side face side -1 end: n 1 worst 0.549" at sta 2155.59 R-in 2.25" z-rel-deck 1.78" fromBegin 1218.0" fromEnd 20.3"; sta range 2155.59..2155.59
+   CS bottom face side -1 end: n 1 worst 0.350" at sta 2156.25 R-in 2.25" z-rel-deck 1.78" fromBegin 1222.4" fromEnd 11.3"; sta range 2156.25..2156.25
+   CS top face side 1 end: n 1 worst 0.243" at sta 2049.65 R-in 5.43" z-rel-deck -1.41" fromBegin 1.8" fromEnd 794.3"; sta range 2049.65..2049.65
+   CS bottom face side 1 mid: n 60 worst 0.530" at sta 2139.84 R-in 7.75" z-rel-deck 1.72" fromBegin 963.4" fromEnd 179.4"; sta range 2092.21..2154.30
+   CS bottom face side 1 end: n 2 worst 0.478" at sta 2155.15 R-in 7.75" z-rel-deck 1.72" fromBegin 1060.5" fromEnd 20.2"; sta range 2155.15..2156.00
+   C bottom face side -1 mid: n 2 worst 0.507" at sta 2144.03 R-in 2.75" z-rel-deck 1.25" fromBegin 1128.5" fromEnd 175.2"; sta range 2096.35..2144.03
+   C bottom face side 1 mid: n 3 worst 0.638" at sta 2091.36 R-in 2.75" z-rel-deck 1.25" fromBegin 502.2" fromEnd 558.7"; sta range 2091.36..2143.97
+   mid violation stations: 2091.36 2091.36 2091.60 2092.21 2092.31 2093.91 2094.31 2094.76 2094.98 2095.61 2095.65 2096.31 2096.35 2096.46 2096.98 2097.31 2097.64 2098.98 2099.01 2099.64 2099.86 2100.31 2100.71 2100.97 2101.56 2101.64 2102.31 2102.41 2102.97 2103.64 2104.11 2104.30 2104.97 2104.97 2105.64 2105.82 2106.30 2106.67 2106.97 2107.52 2107.63 2108.97 2109.22 2109.63 2110.07 2110.30 2110.92 2110.96 2111.63 2111.77 2112.30 2113.63 2114.29 2114.32 2114.96 2115.17 2115.63 2116.02 2116.29 2116.87
+   CS min centerline distance from begin end 1.75", from end end 2.24"
+   C ends: min from begin 2.00", from end 2.00"
+== NHT Unit 2: 174 C/CS violations
+   CS top face side -1 end: n 1 worst 0.211" at sta 2157.40 R-in 5.43" z-rel-deck -1.41" fromBegin 1.7" fromEnd 1006.4"; sta range 2157.40..2157.40
+   CS bottom face side -1 end: n 1 worst 0.307" at sta 2158.10 R-in 2.25" z-rel-deck 1.78" fromBegin 11.3" fromEnd 1006.8"; sta range 2158.10..2158.10
+   CS side face side -1 end: n 1 worst 0.508" at sta 2158.77 R-in 2.25" z-rel-deck 1.78" fromBegin 20.2" fromEnd 1004.2"; sta range 2158.77..2158.77
+   CS side face side -1 mid: n 62 worst 0.661" at sta 2188.68 R-in 2.25" z-rel-deck 1.78" fromBegin 405.6" fromEnd 795.1"; sta range 2159.43..2233.20
+   CS bottom face side -1 mid: n 35 worst 0.447" at sta 2187.35 R-in 2.25" z-rel-deck 1.78" fromBegin 389.9" fromEnd 807.9"; sta range 2161.43..2233.87
+   CS top face side 1 end: n 1 worst 0.202" at sta 2157.47 R-in 5.43" z-rel-deck -1.41" fromBegin 1.8" fromEnd 835.8"; sta range 2157.47..2157.47
+   CS bottom face side 1 end: n 2 worst 0.431" at sta 2159.22 R-in 7.75" z-rel-deck 1.72" fromBegin 20.3" fromEnd 832.7"; sta range 2158.37..2159.22
+   CS bottom face side 1 mid: n 69 worst 0.509" at sta 2193.37 R-in 7.75" z-rel-deck 1.72" fromBegin 358.3" fromEnd 634.1"; sta range 2160.07..2234.35
+   C bottom face side -1 mid: n 2 worst 0.590" at sta 2235.01 R-in 2.75" z-rel-deck 1.25" fromBegin 779.8" fromEnd 228.8"; sta range 2193.23..2235.01
+   mid violation stations: 2159.43 2160.07 2160.10 2160.76 2160.93 2161.43 2162.76 2163.42 2163.49 2164.09 2164.34 2164.75 2165.20 2165.41 2166.05 2166.08 2167.76 2168.07 2168.61 2168.74 2169.40 2169.47 2170.07 2170.32 2170.73 2172.73 2172.88 2173.39 2173.73 2174.05 2174.59 2174.72 2175.38 2175.44 2176.05 2177.15 2177.38 2178.00 2178.04 2178.71 2178.86 2179.37 2179.71 2180.04 2180.56 2180.70 2182.03 2182.27 2182.69 2183.13 2183.36 2183.98 2184.02 2184.69 2184.83 2185.35 2185.69 2186.02 2186.68 2187.35
+   CS min centerline distance from begin end 1.75", from end end 2.25"
+   C ends: min from begin 2.00", from end 2.00"
+== NHT Unit 3: 37 C/CS violations
+   CS top face side -1 end: n 1 worst 0.253" at sta 2254.43 R-in 5.43" z-rel-deck -1.41" fromBegin 1.7" fromEnd 1910.3"; sta range 2254.43..2254.43
+   CS bottom face side -1 mid: n 21 worst 0.146" at sta 2285.60 R-in 2.25" z-rel-deck 1.78" fromBegin 379.9" fromEnd 1532.5"; sta range 2276.14..2319.80
+   CS side face side -1 end: n 1 worst 0.897" at sta 2414.23 R-in 2.25" z-rel-deck -6.22" fromBegin 1894.6" fromEnd 1.4"; sta range 2414.23..2414.23
+   CS top face side 1 end: n 1 worst 0.248" at sta 2254.43 R-in 5.43" z-rel-deck -1.41" fromBegin 1.8" fromEnd 1902.3"; sta range 2254.43..2254.43
+   CS bottom face side 1 mid: n 12 worst 0.140" at sta 2290.81 R-in 7.75" z-rel-deck 1.72" fromBegin 432.5" fromEnd 1471.7"; sta range 2276.19..2310.06
+   CS side face side 1 end: n 1 worst 0.930" at sta 2419.46 R-in 7.75" z-rel-deck 1.72" fromBegin 1886.0" fromEnd 1.3"; sta range 2419.46..2419.46
+   mid violation stations: 2276.14 2276.19 2280.51 2280.81 2281.24 2281.58 2284.87 2285.43 2285.60 2286.19 2286.33 2289.97 2290.69 2290.81 2291.42 2295.06 2295.43 2295.79 2296.20 2300.05 2300.15 2300.82 2300.88 2304.52 2305.24 2305.44 2305.97 2309.61 2310.06 2310.34 2314.70 2315.43 2319.80
+   CS min centerline distance from begin end 1.75", from end end 1.32"
+   C ends: min from begin 2.00", from end 2.00"
+== NHT Unit 4: 26 C/CS violations
+   CS side face side -1 end: n 1 worst 0.932" at sta 2618.06 R-in 7.75" z-rel-deck -2.28" fromBegin 1.3" fromEnd 1440.7"; sta range 2618.06..2618.06
+   CS bottom face side -1 mid: n 8 worst 0.133" at sta 2701.78 R-in 7.75" z-rel-deck 1.72" fromBegin 955.0" fromEnd 487.1"; sta range 2692.53..2711.81
+   CS side face side 1 end: n 1 worst 0.897" at sta 2623.29 R-in 2.25" z-rel-deck -6.22" fromBegin 1.4" fromEnd 1440.7"; sta range 2623.29..2623.29
+   CS bottom face side 1 mid: n 14 worst 0.141" at sta 2711.32 R-in 2.25" z-rel-deck 1.78" fromBegin 1063.4" fromEnd 378.8"; sta range 2683.02..2712.04
+   C bottom face side -1 mid: n 2 worst 0.587" at sta 2715.68 R-in 2.75" z-rel-deck 1.25" fromBegin 1117.1" fromEnd 325.0"; sta range 2715.68..2715.71
+   mid violation stations: 2683.02 2687.38 2688.10 2692.45 2692.53 2693.18 2696.81 2697.16 2697.53 2701.78 2701.89 2702.55 2702.61 2706.24 2706.41 2706.96 2707.18 2707.69 2711.04 2711.32 2711.81 2712.04 2715.68 2715.71
+   CS min centerline distance from begin end 1.32", from end end 2.25"
+   C ends: min from begin 2.00", from end 2.00"
+== NHT Unit 5: 74 C/CS violations
+   CS top face side -1 end: n 1 worst 0.250" at sta 2743.12 R-in 5.43" z-rel-deck -1.46" fromBegin 1.8" fromEnd 2011.7"; sta range 2743.12..2743.12
+   CS bottom face side -1 mid: n 36 worst 0.180" at sta 2841.13 R-in 2.25" z-rel-deck 1.78" fromBegin 1181.3" fromEnd 837.3"; sta range 2835.35..2908.12
+   CS bottom face side -1 end: n 1 worst 0.146" at sta 2908.90 R-in 7.75" z-rel-deck 1.72" fromBegin 1990.4" fromEnd 20.3"; sta range 2908.90..2908.90
+   CS top face side 1 end: n 1 worst 0.250" at sta 2743.12 R-in 5.43" z-rel-deck -1.46" fromBegin 1.8" fromEnd 1995.4"; sta range 2743.12..2743.12
+   CS bottom face side 1 mid: n 30 worst 0.166" at sta 2841.33 R-in 7.75" z-rel-deck 1.72" fromBegin 1177.0" fromEnd 825.3"; sta range 2835.90..2908.33
+   CS bottom face side 1 end: n 1 worst 0.147" at sta 2909.05 R-in 2.25" z-rel-deck 1.78" fromBegin 1974.1" fromEnd 20.2"; sta range 2909.05..2909.05
+   C bottom face side -1 mid: n 2 worst 0.574" at sta 2832.79 R-in 7.25" z-rel-deck 1.25" fromBegin 1077.8" fromEnd 940.1"; sta range 2832.29..2832.79
+   C bottom face side 1 mid: n 2 worst 0.511" at sta 2835.79 R-in 7.25" z-rel-deck 1.25" fromBegin 1112.9" fromEnd 889.2"; sta range 2835.79..2836.79
+   mid violation stations: 2832.29 2832.79 2835.35 2835.79 2835.90 2836.07 2836.68 2836.79 2836.79 2837.45 2837.52 2840.41 2840.56 2841.13 2841.33 2841.86 2842.11 2844.75 2845.21 2845.47 2845.99 2846.19 2846.76 2846.92 2849.81 2849.87 2850.53 2850.64 2851.26 2851.42 2851.98 2854.87 2855.30 2855.60 2856.08 2856.32 2859.93 2859.96 2860.66 2860.73 2861.38 2864.27 2864.61 2865.00 2865.39 2865.72 2869.34 2870.04 2870.06 2870.78 2893.20 2893.32 2893.92 2894.10 2894.64 2898.00 2898.24 2898.78 2898.96 2899.68
+   CS min centerline distance from begin end 1.75", from end end 2.24"
+   C ends: min from begin 2.00", from end 2.00"
+12 approach railing runs, 0 base jumps

@@ -1,0 +1,102 @@
+== KNUCKLE-WEST-EW: PL 1" x 254" end web, 4 PT openings 14" x 3", outside face 1/2" inside the end flange edge (p.126)
+   no EW vertex near Curb LT
+   no EW vertex near Curb RT
+== KNUCKLE-EAST-EW: PL 1" x 254" end web, 4 PT openings 14" x 3", outside face 1/2" inside the end flange edge (p.126)
+   no EW vertex near Curb LT
+   no EW vertex near Curb RT
+slab-end top vertices at Curb LT inner line: stations 26+16.53, 26+16.63, 26+16.90 .. 26+16.53, 26+16.63, 26+16.90
+slab-end top vertices at Curb RT inner line: stations 24+20.69, 24+20.97, 24+21.07 .. 24+20.69, 24+20.97, 24+21.07
+S1 within 1" of FB32-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.009 in at 26+08.41 off -7.187 z-grade -5.48, 19 pts; part top-grade -3.01 in
+S1 within 1" of FB32-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.044 in at 26+08.41 off -7.542 z-grade -6.68, 10 pts; part top-grade -3.72 in
+S1 within 1" of FB3-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.044 in at 24+35.16 off 7.646 z-grade -5.42, 10 pts; part top-grade -2.68 in
+S1 within 1" of FB29-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.059 in at 25+90.46 off -7.542 z-grade -6.69, 11 pts; part top-grade -3.65 in
+S1 within 1" of FB2-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.063 in at 24+29.18 off 7.615 z-grade -6.31, 9 pts; part top-grade -2.64 in
+S1 within 1" of FB30-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.119 in at 25+96.44 off -7.569 z-grade -6.64, 10 pts; part top-grade -3.66 in
+S1 within 1" of FB1-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.128 in at 24+23.19 off 7.594 z-grade -6.51, 8 pts; part top-grade -2.60 in
+S1 within 1" of FB28-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.131 in at 25+84.48 off -7.646 z-grade -5.42, 10 pts; part top-grade -3.64 in
+S1 within 1" of FB31-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.140 in at 26+02.43 off -7.646 z-grade -5.42, 14 pts; part top-grade -2.96 in
+S1 within 1" of FB31-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.140 in at 26+02.43 off -7.646 z-grade -5.42, 9 pts; part top-grade -3.69 in
+S1 within 1" of FB33-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.199 in at 26+14.39 off -7.188 z-grade -5.48, 28 pts; part top-grade -3.08 in
+S1 within 1" of FB33-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.241 in at 26+14.39 off -7.542 z-grade -6.68, 8 pts; part top-grade -3.76 in
+S1 within 1" of FB4-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.244 in at 24+41.14 off 7.646 z-grade -5.42, 10 pts; part top-grade -2.70 in
+S1 within 1" of FB1-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.280 in at 24+23.19 off 7.646 z-grade -5.42, 30 pts; part top-grade -3.11 in
+S1 within 1" of FB27-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.332 in at 25+78.50 off -7.646 z-grade -5.42, 8 pts; part top-grade -3.63 in
+S1 within 1" of FB30-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.345 in at 25+96.45 off -7.646 z-grade -5.42, 14 pts; part top-grade -2.91 in
+S1 within 1" of FB5-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.444 in at 24+47.12 off 7.646 z-grade -5.42, 10 pts; part top-grade -2.72 in
+S1 within 1" of FB2-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.472 in at 24+29.18 off 7.646 z-grade -5.42, 28 pts; part top-grade -3.17 in
+S1 within 1" of FORM-DECK (FormDeck, 3" x 8" 12 ga galvanized steel deck form (Gr 33, G165), L.B. Foster 3" bridge decking): min 0.502 in at 25+51.46 off 7.542 z-grade -6.68, 340 pts; part top-grade 9.88 in
+S1 within 1" of FB26-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.527 in at 25+72.52 off -7.646 z-grade -5.42, 7 pts; part top-grade -3.64 in
+S1 within 1" of FB29-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.552 in at 25+90.47 off -7.646 z-grade -5.42, 15 pts; part top-grade -2.87 in
+S1 within 1" of FB6-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.643 in at 24+53.10 off 7.646 z-grade -5.42, 9 pts; part top-grade -2.72 in
+S1 within 1" of FB3-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.669 in at 24+35.16 off 7.646 z-grade -5.42, 28 pts; part top-grade -3.23 in
+S1 within 1" of FB25-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.715 in at 25+66.54 off -7.646 z-grade -5.42, 7 pts; part top-grade -3.65 in
+S1 within 1" of FB28-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.756 in at 25+84.48 off -7.646 z-grade -5.42, 15 pts; part top-grade -2.83 in
+S1 within 1" of FB4-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.785 in at 24+40.91 off -7.646 z-grade -5.42, 28 pts; part top-grade -3.27 in
+S1 within 1" of FB7-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.839 in at 24+59.08 off 7.646 z-grade -5.42, 7 pts; part top-grade -2.72 in
+S1 within 1" of FB5-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.853 in at 24+46.89 off -7.646 z-grade -5.42, 14 pts; part top-grade -3.32 in
+S1 within 1" of FB24-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.893 in at 25+60.55 off -7.646 z-grade -5.42, 7 pts; part top-grade -3.68 in
+S1 within 1" of FB6-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.922 in at 24+52.88 off -7.646 z-grade -5.42, 14 pts; part top-grade -3.35 in
+S1 within 1" of FB27-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.955 in at 25+78.50 off -7.265 z-grade -6.68, 14 pts; part top-grade -2.81 in
+S1 within 1" of FB7-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.991 in at 24+58.85 off -7.265 z-grade -6.68, 7 pts; part top-grade -3.38 in
+D4 within 1" of FB11-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.001 in at 24+82.90 off -7.599 z-grade -6.12, 4 pts; part top-grade -3.40 in
+D4 within 1" of FB12-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.002 in at 24+88.89 off -7.599 z-grade -6.12, 6 pts; part top-grade -3.39 in
+D4 within 1" of FB13-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.010 in at 24+94.88 off -7.599 z-grade -6.12, 4 pts; part top-grade -3.36 in
+D4 within 1" of FB9-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.014 in at 24+70.91 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.41 in
+D4 within 1" of FB10-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.018 in at 24+76.90 off -7.599 z-grade -6.12, 4 pts; part top-grade -3.41 in
+D4 within 1" of FB15-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.018 in at 25+06.86 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.29 in
+D4 within 1" of FB23-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.019 in at 25+54.80 off -7.599 z-grade -6.12, 4 pts; part top-grade -2.83 in
+D4 within 1" of FB23-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.019 in at 25+54.80 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.71 in
+D4 within 1" of FB14-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.024 in at 25+00.87 off -7.234 z-grade -6.16, 6 pts; part top-grade -3.33 in
+D4 within 1" of FB25-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.030 in at 25+66.78 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.65 in
+D4 within 1" of FB19-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.048 in at 25+30.83 off -7.599 z-grade -6.12, 4 pts; part top-grade -2.96 in
+D4 within 1" of FB8-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.058 in at 24+64.92 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.39 in
+D4 within 1" of FB18-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.065 in at 25+24.84 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.02 in
+D4 within 1" of FB16-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.082 in at 25+12.86 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.20 in
+D4 within 1" of FB7-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.109 in at 24+58.93 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.38 in
+D4 within 1" of FB9-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.111 in at 24+70.79 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.67 in
+D4 within 1" of FB6-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.165 in at 24+52.94 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.35 in
+D4 within 1" of FB10-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.179 in at 24+76.79 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.64 in
+D4 within 1" of FB8-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.183 in at 24+64.80 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.70 in
+D4 within 1" of FB22-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.195 in at 25+48.81 off -7.234 z-grade -6.16, 4 pts; part top-grade -2.85 in
+D4 within 1" of FB7-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.219 in at 24+58.81 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.72 in
+D4 within 1" of FB5-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.224 in at 24+46.94 off -7.234 z-grade -6.16, 2 pts; part top-grade -3.32 in
+D4 within 1" of FB17-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.228 in at 25+18.85 off -7.234 z-grade -6.16, 4 pts; part top-grade -3.09 in
+D4 within 1" of FB22-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.249 in at 25+48.81 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.75 in
+D4 within 1" of FB20-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.263 in at 25+36.82 off -7.599 z-grade -6.12, 6 pts; part top-grade -2.91 in
+D4 within 1" of FB26-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.274 in at 25+72.78 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.64 in
+D4 within 1" of FB12-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.278 in at 24+88.77 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.52 in
+D4 within 1" of FB4-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.284 in at 24+40.95 off -7.599 z-grade -6.12, 2 pts; part top-grade -3.27 in
+D4 within 1" of FB24-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.301 in at 25+60.79 off -7.599 z-grade -6.12, 4 pts; part top-grade -2.81 in
+D4 within 1" of FB24-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.301 in at 25+60.79 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.68 in
+D4 within 1" of FB3-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.338 in at 24+34.96 off -7.599 z-grade -6.12, 2 pts; part top-grade -3.23 in
+D4 within 1" of FB2-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.389 in at 24+28.97 off -7.599 z-grade -6.12, 2 pts; part top-grade -3.17 in
+D4 within 1" of FB6-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.404 in at 24+52.82 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.72 in
+D4 within 1" of FB21-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.416 in at 25+42.69 off 7.234 z-grade -6.16, 4 pts; part top-grade -2.88 in
+D4 within 1" of FB25-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.421 in at 25+66.66 off 7.234 z-grade -6.16, 4 pts; part top-grade -2.80 in
+D4 within 1" of FB1-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.434 in at 24+22.97 off -7.599 z-grade -6.12, 2 pts; part top-grade -3.11 in
+D4 within 1" of FB26-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.452 in at 25+72.65 off 7.234 z-grade -6.16, 6 pts; part top-grade -2.80 in
+D4 within 1" of FB11-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.457 in at 24+82.78 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.59 in
+D4 within 1" of FB27-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.490 in at 25+78.64 off 7.234 z-grade -6.16, 2 pts; part top-grade -2.81 in
+D4 within 1" of FB13-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.521 in at 24+94.76 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.45 in
+D4 within 1" of FB28-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.534 in at 25+84.63 off 7.234 z-grade -6.16, 2 pts; part top-grade -2.83 in
+D4 within 1" of FB29-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.582 in at 25+90.62 off 7.234 z-grade -6.16, 2 pts; part top-grade -2.87 in
+D4 within 1" of FB27-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.585 in at 25+78.77 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.63 in
+D4 within 1" of FB30-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.631 in at 25+96.61 off 7.234 z-grade -6.16, 2 pts; part top-grade -2.91 in
+D4 within 1" of FB31-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.674 in at 26+02.60 off 7.599 z-grade -6.12, 2 pts; part top-grade -2.96 in
+D4 within 1" of FB32-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.714 in at 26+08.59 off 7.599 z-grade -6.12, 2 pts; part top-grade -3.01 in
+D4 within 1" of FB5-WPA (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.718 in at 24+46.83 off 7.599 z-grade -6.12, 1 pts; part top-grade -2.72 in
+D4 within 1" of FB33-W (FloorbeamPlate, PL 1" floorbeam web 8 7/8" - 9 7/8" deep, 4 PT slots 2 1/4" x 5 1/2"): min 0.749 in at 26+14.59 off 7.599 z-grade -6.12, 2 pts; part top-grade -3.08 in
+D4 within 1" of FB28-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.902 in at 25+84.76 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.64 in
+D4 within 1" of FB21-WPB (ArchConnectionPlate, 2 - PL 5/8" x 7" x 12 1/2" web connection plates (p.146)): min 0.968 in at 25+42.82 off -7.599 z-grade -6.12, 1 pts; part top-grade -3.81 in
+rail High LT base 24+14.68 off -7.000: z - (grade at curb line + 4") = -0.04 in
+rail High LT base 24+15.66 off -7.000: z - (grade at curb line + 4") = -0.03 in
+rail High LT base 24+16.63 off -7.000: z - (grade at curb line + 4") = -0.03 in
+rail High LT base 26+15.87 off -7.000: z - (grade at curb line + 4") = -0.03 in
+rail High LT base 26+16.88 off -7.000: z - (grade at curb line + 4") = -0.03 in
+rail High LT base 26+17.90 off -7.000: z - (grade at curb line + 4") = 0.04 in
+rail High RT base 24+19.62 off 7.000: z - (grade at curb line + 4") = -0.10 in
+rail High RT base 24+20.64 off 7.000: z - (grade at curb line + 4") = 0.03 in
+rail High RT base 24+21.65 off 7.000: z - (grade at curb line + 4") = 0.03 in
+rail High RT base 26+20.89 off 7.000: z - (grade at curb line + 4") = 0.03 in
+rail High RT base 26+21.86 off 7.000: z - (grade at curb line + 4") = 0.03 in
+rail High RT base 26+22.84 off 7.000: z - (grade at curb line + 4") = -1.55 in

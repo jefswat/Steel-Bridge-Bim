@@ -1,0 +1,36 @@
+Curb LT west end, off -7.000 ft, end sta 24+14.85, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT west end, off -7.000 ft, end sta 24+14.85, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT west end, off -7.417 ft, end sta 24+14.71, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT west end, off -7.417 ft, end sta 24+14.71, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT west end, off -7.833 ft, end sta 24+14.57, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT west end, off -7.833 ft, end sta 24+14.57, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT west: end web top - finished grade at mid-curb = -0.94 in
+Curb LT east end, off -7.000 ft, end sta 26+17.75, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT east end, off -7.000 ft, end sta 26+17.75, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT east end, off -7.417 ft, end sta 26+17.60, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT east end, off -7.417 ft, end sta 26+17.60, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT east end, off -7.833 ft, end sta 26+17.45, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT east end, off -7.833 ft, end sta 26+17.45, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb LT east: end web top - finished grade at mid-curb = -1.20 in
+Curb LT S1 west-most point 24+14.99 off -7.421: CL to end web along the alignment Infinity in (clear Infinity in)
+Curb LT S1 east-most point 26+15.76 off -7.381: CL to end web along the alignment Infinity in (clear Infinity in)
+Curb LT D4 west-most point 24+14.99 off -7.234: CL to end web along the alignment 2.71 in (clear 2.39 in)
+Curb LT D4 east-most point 26+15.72 off -7.234: CL to end web along the alignment 22.88 in (clear 22.57 in)
+Curb RT west end, off 7.000 ft, end sta 24+19.81, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT west end, off 7.000 ft, end sta 24+19.81, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT west end, off 7.417 ft, end sta 24+19.96, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT west end, off 7.417 ft, end sta 24+19.96, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT west end, off 7.833 ft, end sta 24+20.11, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT west end, off 7.833 ft, end sta 24+20.11, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT west: end web top - finished grade at mid-curb = -0.06 in
+Curb RT east end, off 7.000 ft, end sta 26+22.70, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT east end, off 7.000 ft, end sta 26+22.70, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT east end, off 7.417 ft, end sta 26+22.84, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT east end, off 7.417 ft, end sta 26+22.84, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT east end, off 7.833 ft, end sta 26+22.98, 0.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT east end, off 7.833 ft, end sta 26+22.98, 3.5" above grade: gap curb end -> end web along the alignment no hit
+Curb RT east: end web top - finished grade at mid-curb = -0.06 in
+Curb RT S1 west-most point 24+21.86 off 7.642: CL to end web along the alignment 21.58 in (clear 21.33 in)
+Curb RT S1 east-most point 26+22.62 off 7.453: CL to end web along the alignment 2.93 in (clear 2.68 in)
+Curb RT D4 west-most point 24+21.86 off 7.599: CL to end web along the alignment 21.78 in (clear 21.47 in)
+Curb RT D4 east-most point 26+22.57 off 7.599: CL to end web along the alignment 3.94 in (clear 3.63 in)

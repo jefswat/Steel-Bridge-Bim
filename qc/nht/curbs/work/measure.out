@@ -1,0 +1,227 @@
+==== NHT Unit 1: alignment CL NHT (TRAILCLNEW); deck edges L -7.8333 ft R 7.8333 ft, t 8.500 in; barrier type Custom IsCurb True L True R True perp False reinf False
+   profile: R 10.000 H 0.000 rad 0.000 ch 0.000 tag '' | R 10.000 H 4.100 rad 0.000 ch 0.750 tag '' | R 0.000 H 4.000 rad 0.000 ch 0.750 tag '' | R 0.000 H 0.000 rad 0.000 ch 0.000 tag ''
+   supports: Abutment 1 sta 2049.300 skew 0.000 deckEndOff -2.500", Pier 2 sta 2097.180 skew 0.000 deckEndOff 0.000", Pier 3 sta 2127.180 skew 0.000 deckEndOff 0.000", Pier 4 sta 2157.180 skew 0.000 deckEndOff -1.250"
+   Left curb: vol 0.8954 m3 = 1.171 CY; tris 272; sta 2049.508..2157.088 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/-0)x23 (10,3.35/3.25)x23 (9.25,4.09/4)x23 (0.75,4.01/4)x23 (-0,3.25/3.25)x23 (-0,-0/-0)x23
+      toe sta 2049.5083..2157.0867; outer face sta 2049.5083..2157.0879
+      FromBegin toe 0.000" outer 0.000"; FromEnd toe -0.000" outer -0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   Right curb: vol 0.7719 m3 = 1.010 CY; tris 272; sta 2049.508..2157.062 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/0)x23 (10,3.35/3.25)x23 (9.25,4.09/4)x23 (0.75,4.01/4)x23 (-0,3.25/3.25)x23 (-0,0/0)x23
+      toe sta 2049.5083..2157.0621; outer face sta 2049.5083..2157.0602
+      FromBegin toe -0.000" outer -0.000"; FromEnd toe 0.000" outer -0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   deck begin line pt sta 2049.508, end 2157.076; joints: Abutment 1 begin=True blockoutW 0.000 body True hw 87; Pier 4 begin=False blockoutW 0.000 body True hw 89
+   bars C: 8 placements; mark count 8 len 58.59 ft mass 291.0 lb
+   bars CS: 289 placements; mark count 289 len 3.00 ft mass 579.1 lb
+   bars D: 12 placements; mark count 12 len 58.59 ft mass 436.6 lb
+   bars T: 44 placements; mark count 44 len 58.59 ft mass 1600.7 lb
+   cover violations C/CS/D/T: 154; all marks: 154 CS:149 max 0.675" top face, C:5 max 0.638" bottom face
+      C mid pt: R in 2.750" z below curb top (deck@pt+4") 2.750" clear 2.500" db 0.500
+      C mid pt: R in 2.749" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 7.250" z below curb top (deck@pt+4") 2.752" clear 2.502" db 0.500
+      C mid pt: R in 7.250" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.251" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.250" z below curb top (deck@pt+4") 2.748" clear 2.498" db 0.500
+      C mid pt: R in 2.750" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 2.749" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      CS mid pt: R in 7.383" z below curb top (deck@pt+4") 9.907" clear 9.657" db 0.500
+      CS mid pt: R in 7.383" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS mid pt: R in 7.385" z below curb top (deck@pt+4") 9.907" clear 9.657" db 0.500
+      CS mid pt: R in 7.385" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS sample: R in 2.251..7.749", z rel deck@pt -6.266..1.747" (db 0.500); spacing first two 8.980"
+   rail Low LT: off -7.000 ft sta 2049.508..2157.087 L 115.171 ft; base above deck@ref line min 3.889 max 3.950 in
+   rail Low RT: off 7.000 ft sta 2049.508..2157.062 L 99.964 ft; base above deck@ref line min 3.912 max 4.013 in
+   DIAG Info: Left curb: Curb 10" x 4" (p.89, p.113), 115'-2 1/16" along the toe (gutter) line, deck end to deck end along it 115'-2 1/16", section 0.277 SF, 0 zone(s), concrete 1.17 CY.
+   DIAG Info: Right curb: Curb 10" x 4" (p.89, p.113), 99'-11 9/16" along the toe (gutter) line, deck end to deck end along it 99'-11 9/16", section 0.277 SF, 0 zone(s), concrete 1.01 CY.
+   DIAG Warning: Expansion joint at Abutment 1: UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) modification and joint seal manufacturer - the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2" to 2 1/2"); standard version post-dates the plans (09/2020): the 2024 revision in hand is used. SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" studs at 6" max between the curb toes, 2 1/2" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.
+   DIAG Warning: Expansion joint at Abutment 1: UNRESOLVED (p.91): BS-EJCP cover plate version - standard version post-dates the plans (09/2020): the 2024 revision in hand is used; the clear distance to the curb is a maximum (1" at a rail, 2" at a sidewalk). 1/4" x 1'-4 plate from 1" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1" x 1" corner clips and edge bevels not modeled.
+   DIAG Warning: Expansion joint at Pier 4: UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) modification and joint seal manufacturer - the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2" to 2 1/2"); standard version post-dates the plans (09/2020): the 2024 revision in hand is used. SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" studs at 6" max between the curb toes, 2 1/2" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.
+   DIAG Warning: Expansion joint at Pier 4: UNRESOLVED (p.91): BS-EJCP cover plate version - standard version post-dates the plans (09/2020): the 2024 revision in hand is used; the clear distance to the curb is a maximum (1" at a rail, 2" at a sidewalk). 1/4" x 1'-4 plate from 1" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1" x 1" corner clips and edge bevels not modeled.
+   DIAG Warning: Deck: 149 bar(s) of mark CS (NHT Unit 1 curb stirrups CS (6" x 8 1/2", 9" max)) violate the plan clear cover (tolerance 1/8"), worst 0.688" at the side face - kept as the plan places them.
+   DIAG Warning: Deck: 5 bar(s) of mark C (NHT Unit 1 curb top bars C) violate the plan clear cover (tolerance 1/8"), worst 0.625" at the bottom face - kept as the plan places them.
+==== NHT Unit 2: alignment CL NHT (TRAILCLNEW); deck edges L -7.8333 ft R 7.8333 ft, t 8.500 in; barrier type Custom IsCurb True L True R True perp False reinf False
+   profile: R 10.000 H 0.000 rad 0.000 ch 0.000 tag '' | R 10.000 H 4.100 rad 0.000 ch 0.750 tag '' | R 0.000 H 4.000 rad 0.000 ch 0.750 tag '' | R 0.000 H 0.000 rad 0.000 ch 0.000 tag ''
+   supports: Pier 4 sta 2157.180 skew 0.000 deckEndOff -1.250", Pier 5 sta 2187.180 skew 0.000 deckEndOff 0.000", Pier 6 sta 2217.180 skew 0.000 deckEndOff 0.000", Pier 7 sta 2254.180 skew 0.000 deckEndOff -1.250"
+   Left curb: vol 0.8237 m3 = 1.077 CY; tris 248; sta 2157.272..2254.076 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/0)x21 (10,3.35/3.25)x21 (9.25,4.09/4)x21 (0.75,4.01/4)x21 (-0,3.25/3.25)x21 (-0,0/0)x21
+      toe sta 2157.2733..2254.0758; outer face sta 2157.2721..2254.0758
+      FromBegin toe 0.000" outer 0.000"; FromEnd toe -0.000" outer 0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   Right curb: vol 0.6762 m3 = 0.884 CY; tris 248; sta 2157.298..2254.076 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/0)x21 (10,3.35/3.25)x21 (9.25,4.09/4)x21 (0.75,4.01/4)x21 (0,3.25/3.25)x21 (0,-0/-0)x21
+      toe sta 2157.2979..2254.0758; outer face sta 2157.2998..2254.0758
+      FromBegin toe -0.000" outer 0.000"; FromEnd toe 0.000" outer -0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   deck begin line pt sta 2157.284, end 2254.076; joints: Pier 4 begin=True blockoutW 0.000 body False hw 0; Pier 7 begin=False blockoutW 0.000 body True hw 87
+   bars C: 8 placements; mark count 8 len 54.00 ft mass 262.2 lb
+   bars CS: 260 placements; mark count 260 len 3.00 ft mass 521.0 lb
+   bars D: 12 placements; mark count 12 len 54.00 ft mass 393.3 lb
+   bars T: 44 placements; mark count 44 len 54.00 ft mass 1442.2 lb
+   cover violations C/CS/D/T: 174; all marks: 174 CS:172 max 0.661" top face, C:2 max 0.590" bottom face
+      C mid pt: R in 2.749" z below curb top (deck@pt+4") 2.748" clear 2.498" db 0.500
+      C mid pt: R in 2.751" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 7.251" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.250" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.251" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.251" z below curb top (deck@pt+4") 2.750" clear 2.500" db 0.500
+      C mid pt: R in 2.751" z below curb top (deck@pt+4") 2.750" clear 2.500" db 0.500
+      C mid pt: R in 2.751" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      CS mid pt: R in 7.385" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS mid pt: R in 7.383" z below curb top (deck@pt+4") 9.906" clear 9.656" db 0.500
+      CS mid pt: R in 7.384" z below curb top (deck@pt+4") 9.907" clear 9.657" db 0.500
+      CS mid pt: R in 7.384" z below curb top (deck@pt+4") 9.908" clear 9.658" db 0.500
+      CS sample: R in 2.250..7.752", z rel deck@pt -6.264..1.749" (db 0.500); spacing first two 8.966"
+   rail Low LT: off -7.000 ft sta 2157.273..2254.076 L 105.873 ft; base above deck@ref line min 3.929 max 3.969 in
+   rail Low RT: off 7.000 ft sta 2157.298..2254.076 L 87.710 ft; base above deck@ref line min 3.931 max 3.990 in
+   DIAG Info: Left curb: Curb 10" x 4" (p.89, p.113), 105'-10 1/2" along the toe (gutter) line, deck end to deck end along it 105'-10 1/2", section 0.277 SF, 0 zone(s), concrete 1.08 CY.
+   DIAG Info: Right curb: Curb 10" x 4" (p.89, p.113), 87'-8 1/2" along the toe (gutter) line, deck end to deck end along it 87'-8 1/2", section 0.277 SF, 0 zone(s), concrete 0.88 CY.
+   DIAG Warning: Expansion joint at Pier 7: UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) modification and joint seal manufacturer - the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2" to 2 1/2"); standard version post-dates the plans (09/2020): the 2024 revision in hand is used. SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" studs at 6" max between the curb toes, 2 1/2" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.
+   DIAG Warning: Expansion joint at Pier 7: UNRESOLVED (p.91): BS-EJCP cover plate version - standard version post-dates the plans (09/2020): the 2024 revision in hand is used; the clear distance to the curb is a maximum (1" at a rail, 2" at a sidewalk). 1/4" x 1'-4 plate from 1" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1" x 1" corner clips and edge bevels not modeled.
+   DIAG Warning: Deck: 172 bar(s) of mark CS (NHT Unit 2 curb stirrups CS (6" x 8 1/2", 9" max)) violate the plan clear cover (tolerance 1/8"), worst 0.688" at the side face - kept as the plan places them.
+   DIAG Warning: Deck: 2 bar(s) of mark C (NHT Unit 2 curb top bars C) violate the plan clear cover (tolerance 1/8"), worst 0.563" at the bottom face - kept as the plan places them.
+==== NHT Unit 3: alignment CL NHT (TRAILCLNEW); deck edges L -7.8333 ft R 7.8333 ft, t 8.500 in; barrier type Custom IsCurb True L True R True perp False reinf False
+   profile: R 10.000 H 0.000 rad 0.000 ch 0.000 tag '' | R 10.000 H 4.100 rad 0.000 ch 0.750 tag '' | R 0.000 H 4.000 rad 0.000 ch 0.750 tag '' | R 0.000 H 0.000 rad 0.000 ch 0.000 tag ''
+   supports: Pier 7 sta 2254.180 skew 0.000 deckEndOff -1.250", Pier 8 sta 2313.740 skew 0.000 deckEndOff 0.000", Pier 9 sta 2338.740 skew 0.000 deckEndOff 0.000", Pier 10 sta 2417.920 skew 19.578 deckEndOff -10.500"
+   Left curb: vol 1.2637 m3 = 1.653 CY; tris 404; sta 2254.284..2414.568 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/-0)x34 (10,3.35/3.25)x34 (9.25,4.09/4)x34 (0.75,4.01/4)x34 (0,3.25/3.25)x34 (0,0/-0)x34
+      toe sta 2254.2842..2414.5679; outer face sta 2254.2842..2414.2855
+      FromBegin toe 0.000" outer -0.000"; FromEnd toe -0.000" outer 0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   Right curb: vol 1.2600 m3 = 1.648 CY; tris 416; sta 2254.284..2419.817 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/-0)x35 (10,3.35/3.25)x35 (9.25,4.09/4)x35 (0.75,4.01/4)x35 (0,3.25/3.25)x35 (0,0/-0)x35
+      toe sta 2254.2842..2419.5110; outer face sta 2254.2842..2419.8175
+      FromBegin toe 0.000" outer 0.000"; FromEnd toe 0.000" outer 0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   deck begin line pt sta 2254.284, end 2417.095; joints: Pier 7 begin=True blockoutW 0.000 body False hw 0; Pier 10 begin=False blockoutW 0.000 body True hw 93
+   bars C: 12 placements; mark count 12 len 55.28 ft mass 442.4 lb
+   bars CS: 436 placements; mark count 436 len 3.00 ft mass 873.8 lb
+   bars D: 18 placements; mark count 18 len 55.28 ft mass 663.7 lb
+   bars T: 66 placements; mark count 66 len 55.28 ft mass 2433.4 lb
+   cover violations C/CS/D/T: 37; all marks: 37 CS:37 max 0.930" top face
+      C mid pt: R in 2.750" z below curb top (deck@pt+4") 2.752" clear 2.502" db 0.500
+      C mid pt: R in 2.748" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 2.751" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.251" z below curb top (deck@pt+4") 2.752" clear 2.502" db 0.500
+      C mid pt: R in 7.248" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.250" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 7.251" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      CS mid pt: R in 7.386" z below curb top (deck@pt+4") 9.906" clear 9.656" db 0.500
+      CS mid pt: R in 7.386" z below curb top (deck@pt+4") 9.908" clear 9.658" db 0.500
+      CS mid pt: R in 7.385" z below curb top (deck@pt+4") 9.907" clear 9.657" db 0.500
+      CS mid pt: R in 7.385" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS sample: R in 2.250..7.752", z rel deck@pt -6.264..1.749" (db 0.500); spacing first two 8.990"
+   rail Low LT: off -7.000 ft sta 2254.284..2338.740 L 86.259 ft; base above deck@ref line min 3.928 max 3.950 in
+   rail High LT: off -7.000 ft sta 2338.740..2414.568 L 76.674 ft; base above deck@ref line min 3.934 max 3.988 in
+   rail Low RT: off 7.000 ft sta 2254.284..2338.740 L 82.653 ft; base above deck@ref line min 3.933 max 3.952 in
+   rail High RT: off 7.000 ft sta 2338.740..2419.511 L 79.835 ft; base above deck@ref line min 3.934 max 3.957 in
+   DIAG Info: Left curb: Curb 10" x 4" (p.89, p.113), 162'-11 3/16" along the toe (gutter) line, deck end to deck end along it 162'-11 3/16", section 0.277 SF, 0 zone(s), concrete 1.65 CY.
+   DIAG Info: Right curb: Curb 10" x 4" (p.89, p.113), 162'-9 1/2" along the toe (gutter) line, deck end to deck end along it 162'-5 7/8", section 0.277 SF, 0 zone(s), concrete 1.65 CY.
+   DIAG Warning: Expansion joint at Pier 10: UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) modification and joint seal manufacturer - the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2" to 2 1/2"); standard version post-dates the plans (09/2020): the 2024 revision in hand is used. SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" studs at 6" max between the curb toes, 2 1/2" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.
+   DIAG Warning: Expansion joint at Pier 10: UNRESOLVED (p.91): BS-EJCP cover plate version - standard version post-dates the plans (09/2020): the 2024 revision in hand is used; the clear distance to the curb is a maximum (1" at a rail, 2" at a sidewalk). 1/4" x 1'-4 plate from 1" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1" x 1" corner clips and edge bevels not modeled.
+   DIAG Warning: Deck: 37 bar(s) of mark CS (NHT Unit 3 curb stirrups CS (6" x 8 1/2", 9" max)) violate the plan clear cover (tolerance 1/8"), worst 0.938" at the side face - kept as the plan places them.
+==== NHT Unit 4: alignment CL NHT (TRAILCLNEW); deck edges L -7.8333 ft R 7.8333 ft, t 8.500 in; barrier type Custom IsCurb True L True R True perp False reinf False
+   profile: R 10.000 H 0.000 rad 0.000 ch 0.000 tag '' | R 10.000 H 4.100 rad 0.000 ch 0.750 tag '' | R 0.000 H 4.000 rad 0.000 ch 0.750 tag '' | R 0.000 H 0.000 rad 0.000 ch 0.000 tag ''
+   supports: Pier 11 sta 2619.600 skew 19.578 deckEndOff -10.500", Pier 12 sta 2686.870 skew 0.000 deckEndOff 0.000", Pier 13 sta 2742.870 skew 0.000 deckEndOff -1.250"
+   Left curb: vol 0.9487 m3 = 1.241 CY; tris 320; sta 2617.703..2742.766 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/0)x27 (10,3.35/3.25)x27 (9.25,4.09/4)x27 (0.75,4.01/4)x27 (0,3.25/3.25)x27 (0,0/-0)x27
+      toe sta 2618.0090..2742.7658; outer face sta 2617.7025..2742.7658
+      FromBegin toe 0.000" outer 0.000"; FromEnd toe 0.000" outer 0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   Right curb: vol 0.9473 m3 = 1.239 CY; tris 308; sta 2622.952..2742.766 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/-0)x26 (10,3.35/3.25)x26 (9.25,4.09/4)x26 (0.75,4.01/4)x26 (-0,3.25/3.25)x26 (-0,0/0)x26
+      toe sta 2622.9521..2742.7658; outer face sta 2623.2345..2742.7658
+      FromBegin toe -0.000" outer 0.000"; FromEnd toe -0.000" outer -0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   deck begin line pt sta 2620.425, end 2742.766; joints: Pier 11 begin=True blockoutW 0.000 body True hw 93; Pier 13 begin=False blockoutW 0.000 body True hw 89
+   bars C: 12 placements; mark count 12 len 41.76 ft mass 334.5 lb
+   bars CS: 328 placements; mark count 328 len 3.00 ft mass 657.2 lb
+   bars D: 18 placements; mark count 18 len 41.76 ft mass 501.7 lb
+   bars T: 66 placements; mark count 66 len 41.76 ft mass 1839.5 lb
+   cover violations C/CS/D/T: 26; all marks: 26 CS:24 max 0.932" side face, C:2 max 0.587" bottom face
+      C mid pt: R in 2.750" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 2.751" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 2.752" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.750" clear 2.500" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.250" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      CS mid pt: R in 7.386" z below curb top (deck@pt+4") 9.907" clear 9.657" db 0.500
+      CS mid pt: R in 7.384" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS mid pt: R in 7.382" z below curb top (deck@pt+4") 9.908" clear 9.658" db 0.500
+      CS mid pt: R in 7.382" z below curb top (deck@pt+4") 9.906" clear 9.656" db 0.500
+      CS sample: R in 2.251..7.750", z rel deck@pt -6.267..1.745" (db 0.500); spacing first two 8.976"
+   rail High LT: off -7.000 ft sta 2618.009..2742.766 L 122.332 ft; base above deck@ref line min 3.927 max 3.969 in
+   rail High RT: off 7.000 ft sta 2622.952..2742.766 L 122.148 ft; base above deck@ref line min 3.919 max 3.973 in
+   DIAG Info: Left curb: Curb 10" x 4" (p.89, p.113), 122'-7 5/8" along the toe (gutter) line, deck end to deck end along it 122'-4", section 0.277 SF, 0 zone(s), concrete 1.24 CY.
+   DIAG Info: Right curb: Curb 10" x 4" (p.89, p.113), 122'-1 13/16" along the toe (gutter) line, deck end to deck end along it 122'-1 13/16", section 0.277 SF, 0 zone(s), concrete 1.24 CY.
+   DIAG Warning: Expansion joint at Pier 11: UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) modification and joint seal manufacturer - the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2" to 2 1/2"); standard version post-dates the plans (09/2020): the 2024 revision in hand is used. SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" studs at 6" max between the curb toes, 2 1/2" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.
+   DIAG Warning: Expansion joint at Pier 11: UNRESOLVED (p.91): BS-EJCP cover plate version - standard version post-dates the plans (09/2020): the 2024 revision in hand is used; the clear distance to the curb is a maximum (1" at a rail, 2" at a sidewalk). 1/4" x 1'-4 plate from 1" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1" x 1" corner clips and edge bevels not modeled.
+   DIAG Warning: Expansion joint at Pier 13: UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) modification and joint seal manufacturer - the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2" to 2 1/2"); standard version post-dates the plans (09/2020): the 2024 revision in hand is used. SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" studs at 6" max between the curb toes, 2 1/2" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.
+   DIAG Warning: Expansion joint at Pier 13: UNRESOLVED (p.91): BS-EJCP cover plate version - standard version post-dates the plans (09/2020): the 2024 revision in hand is used; the clear distance to the curb is a maximum (1" at a rail, 2" at a sidewalk). 1/4" x 1'-4 plate from 1" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1" x 1" corner clips and edge bevels not modeled.
+   DIAG Warning: Deck: 24 bar(s) of mark CS (NHT Unit 4 curb stirrups CS (6" x 8 1/2", 9" max)) violate the plan clear cover (tolerance 1/8"), worst 0.938" at the side face - kept as the plan places them.
+   DIAG Warning: Deck: 2 bar(s) of mark C (NHT Unit 4 curb top bars C) violate the plan clear cover (tolerance 1/8"), worst 0.563" at the bottom face - kept as the plan places them.
+==== NHT Unit 5: alignment CL NHT (TRAILCLNEW); deck edges L -7.8333 ft R 7.8333 ft, t 8.500 in; barrier type Custom IsCurb True L True R True perp False reinf False
+   profile: R 10.000 H 0.000 rad 0.000 ch 0.000 tag '' | R 10.000 H 4.100 rad 0.000 ch 0.750 tag '' | R 0.000 H 4.000 rad 0.000 ch 0.750 tag '' | R 0.000 H 0.000 rad 0.000 ch 0.000 tag ''
+   supports: Pier 13 sta 2742.870 skew 0.000 deckEndOff -1.250", Pier 14 sta 2798.870 skew 0.000 deckEndOff 0.000", Pier 15 sta 2854.870 skew 0.000 deckEndOff 0.000", Abutment 16 sta 2910.870 skew 0.000 deckEndOff -2.500"
+   Left curb: vol 1.3058 m3 = 1.708 CY; tris 428; sta 2742.974..2910.654 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/0)x36 (10,3.35/3.25)x36 (9.25,4.09/4)x36 (0.75,4.01/4)x36 (-0,3.25/3.25)x36 (-0,0/0)x36
+      toe sta 2742.9742..2910.6541; outer face sta 2742.9742..2910.6532
+      FromBegin toe -0.000" outer -0.000"; FromEnd toe 0.000" outer 0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   Right curb: vol 1.2950 m3 = 1.694 CY; tris 428; sta 2742.974..2910.670 ft; pieces 1
+      section clusters (R in from edge, H above deck@edge / above deck@point): (10,0.1/0)x36 (10,3.35/3.25)x36 (9.25,4.09/4)x36 (0.75,4.01/4)x36 (-0,3.25/3.25)x36 (-0,0/0)x36
+      toe sta 2742.9742..2910.6687; outer face sta 2742.9742..2910.6695
+      FromBegin toe 0.000" outer 0.000"; FromEnd toe 0.000" outer 0.000"
+      inner top chamfer point (R 9.25): H above deck@point min 4.000 max 4.000
+      outer top chamfer point (R 0.75): H above deck@point min 4.000 max 4.000
+      deck slope rising inward under the curb: 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 1.000 %
+   deck begin line pt sta 2742.974, end 2910.662; joints: Pier 13 begin=True blockoutW 0.000 body False hw 0; Abutment 16 begin=False blockoutW 0.000 body True hw 88
+   bars C: 12 placements; mark count 12 len 57.14 ft mass 456.2 lb
+   bars CS: 449 placements; mark count 449 len 3.00 ft mass 899.6 lb
+   bars D: 18 placements; mark count 18 len 57.14 ft mass 684.3 lb
+   bars T: 66 placements; mark count 66 len 57.14 ft mass 2508.9 lb
+   cover violations C/CS/D/T: 74; all marks: 74 CS:70 max 0.250" top face, C:4 max 0.574" bottom face
+      C mid pt: R in 2.749" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 2.751" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 2.752" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.251" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.751" clear 2.501" db 0.500
+      C mid pt: R in 7.249" z below curb top (deck@pt+4") 2.748" clear 2.498" db 0.500
+      C mid pt: R in 7.250" z below curb top (deck@pt+4") 2.749" clear 2.499" db 0.500
+      CS mid pt: R in 7.384" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS mid pt: R in 7.385" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS mid pt: R in 7.386" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS mid pt: R in 7.382" z below curb top (deck@pt+4") 9.909" clear 9.659" db 0.500
+      CS sample: R in 2.250..7.749", z rel deck@pt -6.266..1.746" (db 0.500); spacing first two 8.997"
+   rail High LT: off -7.000 ft sta 2742.974..2910.654 L 168.332 ft; base above deck@ref line min 3.931 max 3.990 in
+   rail High RT: off 7.000 ft sta 2742.974..2910.669 L 167.043 ft; base above deck@ref line min 3.943 max 3.969 in
+   DIAG Info: Left curb: Curb 10" x 4" (p.89, p.113), 168'-4" along the toe (gutter) line, deck end to deck end along it 168'-4", section 0.277 SF, 0 zone(s), concrete 1.71 CY.
+   DIAG Info: Right curb: Curb 10" x 4" (p.89, p.113), 167'-0 1/2" along the toe (gutter) line, deck end to deck end along it 167'-0 1/2", section 0.277 SF, 0 zone(s), concrete 1.69 CY.
+   DIAG Warning: Expansion joint at Abutment 16: UNRESOLVED (p.84-88, 91, 113): SEJ-B(MOD) modification and joint seal manufacturer - the plans call for SEJ-B(MOD); the (MOD) sheet / note is not in the set, and the SEJ-B standard gives the 70 F opening per manufacturer (2" to 2 1/2"); standard version post-dates the plans (09/2020): the 2024 revision in hand is used. SEJ-B (10-2024) armor PL 1/2 x 4 + Bar 1/2 x 1/4 + 5/8" studs at 6" max between the curb toes, 2 1/2" opening (R.J. Watson SF-400, the standard's drawn section); seal = envelope in the opening, its upturns at the curbs not modeled.
+   DIAG Warning: Expansion joint at Abutment 16: UNRESOLVED (p.91): BS-EJCP cover plate version - standard version post-dates the plans (09/2020): the 2024 revision in hand is used; the clear distance to the curb is a maximum (1" at a rail, 2" at a sidewalk). 1/4" x 1'-4 plate from 1" inside each curb toe (reproduces the p.91 194 / 206 lb at the standard's 14 plf estimate); 1" x 1" corner clips and edge bevels not modeled.
+   DIAG Warning: Deck: 70 bar(s) of mark CS (NHT Unit 5 curb stirrups CS (6" x 8 1/2", 9" max)) violate the plan clear cover (tolerance 1/8"), worst 0.25" at the top face - kept as the plan places them.
+   DIAG Warning: Deck: 4 bar(s) of mark C (NHT Unit 5 curb top bars C) violate the plan clear cover (tolerance 1/8"), worst 0.563" at the bottom face - kept as the plan places them.
+TOTAL curb volume 10.1877 m3 = 13.325 CY
+curb ends by unit (outer face): NHT Unit 1 L 2049.508..2157.088; NHT Unit 1 R 2049.508..2157.060; NHT Unit 2 L 2157.272..2254.076; NHT Unit 2 R 2157.300..2254.076; NHT Unit 3 L 2254.284..2414.285; NHT Unit 3 R 2254.284..2419.817; NHT Unit 4 L 2617.703..2742.766; NHT Unit 4 R 2623.235..2742.766; NHT Unit 5 L 2742.974..2910.653; NHT Unit 5 R 2742.974..2910.670

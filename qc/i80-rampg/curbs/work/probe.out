@@ -1,0 +1,28 @@
+Unit 2 barriers: Left barrier, Right barrier; bumps 0; deck parts 0
+Barrier def: Type FShape H 44.00 in base 16.00 in top 6.00 in IsCurb False
+Misc elements (crash cushion group): 0
+  Warning: UNRESOLVED [cushion] End posts: start of the end block from the CL pier (scaled about 2'-1 on Ramp A), wedge direction, plan width at the pier end (two 1'-5 rails + gap) and the skewed Ramp G plan are not dimensioned; the I.M. 455 crash cushion has no geometry in the plans.
+  Info: Crash cushion end post Ramp A (Pier 5WB): bar 6c3 length varies (plan prints a range); average length 79 7/8" derived from the printed weight 100 lb.
+  Warning: Crash cushion end post Ramp A (Pier 5WB): UNRESOLVED (I-80 PDF 229 / 230 end post details): end post position from the CL pier, wedge direction and plan width at the pier end - the details show the end post shape only, these are not dimensioned (the Ramp G wedge is also skewed 27d27'55"). Wedge and cushion placeholder NOT placed; the bar list is scheduled.
+  Info: Crash cushion end post Ramp G (Pier 11WB): bar 6c4 length varies (plan prints a range); average length 59 1/8" derived from the printed weight 37 lb.
+  Info: Crash cushion end post Ramp G (Pier 11WB): bar 6c3 length varies (plan prints a range); average length 79 7/8" derived from the printed weight 100 lb.
+  Warning: Crash cushion end post Ramp G (Pier 11WB): UNRESOLVED (I-80 PDF 229 / 230 end post details): end post position from the CL pier, wedge direction and plan width at the pier end - the details show the end post shape only, these are not dimensioned (the Ramp G wedge is also skewed 27d27'55"). Wedge and cushion placeholder NOT placed; the bar list is scheduled.
+  I-80 WB Unit 1: barrier IsCurb False, misc end posts 0
+  I-80 WB Unit 2: barrier IsCurb False, misc end posts 2
+  I-80 WB Unit 3: barrier IsCurb False, misc end posts 0
+  Ramp G Unit 1: barrier IsCurb False, misc end posts 0
+  Ramp G Unit 2: barrier IsCurb False, misc end posts 0
+  Ramp G Unit 3: barrier IsCurb False, misc end posts 0
+  Ramp G Unit 4: barrier IsCurb False, misc end posts 0
+Ramp A end post: taper start S         I-80 7591+08.51  65.38 LT: finished grade 1023.223  deck top NaN  barrier -  misc -
+Ramp A end post: taper start N         I-80 7591+08.51  68.21 LT: finished grade 1023.193  deck top NaN  barrier -  misc -
+Ramp A end post: centre                I-80 7591+14.75  66.79 LT: finished grade 1023.264  deck top 1023.264  barrier -  misc -
+Cushion strip: 7591+30 mid             I-80 7591+30.00  66.92 LT: finished grade 1023.396  deck top 1023.394  barrier -  misc -
+Cushion strip: 7591+50 @65.08          I-80 7591+50.00  65.08 LT: finished grade 1023.616  deck top 1023.617  barrier -  misc -
+Cushion strip: 7591+50 @68.76          I-80 7591+50.00  68.76 LT: finished grade 1023.506  deck top 1023.513  barrier -  misc -
+Gutter WP 6A @65.08 (7591+06.76)       I-80 7591+07.20  65.08 LT: finished grade 1023.214  deck top NaN  barrier -  misc -
+Gutter WP 6A @68.76 (7591+06.74)       I-80 7591+07.20  68.76 LT: finished grade 1023.175  deck top NaN  barrier -  misc -
+I-80 WB Unit 2: Ramp G end post centre I-80 7603+21.50  78.79 LT: finished grade 1021.678  deck top NaN  barrier -  misc -
+I-80 WB Unit 2: Ramp G taper start mid I-80 7603+15.50  79.08 LT: finished grade 1021.711  deck top NaN  barrier -  misc -
+I-80 WB Unit 3: Ramp G end post centre I-80 7603+21.50  78.79 LT: finished grade 1021.577  deck top 1021.577  barrier -  misc -
+I-80 WB Unit 3: Ramp G taper start mid I-80 7603+15.50  79.08 LT: finished grade 1021.593  deck top 1021.593  barrier -  misc -

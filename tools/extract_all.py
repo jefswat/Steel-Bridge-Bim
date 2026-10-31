@@ -1,5 +1,5 @@
 import sys, json, re
-sys.path.insert(0, r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\tools')
+sys.path.insert(0, r'C:\SBM\.worktrees\bends\tools')
 import bendx, csv
 out = []
 for design in ('116', '316'):
@@ -21,7 +21,7 @@ for design in ('116', '316'):
                 L = lens.get(mk.lower(), lens.get(mk, (None, '', '', '')))
                 out.append(dict(design=design, page=page, sheet=title, title=key, mark=mk, listed=L[0], listed_txt=L[1], desc=L[2], count=L[3], dims=ds,
                                 recon=bendx.recon(mine, L[0])))
-json.dump(out, open(r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\temp\bend\plan_dims.json', 'w'), indent=0)
+json.dump(out, open(r'C:\SBM\.worktrees\bends\temp\bend\plan_dims.json', 'w'), indent=0)
 import collections
 c = collections.Counter(o['recon'] for o in out); print(len(out), c)
 for o in out:

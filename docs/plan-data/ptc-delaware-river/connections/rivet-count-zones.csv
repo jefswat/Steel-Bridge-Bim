@@ -2,7 +2,7 @@ structure,joint,member,zone_px,note
 main,L15,SKIP,"350,330;385,330;385,610;350,610",bracing angle strip Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
 main,L15,SKIP,"546,185;563,185;563,478;546,478",post U15-L15 left edge: rivets drawn in profile
 main,L15,SKIP,"668,185;685,185;685,478;668,478",post U15-L15 right edge: rivets drawn in profile
-main,L15,SKIP,"688,230;815,230;815,410;688,410",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C)
+main,L15,SKIP,"688,230;815,230;815,410;688,410",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
 main,L15,U15-L15,"552,185;692,185;692,478;552,478",vertical field (p.86)
 main,L15,U14-L15,"355,300;505,205;552,215;552,528;505,535;355,420",diagonal field (p.86)
 main,L16,SKIP,"1758,280;1772,280;1772,485;1758,485",post U16-L16 left edge: rivets drawn in profile (p.86 right half)
@@ -84,3 +84,14 @@ main,L22,SKIP,"250,795;354,795;354,897;250,897",top-west chord-end diaphragm / l
 main,L22,SKIP,"884,795;988,795;988,897;884,897",top-east chord-end diaphragm / lug angle ring block
 main,L22,SKIP,"250,1100;990,1100;990,1216;250,1216",bottom lug angle blocks and bottom strut connection below the chord
 main,L22,SKIP,"700,738;806,738;806,766;700,766",top strut bracket plate (2-3/8 gussets) rivets
+main,U8,SKIP,"679,491;630,646;659,655;708,500",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
+main,U9,SKIP,"1599,467;1500,734;1529,745;1628,478",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
+main,L9,SKIP,"1175,1043;1246,917;1220,902;1149,1028",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
+main,L9,SKIP,"1343,919;1410,1074;1437,1062;1370,907",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
+main,L10,SKIP,"500,718;554,497;525,489;471,710",left bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.78; agent review gussets G51 / rivets R02)
+main,L10,SKIP,"978,503;1053,814;1082,807;1007,496",right bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.78; agent review gussets G51 / rivets R02)
+main,L12,SKIP,"496,869;554,466;525,461;467,864",left bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.81; agent review gussets G51 / rivets R02)
+main,L12,SKIP,"876,407;969,554;994,538;901,391",right bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.81; agent review gussets G51 / rivets R02)
+main,L18,SKIP,"827,829;919,957;943,939;851,811",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.88; agent review gussets G51; L19 takes the L18 outline)
+main,U19,SKIP,"1508,673;1449,534;1422,546;1481,685",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.88; agent review gussets G51 / rivets R02)
+main,U20,SKIP,"571,689;476,570;452,589;547,708",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.89; agent review gussets G51 / rivets R02; U21 inherits via the shared outline - G53 UNRESOLVED)

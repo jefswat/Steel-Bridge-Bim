@@ -75,20 +75,22 @@ foreach (var bn in girders)
     // 1-Pl 3 1/2 x 7/16 F.S.; drawn 7 web rows, 6 columns (2 field + 4 shop) with the joint ('Fin.') between the 3rd and 4th; floor system rivets 7/8 carbon (p.45 note).
     string splFlag = U("p.45, p.43", "girder-span stringer splices (plate lengths, rivet pitch and gages)",
         "the p.45 splice details give the plate sizes and the drawn rivet pattern (7 rows, 6 columns, 2 flange lines) but no lengths, pitch or gages; the p.43 stringer diagram puts the splice at the middle support of the 4-span continuous stringer",
-        "plates 9 in. each side of the joint, columns 1 1/2 / 4 1/2 / 7 1/2 in. each side, web rows at 2 1/2 in., flange lines at the AISC workable gage 5 1/2 in.; F.S. plates one each side of the web clear of the root fillet; at the middle floor beam of every span.");
+        "plates 9 in. each side of the joint, columns 1 1/2 / 4 1/2 / 7 1/2 in. each side, web rows at 2 1/2 in., flange lines at the AISC workable gage 5 1/2 in.; F.S. plates one each side of the web clear of the root fillet although the F.S. callout reads '1-Pl' (plan question, agent review girders G24); at the middle floor beam of every span.");
     double[] cols = { -7.5, -4.5, -1.5, 1.5, 4.5, 7.5 };
-    TrussStringerSpliceDefinition Spl(string sec, string label, double topW, double topT, double fsW, double fsT) => new()
+    TrussStringerSpliceDefinition Spl(string sec, string label, double topW, double topT, double fsW, double fsT, double webH = 18.5, int webRows = 7) => new()
     {
-        Label = label, Section = sec, Stations = spans.Select(n => fbSta[n][2]).ToList(), Before = In(9), After = In(9), WebPlateHeight = In(18.5), WebPlateThickness = In(0.375),
+        Label = label, Section = sec, Stations = spans.Select(n => fbSta[n][2]).ToList(), Before = In(9), After = In(9), WebPlateHeight = In(webH), WebPlateThickness = In(0.375),
         TopPlateWidth = topW, TopPlateThickness = topT, UnderPlateWidth = fsW, UnderPlateThickness = fsT,
-        WebRivetColumns = cols.Select(c => In(c)).ToList(), WebRivetRows = 7, WebRivetPitch = In(2.5), FlangeRivetColumns = cols.Select(c => In(c)).ToList(), FlangeRivetGage = In(2.75),
+        WebRivetColumns = cols.Select(c => In(c)).ToList(), WebRivetRows = webRows, WebRivetPitch = In(2.5), FlangeRivetColumns = cols.Select(c => In(c)).ToList(), FlangeRivetGage = In(2.75),
         RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet", Material = "C", Unresolved = splFlag, Source = "p.43 / p.45",
     };
     t.Floor.Splices = new()
     {
         Spl("W24x84", "24 WF 84: 2-Pls 18 1/2 x 3/8, 1-Pl 9 x 1/2 N.S., 2-Pls 4 x 9/16 F.S.", In(9), In(0.5), In(4), In(9.0 / 16)),
         Spl("W24x94", "24 WF 94: 2-Pls 18 1/2 x 3/8, 1-Pl 9 x 1/2 N.S., 2-Pls 4 x 9/16 F.S.", In(9), In(0.5), In(4), In(9.0 / 16)),
-        Spl("W21x62", "21 WF 62: 2-Pls 18 1/2 x 3/8, 1-Pl 8 1/2 x 3/8 N.S., 2-Pls 3 1/2 x 7/16 F.S.", In(8.5), In(0.375), In(3.5), In(7.0 / 16)),
+        // agent review girders G24: the 21 WF 62 splice web plates are 2-Pls 16 1/2 x 3/8 with 6 rows (p.45, medium); the F.S. callout reads "1-Pl" 4 x 9/16 / 3 1/2 x 7/16 on
+        // both splices while the drawn section shows a plate each side of the web: PLAN QUESTION - two plates kept (one each side of the web, clear of the root fillet)
+        Spl("W21x62", "21 WF 62: 2-Pls 16 1/2 x 3/8, 1-Pl 8 1/2 x 3/8 N.S., 2-Pls 3 1/2 x 7/16 F.S. (callout '1-Pl', plan question)", In(8.5), In(0.375), In(3.5), In(7.0 / 16), 16.5, 6),
     };
     t.Floor.Unresolved = t.Floor.Unresolved.Replace("bearing plates, splices, clip angles and diaphragms not built", "bearing plates, clip angles and the abutment diaphragms not built (splices, mid-panel diaphragms and the pier dam diaphragms are, girder-details-ptc.csx)");
 
@@ -128,7 +130,7 @@ foreach (var bn in girders)
                 {
                     Name = name, Kind = TrussLineItemKind.Steel, Category = PartCategory.SplicePlate, Transverse = true, Station = sta, From = go - half, To = go + half, FromGrade = true,
                     Profile = new() { new TrussUV(-halfW, vb - G * halfW), new TrussUV(halfW, vb + G * halfW), new TrussUV(halfW, vb + G * halfW + In(0.75)), new TrussUV(-halfW, vb - G * halfW + In(0.75)) },
-                    Material = "S", Assembly = OwnAsm, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.44 / p.45", Unresolved = tpFlag, Rivets = rivets,
+                    Material = "S", Assembly = OwnAsm, AssemblyKind = AssemblyKind.TrussFloor, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.44 / p.45", Unresolved = tpFlag, Rivets = rivets,
                 });
                 nTp++;
                 if (nCov < 2) continue;
@@ -144,7 +146,7 @@ foreach (var bn in girders)
                         Name = $"{name} fill {(side < 0 ? "a" : "b")}", Kind = TrussLineItemKind.Steel, Category = PartCategory.FillerPlate, Transverse = true, Station = sta,
                         From = Math.Min(o0, o1), To = Math.Max(o0, o1), FromGrade = true,
                         Profile = new() { new TrussUV(-In(7), fb - G * In(7)), new TrussUV(In(7), fb + G * In(7)), new TrussUV(In(7), vb + G * In(7)), new TrussUV(-In(7), vb - G * In(7)) },
-                        Material = "S", Assembly = OwnAsm, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.44 / p.45",
+                        Material = "S", Assembly = OwnAsm, AssemblyKind = AssemblyKind.TrussFloor, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.44 / p.45",
                         Unresolved = tpFlag + $" Fill {(vb - fb) / In(1):0.###} in. (plan {nCov - 1} x 13/16).",
                     });
                     nFill++;
@@ -205,7 +207,7 @@ foreach (var bn in girders)
                 {
                     Name = nm, Kind = TrussLineItemKind.Steel, Category = PartCategory.TrussFloorBeam,
                     Transverse = true, Station = sDia, From = from, To = to, FromGrade = true, Profile = outer ? profOuter : prof, NominalWeightLbPerFt = outer ? 0 : 64, Density = outer ? 7850 : 0, Material = "C",
-                    Assembly = OwnAsm, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.46", Unresolved = outer ? damFlag + " " + outerFlag : damFlag,
+                    Assembly = OwnAsm, AssemblyKind = AssemblyKind.TrussFloor, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.46", Unresolved = outer ? damFlag + " " + outerFlag : damFlag,
                     ClipAngles = new TrussClipAngles
                     {
                         Angle = "L4x4x7/16", HeelU = -tw / 2, Toward = -1, PairHeelU = tw / 2, Top = vTop - In(2.75), Length = outer ? In(12) : In(14.5), RivetDiameter = In(0.875), Material = "C",
@@ -215,7 +217,7 @@ foreach (var bn in girders)
                 t.LineItems.Add(new TrussLineItemDefinition
                 {
                     Name = nm + " Pl 11 x 3/4", Kind = TrussLineItemKind.Steel, Category = PartCategory.SplicePlate, Transverse = true, Station = sDia, From = from, To = to, FromGrade = true, Profile = pl,
-                    Material = "C", Assembly = OwnAsm, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.46", Unresolved = damFlag,
+                    Material = "C", Assembly = OwnAsm, AssemblyKind = AssemblyKind.TrussFloor, AssemblyDescription = $"{t.Name} - floor beam / girder tension plates and dam diaphragms", Source = "p.46", Unresolved = damFlag,
                 });
                 nDia++;
             }

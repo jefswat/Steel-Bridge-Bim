@@ -54,8 +54,10 @@ public sealed class RegenerationCache
     }
 
     /// <summary>Regenerates (or reuses) every bridge in the project. Steel can be skipped for fast framing-only runs.</summary>
-    public List<BridgeModel?> Regenerate(BridgeProject project, bool includeSteel = true)
+    /// <param name="output">OPTIONAL output the model is for: its cap in <see cref="LodSettings.Outputs"/> lowers every level (null = the project levels).</param>
+    public List<BridgeModel?> Regenerate(BridgeProject project, bool includeSteel = true, LodOutput? output = null)
     {
+        var lod = output is { } lo ? project.Lod?.ForOutput(lo) : project.Lod;
         var bridges = project.Bridges.ToArray();
         var keys = new string?[bridges.Length];
         var parts = new (BridgeFraming f, SteelModel? s, Concrete.ConcreteModel? cm, Prestressed.PrestressedModel? ps, bool hit)?[bridges.Length];
@@ -69,7 +71,8 @@ public sealed class RegenerationCache
             if (a == null) return;
             var geo = GeometrySettings.Active(project);
             string key = Key(b, a, project.Units) + (includeSteel ? "+steel" : "")
-                + (geo == null ? "" : $"+nurbs:{geo.FitToleranceFor(project.Units):R}:{geo.ChordTolerance:R}");
+                + (geo == null ? "" : $"+nurbs:{geo.FitToleranceFor(project.Units):R}:{geo.ChordTolerance:R}")
+                + (lod?.KeyFor(b.Name) ?? "");
             keys[i] = key;
             lock (_lock) used.Add(key);
             (BridgeFraming, SteelModel?, Concrete.ConcreteModel?, Prestressed.PrestressedModel?) hit;
@@ -87,7 +90,7 @@ public sealed class RegenerationCache
             else if (includeSteel && !f.HasErrors && b.Arch != null)
             {
                 // Steel tied arch: its own generator; steel parts + seats in a SteelModel, the slab / curbs in a ConcreteModel.
-                var am = SBM.Core.Arch.ArchGenerator.Generate(f, project.Units);
+                var am = SBM.Core.Arch.ArchGenerator.Generate(f, project.Units, geo);
                 st = am.Steel;
                 cm = am.Concrete;
                 RoundBends(cm, null);
@@ -95,7 +98,7 @@ public sealed class RegenerationCache
             else if (includeSteel && !f.HasErrors && b.Truss != null)
             {
                 // Steel truss: its own generator; members / gussets / floor / suspenders / shoes in a SteelModel, the deck slab in a ConcreteModel.
-                var tm = SBM.Core.Truss.TrussGenerator.Generate(f, project.Units);
+                var tm = SBM.Core.Truss.TrussGenerator.Generate(f, project.Units, (lod?.LevelFor(b.Name, LodGroup.Fasteners) ?? LodSettings.Full) >= LodSettings.Full);
                 st = tm.Steel;
                 cm = tm.Concrete;
             }
@@ -112,6 +115,14 @@ public sealed class RegenerationCache
                 var sm = SBM.Core.Segmental.SegmentalGenerator.Generate(f, project.Units);
                 cm = new Concrete.ConcreteModel { Segmental = sm };
                 cm.Diagnostics.AddRange(sm.Diagnostics);
+                // OPTIONAL details: segment bill bars and the parapets go on the concrete model so every bar / barrier consumer has them
+                cm.Marks.AddRange(sm.Marks); cm.Bars.AddRange(sm.Bars); cm.CoverViolations.AddRange(sm.CoverViolations);
+                foreach (var (name, mesh) in sm.Parapets)
+                {
+                    cm.Barriers.Add((name, mesh));
+                    cm.BarrierInfo[name] = (sm.Definition.Parapet?.Material ?? "", sm.ParapetAssumption);
+                }
+                if (cm.Bars.Count > 0) RoundBends(cm, null);
             }
             else if (includeSteel && !f.HasErrors && b.Girders.IsPrestressed)
             {
@@ -152,6 +163,8 @@ public sealed class RegenerationCache
                     st.Parts.AddRange(jr.Hardware);
                 }
             }
+            // OPTIONAL level of detail: reduce this entry's own fresh objects (the level is part of the key)
+            if (lod != null && lod.KeyFor(b.Name) != "") LodApply.Superstructure(lod, b.Name, st, cm, ps);
             lock (_lock) _super[key] = (f, st, cm, ps);
             parts[i] = (f, st, cm, ps, false);
         });
@@ -232,6 +245,7 @@ public sealed class RegenerationCache
                 }
                 if (sub != null && (b.Misc != null || b.Drains.Any(d => d.Trench != null)))
                     sub.Misc = Misc.MiscItemsGenerator.Generate(pt.f, pt.s, sub, project.Units, Ground);
+                if (lod != null && lod.KeyFor(b.Name) != "") LodApply.Substructure(lod, b.Name, sub);
                 lock (_lock) _sub[subKey] = sub;
             }
             // Concrete end / pier diaphragms and surface treatments depend only on cached inputs (framing / beams / deck / substructure): when all of
@@ -241,7 +255,7 @@ public sealed class RegenerationCache
             if (phase2Cached) { }
             // Concrete end / pier diaphragms: superstructure elements built after the beams and the substructure.
             else if (includeSteel && pt.ps != null && !pt.f.HasErrors)
-                pt.ps.ConcreteDiaphragms = Diaphragms.ConcreteDiaphragmGenerator.Generate(pt.f, pt.ps, project.Units);
+                pt.ps.ConcreteDiaphragms = Diaphragms.ConcreteDiaphragmGenerator.Generate(pt.f, pt.ps, project.Units, GeometrySettings.Active(project) != null);
             // Architectural surface treatments (form liner / thin brick) on the barrier, substructure and diaphragm faces: after everything they sit on
             // (cheap; always rebuilt). Kept on the substructure model, which every consumer (viewport, IFC, database) already receives.
             if (sub != null && !phase2Cached)

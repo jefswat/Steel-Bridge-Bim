@@ -78,3 +78,4 @@ foreach (var u in units)
 }
 Doc.Save();
 Print("Expansion joints set (6 joint ends).");
+{ var rs = await SBM.Api.ScriptHost.RunFileAsync(@"samples\plansarrier-sliders-i80.csx", Doc, Args); Print(rs.Output.TrimEnd()); if (!rs.Success) Print("ERROR in barrier-sliders-i80.csx: " + rs.Error); }   // barrier slider plates (agent review I07)

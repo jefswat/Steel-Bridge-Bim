@@ -25,16 +25,16 @@ var dir = (east - west).Normalized();
 double staWest = S("10+00");                       // stationing: 10+00 at the west trail end
 const string AlName = "CL Richmond Greenway Bridge (concept)";
 Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
-// Plan (fitted 2026-10-26): straight along the Greenway trail line through the pylon (23rd St crossed nearly square), then a gentle S: left (north)
-// R 300 ft to ~35 ft off the trail line about 300-400 ft east of the west trail end (over the UP tracks and Carlson), then right R 700 ft toward the
-// southeast past the east trail end. Source: the near-plan aerial rendering (Pogo Park flyer) with its camera fitted to the OSM lines of 23rd St, the
-// UP tracks, Carlson and the BART aerial (14 px RMS, FOV 49 deg); deck centerline projected to plan at the deck elevation, corrected for the uniform
-// 45 ft shift of the straight west approach; PIs + radii fitted to it (1.7 ft RMS). Local (x along the trail line, y right) -> UTM.
+// Plan (2026-10-27): the bridge crosses 23rd St SQUARE at the pylon (user rule: no skew) - a tangent through the pylon point at 20.1 deg left of the
+// trail line (= normal to 23rd St, OSM SB / NB 15.4 / 16.1 deg off the old pylon axis); west of it R 400 back to the trail line, east of it R 350
+// right onto the tangent read from the near-plan aerial deck trace (x 481-678 ft, 11 deg right of the trail line). Pylon point = 23rd St median centre
+// (between the OSM carriageway centerlines) at the rendered tower feet: rendering camera refitted to the user's road corrections (82 points, 32 px
+// RMS) + a smooth warp (12 px median hold-one-out). Local (x along the trail line from the west trail end, y right) -> UTM.
 var rightN = new Vec2(dir.Y, -dir.X);
 Vec2 Loc(double xFt, double yFt) => west + dir * Ft(xFt) + rightN * Ft(yFt);
-var pis = new[] { (-800.0, 0.0, 0.0), (80.0, 0.0, 300.0), (400.0, -60.0, 700.0), (1300.0, 300.0, 0.0) };
+var pis = new[] { (-800.0, 0.0, 0.0), (-60.0, 15.0, 400.0), (258.0, -101.3, 350.0), (1300.0, 101.7, 0.0) };
 var al = Doc.AddAlignment(AlName, staWest - Ft(800), pis.Select(q => { var p = Loc(q.Item1, q.Item2); return q.Item3 > 0 ? new PiRow(p.Y, p.X, Ft(q.Item3)) : new PiRow(p.Y, p.X); }).ToArray());
-al.Description = "Richmond Greenway Bridge concept: Greenway trail line (OSM trail ends) to the pylon, then the S-curve read from the renderings (R 300 ft left, R 700 ft right; fitted to the near-plan aerial rendering)";
+al.Description = "Richmond Greenway Bridge concept: Greenway trail line (OSM trail ends), R 400 onto a tangent square to 23rd St through the pylon in the median, R 350 right onto the east tangent read from the near-plan aerial rendering";
 Doc.Project.Georeference = new SBM.Core.Project.GeoreferenceDefinition
 {
     CrsName = "EPSG:26910", Description = "NAD83 / UTM zone 10N (m); project X/Y = UTM metres", GeodeticDatum = "NAD83", MapProjection = "Transverse Mercator",
@@ -66,9 +66,11 @@ br.FieldSplices.Clear();
 br.Girders.Count = 0;
 br.LateralBracing.Enabled = false;
 SupportDefinition Sup(string n, SupportType t, string sta) => new() { Name = n, Type = t, Station = S(sta), SkewDegrees = 0 };
-// pylon in the 23rd St median (62.3 ft east of the west trail end); main span east over the UP tracks and Carlson; approach piers about 130 ft apart.
-double pylonSta = al.Inverse(new Vec2(557304.415, 4198413.086)).Station;   // 23rd St median (OSM) projected on the alignment
-Print($"Pylon station {Doc.Units.FormatStation(pylonSta)}, {al.Inverse(new Vec2(557304.415, 4198413.086)).Offset / 0.3048:0.0} ft off the CL");
+// pylon in the 23rd St median (median centre at the rendered tower feet, 69.0 ft along / 32.2 ft left of the trail line from the west trail end);
+// main span east over the UP tracks and Carlson; approach piers about 130 ft apart.
+var pylonPt = new Vec2(557307.106, 4198425.178);
+double pylonSta = al.Inverse(pylonPt).Station;
+Print($"Pylon station {Doc.Units.FormatStation(pylonSta)}, {al.Inverse(pylonPt).Offset / 0.3048:0.0} ft off the CL");
 br.Supports.Add(Sup("West abutment", SupportType.Abutment, "4+75"));
 br.Supports.Add(Sup("Pier W3", SupportType.Pier, "6+05"));
 br.Supports.Add(Sup("Pier W2", SupportType.Pier, "7+35"));
@@ -80,10 +82,16 @@ br.Supports.Add(Sup("East abutment", SupportType.Abutment, "17+30"));
 foreach (var s in br.Supports) s.Substructure = SubstructureDefinition.Default(s.Type).Clone();
 foreach (var s in br.Supports) s.Substructure!.Enabled = false;   // the cable-stayed generator builds its own piers
 
-double groundAtPylon = Ft(26.0);                    // 3DEP at the 23rd St median
+double groundAtPylon = Ft(24.2);                    // 3DEP 1 m DEM at the pylon point (23rd St median)
 double deckTopAtPylon = al.Profile.ElevationAt(pylonSta);
-var cs = CableStayedConcepts.Osprey("Pylon", pylonSta, groundAtPylon, deckTopAtPylon - groundAtPylon, tipAboveDeck: Ft(180));   // the reported "180 feet at its tallest point", read as above the walkway
+// Foundation (user 2026-10-27, option C): tower legs land in the 23rd St median, 15.5 ft each side of the pylon point along the median (rendered feet
+// 31 ft apart, on the median centreline within 2 ft); props from the knees lean forward over the NB lanes and land beyond them: the rendered NB
+// pavement ends ~48-50 ft east of the median centre, prop feet at 65 ft (the renderings do not show the prop feet - flagged).
+var foundation = new OspreyFoundation { LegFootX = 0, LegFootY = Ft(15.5), LegFootDepth = Ft(4), LegFootingLength = Ft(10), PropFootX = Ft(65), PropFootY = Ft(25),
+    PropFootZLeft = Ft(31.7 - 24.2), PropFootZRight = Ft(33.3 - 24.2) };   // 3DEP 1 m ground at the prop feet: 31.7 (north) / 33.3 (south) ft on the east bank
+var cs = CableStayedConcepts.Osprey("Pylon", pylonSta, groundAtPylon, deckTopAtPylon - groundAtPylon, tipAboveDeck: Ft(180), foundation: foundation);   // the reported "180 feet at its tallest point", read as above the walkway
 cs.Concept = "Richmond Greenway Bridge - osprey concept, starting shape for the shape study";
+cs.Unresolved.Add("UNRESOLVED (renderings): prop feet 65 ft east of the median centre / 25 ft out - the renderings end the prop blade in the air above the shrubs east of 23rd St; placed just clear of the NB pavement (~48-50 ft) by the user's rule. Leg foot depth 4 ft and footings 10 ft along the bridge so they fit the median.");
 cs.Unresolved.Add("UNRESOLVED (site): alignment, profile, pier stations and ramp lengths are a concept reading (straight line through the OSM trail ends, 5 % grades, 3DEP point ground) - the renderings show curved approach ramps.");
 cs.Unresolved.Add("UNRESOLVED (site): clearance envelopes (UP 23'-4\" / roads 17'-0) and the ground at the piers are from public data, not a survey.");
 // pier column bases: 3 ft below the interpolated 3DEP ground

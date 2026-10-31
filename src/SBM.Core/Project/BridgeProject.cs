@@ -23,6 +23,16 @@ public sealed class BridgeProject
     /// <summary>Georeference of the project X / Y (OPTIONAL, null = local grid, IFC map conversion scale 1): map CRS, grid scale (map = local x scale,
     /// e.g. 1 / surface adjustment factor for TxDOT surface coordinates).</summary>
     public GeoreferenceDefinition? Georeference { get; set; }
+    /// <summary>Level of detail of the generated model (OPTIONAL, null = the full model = LOD 400 everywhere; omitted from the .sbm when null).</summary>
+    public LodSettings? Lod { get; set; }
+    /// <summary>Roadway corridors (OPTIONAL; approach roads, roads under / beside the bridge; saved only when not empty). <see cref="Road.RoadGenerator"/>.</summary>
+    public List<Road.RoadDefinition> Roads { get; set; } = new();
+    /// <summary>Retaining walls (OPTIONAL; saved only when not empty). <see cref="Wall.RetainingWallGenerator"/>.</summary>
+    public List<Wall.RetainingWallDefinition> Walls { get; set; } = new();
+    /// <summary>Grading features (OPTIONAL; saved only when not empty). <see cref="Grading.GradingGenerator"/>.</summary>
+    public List<Grading.GradingDefinition> Gradings { get; set; } = new();
+    /// <summary>OPTIONAL utility networks (storm drainage first; <see cref="Utility.UtilityNetworkDefinition"/>), omitted from the .sbm when empty.</summary>
+    public List<Utility.UtilityNetworkDefinition> Utilities { get; set; } = new();
     /// <summary>The plan-set PDFs this model is built from (OPTIONAL; absolute, or relative to the model file; saved only when not empty).
     /// `sbm pipeline` builds the sheet index / skeleton link rules from them when no sheet-links*.json names the model.</summary>
     public List<string> PlanPdfs { get; set; } = new();
@@ -91,6 +101,16 @@ public sealed class BridgeProject
         public GeoreferenceDefinition? Georeference { get; set; }
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         public List<string>? PlanPdfs { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public LodSettings? Lod { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public List<Road.RoadDefinition>? Roads { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public List<Wall.RetainingWallDefinition>? Walls { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public List<Grading.GradingDefinition>? Gradings { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public List<Utility.UtilityNetworkDefinition>? Utilities { get; set; }
 
         public static ProjectDto From(BridgeProject p) => new()
         {
@@ -103,6 +123,11 @@ public sealed class BridgeProject
             Geometry = p.Geometry.IsDefault ? null : p.Geometry,
             Georeference = p.Georeference,
             PlanPdfs = p.PlanPdfs.Count == 0 ? null : p.PlanPdfs,
+            Lod = p.Lod,
+            Roads = p.Roads.Count == 0 ? null : p.Roads,
+            Walls = p.Walls.Count == 0 ? null : p.Walls,
+            Gradings = p.Gradings.Count == 0 ? null : p.Gradings,
+            Utilities = p.Utilities.Count == 0 ? null : p.Utilities,
         };
 
         public BridgeProject ToProject() => new()
@@ -115,6 +140,11 @@ public sealed class BridgeProject
             Geometry = Geometry ?? new(),
             Georeference = Georeference,
             PlanPdfs = PlanPdfs ?? new(),
+            Lod = Lod,
+            Roads = Roads ?? new(),
+            Walls = Walls ?? new(),
+            Gradings = Gradings ?? new(),
+            Utilities = Utilities ?? new(),
         };
     }
 

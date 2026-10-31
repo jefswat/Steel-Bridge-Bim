@@ -106,5 +106,23 @@ public static class Layers
     public static readonly LayerStyle SubCap = new("SBM-SUB-CAP", 210, 190, 150, 42, LineStyle.Continuous, 1.5);
     public static readonly LayerStyle SubPedestal = new("SBM-SUB-PEDESTAL", 230, 170, 110, 32);
     public static readonly LayerStyle SubColumn = new("SBM-SUB-COLUMN", 190, 160, 120, 33, LineStyle.Hidden);
+    public static readonly LayerStyle Wall = new("SBM-WALL", 200, 185, 160, 42, LineStyle.Continuous, 1.5);
+    public static readonly LayerStyle Grading = new("SBM-GRADING", 175, 150, 100, 42, LineStyle.Continuous);
+    public static readonly LayerStyle GradingDaylight = new("SBM-GRADING-DAYLIGHT", 130, 170, 90, 3, LineStyle.Hidden);
+    public static readonly LayerStyle RoadEdge = new("SBM-ROAD-EDGE", 170, 170, 175, 8);
+    public static readonly LayerStyle RoadDaylight = new("SBM-ROAD-DAYLIGHT", 130, 170, 90, 3, LineStyle.Hidden);
     public static readonly LayerStyle SubFoundation = new("SBM-SUB-FOUNDATION", 150, 130, 100, 35, LineStyle.Hidden);
+
+    /// <summary>Utility network layer per system, APWA colours (storm / sanitary green, water blue, gas yellow, electric red, telecom orange).</summary>
+    public static LayerStyle Utility(Utility.UtilitySystem s) => s switch
+    {
+        Core.Utility.UtilitySystem.Storm => new("SBM-UTIL-STORM", 40, 170, 60, 3, LineStyle.Continuous, 1.5),
+        Core.Utility.UtilitySystem.Sanitary => new("SBM-UTIL-SANITARY", 40, 170, 60, 3, LineStyle.Continuous, 1.5),
+        Core.Utility.UtilitySystem.Water => new("SBM-UTIL-WATER", 40, 110, 230, 5, LineStyle.Continuous, 1.5),
+        Core.Utility.UtilitySystem.Gas => new("SBM-UTIL-GAS", 235, 210, 30, 2, LineStyle.Continuous, 1.5),
+        Core.Utility.UtilitySystem.Electrical => new("SBM-UTIL-ELECTRICAL", 220, 50, 40, 1, LineStyle.Continuous, 1.5),
+        Core.Utility.UtilitySystem.Telecom => new("SBM-UTIL-TELECOM", 240, 140, 30, 30, LineStyle.Continuous, 1.5),
+        Core.Utility.UtilitySystem.Lighting => new("SBM-UTIL-LIGHTING", 220, 50, 40, 1, LineStyle.Continuous, 1.5),
+        _ => new("SBM-UTIL-OTHER", 150, 150, 150, 8, LineStyle.Continuous, 1.5),
+    };
 }

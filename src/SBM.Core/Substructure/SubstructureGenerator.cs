@@ -760,8 +760,10 @@ public sealed partial class SubstructureGenerator
         if (def.Drains.Count(d => d.Trench == null) == 0 || _f.HasErrors) return;
         var a = _f.Alignment;
         var deck = def.Deck;
-        double depth = def.Girders.IsPrestressed ? Prestressed.TxGirderCatalog.Get(def.Girders.Prestressed).Depth
+        bool allSlab = def.Drains.Where(d => d.Trench == null).All(d => d.SlabPipeOnly);
+        double depth = allSlab ? 0 : def.Girders.IsPrestressed ? Prestressed.TxGirderCatalog.Get(def.Girders.Prestressed).Depth
             : def.Girders.Section.TotalDepth;
+        var flagged = new HashSet<string>();
         var (toe, _, _) = Concrete.BarrierProfiles.PlanLines(deck.Barrier);
         int k = 0;
         foreach (var dr in def.Drains.Where(d => d.Trench == null))
@@ -774,6 +776,15 @@ public sealed partial class SubstructureGenerator
             var t = Vec2.FromAngle(ang);
             double zTop = deck.FinishedElevation(a, dr.Station, edge);
             double zSlabBot = zTop - deck.Thickness;
+            if (dr.SlabPipeOnly)
+            {
+                // OPTIONAL slab pipe drain: vertical pipe through the slab only
+                Assumption? asm = dr.Unresolved is { Length: > 0 } why ? Assumption.UnresolvedDimension(why, dr.Basis ?? "") : null;
+                if (asm != null && flagged.Add(dr.Unresolved!)) Warn(dr.Unresolved!);
+                m.Drainage.Add(new SubSolid(SubElementKind.DrainPipe, name, $"{Sh(dr.PipeDiameter)} pipe deck drain through the slab ({dr.Type})",
+                    Pipe(p.WithZ(zTop), p.WithZ(zSlabBot - dr.PipeBelowSlab), dr.PipeDiameter / 2), IsConcrete: false) { Assumption = asm });
+                continue;
+            }
             // Inlet: steel box through the slab, 6" below it.
             var f = new Frame3(p.WithZ(0), new Vec3(t.X, t.Y, 0), new Vec3(-t.Y, t.X, 0), Up);
             var inlet = new Mesh();

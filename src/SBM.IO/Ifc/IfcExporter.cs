@@ -43,7 +43,10 @@ public enum IfcGeometryMode
 /// 0 = default 1/32 in (0.79 mm).</param>
 /// <param name="ForCheck">CHECKING export for an independent checker: strips the originator's interpretation (see <see cref="IfcCheckFilter"/>). Geometry unchanged.</param>
 /// <param name="KeepDesignations">With ForCheck: keep section designations (e.g. WT 7x26.5) and fabrication specification attributes; plan size strings and notes are still stripped.</param>
-public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0, bool ForCheck = false, bool KeepDesignations = false);
+public sealed record IfcExportOptions(IfcGeometryMode Geometry = IfcGeometryMode.Parametric, double ChordTolerance = 0, bool ForCheck = false, bool KeepDesignations = false,
+    IReadOnlyList<SBM.Core.Road.RoadModel>? Roads = null, IReadOnlyList<SBM.Core.Wall.RetainingWallModel>? Walls = null,
+    IReadOnlyList<SBM.Core.Grading.GradingModel>? Gradings = null, IReadOnlyList<SBM.Core.Utility.UtilityModel>? Utilities = null,
+    SBM.Core.Project.LodSettings? Lod = null);
 
 /// <summary>
 /// Exports the model to IFC 4.3 (IFC4X3_ADD2) with semantic entities:
@@ -226,7 +229,7 @@ public static class IfcExporter
             return id;
         }
 
-        int FaceSet(Mesh m, int? style)
+        int FaceSet(Mesh m, int? style, bool closed = true)
         {
             // Merge coincident vertices (builders emit separate vertices per wall triangle).
             var index = new Dictionary<Vec3, int>(m.Positions.Count);
@@ -246,7 +249,7 @@ public static class IfcExporter
             }
             sb.Append("),$");
             int pts = w.Add("IFCCARTESIANPOINTLIST3D", sb.ToString());
-            sb.Clear().Append(Ref(pts)).Append(",$,.T.,(");
+            sb.Clear().Append(Ref(pts)).Append(closed ? ",$,.T.,(" : ",$,.F.,(");
             bool firstTri = true;
             for (int i = 0; i < m.Indices.Count; i += 3)
             {
@@ -389,13 +392,26 @@ public static class IfcExporter
 
         var materials = new Dictionary<string, List<int>>();
         var psetTargets = new List<(int id, string mark, string desc, double length, double massKg)>();
+        // OPTIONAL level of detail: the levels the model was generated at (the output's cap applied by the caller), per bridge and group -> element ids (Pset SBM_LOD)
+        var lodSet = options.Lod ?? project.Lod;
+        var lodTargets = new Dictionary<(string bridge, SBM.Core.Project.LodGroup g), List<int>>();
+        string lodBridge = "";
+        void LodTarget(SBM.Core.Project.LodGroup g, int id)
+        {
+            if (lodSet == null) return;
+            if (!lodTargets.TryGetValue((lodBridge, g), out var l)) lodTargets[(lodBridge, g)] = l = new List<int>();
+            l.Add(id);
+        }
         // Generic expansion joint devices: (accessory, location text) -> SBM_Placeholder property set.
         var placeholders = new List<(int id, string location, string type)>();
         // Misc items by others (sign base plates, crash cushion, junction boxes, trough): SBM_Placeholder with the plan basis.
         var miscPlaceholders = new List<(int id, string location, string basis)>();
         // Elements modeled on an assumption the plans do not fix: Pset SBM_Status (Status, Reason, Basis).
         var miscStatus = new List<(int id, SBM.Core.Assumption a)>();
+        // approach slabs owned by a road (ApproachSlabDefinition.Owner = Road): contained in that IfcRoad, written with the roads
+        var roadContained = new Dictionary<string, List<int>>();
         var fabAttrs = new List<(int id, SBM.Core.Bridge.FabricationAttributes f)>();
+        var fitAttrs = new List<(int id, List<PartFit> f)>();
         // Debonded strands: Pset SBM_Debonding (tendon id, its key, lengths from the start / end of the beam, plan symbol).
         var debondPsets = new List<(int id, string key, double start, double end, string symbol)>();
         var pipePiles = new List<(int id, string key, double diameter, double shell)>();   // CIP pipe piles -> SBM_PipePile
@@ -468,6 +484,19 @@ public static class IfcExporter
 
         // Bar / strand centerline as an IfcIndexedPolyCurve of straight runs (IfcLineIndex) and true circular arcs
         // (IfcArcIndex) fitted through the samples within 0.5 mm: bends come back exact, spirals as short arcs.
+        // OPTIONAL camber data (plan camber tables; the geometry stays the FINAL, uncambered shape): Pset SBM_Camber = single values + one
+        // IfcPropertyTableValue per column (defining = distance along the girder / fraction of the span, rows with a NaN value left out of that column).
+        void CamberPset(IReadOnlyList<int> targets, string key, List<int> singles, string definingName,
+            IReadOnlyList<(string name, List<(string def, string val)> rows)> columns)
+        {
+            var props = new List<int>(singles);
+            foreach (var (name, rows) in columns)
+                if (rows.Count > 0)
+                    props.Add(w.Add("IFCPROPERTYTABLEVALUE", $"{S(name)},{S(name + " by " + definingName)},({string.Join(",", rows.Select(r => r.def))}),({string.Join(",", rows.Select(r => r.val))}),$,$,$,.LINEAR."));
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/camber")},$,'SBM_Camber',$,{Refs(props)}");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relcamber")},$,$,$,{Refs(targets)},{Ref(ps)}");
+        }
+
         (int curve, double length) Directrix(IReadOnlyList<Vec3> pts)
         {
             var pieces = ArcFit.Fit(pts, 0.0005);
@@ -536,6 +565,7 @@ public static class IfcExporter
                 contained.Add(id);
                 AddMaterial($"ASTM A615 Gr. {fy:0}" + (mk.Epoxy ? ", epoxy coated" : ""), id);
                 psetTargets.Add((id, tag, mk.Size.Name, len, len * mk.Size.MassPerLength));
+                LodTarget(SBM.Core.Project.LodGroup.Reinforcing, id);
             }
         }
 
@@ -549,6 +579,9 @@ public static class IfcExporter
                 SBM.Core.Misc.MiscGroup.Drainage => RgbStyle("Drainage", 0.35, 0.65, 0.8),
                 SBM.Core.Misc.MiscGroup.SignSupport => RgbStyle("Sign support", 0.55, 0.62, 0.7),
                 SBM.Core.Misc.MiscGroup.CrashCushion => RgbStyle("Crash cushion", 0.8, 0.72, 0.2),
+                SBM.Core.Misc.MiscGroup.ExpansionJoint => RgbStyle("Expansion joint", 0.6, 0.6, 0.62),
+                SBM.Core.Misc.MiscGroup.SolarPlatform => RgbStyle("Solar array platform", 0.55, 0.6, 0.66),
+                SBM.Core.Misc.MiscGroup.Access => RgbStyle("Access hardware", 0.5, 0.55, 0.5),
                 _ => RgbStyle("Lighting", 0.9, 0.85, 0.4),
             };
             var styles = new Dictionary<SBM.Core.Misc.MiscGroup, int>();
@@ -589,6 +622,20 @@ public static class IfcExporter
                     SBM.Core.Misc.MiscKind.EndPostConcrete => w.Add("IFCBUILDINGELEMENTPROXY", Fs("'CRASH_CUSHION_END_POST'", ".USERDEFINED.")),
                     SBM.Core.Misc.MiscKind.CushionPlaceholder => w.Add("IFCBUILDINGELEMENTPROXY", Fs("'CRASH_CUSHION'", ".USERDEFINED.")),
                     SBM.Core.Misc.MiscKind.JunctionBox => w.Add("IFCJUNCTIONBOX", Fs("'LI-104_TYPE_1'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.JointDevice => w.Add("IFCDISCRETEACCESSORY", Fs("'EXPANSION_JOINT_DEVICE'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.JointEndPost => w.Add("IFCRAILING", Fs("'PARAPET_END_POST'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.JointCoverPlate => w.Add("IFCPLATE", Fs("'JOINT_COVER_PLATE'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.PlatformMember => w.Add("IFCMEMBER", Fs("$", ".MEMBER.")),
+                    SBM.Core.Misc.MiscKind.PlatformPlate => w.Add("IFCPLATE", Fs("'PLATFORM_PLATE'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.PlatformGrating => w.Add("IFCPLATE", Fs("'GRATING'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.SolarArray => w.Add("IFCSOLARDEVICE", Fs("$", ".SOLARPANEL.")),
+                    SBM.Core.Misc.MiscKind.Battery => w.Add("IFCELECTRICFLOWSTORAGEDEVICE", Fs("$", ".BATTERY.")),
+                    SBM.Core.Misc.MiscKind.Luminaire => w.Add("IFCLIGHTFIXTURE", Fs("$", ".DIRECTIONSOURCE.")),
+                    SBM.Core.Misc.MiscKind.OutletBox => w.Add("IFCOUTLET", Fs("$", ".POWEROUTLET.")),
+                    SBM.Core.Misc.MiscKind.Panelboard => w.Add("IFCELECTRICDISTRIBUTIONBOARD", Fs("$", ".DISTRIBUTIONBOARD.")),
+                    SBM.Core.Misc.MiscKind.ElectricalBox => w.Add("IFCJUNCTIONBOX", Fs("$", ".POWER.")),
+                    SBM.Core.Misc.MiscKind.VerminScreen => w.Add("IFCPLATE", Fs("'VERMIN_SCREEN'", ".USERDEFINED.")),
+                    SBM.Core.Misc.MiscKind.AccessDoor => w.Add("IFCPLATE", Fs("'ACCESS_DOOR'", ".USERDEFINED.")),
                     _ => w.Add("IFCCABLECARRIERSEGMENT", Fs("$", ".CONDUITSEGMENT.")),
                 };
                 AddMaterial(el.Material, id);
@@ -752,6 +799,33 @@ public static class IfcExporter
                 AddMaterial(concreteMat, slab);
                 psetTargets.Add((slab, "DECK", "Deck slab", 0, (c.DeckVolume + c.HaunchVolume + c.DeckBumpVolume) * 2400));
             }
+            if (c.DeckParts.Count > 0)
+            {
+                // precast panels / closure pours: IfcBuildingElementPart (PRECASTPANEL / 'CLOSURE_POUR') aggregated into the deck slab (a slab without
+                // a body of its own when the deck is made of them only)
+                if (deckSlab == 0)
+                {
+                    deckSlab = w.Add("IFCSLAB", $"{Guid(IfcKeys.DeckSlab(bk))},$,'Deck slab','Precast deck panels with cast-in-place closure pours','BRIDGE_DECK',{Ref(pl)},$,'DECK',.USERDEFINED.");
+                    contained.Add(deckSlab);
+                    AddMaterial(concreteMat, deckSlab);
+                    psetTargets.Add((deckSlab, "DECK", "Deck slab", 0, c.DeckPartVolume * 2400));
+                }
+                var pieces = new List<int>();
+                foreach (var dp in c.DeckParts)
+                {
+                    if (dp.Mesh.IsEmpty) continue;
+                    int dpds = Body(dp.Mesh, concreteStyle);
+                    int id = dp.IsPanel
+                        ? w.Add("IFCBUILDINGELEMENTPART", $"{Guid(IfcKeys.DeckPiece(bk, dp.Name))},$,{S(dp.Name)},'Precast deck panel',$,{Ref(pl)},{Ref(dpds)},$,.PRECASTPANEL.")
+                        : w.Add("IFCBUILDINGELEMENTPART", $"{Guid(IfcKeys.DeckPiece(bk, dp.Name))},$,{S(dp.Name)},'Cast-in-place closure pour','CLOSURE_POUR',{Ref(pl)},{Ref(dpds)},$,.USERDEFINED.");
+                    pieces.Add(id);
+                    AddMaterial(concreteMat, id);
+                    psetTargets.Add((id, dp.IsPanel ? "PANEL" : "CLOSURE", dp.Name, 0, Math.Abs(dp.Mesh.Volume()) * 2400));
+                    if (dp.Assumption != null) miscStatus.Add((id, dp.Assumption));
+                    result.ElementCount++;
+                }
+                if (pieces.Count > 0) w.Add("IFCRELAGGREGATES", $"{Guid(IfcKeys.DeckSlab(bk) + "/rel/pieces")},$,$,$,{Ref(deckSlab)},{Refs(pieces)}");
+            }
             foreach (var (name, mesh) in c.Barriers)
             {
                 int pds;
@@ -774,7 +848,9 @@ public static class IfcExporter
                     ? w.Add("IFCKERB", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(btype)},{S(btype)},{Ref(pl)},{Ref(pds)},{S(name)},.USERDEFINED.")
                     : w.Add("IFCRAILING", $"{Guid(IfcKeys.Barrier(bk, name))},$,{S(name)},{S(btype)},$,{Ref(pl)},{Ref(pds)},{S(name)},.GUARDRAIL.");
                 contained.Add(rail);
-                AddMaterial(concreteMat, rail);
+                bool hasInfo = c.BarrierInfo.TryGetValue(name, out var binfo);
+                AddMaterial(hasInfo && binfo.Material.Length > 0 ? binfo.Material : concreteMat, rail);
+                if (hasInfo && binfo.Assumption != null) miscStatus.Add((rail, binfo.Assumption));
                 psetTargets.Add((rail, name, "Concrete barrier", 0, Math.Abs(mesh.Volume()) * 2400));
             }
             // Expansion joints. The blockout concrete is poured separately (after the device is set), so it is its own element:
@@ -841,11 +917,40 @@ public static class IfcExporter
                 psetTargets.Add((hp, "CAPHAUNCH", ch.Name, 0, ch.Volume * 2400));
                 result.ElementCount++;
             }
+            // Approach slabs (OPTIONAL SupportDefinition.ApproachSlab): IfcSlab APPROACH_SLAB + sleeper IfcSlab 'SLEEPER_SLAB', in the bridge's deck part or,
+            // owner Road, in the IfcRoad on the same alignment whose station range overlaps the slab.
+            foreach (var asr in c.ApproachSlabs)
+            {
+                string ak = IfcKeys.ApproachSlab(bk, asr.Support);
+                var road = asr.Definition.Owner == SBM.Core.Bridge.ApproachSlabOwner.Road
+                    ? options.Roads?.FirstOrDefault(r => r.Parts.Count > 0 && string.Equals(r.Definition.AlignmentName, def.AlignmentName, StringComparison.OrdinalIgnoreCase)
+                        && Math.Min(r.Definition.BeginStation, r.Definition.EndStation) <= asr.StationMax + 0.01 && Math.Max(r.Definition.BeginStation, r.Definition.EndStation) >= asr.StationMin - 0.01)
+                    : null;
+                var target = road != null ? (roadContained.TryGetValue(road.Definition.Name, out var rl) ? rl : roadContained[road.Definition.Name] = new()) : contained;
+                string mat = asr.Definition.Material.Length > 0 ? asr.Definition.Material : concreteMat;
+                string adesc = $"Approach slab {u.FormatLength(asr.Definition.Length)} x {u.FormatLength(asr.Definition.Thickness, LengthKind.Short)} beyond the deck end of {def.Name}" +
+                    $"; owner {asr.Definition.Owner?.ToString() ?? "not given (UNRESOLVED)"}" + (asr.Definition.Source.Length > 0 ? $" ({asr.Definition.Source})" : "");
+                int apds = Body(asr.Mesh, concreteStyle);
+                int ap = w.Add("IFCSLAB", $"{Guid(ak)},$,{S(asr.Name)},{S(adesc)},$,{Ref(pl)},{Ref(apds)},$,.APPROACH_SLAB.");
+                target.Add(ap);
+                if (asr.Assumption != null) miscStatus.Add((ap, asr.Assumption));
+                AddMaterial(mat, ap);
+                psetTargets.Add((ap, "APPROACH", asr.Name, 0, asr.Volume * 2400));
+                if (asr.Sleeper is { IsEmpty: false } sm)
+                {
+                    int spds = Body(sm, concreteStyle);
+                    int sp = w.Add("IFCSLAB", $"{Guid(IfcKeys.SleeperSlab(ak))},$,{S("Sleeper slab at " + asr.Support)},{S("Sleeper slab under the far end of the approach slab")},'SLEEPER_SLAB',{Ref(pl)},{Ref(spds)},$,.USERDEFINED.");
+                    target.Add(sp);
+                    AddMaterial(mat, sp);
+                    psetTargets.Add((sp, "SLEEPER", "Sleeper slab at " + asr.Support, 0, asr.SleeperVolume * 2400));
+                }
+                if (road != null) result.ElementCount += asr.Sleeper is { IsEmpty: false } ? 2 : 1;
+            }
             if (blockParts.Count > 0 && deckSlab > 0)
                 w.Add("IFCRELAGGREGATES", $"{Guid(bk + "/rel/blockouts")},$,$,$,{Ref(deckSlab)},{Refs(blockParts)}");
             else contained.AddRange(blockParts);
-            var marks = c.Marks.ToDictionary(m => m.Mark);
-            ExportBars(c.Bars.Select(b => (b, marks[b.Mark])), i => IfcKeys.DeckBar(bk, i), contained, pl, def.Deck.Reinforcement.SteelYieldKsi);
+            var marks = new SBM.Core.Concrete.BarMarkLookup(c.Marks);
+            ExportBars(c.Bars.Select(b => (b, marks[b])), i => IfcKeys.DeckBar(bk, i), contained, pl, def.Deck.Reinforcement.SteelYieldKsi);
             for (int i = 0; i < contained.Count; i += 5000)
                 w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/deck/" + i)},$,$,$,{Refs(contained.Skip(i).Take(5000))},{Ref(deckPart)}");
             result.ElementCount += contained.Count;
@@ -888,6 +993,22 @@ public static class IfcExporter
                 int beam = w.Add("IFCBEAM", $"{Guid(IfcKeys.PsBeam(bk, b.Mark))},$,{S(b.Mark)},{S(desc)},$,{Ref(pl)},{Ref(pds)},{S(b.Mark)},.GIRDER_SEGMENT.");
                 AddMaterial(b.Definition == null ? concreteMat : bConcrete, beam);
                 psetTargets.Add((beam, b.Mark, b.TypeName, b.Length, b.Mass));
+                if (bpd.CamberTable is { Count: > 0 } ctab)
+                {
+                    var rows = ctab.OrderBy(c => c.Fraction).ToList();
+                    string Fr(SBM.Core.Bridge.PrestressedCamberPoint c) => $"IFCNORMALISEDRATIOMEASURE({R(c.Fraction)})";
+                    List<(string, string)> Col(Func<SBM.Core.Bridge.PrestressedCamberPoint, double> f) =>
+                        rows.Select(c => (Fr(c), $"IFCLENGTHMEASURE({R(f(c) * scale)})")).ToList();
+                    var singles = new List<int>
+                    {
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'Source',$,IFCTEXT({S(bpd.CamberSource ?? bpd.Source)}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'Definition',$,IFCTEXT({S("Plan camber table: girder-alone camber (up +), superimposed dead load deflection (down +) and final camber at fractions of the span; the modeled beam is the final, uncambered shape")}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'MaxCamber',$,IFCLENGTHMEASURE({R(rows.Max(c => c.Camber) * scale)}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'MaxFinalCamber',$,IFCLENGTHMEASURE({R(rows.Max(c => c.FinalCamber) * scale)}),$"),
+                    };
+                    CamberPset(new[] { beam }, IfcKeys.PsBeam(bk, b.Mark), singles, "SpanFraction",
+                        new List<(string, List<(string, string)>)> { ("Camber", Col(c => c.Camber)), ("SdlDeflection", Col(c => c.Deflection)), ("FinalCamber", Col(c => c.FinalCamber)) });
+                }
                 if (b.Assumption != null) miscStatus.Add((beam, b.Assumption));
                 var kids = new List<int> { beam };
                 int n = 0;
@@ -910,6 +1031,7 @@ public static class IfcExporter
                         $"{R(sDia * scale)},{R(sArea * scale * scale)},$,$,$,$,$");
                     AddMaterial(b.Definition == null ? strandMat : bStrandMat, id);
                     kids.Add(id);
+                    LodTarget(SBM.Core.Project.LodGroup.Prestressing, id);
                     if (!st.Debonded) continue;
                     // Debonded strand: Pset SBM_Debonding on the tendon + one sheathing solid (IfcTendonConduit) per debonded end.
                     debondPsets.Add((id, sk, st.DebondStart, st.DebondEnd, st.DebondSymbol));
@@ -1021,6 +1143,7 @@ public static class IfcExporter
             string precastMat = $"Precast segmental box concrete, f'c = {sd.ConcreteStrengthKsi:0.0#} ksi";
             var contained = new List<int>();
             var asm = new Dictionary<string, (int id, List<int> kids)>();
+            var segIds = new Dictionary<string, int>();
             foreach (var bent in sm.Segments.Where(x => x.Bent != "").Select(x => x.Bent).Distinct())
             {
                 int a = w.Add("IFCELEMENTASSEMBLY", $"{Guid(IfcKeys.SegCantilever(bk, bent))},$,{S(bent + " cantilever")},{S($"Balanced cantilever from {bent}: split bent segment and the segments erected from it")},$,{Ref(pl)},$,{S(bent)},.SITE.,.GIRDER.");
@@ -1045,6 +1168,78 @@ public static class IfcExporter
                 psetTargets.Add((id, g.Name, ot, g.ChordLength, g.Volume * 2400));
                 if (g.Assumption != null) miscStatus.Add((id, g.Assumption));
                 if (g.Bent != "" && asm.TryGetValue(g.Bent, out var aa)) aa.kids.Add(id); else contained.Add(id);
+                segIds[g.Name] = id;
+            }
+            // OPTIONAL details: blocks = IfcBuildingElementPart aggregated into their segment; openings = IfcOpeningElement voiding it
+            if (sm.Blocks.Count > 0 || sm.PtHardware.Count > 0)
+            {
+                var blockKids = new Dictionary<int, List<int>>();
+                // PT hardware (OPTIONAL): pipes cast in a segment = IfcTendonConduit aggregated into it; bars = IfcTendon .BAR. (temporary bars are removed
+                // after erection: contained in the superstructure)
+                int pipeStyle = 0, barStyle = 0;
+                foreach (var hw in sm.PtHardware)
+                {
+                    if (hw.Points.Count < 2 || !segIds.TryGetValue(hw.Segment, out int hhost)) continue;
+                    var (hc, _) = Directrix(hw.Points);
+                    string hk = IfcKeys.SegHardware(bk, hw.Name);
+                    int hid;
+                    if (hw.IsPipe)
+                    {
+                        if (pipeStyle == 0) pipeStyle = RgbStyle("Galvanized steel pipe", 0.70, 0.72, 0.74);
+                        int hd = w.Add("IFCSWEPTDISKSOLID", $"{Ref(hc)},{R(hw.OuterDiameter / 2 * scale)},{(hw.InnerDiameter > 0 ? R(hw.InnerDiameter / 2 * scale) : "$")},$,$");
+                        w.Add("IFCSTYLEDITEM", $"{Ref(hd)},({Ref(pipeStyle)}),$");
+                        int hr = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(hd)})");
+                        int hp = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(hr)})");
+                        string hot = hw.Kind == SBM.Core.Segmental.SegmentalHardwareKind.DeviationPipe ? "DEVIATION_PIPE" : "FUTURE_PT_PIPE";
+                        hid = w.Add("IFCTENDONCONDUIT", $"{Guid(hk)},$,{S(hw.Name)},{S(hw.Description)},{S(hot)},{Ref(pl)},{Ref(hp)},$,$,.DUCT.");
+                        if (!blockKids.TryGetValue(hhost, out var lk)) blockKids[hhost] = lk = new List<int>();
+                        lk.Add(hid);
+                    }
+                    else
+                    {
+                        if (barStyle == 0) barStyle = RgbStyle("PT bar", 0.30, 0.30, 0.34);
+                        double hr0 = hw.OuterDiameter / 2;
+                        int hd = w.Add("IFCSWEPTDISKSOLID", $"{Ref(hc)},{R(hr0 * scale)},$,$,$");
+                        w.Add("IFCSTYLEDITEM", $"{Ref(hd)},({Ref(barStyle)}),$");
+                        int hr = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','AdvancedSweptSolid',({Ref(hd)})");
+                        int hp = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(hr)})");
+                        string hot = hw.Kind switch
+                        {
+                            SBM.Core.Segmental.SegmentalHardwareKind.TemporaryPtBar => "TEMPORARY_ERECTION_PT_BAR",
+                            SBM.Core.Segmental.SegmentalHardwareKind.VerticalPtBar => "VERTICAL_PT_BAR", _ => "PERMANENT_PT_BAR",
+                        };
+                        hid = w.Add("IFCTENDON", $"{Guid(hk)},$,{S(hw.Name)},{S(hw.Description)},{S(hot)},{Ref(pl)},{Ref(hp)},$,$,.BAR.," +
+                            $"{R(2 * hr0 * scale)},{R(Math.PI * hr0 * hr0 * scale * scale)},$,$,$,$,$");
+                        contained.Add(hid);
+                    }
+                    if (hw.Material.Length > 0) AddMaterial(hw.Material, hid);
+                    if (hw.Assumption != null) miscStatus.Add((hid, hw.Assumption));
+                    result.ElementCount++;
+                }
+                foreach (var bl in sm.Blocks)
+                {
+                    if (!segIds.TryGetValue(bl.Segment, out int host)) continue;
+                    string ot = bl.Kind switch
+                    {
+                        SBM.Core.Bridge.SegmentalBlockKind.AnchorBlock => "ANCHOR_BLOCK", SBM.Core.Bridge.SegmentalBlockKind.DeviationBlock => "DEVIATION_BLOCK",
+                        SBM.Core.Bridge.SegmentalBlockKind.ShearKey => "SHEAR_KEY", _ => "ERECTION_PT_BAR_BLOCK",
+                    };
+                    int bp = w.Add("IFCBUILDINGELEMENTPART", $"{Guid(IfcKeys.SegBlock(bk, bl.Name))},$,{S(bl.Name)},{S(bl.Description)},{S(ot)},{Ref(pl)},{Ref(Body(bl.Mesh, precastStyle))},$,.USERDEFINED.");
+                    AddMaterial(precastMat, bp);
+                    if (bl.Assumption != null) miscStatus.Add((bp, bl.Assumption));
+                    if (!blockKids.TryGetValue(host, out var lk)) blockKids[host] = lk = new List<int>();
+                    lk.Add(bp);
+                }
+                foreach (var (host, kids) in blockKids)
+                    w.Add("IFCRELAGGREGATES", $"{Guid(IfcKeys.Segment(bk, sm.Segments.First(x => segIds[x.Name] == host).Name) + "/rel/blocks")},$,$,$,{Ref(host)},{Refs(kids)}");
+            }
+            foreach (var op in sm.Openings)
+            {
+                if (!segIds.TryGetValue(op.Segment, out int host)) continue;
+                string ok = IfcKeys.SegOpening(bk, op.Name);
+                int open = w.Add("IFCOPENINGELEMENT", $"{Guid(ok)},$,{S(op.Name)},{S(op.Description)},{(op.Temporary ? "'TEMPORARY_ACCESS_OPENING'" : "$")},{Ref(pl)},{Ref(Body(op.Mesh, null))},$,.OPENING.");
+                w.Add("IFCRELVOIDSELEMENT", $"{Guid(ok + "/void")},$,$,$,{Ref(host)},{Ref(open)}");
+                if (op.Assumption != null) miscStatus.Add((open, op.Assumption));
             }
             var segBent = sm.Segments.ToDictionary(x => x.Name, x => x.Bent);
             var tendonProps = new List<(int id, string key, SBM.Core.Segmental.TendonResult t)>();
@@ -1124,6 +1319,17 @@ public static class IfcExporter
             int bPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
             int bridge = w.Add("IFCBRIDGE", $"{Guid(bk)},$,{S(framing.Definition.Name)},$,$,{Ref(bPl)},$,$,.ELEMENT.,.GIRDER.");
             bridgeIds.Add(bridge);
+            lodBridge = framing.Definition.Name;
+            // OPTIONAL level of detail (BridgeProject.Lod): the level of each element group the model was generated at (no Pset when unset)
+            if (lodSet is { } lod)
+            {
+                var lp = new List<int> { w.Add("IFCPROPERTYSINGLEVALUE", $"'Level',$,IFCINTEGER({lod.LevelFor(framing.Definition.Name, SBM.Core.Project.LodGroup.Steel)}),$") };
+                foreach (var g in System.Enum.GetValues<SBM.Core.Project.LodGroup>())
+                    lp.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"{S(g + "Level")},$,IFCINTEGER({lod.LevelFor(framing.Definition.Name, g)}),$"));
+                lp.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"'Basis',$,IFCTEXT('BIMForum LOD 100-400 as generated by SBM: 100 assembly envelopes, 200 without connection parts, 300 without fasteners / welds / holes / placed bars, 350 with holes, 400 full'),$"));
+                int lps = w.Add("IFCPROPERTYSET", $"{Guid(bk + "/lod")},$,'SBM_LOD',$,{Refs(lp)}");
+                w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(bk + "/rellod")},$,$,$,({Ref(bridge)}),{Ref(lps)}");
+            }
             int partPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(bPl)},{Ref(axis)}");
             // IFC4X3_ADD2: IfcFacilityPart is abstract (adds UsageType); IfcBridgePart adds PredefinedType.
             int superPart = w.Add("IFCBRIDGEPART",
@@ -1200,6 +1406,12 @@ public static class IfcExporter
                     AssemblyKind.Pylon => (".SITE.", ".PYLON.", "$"),
                     AssemblyKind.StayGroup => (".SITE.", ".SUSPENSIONASSEMBLY.", "$"),
                     AssemblyKind.CsDeck => (".FACTORY.", ".DECK.", "$"),
+                    AssemblyKind.CsEdgeGirder => (".FACTORY.", ".GIRDER.", "$"),
+                    AssemblyKind.CsFloorbeam => (".FACTORY.", ".USERDEFINED.", "'FLOORBEAM'"),
+                    AssemblyKind.CsFieldSplice => (".SITE.", ".USERDEFINED.", "'FIELD_SPLICE'"),
+                    AssemblyKind.CsAnchorage => (".FACTORY.", ".USERDEFINED.", "'STAY_ANCHORAGE'"),
+                    AssemblyKind.CsStringer => (".FACTORY.", ".USERDEFINED.", "'LONGITUDINAL_SUPPORT'"),
+                    AssemblyKind.PylonAnchorTray => (".FACTORY.", ".USERDEFINED.", "'STAY_ANCHORAGE_TRAY'"),
                     _ => (".SITE.", ".USERDEFINED.", "'BEARING'"),
                 };
                 if (asm.Kind == AssemblyKind.Railing)
@@ -1212,17 +1424,65 @@ public static class IfcExporter
                 }
                 asmIds[asm.Mark] = w.Add("IFCELEMENTASSEMBLY",
                     $"{Guid(IfcKeys.Assembly(bk, asm.Mark))},$,{S(asm.Mark)},{S(asm.Description)},{objType},{Ref(elemPl)},$,{S(asm.Mark)},{place},{type}");
+                // OPTIONAL standard cross frame (CrossFrameDefinition.Standard): Pset SBM_StandardCrossFrame (family, depth, hole shifts, twist); nothing when off.
+                if (asm.Kind == AssemblyKind.CrossFrame && steel.CrossFrameFit?.Row(asm.Mark) is { Standard.Length: > 0 } sfr)
+                {
+                    var sp = new List<int>
+                    {
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'Standard',$,IFCLABEL({S(sfr.Standard)}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'Family',$,IFCLABEL({S(sfr.Family)}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'Applied',$,IFCBOOLEAN({(sfr.Applied ? ".T." : ".F.")}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'DefinedEnd',$,IFCLABEL({S(sfr.DefinedEnd == "R" ? $"G{sfr.RightGirder + 1}" : $"G{sfr.LeftGirder + 1}")}),$"),
+                    };
+                    void SL(string n, double v) { if (!double.IsNaN(v)) sp.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"{S(n)},$,IFCLENGTHMEASURE({R(v * scale)}),$")); }
+                    SL("TopWorkPoint", sfr.TopWorkPoint); SL("Depth", sfr.Depth); SL("WorkPointSpacing", sfr.Spacing); SL("Headroom", sfr.Headroom);
+                    SL("HoleShiftLeft", sfr.ShiftTopL); SL("HoleShiftRight", sfr.ShiftTopR); SL("FarGussetGapMax", sfr.MaxGapBuilt);
+                    sp.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"'TwistDegrees',$,IFCREAL({R(sfr.TwistDegrees)}),$"));
+                    int sps = w.Add("IFCPROPERTYSET", $"{Guid(IfcKeys.Assembly(bk, asm.Mark) + "/stdcf")},$,'SBM_StandardCrossFrame',$,{Refs(sp)}");
+                    w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(IfcKeys.Assembly(bk, asm.Mark) + "/relstdcf")},$,$,$,({Ref(asmIds[asm.Mark])}),{Ref(sps)}");
+                }
             }
             w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(bk + "/rel/contained")},$,$,$,{Refs(asmIds.Values)},{Ref(superPart)}");
+            if (framing.Camber is { Girders.Count: > 0 } camber)
+                foreach (var cg in camber.Girders.Where(g => g.Points.Count > 0).OrderBy(g => g.Girder))
+                {
+                    var targets = steel.Assemblies.Where(a => a.Kind == AssemblyKind.GirderFieldSection && a.Girder == cg.Girder && asmIds.ContainsKey(a.Mark))
+                        .Select(a => asmIds[a.Mark]).ToList();
+                    if (targets.Count == 0) continue;
+                    var pts = cg.Points.OrderBy(p => p.PathDistance).GroupBy(p => R(p.PathDistance * scale)).Select(g => g.First()).ToList();
+                    string D(SBM.Core.Framing.CamberPointResult p) => $"IFCLENGTHMEASURE({R(p.PathDistance * scale)})";
+                    List<(string, string)> Col(Func<SBM.Core.Framing.CamberPointResult, double> f) =>
+                        pts.Where(p => !double.IsNaN(f(p))).Select(p => (D(p), $"IFCLENGTHMEASURE({R(f(p) * scale)})")).ToList();
+                    var singles = new List<int>
+                    {
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'Girder',$,IFCLABEL({S(cg.Name)}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'DatumPoint',$,IFCINTEGER({cg.DatumPoint}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'Definition',$,IFCTEXT({S("Plan camber table of the girder line (camber up +, deflections down +, distance along the girder web path from its start); blocking = no-load top of web above the datum point's; the modeled girder is the final, loaded shape")}),$"),
+                        w.Add("IFCPROPERTYSINGLEVALUE", $"'MaxCamber',$,IFCLENGTHMEASURE({R(pts.Max(p => p.Camber) * scale)}),$"),
+                    };
+                    CamberPset(targets, $"{bk}/girder/{cg.Name}", singles, "DistanceAlongGirder",
+                        new List<(string, List<(string, string)>)>
+                        {
+                            ("PlanPoint", pts.Select(p => (D(p), $"IFCINTEGER({p.Number})")).ToList()),
+                            ("Camber", Col(p => p.Camber)), ("SteelDeflection", Col(p => p.SteelDeflection)), ("SlabDeflection", Col(p => p.SlabDeflection)),
+                            ("NoLoadTopOfWeb", Col(p => p.NoLoadTopOfWeb)), ("Blocking", Col(p => p.Blocking)), ("HaunchElevation", Col(p => p.HaunchElevation)),
+                        });
+                }
 
             var children = asmIds.Keys.ToDictionary(k => k, _ => new List<int>());
+            // OPTIONAL sub-elements (SteelPart.Member, truss PartPerPiece): one IfcElementAssembly per built-up member / joint gusset stack, aggregated into the
+            // part's assembly; its pieces aggregated into it
+            var memberIds = new Dictionary<string, int>();
+            var memberKids = new Dictionary<string, List<int>>();
             foreach (var part in steel.Parts)
             {
                 if (part.Mesh.IsEmpty) continue;
                 int pds = Body(part.Mesh, Style(part.Category));
                 string g = Guid(IfcKeys.Part(bk, part.Mark));
                 string common = $"{g},$,{S(part.Mark)},{S(part.Description)}";
-                int id = part.Category switch
+                int id = part.Member != null && part.Piece is { } piece && PieceIfc(piece) is { } pc
+                    ? w.Add(pc.cls, $"{common},{pc.objType},{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},{pc.type}")
+                    : part.Category switch
                 {
                     PartCategory.FlangePlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.FLANGE_PLATE."),
                     PartCategory.WebPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WEB_PLATE."),
@@ -1312,14 +1572,36 @@ public static class IfcExporter
                     PartCategory.PylonStrut => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STRUT."),
                     PartCategory.StayCable => w.Add("IFCMEMBER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.STAY_CABLE."),
                     PartCategory.CsDeck => w.Add("IFCBEAM", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.GIRDER_SEGMENT."),
+                    // Cable-stayed edge girder deck: floorbeam plates, rocket launcher anchor pipe (IfcMember) and its bearing / pipe plates.
+                    PartCategory.CsFloorbeamPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},{(part.Mark.EndsWith("-W") ? ".WEB_PLATE." : ".FLANGE_PLATE.")}"),
+                    PartCategory.StayAnchorPipe => w.Add("IFCMEMBER", $"{common},'STAY_ANCHOR_PIPE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.CsStringerPlate => w.Add("IFCPLATE", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},{(part.Mark.EndsWith("-W") ? ".WEB_PLATE." : ".FLANGE_PLATE.")}"),
+                    PartCategory.PylonAnchorPlate => w.Add("IFCPLATE", $"{common},'STAY_ANCHORAGE_TRAY_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.PylonGuidePipe => w.Add("IFCMEMBER", $"{common},'STAY_GUIDE_PIPE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
+                    PartCategory.StayAnchorPlate => w.Add("IFCPLATE", $"{common},'STAY_ANCHOR_PLATE',{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.USERDEFINED."),
                     _ => w.Add("IFCFASTENER", $"{common},$,{Ref(elemPl)},{Ref(pds)},{S(part.Mark)},.WELD."),
                 };
                 if (part.Assumption != null) miscStatus.Add((id, part.Assumption));
                 if (part.Fabrication is { IsEmpty: false } fab) fabAttrs.Add((id, fab));
-                if (children.TryGetValue(part.Assembly, out var list)) list.Add(id);
+                if (part.Fits is { Count: > 0 } pf) fitAttrs.Add((id, pf));
+                if (part.Member is { } mem)
+                {
+                    if (!memberIds.TryGetValue(mem, out _))
+                    {
+                        bool stack = part.Category is PartCategory.TrussGusset or PartCategory.FillerPlate or PartCategory.SplicePlate;
+                        memberIds[mem] = w.Add("IFCELEMENTASSEMBLY",
+                            $"{Guid(IfcKeys.Member(bk, mem))},$,{S(mem)},{S(stack ? "joint gusset stack" : "built-up member")},{(stack ? "'GUSSET_STACK'" : "'BUILT_UP_MEMBER'")},{Ref(elemPl)},$,{S(mem)},.FACTORY.,.USERDEFINED.");
+                        memberKids[mem] = new List<int>();
+                        if (children.TryGetValue(part.Assembly, out var plist)) plist.Add(memberIds[mem]);
+                    }
+                    memberKids[mem].Add(id);
+                }
+                else if (children.TryGetValue(part.Assembly, out var list)) list.Add(id);
                 if (!materials.TryGetValue(part.Material, out var ml)) materials[part.Material] = ml = new List<int>();
                 ml.Add(id);
                 psetTargets.Add((id, part.Mark, part.Description, part.Length, part.Mass));
+                LodTarget(part.Category == PartCategory.Weld ? SBM.Core.Project.LodGroup.Welds
+                    : SBM.Core.Project.LodApply.IsConnectionPart(part.Category) ? SBM.Core.Project.LodGroup.Connections : SBM.Core.Project.LodGroup.Steel, id);
             }
 
             // Bolts, anchor bolts and studs: one IfcMechanicalFastenerType per distinct size carries the geometry (a
@@ -1395,6 +1677,7 @@ public static class IfcExporter
                 int id = w.Add("IFCMECHANICALFASTENER",
                     $"{Guid(IfcKeys.Fastener(bk, kind, bolt.Assembly, boltNo++))},$,{S(name)},$,$,{Ref(lp)},{Ref(pds)},$,$,$,{ptype}");
                 ty.occ.Add(id);
+                LodTarget(SBM.Core.Project.LodGroup.Fasteners, id);
                 if (boltRef?.Assumption is { } fas) { if (!fastenerStatus.TryGetValue(fas, out var fl)) fastenerStatus[fas] = fl = new List<int>(); fl.Add(id); }
                 if (children.TryGetValue(bolt.Assembly, out var list)) list.Add(id);
             }
@@ -1416,9 +1699,377 @@ public static class IfcExporter
             foreach (var (mark, ids) in children)
                 if (ids.Count > 0)
                     w.Add("IFCRELAGGREGATES", $"{Guid(bk + "/rel/asm/" + mark)},$,$,$,{Ref(asmIds[mark])},{Refs(ids)}");
+            foreach (var (mem, ids) in memberKids)
+                w.Add("IFCRELAGGREGATES", $"{Guid(IfcKeys.Member(bk, mem) + "/rel")},$,$,$,{Ref(memberIds[mem])},{Refs(ids)}");
             result.ElementCount += steel.Parts.Count + steel.Bolts.Count + steel.Studs.Count;
         }
+        // OPTIONAL roadway corridors (BridgeProject.Roads): IfcRoad > IfcRoadPart per component (CARRIAGEWAY lane / SHOULDER / SIDEWALK / CENTRALRESERVE /
+        // ROADSIDE) > IfcCourse per course (top course PAVEMENT, others USERDEFINED with the course name) or IfcKerb for swept sections; subgrade layers
+        // per side: IfcRoadPart USERDEFINED 'SUBGRADE' > IfcCourse USERDEFINED (placed subbase) / IfcEarthworksFill SUBGRADEBED (treated / prepared subgrade)
+        if (options.Roads is { Count: > 0 } roads)
+        {
+            int roadStyle = RgbStyle("Pavement", 0.35, 0.35, 0.38), curbStyle = RgbStyle("Concrete", 0.72, 0.72, 0.70), subStyle = RgbStyle("Subgrade", 0.55, 0.47, 0.36);
+            foreach (var rm in roads.Where(r => r.Parts.Count > 0))
+            {
+                string rk = IfcKeys.Road(key, rm.Definition.Name);
+                int rPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
+                int road = w.Add("IFCROAD", $"{Guid(rk)},$,{S(rm.Definition.Name)},{S(rm.Definition.Source)},$,{Ref(rPl)},$,$,.ELEMENT.,.NOTDEFINED.");
+                bridgeIds.Add(road);
+                var partIds = new List<int>();
+                foreach (var comp in rm.Parts.GroupBy(p => (p.Side, p.Component, Sub: p.Subgrade != null)))
+                {
+                    var first = comp.First();
+                    if (comp.Key.Sub)
+                    {
+                        string sk = IfcKeys.RoadSubgrade(rk, comp.Key.Side);
+                        int sPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(rPl)},{Ref(axis)}");
+                        int spart = w.Add("IFCROADPART", $"{Guid(sk)},$,{S(comp.Key.Side + " subgrade")},$,'SUBGRADE',{Ref(sPl)},$,$,.ELEMENT.,.VERTICAL.,.USERDEFINED.");
+                        partIds.Add(spart);
+                        var sels = new List<int>();
+                        foreach (var p in comp.Where(p => !p.Mesh.IsEmpty))
+                        {
+                            int ePl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sPl)},{Ref(axis)}");
+                            int pds = p.Pieces is { Count: > 1 } pcs
+                                ? w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(pcs.Select(pc => FaceSet(pc, subStyle)).ToList())}"))})")
+                                : Shape(FaceSet(p.Mesh, subStyle));
+                            string g = Guid(IfcKeys.RoadCourse(sk, p.Course));
+                            int el = p.Subgrade == SBM.Core.Road.RoadSubgradeKind.Subbase
+                                ? w.Add("IFCCOURSE", $"{g},$,{S(p.Name)},$,{S(p.Course)},{Ref(ePl)},{Ref(pds)},{S(p.Course)},.USERDEFINED.")
+                                : p.Subgrade == SBM.Core.Road.RoadSubgradeKind.Other
+                                    ? w.Add("IFCEARTHWORKSFILL", $"{g},$,{S(p.Name)},$,{S(p.Course)},{Ref(ePl)},{Ref(pds)},{S(p.Course)},.USERDEFINED.")
+                                    : w.Add("IFCEARTHWORKSFILL", $"{g},$,{S(p.Name)},{S(p.Subgrade == SBM.Core.Road.RoadSubgradeKind.TreatedSubgrade ? "treated subgrade" : "prepared subgrade")},$,{Ref(ePl)},{Ref(pds)},{S(p.Course)},.SUBGRADEBED.");
+                            sels.Add(el);
+                            if (p.Material.Length > 0) AddMaterial(p.Material, el);
+                            result.ElementCount++;
+                        }
+                        if (sels.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(sk + "/rel")},$,$,$,{Refs(sels)},{Ref(spart)}");
+                        continue;
+                    }
+                    string pk = IfcKeys.RoadPart(rk, comp.Key.Side, comp.Key.Component);
+                    string ptype = first.Kind switch
+                    {
+                        SBM.Core.Road.RoadComponentKind.Lane => ".TRAFFICLANE.", SBM.Core.Road.RoadComponentKind.Shoulder => ".SHOULDER.",
+                        SBM.Core.Road.RoadComponentKind.Sidewalk => ".SIDEWALK.", SBM.Core.Road.RoadComponentKind.Median => ".CENTRALRESERVE.",
+                        SBM.Core.Road.RoadComponentKind.Ditch or SBM.Core.Road.RoadComponentKind.CurbAndGutter => ".ROADSIDE.", _ => ".NOTDEFINED.",
+                    };
+                    int pPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(rPl)},{Ref(axis)}");
+                    int part = w.Add("IFCROADPART", $"{Guid(pk)},$,{S(comp.Key.Side + " " + comp.Key.Component)},$,$,{Ref(pPl)},$,$,.ELEMENT.,.LONGITUDINAL.,{ptype}");
+                    partIds.Add(part);
+                    var els = new List<int>();
+                    int ci = 0;
+                    foreach (var p in comp)
+                    {
+                        if (p.Mesh.IsEmpty) continue;
+                        int ePl = w.Add("IFCLOCALPLACEMENT", $"{Ref(pPl)},{Ref(axis)}");
+                        bool curb = p.Course == "";
+                        int pds = Shape(FaceSet(p.Mesh, curb ? curbStyle : roadStyle));
+                        int el = curb
+                            ? w.Add("IFCKERB", $"{Guid(IfcKeys.RoadKerb(pk))},$,{S(p.Name)},$,{S(p.Component)},{Ref(ePl)},{Ref(pds)},{S(p.Component)},.USERDEFINED.")
+                            : w.Add("IFCCOURSE", $"{Guid(IfcKeys.RoadCourse(pk, p.Course))},$,{S(p.Name)},$,{(ci == 0 ? "$" : S(p.Course))},{Ref(ePl)},{Ref(pds)},{S(p.Course)},{(ci == 0 ? ".PAVEMENT." : ".USERDEFINED.")}");
+                        if (!curb) ci++;
+                        els.Add(el);
+                        if (p.Material.Length > 0) AddMaterial(p.Material, el);
+                        result.ElementCount++;
+                    }
+                    if (els.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(pk + "/rel")},$,$,$,{Refs(els)},{Ref(part)}");
+                }
+                if (partIds.Count > 0) w.Add("IFCRELAGGREGATES", $"{Guid(rk + "/rel/parts")},$,$,$,{Ref(road)},{Refs(partIds)}");
+                if (roadContained.TryGetValue(rm.Definition.Name, out var owned) && owned.Count > 0)
+                    w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(rk + "/rel/approach-slabs")},$,$,$,{Refs(owned)},{Ref(road)}");
+            }
+        }
+        // OPTIONAL retaining walls (BridgeProject.Walls): IfcElementAssembly 'RETAINING_WALL' contained in the site > per panel IfcWall RETAININGWALL (stem) +
+        // IfcFooting STRIP_FOOTING (footing with its key); one closed face set per solid piece (footing steps split a panel)
+        if (options.Walls is { Count: > 0 } walls)
+        {
+            int wallStyle = RgbStyle("Concrete", 0.72, 0.72, 0.70);
+            var siteContained = new List<int>();
+            foreach (var wm in walls.Where(x => x.IsBuilt))
+            {
+                string wk = IfcKeys.Wall(key, wm.Definition.Name);
+                string mat = wm.Definition.Material.Length > 0 ? wm.Definition.Material : "Concrete";
+                int wPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
+                int asm = w.Add("IFCELEMENTASSEMBLY", $"{Guid(wk)},$,{S(wm.Definition.Name)},{S((wm.IsMse ? "MSE retaining wall" : "Cantilever retaining wall") + (wm.Definition.Source.Length > 0 ? $" ({wm.Definition.Source})" : ""))},'RETAINING_WALL',{Ref(wPl)},$,$,.SITE.,.USERDEFINED.");
+                siteContained.Add(asm);
+                var kids = new List<int>();
+                int Rep(List<SBM.Core.Solids.Mesh> pieces)
+                {
+                    var items = pieces.Where(x => !x.IsEmpty).Select(x => FaceSet(x, wallStyle)).ToList();
+                    int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
+                    return w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
+                }
+                if (wm.IsMse)
+                {
+                    // MSE: per joint panel IfcWall RETAININGWALL (facing; its precast panels = IfcBuildingElementPart PRECASTPANEL aggregated into it), leveling pad
+                    // IfcFooting 'LEVELING_PAD', coping IfcCovering COPING, reinforced zone IfcReinforcedSoil 'MSE_REINFORCED_ZONE', reinforcements IfcMember 'SOIL_REINFORCEMENT'
+                    var mse = wm.Definition.Mse!;
+                    string fmat = mse.FacingMaterial.Length > 0 ? mse.FacingMaterial : mat;
+                    var facingIds = new Dictionary<int, (int id, int pl)>();
+                    var partIds = new Dictionary<int, List<int>>();
+                    foreach (var el in wm.ExportElements())
+                    {
+                        string gid = Guid(IfcKeys.WallElement(wk, el.Role.ToString().ToLowerInvariant(), el.Index));
+                        string where = el.FromStation == el.ToStation ? $"station {el.FromStation:0.###}" : $"{el.FromStation:0.###} - {el.ToStation:0.###}";
+                        bool part = el.Role == SBM.Core.Wall.WallElementRole.FacingPanel && facingIds.ContainsKey(el.Panel);
+                        int ePl = w.Add("IFCLOCALPLACEMENT", $"{Ref(part ? facingIds[el.Panel].pl : wPl)},{Ref(axis)}");
+                        string shape = el.Solids.Count > 0 ? Ref(Rep(el.Solids)) : "$";
+                        string len = double.IsNaN(el.Length) ? "" : $", reinforcement length {el.Length:0.###} m";
+                        int id = el.Role switch
+                        {
+                            SBM.Core.Wall.WallElementRole.Facing => w.Add("IFCWALL", $"{gid},$,{S(el.Name)},{S("MSE facing, " + where)},$,{Ref(ePl)},{shape},$,.RETAININGWALL."),
+                            SBM.Core.Wall.WallElementRole.FacingPanel => w.Add("IFCBUILDINGELEMENTPART", $"{gid},$,{S(el.Name)},{S("Precast facing panel, " + where)},$,{Ref(ePl)},{shape},$,.PRECASTPANEL."),
+                            SBM.Core.Wall.WallElementRole.LevelingPad => w.Add("IFCFOOTING", $"{gid},$,{S(el.Name)},{S("Leveling pad, " + where)},'LEVELING_PAD',{Ref(ePl)},{shape},$,.USERDEFINED."),
+                            SBM.Core.Wall.WallElementRole.Coping => w.Add("IFCCOVERING", $"{gid},$,{S(el.Name)},{S("Coping, " + where)},$,{Ref(ePl)},{shape},$,.COPING."),
+                            SBM.Core.Wall.WallElementRole.PileSleeve => w.Add("IFCBUILDINGELEMENTPART", $"{gid},$,{S(el.Name)},{S($"Pile sleeve, {el.Length:0.###} m")},'PILE_SLEEVE',{Ref(ePl)},{shape},$,.USERDEFINED."),
+                            SBM.Core.Wall.WallElementRole.ReinforcedZone => w.Add("IFCREINFORCEDSOIL", $"{gid},$,{S(el.Name)},{S("Reinforced zone envelope, " + where + len)},'MSE_REINFORCED_ZONE',{Ref(ePl)},{shape},$,.USERDEFINED."),
+                            _ => w.Add("IFCMEMBER", $"{gid},$,{S(el.Name)},{S("Soil reinforcement, " + where + len)},'SOIL_REINFORCEMENT',{Ref(ePl)},{shape},$,.USERDEFINED."),
+                        };
+                        if (el.Role == SBM.Core.Wall.WallElementRole.Facing) facingIds[el.Panel] = (id, ePl);
+                        if (part)
+                        {
+                            (partIds.TryGetValue(el.Panel, out var pl) ? pl : partIds[el.Panel] = new()).Add(id);
+                            AddMaterial(fmat, id); result.ElementCount++;
+                            continue;
+                        }
+                        kids.Add(id);
+                        if (el.Role == SBM.Core.Wall.WallElementRole.ReinforcedZone) AddMaterial("Reinforced backfill", id);
+                        else if (el.Role == SBM.Core.Wall.WallElementRole.Reinforcement) AddMaterial(mse.Reinforcement!.Material.Length > 0 ? mse.Reinforcement.Material : "Soil reinforcement", id);
+                        else if (el.Role == SBM.Core.Wall.WallElementRole.PileSleeve) AddMaterial(mse.Abutments?.FirstOrDefault(a => a.SleeveMaterial.Length > 0)?.SleeveMaterial ?? "Pile sleeve", id);
+                        else AddMaterial(el.Role == SBM.Core.Wall.WallElementRole.Facing ? fmat : mat, id);
+                        result.ElementCount++;
+                    }
+                    foreach (var (panel, parts) in partIds)
+                        w.Add("IFCRELAGGREGATES", $"{Guid(IfcKeys.WallElement(wk, "facing", panel) + "/rel")},$,$,$,{Ref(facingIds[panel].id)},{Refs(parts)}");
+                    w.Add("IFCRELAGGREGATES", $"{Guid(wk + "/rel")},$,$,$,{Ref(asm)},{Refs(kids)}");
+                    continue;
+                }
+                foreach (var p in wm.Panels)
+                {
+                    int ePl = w.Add("IFCLOCALPLACEMENT", $"{Ref(wPl)},{Ref(axis)}");
+                    string where = $"panel {p.Index} ({p.FromStation:0.###} - {p.ToStation:0.###})";
+                    int stem = w.Add("IFCWALL", $"{Guid(IfcKeys.WallStem(wk, p.Index))},$,{S($"{wm.Definition.Name} stem {p.Index}")},{S("Stem, " + where)},$,{Ref(ePl)},{Ref(Rep(p.Stems))},$,.RETAININGWALL.");
+                    int ftg = w.Add("IFCFOOTING", $"{Guid(IfcKeys.WallFooting(wk, p.Index))},$,{S($"{wm.Definition.Name} footing {p.Index}")},{S("Footing, " + where)},$,{Ref(ePl)},{Ref(Rep(p.Footings))},$,.STRIP_FOOTING.");
+                    kids.Add(stem); kids.Add(ftg);
+                    AddMaterial(mat, stem); AddMaterial(mat, ftg);
+                    psetTargets.Add((stem, "STEM", $"{wm.Definition.Name} stem {p.Index}", 0, p.StemVolume * 2400));
+                    psetTargets.Add((ftg, "FOOTING", $"{wm.Definition.Name} footing {p.Index}", 0, p.FootingVolume * 2400));
+                    result.ElementCount += 2;
+                }
+                w.Add("IFCRELAGGREGATES", $"{Guid(wk + "/rel")},$,$,$,{Ref(asm)},{Refs(kids)}");
+            }
+            if (siteContained.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(key + "/rel/site-walls")},$,$,$,{Refs(siteContained)},{Ref(site)}");
+        }
+        // OPTIONAL grading (BridgeProject.Gradings): IfcElementAssembly 'GRADING' contained in the site > graded surface IfcGeographicElement TERRAIN (open face sets:
+        // top + slope) + protection layers IfcCourse PROTECTION (closed solids below the finished grade)
+        if (options.Gradings is { Count: > 0 } gradings)
+        {
+            int gStyle = RgbStyle("Graded ground", 0.55, 0.50, 0.38);
+            int pStyle = RgbStyle("Slope protection", 0.60, 0.60, 0.58);
+            var siteContained = new List<int>();
+            foreach (var gm in gradings.Where(x => x.IsBuilt))
+            {
+                string gk = IfcKeys.Grading(key, gm.Definition.Name);
+                int gPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
+                int asm = w.Add("IFCELEMENTASSEMBLY", $"{Guid(gk)},$,{S(gm.Definition.Name)},{S("Grading" + (gm.Definition.Source.Length > 0 ? $" ({gm.Definition.Source})" : ""))},'GRADING',{Ref(gPl)},$,$,.SITE.,.USERDEFINED.");
+                siteContained.Add(asm);
+                var kids = new List<int>();
+                int Rep(IEnumerable<SBM.Core.Solids.Mesh> pieces, int st, bool closed)
+                {
+                    var items = pieces.Where(x => !x.IsEmpty).Select(x => FaceSet(x, st, closed)).ToList();
+                    int rep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(items)}");
+                    return w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(rep)})");
+                }
+                string gvol = gm.CutVolume is double c && gm.FillVolume is double f ? $"; cut {c:0.###} m3, fill {f:0.###} m3 against the existing ground" : "";
+                int sPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(gPl)},{Ref(axis)}");
+                kids.Add(w.Add("IFCGEOGRAPHICELEMENT", $"{Guid(IfcKeys.GradingSurface(gk))},$,{S(gm.Definition.Name + " graded surface")},{S("Finished grade" + gvol)},'FINISHED_GRADE',{Ref(sPl)},{Ref(Rep(gm.Surfaces, gStyle, false))},$,.TERRAIN."));
+                result.ElementCount++;
+                foreach (var pr in gm.Protection)
+                {
+                    int pPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(gPl)},{Ref(axis)}");
+                    int id = w.Add("IFCCOURSE", $"{Guid(IfcKeys.GradingProtection(gk, pr.Index))},$,{S(pr.Name)},{S($"{(pr.Definition.Kind.Length > 0 ? pr.Definition.Kind : "Slope protection")}, {pr.Definition.Thickness:0.###} m thick")},$,{Ref(pPl)},{Ref(Rep(new[] { pr.Solid }, pStyle, true))},$,.PROTECTION.");
+                    AddMaterial(pr.Definition.Material.Length > 0 ? pr.Definition.Material : pr.Definition.Kind.Length > 0 ? pr.Definition.Kind : "Slope protection", id);
+                    kids.Add(id);
+                    result.ElementCount++;
+                }
+                w.Add("IFCRELAGGREGATES", $"{Guid(gk + "/rel")},$,$,$,{Ref(asm)},{Refs(kids)}");
+            }
+            if (siteContained.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(key + "/rel/site-gradings")},$,$,$,{Refs(siteContained)},{Ref(site)}");
+        }
+        // OPTIONAL utility networks (BridgeProject.Utilities): IfcDistributionSystem (STORMWATER / SEWAGE / ...) grouping IfcDistributionChamberElement structures and
+        // IfcPipeSegment pipes, contained in the site; connectivity by IfcDistributionPort pairs (pipe inlet SINK / outlet SOURCE) and IfcRelConnectsPorts
+        if (options.Utilities is { Count: > 0 } utilities)
+        {
+            var siteContained = new List<int>();
+            foreach (var um in utilities.Where(x => x.IsBuilt))
+            {
+                var nd = um.Definition;
+                string nk = IfcKeys.Utility(key, nd.Name);
+                var (sysType, r0, g0, b0) = nd.System switch
+                {
+                    SBM.Core.Utility.UtilitySystem.Storm => (".STORMWATER.", 0.10, 0.55, 0.15),
+                    SBM.Core.Utility.UtilitySystem.Sanitary => (".SEWAGE.", 0.10, 0.55, 0.15),
+                    SBM.Core.Utility.UtilitySystem.Water => (".WATERSUPPLY.", 0.10, 0.35, 0.85),
+                    SBM.Core.Utility.UtilitySystem.Gas => (".GAS.", 0.95, 0.85, 0.10),
+                    SBM.Core.Utility.UtilitySystem.Electrical => (".ELECTRICAL.", 0.90, 0.15, 0.10),
+                    SBM.Core.Utility.UtilitySystem.Telecom => (".COMMUNICATION.", 0.95, 0.55, 0.10),
+                    SBM.Core.Utility.UtilitySystem.Lighting => (".LIGHTING.", 0.90, 0.15, 0.10),
+                    _ => (".USERDEFINED.", 0.55, 0.55, 0.55),
+                };
+                int uStyle = RgbStyle("Utility " + nd.System, r0, g0, b0);
+                int sys = w.Add("IFCDISTRIBUTIONSYSTEM", $"{Guid(nk)},$,{S(nd.Name)},{S(nd.Source)},{(sysType == ".USERDEFINED." ? "'OTHER'" : "$")},{S(nd.Owner)},{sysType}");
+                var members = new List<int>();
+                var structPl = new Dictionary<SBM.Core.Utility.UtilityStructure, int>();
+                var structIds = new Dictionary<SBM.Core.Utility.UtilityStructure, (int id, string k)>();
+                string F(double v) => v.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+                foreach (var st in um.Structures.Where(x => x.IsBuilt))
+                {
+                    var sd = st.Definition;
+                    string sk = IfcKeys.UtilityStructure(nk, sd.Name);
+                    int sPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
+                    var (ot, pt) = sd.Kind switch
+                    {
+                        SBM.Core.Utility.UtilityStructureKind.Manhole => ("$", ".MANHOLE."),
+                        SBM.Core.Utility.UtilityStructureKind.JunctionBox => ("$", ".INSPECTIONCHAMBER."),
+                        SBM.Core.Utility.UtilityStructureKind.Cleanout => ("$", ".INSPECTIONPIT."),
+                        SBM.Core.Utility.UtilityStructureKind.Inlet => ("'INLET'", ".USERDEFINED."),
+                        SBM.Core.Utility.UtilityStructureKind.CatchBasin => ("'CATCH_BASIN'", ".USERDEFINED."),
+                        SBM.Core.Utility.UtilityStructureKind.Headwall => ("'HEADWALL'", ".USERDEFINED."),
+                        SBM.Core.Utility.UtilityStructureKind.Outfall => ("'OUTFALL'", ".USERDEFINED."),
+                        _ => (sd.Description.Length > 0 ? S(sd.Description) : "$", ".NOTDEFINED."),
+                    };
+                    string desc = $"{sd.Kind}; rim {F(st.Rim)} m ({st.RimSource}), sump {F(st.Sump)} m" + (sd.Description.Length > 0 ? "; " + sd.Description : "");
+                    var bodyItems = new List<int> { FaceSet(st.Mesh!, uStyle) };
+                    foreach (var cp in st.Parts.Where(p => p.Kind == "cone")) bodyItems.Add(FaceSet(cp.Mesh, uStyle));
+                    int sRep = w.Add("IFCSHAPEREPRESENTATION", $"{Ref(body)},'Body','Tessellation',{Refs(bodyItems)}");
+                    int sShape = w.Add("IFCPRODUCTDEFINITIONSHAPE", $"$,$,({Ref(sRep)})");
+                    // class by kind: in-line valves / hydrants are their own IFC classes; the rest are chambers
+                    string cls = sd.Kind switch
+                    {
+                        SBM.Core.Utility.UtilityStructureKind.Valve => "IFCVALVE",
+                        SBM.Core.Utility.UtilityStructureKind.Hydrant => "IFCFIRESUPPRESSIONTERMINAL",
+                        _ => "IFCDISTRIBUTIONCHAMBERELEMENT",
+                    };
+                    if (sd.Kind == SBM.Core.Utility.UtilityStructureKind.Valve) (ot, pt) = (sd.Description.Length > 0 ? S(sd.Description) : "$", ".NOTDEFINED.");
+                    else if (sd.Kind == SBM.Core.Utility.UtilityStructureKind.Hydrant) (ot, pt) = ("$", ".FIREHYDRANT.");
+                    else if (sd.Kind == SBM.Core.Utility.UtilityStructureKind.Handhole) (ot, pt) = ("'HANDHOLE'", ".USERDEFINED.");
+                    else if (sd.Kind == SBM.Core.Utility.UtilityStructureKind.Vault) (ot, pt) = nd.System == SBM.Core.Utility.UtilitySystem.Water ? ("$", ".VALVECHAMBER.") : ("'VAULT'", ".USERDEFINED.");
+                    int id = w.Add(cls, $"{Guid(sk)},$,{S(sd.Name)},{S(desc)},{ot},{Ref(sPl)},{Ref(sShape)},{S(sd.Name)},{pt}");
+                    if (sd.Material.Length > 0) AddMaterial(sd.Material, id);
+                    members.Add(id); siteContained.Add(id); structPl[st] = sPl; structIds[st] = (id, sk);
+                    result.ElementCount++;
+                    // frame / cover / grate: accessories aggregated by the structure
+                    var acc = new List<int>();
+                    foreach (var part in st.Parts.Where(p => p.Kind != "cone"))
+                    {
+                        string aot = part.Kind switch { "frame" => sd.Frame?.Grate == true ? "'INLET_FRAME'" : "'MANHOLE_FRAME'", "grate" => "'GRATE'", _ => "'MANHOLE_COVER'" };
+                        int aPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sPl)},{Ref(axis)}");
+                        int aid = w.Add("IFCDISCRETEACCESSORY", $"{Guid(IfcKeys.UtilityPart(sk, part.Kind))},$,{S(part.Name)},{S(sd.Frame?.Designation ?? "")},{aot},{Ref(aPl)},{Ref(Shape(FaceSet(part.Mesh, uStyle)))},$,.USERDEFINED.");
+                        if (sd.Frame?.Material is { Length: > 0 } fm) AddMaterial(fm, aid);
+                        acc.Add(aid); result.ElementCount++;
+                    }
+                    if (acc.Count > 0) w.Add("IFCRELAGGREGATES", $"{Guid(sk + "/rel/parts")},$,$,$,{Ref(id)},{Refs(acc)}");
+                    // wall openings for the pipes / duct banks
+                    foreach (var op in st.Openings)
+                    {
+                        string ok = IfcKeys.UtilityOpening(sk, op.Link);
+                        int oPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sPl)},{Ref(axis)}");
+                        int open = w.Add("IFCOPENINGELEMENT", $"{Guid(ok)},$,{S(sd.Name + " opening for " + op.Link)},$,$,{Ref(oPl)},{Ref(Shape(FaceSet(op.Mesh, null)))},$,.OPENING.");
+                        w.Add("IFCRELVOIDSELEMENT", $"{Guid(ok + "/rel")},$,$,$,{Ref(id)},{Ref(open)}");
+                    }
+                }
+                var structPorts = new Dictionary<SBM.Core.Utility.UtilityStructure, List<int>>();
+                foreach (var pp in um.Pipes.Where(x => x.IsBuilt))
+                {
+                    var pd = pp.Definition;
+                    string pk = IfcKeys.UtilityPipe(nk, pd.Name);
+                    int pPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
+                    bool culvert = pp.FromStructure?.Definition.Kind is SBM.Core.Utility.UtilityStructureKind.Headwall && pp.ToStructure?.Definition.Kind is SBM.Core.Utility.UtilityStructureKind.Headwall or SBM.Core.Utility.UtilityStructureKind.Outfall;
+                    string desc = $"{pd.Shape} {(pd.Shape == SBM.Core.Utility.UtilityPipeShape.Circular ? F(pd.InnerDiameter) : F(pd.InnerRise) + " x " + F(pd.InnerSpan))} m inside, wall {F(pd.WallThickness)} m; "
+                        + $"inverts {F(pp.Start.Z)} / {F(pp.End.Z)} m, slope {F(pp.Slope * 100)} %" + (pp.MinCover is double mc ? $", min cover {F(mc)} m" : "") + (pd.Description.Length > 0 ? "; " + pd.Description : "");
+                    // electrical / telecom / lighting runs are conduits (cable carrier segments)
+                    bool conduit = nd.System is SBM.Core.Utility.UtilitySystem.Electrical or SBM.Core.Utility.UtilitySystem.Telecom or SBM.Core.Utility.UtilitySystem.Lighting;
+                    int id = conduit
+                        ? w.Add("IFCCABLECARRIERSEGMENT", $"{Guid(pk)},$,{S(pd.Name)},{S(desc)},$,{Ref(pPl)},{Ref(Shape(FaceSet(pp.Mesh!, uStyle)))},{S(pd.Name)},.CONDUITSEGMENT.")
+                        : w.Add("IFCPIPESEGMENT", $"{Guid(pk)},$,{S(pd.Name)},{S(desc)},$,{Ref(pPl)},{Ref(Shape(FaceSet(pp.Mesh!, uStyle)))},{S(pd.Name)},{(culvert ? ".CULVERT." : ".RIGIDSEGMENT.")}");
+                    string portType = conduit ? ".CABLECARRIER." : ".PIPE.";
+                    if (pd.Material.Length > 0) AddMaterial(pd.Material, id);
+                    members.Add(id); siteContained.Add(id);
+                    result.ElementCount++;
+                    // ports: inlet (start, SINK) and outlet (end, SOURCE); a built structure at an end gets the opposite port, connected
+                    int Port(string k, int relTo, Vec3 at, string dir, string name)
+                    {
+                        int pnt = w.Add("IFCCARTESIANPOINT", P(at));
+                        int ap = w.Add("IFCAXIS2PLACEMENT3D", $"{Ref(pnt)},$,$");
+                        int lp = w.Add("IFCLOCALPLACEMENT", $"{Ref(relTo)},{Ref(ap)}");
+                        return w.Add("IFCDISTRIBUTIONPORT", $"{Guid(k)},$,{S(name)},$,$,{Ref(lp)},$,{dir},{portType},{sysType}");
+                    }
+                    int pin = Port(IfcKeys.UtilityPort(pk, "start"), pPl, pp.Start, ".SINK.", pd.Name + " inlet");
+                    int pout = Port(IfcKeys.UtilityPort(pk, "end"), pPl, pp.End, ".SOURCE.", pd.Name + " outlet");
+                    w.Add("IFCRELNESTS", $"{Guid(pk + "/rel/ports")},$,$,$,{Ref(id)},({Ref(pin)},{Ref(pout)})");
+                    foreach (var (st, mine, atEnd) in new[] { (pp.FromStructure, pin, false), (pp.ToStructure, pout, true) })
+                    {
+                        if (st == null || !structIds.TryGetValue(st, out var sv)) continue;
+                        // the structure's port for this pipe: it feeds the pipe's inlet (SOURCE) or receives its outlet (SINK)
+                        int sp = Port(IfcKeys.UtilityPort(sv.k, pd.Name), structPl[st], atEnd ? pp.End : pp.Start, atEnd ? ".SINK." : ".SOURCE.", $"{st.Definition.Name} to {pd.Name}");
+                        (structPorts.TryGetValue(st, out var l) ? l : structPorts[st] = new()).Add(sp);
+                        w.Add("IFCRELCONNECTSPORTS", $"{Guid(pk + "/rel/connect/" + (atEnd ? "end" : "start"))},$,$,$,{Ref(atEnd ? mine : sp)},{Ref(atEnd ? sp : mine)},$");
+                    }
+                }
+                foreach (var (st, ports) in structPorts)
+                    w.Add("IFCRELNESTS", $"{Guid(structIds[st].k + "/rel/ports")},$,$,$,{Ref(structIds[st].id)},{Refs(ports)}");
+                // pipe hangers of bridge-hung runs
+                foreach (var hg in um.Hangers.GroupBy(h => h.Pipe))
+                {
+                    string pk = IfcKeys.UtilityPipe(nk, hg.Key.Definition.Name);
+                    int i = 0;
+                    foreach (var h in hg)
+                    {
+                        i++;
+                        if (h.Mesh.IsEmpty) continue;
+                        var hd = hg.Key.Definition.Hangers!;
+                        int hPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
+                        int hid = w.Add("IFCDISCRETEACCESSORY", $"{Guid(IfcKeys.UtilityHanger(pk, i))},$,{S(h.Name)},{S($"{hd.Type} rod {F(hd.RodDiameter)} m, {F(h.Length)} m long, from {h.Above}" + (hd.Source.Length > 0 ? "; " + hd.Source : ""))},'PIPE_HANGER',{Ref(hPl)},{Ref(Shape(FaceSet(h.Mesh, uStyle)))},$,.USERDEFINED.");
+                        if (hd.Material.Length > 0) AddMaterial(hd.Material, hid);
+                        siteContained.Add(hid); members.Add(hid); result.ElementCount++;
+                    }
+                }
+                // duct banks: assembly > encasement (exact extrusion with the conduit holes) + conduits
+                foreach (var db in um.DuctBanks)
+                {
+                    var dd = db.Definition;
+                    string dk = IfcKeys.UtilityDuctBank(nk, dd.Name);
+                    int dPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(sitePl)},{Ref(axis)}");
+                    int asm = w.Add("IFCELEMENTASSEMBLY", $"{Guid(dk)},$,{S(dd.Name)},{S($"{dd.Rows} x {dd.Columns} conduits {F(dd.ConduitDiameter)} m, encasement {F(dd.Width)} x {F(dd.Height)} m" + (dd.Source.Length > 0 ? "; " + dd.Source : ""))},'DUCT_BANK',{Ref(dPl)},$,{S(dd.Name)},.SITE.,.USERDEFINED.");
+                    int cPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(dPl)},{Ref(axis)}");
+                    var kids = new List<int> { w.Add("IFCBUILDINGELEMENTPART", $"{Guid(dk + "/encasement")},$,{S(dd.Name + " encasement")},$,'ENCASEMENT',{Ref(cPl)},{Ref(Body(db.Encasement, uStyle))},$,.USERDEFINED.") };
+                    if (dd.Material.Length > 0) AddMaterial(dd.Material, kids[0]);
+                    for (int i = 0; i < db.Conduits.Count; i++)
+                    {
+                        int qPl = w.Add("IFCLOCALPLACEMENT", $"{Ref(dPl)},{Ref(axis)}");
+                        int cid = w.Add("IFCCABLECARRIERSEGMENT", $"{Guid(IfcKeys.UtilityConduit(dk, i + 1))},$,{S($"{dd.Name} conduit {i + 1}")},$,$,{Ref(qPl)},{Ref(Shape(FaceSet(db.Conduits[i], uStyle)))},$,.CONDUITSEGMENT.");
+                        if (dd.ConduitMaterial.Length > 0) AddMaterial(dd.ConduitMaterial, cid);
+                        kids.Add(cid);
+                    }
+                    w.Add("IFCRELAGGREGATES", $"{Guid(dk + "/rel")},$,$,$,{Ref(asm)},{Refs(kids)}");
+                    siteContained.Add(asm); members.Add(asm); result.ElementCount += kids.Count + 1;
+                }
+                if (members.Count > 0) w.Add("IFCRELASSIGNSTOGROUP", $"{Guid(nk + "/rel/group")},$,$,$,{Refs(members)},$,{Ref(sys)}");
+                w.Add("IFCRELSERVICESBUILDINGS", $"{Guid(nk + "/rel/site")},$,$,$,{Ref(sys)},({Ref(site)})");
+            }
+            if (siteContained.Count > 0) w.Add("IFCRELCONTAINEDINSPATIALSTRUCTURE", $"{Guid(key + "/rel/site-utilities")},$,$,$,{Refs(siteContained)},{Ref(site)}");
+        }
         if (bridgeIds.Count > 0) w.Add("IFCRELAGGREGATES", $"{Guid(key + "/rel/site-bridges")},$,$,$,{Ref(site)},{Refs(bridgeIds)}");
+
+        // ---- per-element level of detail: one SBM_LOD set per bridge and group, related to every element of that group (chunked)
+        foreach (var ((lb, lg), ids) in lodTargets)
+        {
+            string lk = IfcKeys.Bridge(key, lb) + "/lod/" + lg;
+            int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Level',$,IFCINTEGER({lodSet!.LevelFor(lb, lg)}),$");
+            int q2 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Group',$,IFCLABEL({S(lg.ToString())}),$");
+            int lps = w.Add("IFCPROPERTYSET", $"{Guid(lk)},$,'SBM_LOD',$,({Ref(q1)},{Ref(q2)})");
+            // a property set may have only one defining relationship: all its elements in one
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(lk + "/rel")},$,$,$,{Refs(ids)},{Ref(lps)}");
+        }
 
         // ---- materials and properties
         foreach (var (name, ids) in materials)
@@ -1501,6 +2152,14 @@ public static class IfcExporter
             int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/fabattr/" + first)},$,'SBM_FabricationAttributes',$,{Refs(props)}");
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relfabattr/" + first)},$,$,$,{Refs(grp.Select(t => t.id))},{Ref(ps)}");
         }
+        // OPTIONAL per-face fit conditions (SteelPart.Fits, plan inputs only): one Pset SBM_FitConditions per distinct set, shared by its parts.
+        foreach (var grp in fitAttrs.GroupBy(t => string.Join("|", t.f.Select(x => x.Text))))
+        {
+            var props = PartFit.Fields(grp.First().f).Select(x => Prop($"{S(x.Name)},$,IFCTEXT({S(x.Value)}),$")).ToList();
+            int first = grp.First().id;
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/fitcond/" + first)},$,'SBM_FitConditions',$,{Refs(props)}");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relfitcond/" + first)},$,$,$,{Refs(grp.Select(t => t.id))},{Ref(ps)}");
+        }
         foreach (var (id, a) in miscStatus)
         {
             int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Status',$,IFCLABEL({S(a.Status)}),$");
@@ -1525,4 +2184,18 @@ public static class IfcExporter
         foreach (char c in s) { h ^= c; h *= 1099511628211UL; }
         return (long)(h % 1_000_000_007UL);
     }
+    /// <summary>IFC class / ObjectType / predefined type of a built-up member piece (<c>SteelPart.Piece</c>); null = by part category (gussets, fills, splice plates).</summary>
+    private static (string cls, string objType, string type)? PieceIfc(string piece) => piece switch
+    {
+        "web ply" or "web plate" => ("IFCPLATE", "$", ".WEB_PLATE."),
+        "cover plate" => ("IFCPLATE", "$", ".COVER_PLATE."),
+        "plate" or "envelope" => ("IFCPLATE", "$", ".NOTDEFINED."),
+        "lacing" => ("IFCPLATE", "'LACING_BARS'", ".USERDEFINED."),
+        "angle" => ("IFCMEMBER", "'ANGLE'", ".USERDEFINED."),
+        "channel" => ("IFCMEMBER", "'CHANNEL'", ".USERDEFINED."),
+        "rolled shape" => ("IFCMEMBER", "$", ".MEMBER."),
+        "round bar" => ("IFCMEMBER", "'ROUND_BAR'", ".USERDEFINED."),
+        _ => null,
+    };
+
 }

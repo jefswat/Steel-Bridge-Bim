@@ -521,11 +521,15 @@ public partial class MainWindow
             }
             if (tag == null || TagHidden(tag)) continue; // hidden / outside the isolate: not pickable
             _lastPickHit = hit.PointHit;
+            _selectedModel = model;
+            // sub-elements of a built-up member: at member level (default) the whole member / gusset stack is selected (MainWindow.SubElements.cs)
+            if (PickMember(tag, hit.PointHit)) return;
             _selectedTitle = _vm.ShowPicked(tag);
             _selectedTag = tag;
             _selectedModel = model;
             if (hl != null) ShowHighlight(hl);
             DbOnPicked(tag, hit.PointHit);
+            ClickViewsOnPicked(hit.PointHit);
             return;
         }
         _vm.SelectedProperties.Clear();

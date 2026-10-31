@@ -106,6 +106,7 @@ var chords = Csv("chords.csv");
 var webs = Csv("webs.csv").ToDictionary(r => r["member"], r => r);
 var t = new TrussDefinition
 {
+    PartPerPiece = true,   // main span review BW-M1 / user 2026-10-27: every ply / angle / cover plate / gusset layer its own element (sub-element of its member / joint stack)
     Name = "Main truss spans 18-20", Source = "PTC DRB-4 (as-built 1954-57)", DefaultMaterial = "Structural steel (C / S not given)",
     Materials = { ["C"] = "Structural carbon steel (C)", ["S"] = "Structural silicon steel (S)" },   // p.70 note: "Silicon or Carbon Steel as noted by (S) or (C)"
     PlanSteelWeightLb = 5_730_000 + 10_200_000, PlanSteelWeightSource = "p.42 items 3 + 6, main river spans",
@@ -144,7 +145,10 @@ foreach (bool pr in halves)
         Pt("UM" + P(n, pr), s, LowerEl(n) + VertLen(n), "CL of the upper strut", Ft(43.5), -Ft(43.5));
         Pt("LM" + P(n, pr), s, LowerEl(n), "CL of the lower strut", Ft(43.5), -Ft(43.5));
         if (n == 22) Pt("WM22", s, Ft(D(elev[22]["wind_chord_ft"])), "CL of the floor lateral system at W22 (p.71 apex of the W21-W22 K)", Ft(43.5), -Ft(43.5));
-        Pt("SW" + P(n, pr), s, Gutter(n) - In(FbTopBelowGutterIn + FbDepthIn), "CL of the floor beam bottom (sway frame apex)", Ft(43.5), -Ft(43.5));
+        // sway frame V (batch 5c, p.71 SWAY BRACING sketch, p.97 cross sections at CL bridge, p.85 'Bracing Connection'): the diagonals run from the floor
+        // beam bottom at the truss (top, gusset pair + 4-Ls 6 x 4 x 1/2 on the floor beam / post) DOWN to the lower strut at the CL (apex on the strut top,
+        // 2-1/2 Pls + 2-Ls 4 x 4 x 3/4); the earlier model had the V upside down (apex at the floor beam bottom on the CL)
+        Pt("SW" + P(n, pr), s, Gutter(n) - In(FbTopBelowGutterIn + FbDepthIn), "floor beam bottom at the truss (sway V top, p.71 / p.85)");
     }
 
 // ================================================================ 3. sections
@@ -312,35 +316,84 @@ Add(new TrussSectionDefinition { Name = "W24x94", Kind = TrussSectionKind.Rolled
 Add(new TrussSectionDefinition { Name = "HP14x73", Kind = TrussSectionKind.Rolled, Designation = "HP14x73", Depth = In(13.6), FlangeWidth = In(14.6), WebThickness = In(0.505), FlangeThickness = In(0.505),
     WeightLbPerFt = 73, ShapeArea = In(1) * In(1) * 21.4, Material = "S", Label = "14 BP 73", Source = "p.71",   // ShapeArea: AISC HP14x73 21.4 sq in (the sharp-root polygon is 21.1, QC I032)
     Unresolved = U("p.71", "orientation of the 14 BP 73 wind chord / floor lateral web", "the bracing diagram gives the section only", "web vertical.") });
-Add(new TrussSectionDefinition { Name = "L13-W14", Kind = TrussSectionKind.LacedChannels, Channel = "C15x50", BackToBack = In(13.625), Material = "S",
+Add(new TrussSectionDefinition { Name = "L13-W14", Kind = TrussSectionKind.LacedChannels, Channel = "C15x50", BackToBack = In(13.625), Material = "S", Rotated = true,   // BW-S2: 1'-1 5/8 b.b. [ vertical
     TopPlates = { new TrussPlate(In(13), In(0.5), true, "PL (13-6) x 1/2") }, BottomPlates = { new TrussPlate(In(13), In(0.5), true, "PL (13-6) x 1/2") },
     Label = "2-15[ 50.0; 2-Web Pls 12x1/2; 2-Pls (13-6)x1/2; 1'-1 5/8 b.b. [s", Source = "p.71",
     Unresolved = U("p.71", "wind chord panel L13-W14 web plates 2-12 x 1/2", "their position in the section is only sketched", "channels + covers built, the 12 x 1/2 web plates are not.") });
 // Bracing (p.71 / p.79): laced / perforated channel members
 string bracingDetail = U("p.71, p.97-100", "bracing connections and the exact lateral / sway / portal geometry", "p.71 gives the systems as diagrams and sections; the bracing detail sheets p.97-100 were not read",
     "members run work point to work point (chord CL / strut mid points) with automatic end setbacks.");
-TrussSectionDefinition Laced(string name, string ch, double bb, double cw, double ct, string label) => Add(new TrussSectionDefinition
+// main span review BW-S1 / S3 (2026-10-27): the p.71 TRANSVERSE STRUTS / DIAGONAL / FLOOR LATERALS sketches give "2'-8 1/4 b.b. [" (W21-W22: "1'-1 5/8 b.b. [")
+// as the VERTICAL dimension (channels top and bottom on the chord's lateral plates, perforated plates on the sides) -> turned 90 deg (Rotated)
+TrussSectionDefinition Laced(string name, string ch, double bb, double cw, double ct, string label, bool turned = false) => Add(new TrussSectionDefinition
 {
-    Name = name, Kind = TrussSectionKind.LacedChannels, Channel = ch, BackToBack = bb, Material = ch.StartsWith("MC18") ? "S" : "C", Label = label, Source = "p.71",
+    Name = name, Kind = TrussSectionKind.LacedChannels, Channel = ch, BackToBack = bb, Material = ch.StartsWith("MC18") ? "S" : "C", Label = label, Source = "p.71", Rotated = turned,
     // QC I032: each channel at its 1954 gross area (p.70 for the 18 in channels, else weight / 3.4 lb/ft per sq in); the AISC v16 polygons are larger
     ShapeArea = In(1) * In(1) * (ch.StartsWith("MC18x") && Channel1954.TryGetValue(ch.Substring(5), out var a18) ? a18 : D(ch.Substring(ch.IndexOf('x') + 1)) / 3.4),
     TopPlates = { new TrussPlate(cw, ct, true) }, BottomPlates = { new TrussPlate(cw, ct, true) }, Unresolved = bracingDetail,
 });
-Laced("STRUT", "MC18x45.8", FI(2, 8.25), In(29.5), In(0.5), "2-18[ 45.8 (S); 2-Pls (29 1/2-13 1/2) x 1/2; 2'-8 1/4 b.b. [s");
-Laced("LAT31", "MC13x31.8", FI(2, 8.25), In(29.5), In(0.5), "2-13[ 31.8; 2-Pls (29 1/2-13 1/2) x 1/2; 2'-8 1/4 b.b. [s");
-Laced("LAT50", "MC13x50", FI(2, 8.25), In(29.5), In(0.5), "2-13[ 50; 2-Pls (29 1/2-13 1/2) x 1/2; 2'-8 1/4 b.b. [s");
+Laced("STRUT", "MC18x45.8", FI(2, 8.25), In(29.5), In(0.5), "2-18[ 45.8 (S); 2-Pls (29 1/2-13 1/2) x 1/2; 2'-8 1/4 b.b. [s", true);
+Laced("LAT31", "MC13x31.8", FI(2, 8.25), In(29.5), In(0.5), "2-13[ 31.8; 2-Pls (29 1/2-13 1/2) x 1/2; 2'-8 1/4 b.b. [s", true);
+Laced("LAT50", "MC13x50", FI(2, 8.25), In(29.5), In(0.5), "2-13[ 50; 2-Pls (29 1/2-13 1/2) x 1/2; 2'-8 1/4 b.b. [s", true);
 Laced("SWAY", "C15x33.9", In(13), In(12.5), In(0.375), "2-15[ 33.9; 2-Pls (12 1/2-6) x 3/8; 1'-1\"");
 Laced("SWAY11", "MC18x42.7", FI(1, 11.625), In(22), In(0.375), "2-18[ 42.7; 2-Cov. Pls (22-12) x 3/8; 1'-11 5/8 b.b.");
-Laced("FLAT21", "C12x25", In(13), In(13), In(0.375), "2-12[ 25; 2-Pls 13 x 3/8");
+Laced("FLAT21", "C12x25", FI(1, 1.625), In(13), In(0.375), "2-12[ 25; 2-Pls (13-6) x 3/8; 1'-1 5/8 b.b. [s", true);   // p.71 W21-W22 (was 13 b.b., not turned)
 Add(new TrussSectionDefinition { Name = "STRUT L0", Kind = TrussSectionKind.Box, Material = "S", WebDepth = In(30), WebPlies = { new TrussPly(In(30), In(0.5)) }, WebsBackToBack = In(18),
     Angle = "L5x5x7/8", AngleProjection = In(0.25), TopPlates = { new TrussPlate(In(17), In(7.0 / 8)) }, BottomPlates = { new TrussPlate(In(17), In(7.0 / 8)) },
     Label = "2-Cov. Pls 17x7/8; 4-Ls 5x5x7/8; 2-Web Pls (30-13 1/2) x 1/2; 1'-6 / 2'-6 1/2 b.b. Ls", Source = "p.71", Unresolved = bracingDetail + " Web manholes 13 1/2 x 24 @ 4'-6 not cut." });
 Add(new TrussSectionDefinition { Name = "STRUT L11", Kind = TrussSectionKind.Box, Material = "S", WebDepth = In(40), WebPlies = { new TrussPly(In(40), In(9.0 / 16)) }, WebsBackToBack = In(22.5),
     Angle = "L7x4x9/16", AngleProjection = In(0.25), TopPlates = { new TrussPlate(In(22), In(9.0 / 16)) }, BottomPlates = { new TrussPlate(In(22), In(9.0 / 16)) },
     Label = "2-Cov. Pls 22x9/16; 4-Ls 7x4x9/16; 2-Web Pls (40-16) x 9/16; 1'-10 1/2 / 3'-4 1/2 b.b. Ls", Source = "p.71", Unresolved = bracingDetail + " Web manholes 16 x 24 @ 4'-6 not cut." });
-Add(new TrussSectionDefinition { Name = "PORTAL U11", Kind = TrussSectionKind.Nominal, Width = In(24.1875), Depth = In(34.5), Material = "S", Label = "portal strut U11 (p.79 Section C)", Source = "p.79",
-    Unresolved = U("p.79, p.100", "portal strut and portal bracing at U11", "p.79 Section C lists plates 34 1/2 x 11/16, 24 1/2 x 7/16, (33-13 1/2) x 11/16, (35 1/2-13 1/2) x 9/16 and angles without their arrangement; the portal sheet p.100 was not read",
-        "nominal envelope 2'-0 3/16 x 2'-10 1/2 between the U11 points; portal knee bracing not built.") });
+// batch 5e (2026-10-28, review BW-S4): p.71 "Portal Strut at U11" dimensions the built-up box: W.P.s 1'-6 3/8 each side of CL U11-L11 at the bottom, the
+// side toward U12 square to CL U11-U12 (1'-5 7/16 above / 1'-4 1/8 below it, "90 deg"), top and bottom parallel to CL U11-U12, the other side plumb;
+// PL 34 1/2 x 11/16 (plumb side), PL (33-13 1/2) x 11/16 (square side, M.H. 13 1/2 x 24 @ 4'-6), PL 24 1/2 x 7/16 (top), PL (35 1/2-13 1/2) x 9/16 (bottom),
+// 2-Ls 6 x 6 x 1/2 at the square corners, "2-Ls each composed of 2-Pls 6 x 1/2 welded together F.L." at the plumb side. Section frame: x toward U12, y up.
+string portalFlag = U("p.71, p.79, p.100", "portal strut at U11: plate edges at the corners, manholes, strut-to-post and knee brace connections",
+    "the sketch gives the W.P. outline, plate sizes and corner angles but not how the plates meet at the corners; the manholes and the p.100 end / knee connections are drawn without dimensions",
+    "outline = the W.P. quadrilateral (out to out), plumb / square side plates full height, top / bottom between them, 6 x 6 x 1/2 angles inside the four corners; manholes not cut; end and knee connections not built.");
+TrussSectionDefinition PortalU11(string name, double sgn)
+{
+    // inches in the section frame (x toward U12 for sgn = +1)
+    double zA = LowerEl(11) + VertLen(11), zB = LowerEl(12) + VertLen(12);
+    double th = Math.Atan2(zB - zA, Panel), sn = Math.Sin(th), cs = Math.Cos(th), tn = Math.Tan(th);
+    double xc = 18.375 - 16.125 * sn;
+    (double x, double y) BR = (xc + 16.125 * sn, xc * tn - 16.125 * cs), TR = (xc - 17.4375 * sn, xc * tn + 17.4375 * cs);
+    (double x, double y) BL = (-18.375, BR.y - 36.75 * tn), TL = (-18.375, TR.y + (-18.375 - TR.x) * tn);
+    // sides as lines (point, unit direction), inward normals
+    (double x, double y) Sub((double x, double y) a, (double x, double y) b) => (a.x - b.x, a.y - b.y);
+    (double x, double y) U2((double x, double y) a) { double l = Math.Sqrt(a.x * a.x + a.y * a.y); return (a.x / l, a.y / l); }
+    (double x, double y) X((double x, double y) p1, (double x, double y) d1, (double x, double y) p2, (double x, double y) d2)
+    { double den = d1.x * d2.y - d1.y * d2.x; double t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / den; return (p1.x + d1.x * t, p1.y + d1.y * t); }
+    var cen = ((BL.x + BR.x + TR.x + TL.x) / 4, (BL.y + BR.y + TR.y + TL.y) / 4);
+    (double x, double y) Off((double x, double y) p, (double x, double y) d, double t)
+    { var nrm = (-d.y, d.x); if (nrm.Item1 * (cen.Item1 - p.x) + nrm.Item2 * (cen.Item2 - p.y) < 0) nrm = (d.y, -d.x); return (p.x + nrm.Item1 * t, p.y + nrm.Item2 * t); }
+    var dL = U2(Sub(TL, BL)); var dR = U2(Sub(TR, BR)); var dT = U2(Sub(TR, TL)); var dB = U2(Sub(BR, BL));
+    double tL = 11.0 / 16, tR = 11.0 / 16, tT = 7.0 / 16, tB = 9.0 / 16, ta = 0.5, leg = 6;
+    var iL = Off(BL, dL, tL); var iR = Off(BR, dR, tR); var iT = Off(TL, dT, tT); var iB = Off(BL, dB, tB);
+    var pieces = new List<TrussSectionPieceDefinition>();
+    void Piece(string label, string kind, params (double x, double y)[] pts) => pieces.Add(new TrussSectionPieceDefinition { Label = label, Kind = kind, Polygon = pts.Select(q => new TrussUV(In(q.x) * sgn, In(q.y))).ToList() });
+    Piece("PL 34 1/2 x 11/16", "plate", BL, TL, X(iL, dL, TL, dT), X(iL, dL, BL, dB));
+    Piece("PL (33-13 1/2) x 11/16", "plate", BR, X(iR, dR, BR, dB), X(iR, dR, TR, dT), TR);
+    Piece("PL 24 1/2 x 7/16", "plate", X(iL, dL, TL, dT), X(iR, dR, TR, dT), X(iR, dR, iT, dT), X(iL, dL, iT, dT));
+    Piece("PL (35 1/2-13 1/2) x 9/16", "plate", X(iL, dL, BL, dB), X(iL, dL, iB, dB), X(iR, dR, iB, dB), X(iR, dR, BR, dB));
+    // corner angles inside the plates: legs along the two sides from the inner corner
+    void Ang(string label, (double x, double y) p1, (double x, double y) d1, (double x, double y) p2, (double x, double y) d2)
+    {
+        var k = X(p1, d1, p2, d2); var k1 = X(Off(p1, d1, ta), d1, Off(p2, d2, ta), d2);
+        var a = U2(Sub(cen, k)); double s1 = d1.x * a.x + d1.y * a.y >= 0 ? 1 : -1, s2 = d2.x * a.x + d2.y * a.y >= 0 ? 1 : -1;
+        (double x, double y) A1 = (k.x + d1.x * s1 * leg, k.y + d1.y * s1 * leg), B1 = (k.x + d2.x * s2 * leg, k.y + d2.y * s2 * leg);
+        var A1i = X(Off(p1, d1, ta), d1, A1, (d1.y, -d1.x)); var B1i = X(Off(p2, d2, ta), d2, B1, (d2.y, -d2.x));
+        Piece(label, "angle", k, A1, A1i, k1, B1i, B1);
+    }
+    Ang("L 6 x 6 x 1/2", iR, dR, iT, dT); Ang("L 6 x 6 x 1/2", iR, dR, iB, dB);
+    Ang("L 6 x 6 x 1/2 (2-Pls 6 x 1/2 welded F.L.)", iL, dL, iT, dT); Ang("L 6 x 6 x 1/2 (2-Pls 6 x 1/2 welded F.L.)", iL, dL, iB, dB);
+    var sd = Add(new TrussSectionDefinition { Name = name, Kind = TrussSectionKind.Nominal, Width = In(36.75), Depth = In(TL.y - BL.y), Material = "S", Source = "p.71",
+        Label = $"portal strut U11 (p.71): PL 34 1/2 x 11/16, PL (33-13 1/2) x 11/16, PL 24 1/2 x 7/16, PL (35 1/2-13 1/2) x 9/16, 4 corner Ls 6 x 6 x 1/2 (plumb side {TL.y - BL.y:0.00} in. vs the 34 1/2 plate)",
+        CustomPieces = pieces, Unresolved = portalFlag });
+    return sd;
+}
+PortalU11("PORTAL U11", 1);
+PortalU11("PORTAL U11'", -1);
 
 // ================================================================ 4. members
 void Mem(string name, string from, string to, string sec, TrussMemberRole role, string panel, double planLen = 0, string plane = "", string system = "", double? sa = null, double? sb = null, string src = "")
@@ -417,7 +470,7 @@ foreach (bool pr in halves)
     // upper laterals U11-U22: K from the U(n) corners to the mid strut U(n+1) (apex toward the crown); struts U12-U22
     for (int n = 12; n <= 22; n++) if (!(pr && n == 22)) Strut("U" + P(n, pr), "STRUT", "Upper laterals");
     for (int n = 11; n < 22; n++) KDiag("U" + P(n, pr), "UM" + P(n + 1, pr), "LAT31", "Upper laterals", TrussMemberRole.UpperLateral);
-    Mem("PORTAL-U" + P(11, pr), "N:U" + P(11, pr), "S:U" + P(11, pr), "PORTAL U11", TrussMemberRole.Portal, "", system: "Portals");
+    Mem("PORTAL-U" + P(11, pr), "N:U" + P(11, pr), "S:U" + P(11, pr), pr ? "PORTAL U11'" : "PORTAL U11", TrussMemberRole.Portal, "", system: "Portals");
     // lower laterals: L0-L10 K apex at the lower-numbered strut, L10-L12 diamond about L11, L12-L13 K apex at L13, L15-L22 K apex at L(n+1)
     Strut("L" + P(0, pr), "STRUT L0", "Lower laterals");
     Strut("L" + P(11, pr), "STRUT L11", "Lower laterals");
@@ -428,12 +481,13 @@ foreach (bool pr in halves)
     KDiag("L" + P(12, pr), "LM" + P(13, pr), "LAT50", "Lower laterals", TrussMemberRole.LowerLateral);
     for (int n = 15; n < 22; n++) KDiag("L" + P(n, pr), "LM" + P(n + 1, pr), "LAT31", "Lower laterals", TrussMemberRole.LowerLateral);
     Mem("LL-CL" + P(16, pr), "N:LM" + P(16, pr), "N:LM" + P(17, pr), "LAT31", TrussMemberRole.LowerLateral, "", system: "Lower laterals");
-    // sway frames: V below the floor beam at points 0-10, 12 (2-15[ 33.9) and 11 (2-18[ 42.7)
+    // sway frames: V below the floor beam at points 0-10, 12 (2-15[ 33.9) and 11 (2-18[ 42.7): from the floor beam bottom at each truss down to the
+    // lower strut CL (p.71 sketch "At Pt. 0, and 1 to 10 incl., and 12" / "At U11 - L11", p.97 cross sections at CL bridge)
     foreach (int n in Enumerable.Range(0, 13))
     {
         string sec = n == 11 ? "SWAY11" : "SWAY";
-        Mem($"SW-N{P(n, pr)}", "N:L" + P(n, pr), "N:SW" + P(n, pr), sec, TrussMemberRole.Sway, "", system: "Sway frames");
-        Mem($"SW-S{P(n, pr)}", "S:L" + P(n, pr), "S:SW" + P(n, pr), sec, TrussMemberRole.Sway, "", system: "Sway frames");
+        Mem($"SW-N{P(n, pr)}", "N:SW" + P(n, pr), "N:LM" + P(n, pr), sec, TrussMemberRole.Sway, "", system: "Sway frames");
+        Mem($"SW-S{P(n, pr)}", "S:SW" + P(n, pr), "S:LM" + P(n, pr), sec, TrussMemberRole.Sway, "", system: "Sway frames");
     }
     // floor lateral system span 19 (wind chords 87'-0 c.c.), p.71 FLOOR LATERAL SYSTEM + p.99 (QC I026): two-panel X (14 BP 73) L13-W15, W15-W17,
     // W17-W19, W19-W21, crossing at the CL of floor beams W14 / W16 / W18 / W20 (p.99 "floor lateral conn. at floor beam W14" / "W16, W18 & W20"; wind
@@ -450,19 +504,54 @@ foreach (bool pr in halves)
 UG("p.71, p.93, p.99", "floor lateral tongue beam 16 WF 88 + 2-Cov. Pls. 11 1/2 x 1/2 x 5'-6 (W21 - W22 - W21' on the CL, through the slot in the near-side web of F7) and the shear lock at W22",
     "p.93 Section E draws the tongue beam, its 2-7/16 lateral plates and the slot, but the beam length and its end at the shear lock are not dimensioned, and the 1954 16 WF 88 is not in the AISC v16 extract (its d / bf / tw / tf are not on the sheets)",
     "not built; the 2-12[ 25 K members end at the CL point of W22.");
-UG("p.71", "lower lateral double K L13-L13 1/2 and the 33 WF 130 strut at L13 1/2; the inverted portal L13 1/2-L15 (Sheets 44 / 45)", "the L13 1/2 point is not dimensioned on the sheets read", "not built.");
+// batch 5d (2026-10-28, review B06): p.98 BOTTOM CHORD BRACING ADJACENT TO L13 dimensions the L13 1/2 point "13'-1 Meas. along CL of Chord" from L13; the
+// p.71 diagram draws the double K between L13 (floor beam F8) and L13 1/2: N:L13 1/2 -> F8 at the quarter point -> strut CL at L13 1/2 -> F8 quarter point -> S:L13 1/2
+// (33 WF 130, "28" rivets each end) and the strut at L13 1/2 (2-18[ 45.8 (S) + 2-Pls (31-13 1/2) x 1/2, "46 at L13 1/2"). p.98 prints 21'-9 from the CL truss to
+// the quarter point (= 87'-0 / 4).
+Laced("STRUT31", "MC18x45.8", FI(2, 8.25), In(31), In(0.5), "2-18[ 45.8 (S); 2-Pls (31-13 1/2) x 1/2 (strut at L13 1/2)", true).Unresolved =
+    U("p.71, p.98", "strut at L13 1/2: back to back of the 2-18[ 45.8", "p.71 / p.98 give the channels and the 31 in. side plates but no b.b. dimension (the other struts print 2'-8 1/4 b.b. with 29 1/2 in. plates)",
+        "built at 2'-8 1/4 b.b. like the other struts.");
+Add(new TrussSectionDefinition { Name = "W33x130", Kind = TrussSectionKind.Rolled, Designation = "W33x130", Material = "C", Label = "33 WF 130 (lower lateral double K L13 - L13 1/2)", Source = "p.98" });
+foreach (bool pr in halves)
+{
+    string q = pr ? "'" : "";
+    double s13 = StaOf(13, pr), s14 = StaOf(14, pr), z13 = LowerEl(13), z14 = LowerEl(14);
+    double f = Ft(13 + 1.0 / 12) / Math.Sqrt((s14 - s13) * (s14 - s13) + (z14 - z13) * (z14 - z13));
+    Pt("L13H" + q, s13 + (s14 - s13) * f, z13 + (z14 - z13) * f, "p.98: 13'-1 measured along the CL of chord from L13");
+    Pt("LM13H" + q, s13 + (s14 - s13) * f, z13 + (z14 - z13) * f, "CL of the strut at L13 1/2", Ft(43.5), -Ft(43.5));
+    Pt("LQ13" + q, s13, z13, "p.98 / p.71: double K apex on the floor beam F8, 21'-9 from the CL truss", Ft(21.75), -Ft(21.75));
+    Strut("L13H" + q, "STRUT31", "Lower laterals");
+    Mem($"LL-NL13H{q}-LQ13{q}", "N:L13H" + q, "N:LQ13" + q, "W33x130", TrussMemberRole.LowerLateral, "", system: "Lower laterals", src: "p.98 / p.71");
+    Mem($"LL-SL13H{q}-LQ13{q}", "S:L13H" + q, "S:LQ13" + q, "W33x130", TrussMemberRole.LowerLateral, "", system: "Lower laterals", src: "p.98 / p.71");
+    Mem($"LL-LM13H{q}-NLQ13{q}", "N:LM13H" + q, "N:LQ13" + q, "W33x130", TrussMemberRole.LowerLateral, "", system: "Lower laterals", src: "p.98 / p.71");
+    Mem($"LL-LM13H{q}-SLQ13{q}", "N:LM13H" + q, "S:LQ13" + q, "W33x130", TrussMemberRole.LowerLateral, "", system: "Lower laterals", src: "p.98 / p.71");
+}
+UG("p.71, p.98, p.95", "lower lateral double K L13 - L13 1/2: apex points on the floor beam F8",
+    "p.98 prints 21'-9 from the CL truss to the apex line (scaled to be the F8 quarter point) and the 13'-1 to L13 1/2; the apex elevation and the 33 WF 130 connection to the F8 bottom flange (p.95 Sections B-E) are drawn without dimensions",
+    "apexes at the quarter points of the F8 at the L13 lower chord work point elevation; the diagonals stop clear of F8 (bracing corner rule).");
+UG("p.71", "inverted portal L13 1/2 - L15 (Sheets 44 / 45)", "the portal is drawn on approach sheets 44 / 45 which belong to another structure",
+    "not built.");
 UG("p.71", "sway bracing above the floor beams and the portal knee bracing", "only the V frames below the floor beams are tabulated on p.71", "V frames 0-12 built; nothing above the floor beams except the U11 portal strut envelope.");
 
 // ================================================================ 5. floor: stringers on the floor beams + deck slab
 t.Floor = new TrussFloorDefinition
 {
     StringersOnTop = true, StringerTopBelowGrade = In(7.75), Source = "p.72 / p.94",
-    Unresolved = U("p.94", "stringer bearings (Section D) and diaphragms 15[ 33.9", "the bearing heights per line are not decoded and the diaphragms are only located (midway between floor beams)",
-        "stringers continuous over the floor beams, top = finished grade - 7 3/4 slab; one straight piece per bay; bearings / diaphragms not built."),
+    Unresolved = U("p.94, p.72", "stringer bearings (Section D), diaphragms 15[ 33.9 and the stringer splices", "the bearing heights per line are not decoded, the diaphragms are only located (midway between floor beams) and the p.72 splice details (24 WF 84 & 94 / 21 WF 62) are not built yet",
+        "stringers on the floor beams as the p.72 continuous members (2-span S13-S16 panels 0-2 / 2'-0', 4-span S9-S12 between the pavement breaks 2-6-10-14-18-22), top = finished grade - 7 3/4 slab, one straight solid per bay (kinked at the floor beams); bearings / splices / diaphragms not built."),
 };
+// main span review BW-M2 (2026-10-27): p.72 stringer diagram - pavement breaks (= ends of stringers) at panels 2, 6, 10, 14, 18, 22 (symmetric about 22):
+// 2-span continuous S13-S16 over panels 0-2 / 2'-0', 4-span continuous S9-S12 in between ("Stringer Splice" at the middle support, splice not built)
+var runBays = new List<int> { 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2 };
+// types per line from the p.72 panel diagram: 2-span rows S13 / S14 / S15 x3 / S16 (CL); 4-span rows S9 / S10 / S11 / S12 - which inner 24 WF 94 line is S12
+// is not legible (labels between the lines), so the three inner lines and the CL carry "S11 / S12"
+string[] Types(string sec, bool cl) => runBays.Select(b => b == 2
+    ? (sec == "W21x62" ? "S13" : sec == "W24x84" ? "S14" : cl ? "S16" : "S15")
+    : (sec == "W21x62" ? "S9" : sec == "W24x84" ? "S10" : "S11 / S12")).ToArray();
 foreach (var (off, sec) in new[] { (-39 - 1 / 12.0, "W21x62"), (-33.0, "W24x84"), (-24.75, "W24x94"), (-16.5, "W24x94"), (-8.25, "W24x94"), (0.0, "W24x94"),
     (8.25, "W24x94"), (16.5, "W24x94"), (24.75, "W24x94"), (33.0, "W24x84"), (39 + 1 / 12.0, "W21x62") })
-    t.Floor.Stringers.Add(new TrussStringerLine { Name = off == 0 ? "CL" : (off < 0 ? "N" : "S") + Math.Abs(off).ToString("0.##", inv), Offset = Ft(off), Section = sec });
+    t.Floor.Stringers.Add(new TrussStringerLine { Name = off == 0 ? "CL" : (off < 0 ? "N" : "S") + Math.Abs(off).ToString("0.##", inv), Offset = Ft(off), Section = sec,
+        ContinuousBays = runBays.ToList(), RunTypes = Types(sec, off == 0).ToList() });
 t.Floor.Deck = new TrussDeckDefinition
 {
     Thickness = In(7.75), LeftOffset = -Ft(38.25), RightOffset = Ft(38.25), BeginStation = StaOf(0, false), EndStation = StaOf(0, true), Source = "p.94 / p.107",
@@ -543,6 +632,9 @@ UG("p.69, p.70", "perforated cover plates (manholes 12 x 20 / 11 1/2 x 20 at 3'-
 // one layer, "31 1/2 x 5/8 Web" innermost) and p.81 / p.84 dimension "2'-5 o. to o. 1 1/8 webs" / b. to b. Ls; chords.csv lists the plies outside -> inside and the
 // generator puts a ply that follows a ply fitting between the angle legs inside the angles (TrussSections.Box).
 UG("p.73", "hold-down rollers and shear lock at piers 17 / 20", "detailed on p.73 but not part of this phase", "not built.");
+// batch 5a (2026-10-28): the laced lateral / strut members lie in the plane of the lateral system (section up = the normal of the chord panel plane), so the
+// 2-1/2 Pls. lie flat on them (p.97 / p.98 draw the plates on the member faces); the box struts L0 / L11 keep their plumb webs (end connections p.73 / p.80)
+foreach (var m in t.Members.Where(m => m.System is "Upper laterals" or "Lower laterals" && !m.Section.StartsWith("STRUT L"))) m.RollToLateralPlane = true;
 t.Unresolved.AddRange(unresolved.Distinct());
 br.Truss = t;
 

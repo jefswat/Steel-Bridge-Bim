@@ -13,7 +13,7 @@ using System.Text;
 const double Tol = 0.01, Tol2 = 0.02, CamTol = 0.02;   // ft, ft, in
 var verbose = Environment.GetEnvironmentVariable("CB_VERBOSE") == "1";
 var outPath = Environment.GetEnvironmentVariable("CB_OUT");
-string dataDir = new[] { @"docs\plan-data\camber", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\docs\plan-data\camber" }.First(System.IO.Directory.Exists);
+string dataDir = new[] { @"docs\plan-data\camber", @"C:\SBM\docs\plan-data\camber" }.First(System.IO.Directory.Exists);
 double Num(string s) => double.Parse(s.Trim().TrimEnd('*'), CultureInfo.InvariantCulture);
 bool Has(string s) => s.Trim().Length > 0;
 List<string[]> Table(string name) => System.IO.File.ReadAllLines(System.IO.Path.Combine(dataDir, name)).Select(l => l.Split(',')).ToList();

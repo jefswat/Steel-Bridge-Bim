@@ -174,11 +174,12 @@ public sealed partial class SteelModelGenerator
             if (mm < 0) return;
             (top ? tfHoles : bfHoles)[mm].Add(new Hole(new Vec2(x, nLocal), dia));
         }
-        void Part(string a, string mark, PartCategory cat, Mesh mesh, double len, string desc, string? material = null, Assumption? why = null, double weight = 0, double density = 0)
+        void Part(string a, string mark, PartCategory cat, Mesh mesh, double len, string desc, string? material = null, Assumption? why = null, double weight = 0, double density = 0,
+            List<PartFit>? fits = null)
         {
             if (mesh.IsEmpty) return;
             _parts.Add(new SteelPart { Mark = mark, Category = cat, Assembly = a, Mesh = mesh, Length = len, Description = desc, Material = material ?? cd.Material,
-                Assumption = why, NominalWeightLbPerFt = weight, Density = density });
+                Assumption = why, NominalWeightLbPerFt = weight, Density = density, Fits = fits });
         }
         var bg = _model.Bolt;
         double hole = bg.HoleDiameter;
@@ -280,7 +281,14 @@ public sealed partial class SteelModelGenerator
                     {
                         var dm = new Mesh();
                         MeshBuilder.AddBox(dm, fd, -nIn, nIn, z0, z1, -td / 2, td / 2);
-                        Part(casm, $"{casm}-DP{pn++}", PartCategory.DiaphragmPlate, dm, z1 - z0, $"Girder connection diaphragm {Pl(2 * nIn, td)} x {In(z1 - z0)} (girder web plane, inside the cap)");
+                        // OPTIONAL plan fits: the pieces that end on the bottom plate (upper piece: bottom end, lower piece: top end)
+                        List<PartFit>? dpf = null;
+                        if (conn.DiaphragmPlateFits is { Count: > 0 } dfl && !double.IsNaN(zBpTop))
+                        {
+                            string face = Math.Abs(z0 - zBpTop) < 1e-6 ? "bottom end" : Math.Abs(z1 - zBpBot) < 1e-6 ? "top end" : "";
+                            if (face.Length > 0) dpf = dfl.Select(x => new PartFit(face, x.Condition, $"{casm}-BP", x.Source)).ToList();
+                        }
+                        Part(casm, $"{casm}-DP{pn++}", PartCategory.DiaphragmPlate, dm, z1 - z0, $"Girder connection diaphragm {Pl(2 * nIn, td)} x {In(z1 - z0)} (girder web plane, inside the cap)", fits: dpf);
                     }
                     // Welds of the diaphragm plate pieces: to the connector plates (symbols without a size: UNRESOLVED dimension) and, where they are milled to
                     // bear on the bottom plate, 5/16 both faces (p.30). Welds on both faces of the diaphragm plate; legs along its face and along the other plate.
@@ -551,8 +559,26 @@ public sealed partial class SteelModelGenerator
                         var poly = new[] { new Vec2(0, clip), new Vec2(clip, 0), new Vec2(ws, 0), new Vec2(ws, hgt), new Vec2(clip, hgt), new Vec2(0, hgt - clip) };
                         var mesh = new Mesh();
                         PlateBuilder.AddPlanar(mesh, poly, Array.Empty<Hole>(), f, -ts / 2, ts / 2);
+                        // fit conditions: plan inputs only; the loaded (bottom) end without mill / finish to bear = POTENTIAL NONCOMPLIANCE (nothing assumed)
+                        var fk = kind == "bearing" ? StiffenerFitKind.Bearing : StiffenerFitKind.Jacking;
+                        var capFitDef = new StiffenerDefinition { EndFits = cd.StiffenerFits };
+                        var sfits = new List<PartFit>();
+                        foreach (var end in new[] { StiffenerEnd.Top, StiffenerEnd.Bottom })
+                            foreach (var x in SBM.Core.Bridge.StiffenerFits.Of(capFitDef, null, fk, end))
+                                sfits.Add(new PartFit(end == StiffenerEnd.Top ? "top end (cap top flange)" : "bottom end (cap bottom flange)", x.Condition, null, x.Source));
+                        var botGiven = SBM.Core.Bridge.StiffenerFits.Of(capFitDef, null, fk, StiffenerEnd.Bottom);
+                        Assumption? nc = null;
+                        if (!SBM.Core.Bridge.StiffenerFits.Satisfies(fk, StiffenerEnd.Bottom, botGiven.Select(x => x.Condition)))
+                        {
+                            var rq = SBM.Core.Bridge.StiffenerFits.Requirement(fk, StiffenerEnd.Bottom)!.Value;
+                            string txt = UnresolvedFlag.Text(botGiven.Count > 0 ? string.Join(", ", botGiven.Select(x => x.Source).Distinct()) : "inputs checked: IntegralSteelCap.StiffenerFits",
+                                $"cap {kind} stiffener bottom end fit", (botGiven.Count > 0 ? "the plan fit given" : "no fit condition is given for it, so it") + $" may not satisfy {rq.Article}: {rq.Requirement}",
+                                "Nothing assumed; geometry as generated.").Replace("UNRESOLVED", SBM.Core.Bridge.StiffenerFits.NoncomplianceStatus);
+                            nc = new Assumption(SBM.Core.Bridge.StiffenerFits.NoncomplianceStatus, txt, "nothing assumed: no fit condition recorded") { DimensionOnly = true };
+                            if (_fitWarned.TryAdd(txt, 0)) Warn($"{cap.SupName} cap: {txt}");
+                        }
                         Part(asm, $"{asm}-{(kind == "bearing" ? "BS" : "JS")}{sn}", PartCategory.BearingStiffener, mesh, hgt,
-                            $"{(kind == "bearing" ? "Bearing" : "Jacking")} stiffener {Pl(ws, ts)} x {In(hgt)} (plumb, {In(clip)} clips)");
+                            $"{(kind == "bearing" ? "Bearing" : "Jacking")} stiffener {Pl(ws, ts)} x {In(hgt)} (plumb, {In(clip)} clips)", why: nc, fits: sfits.Count > 0 ? sfits : null);
                         var welds = new Mesh();
                         double top = hgt - Math.Max(clip, cd.StiffenerTopNoWeld);
                         double hbS = HoldBack(cd.StiffenerWeld), wLen = 0;

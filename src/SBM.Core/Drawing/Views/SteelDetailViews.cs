@@ -14,7 +14,12 @@ namespace SBM.Core.Drawing.Views;
 /// </summary>
 public static class SteelDetailViews
 {
-    public static SheetView CrossFrame(ViewContext ctx, bool support)
+    public static SheetView CrossFrame(ViewContext ctx, bool support) => CrossFrame(ctx, support, null);
+
+    /// <summary>OPTIONAL standard cross frame family: its prototype frame as detailed (level chords), with the family's numbers from the model report.</summary>
+    public static SheetView StandardCrossFrame(ViewContext ctx, CrossFrameFamily family) => CrossFrame(ctx, family.AtSupport, family);
+
+    private static SheetView CrossFrame(ViewContext ctx, bool support, CrossFrameFamily? family)
     {
         var f = ctx.Framing;
         var def = f.Definition;
@@ -24,8 +29,8 @@ public static class SteelDetailViews
         var all = ctx.Steel?.CrossFrameDetails.Where(c => c.AtSupport == support).ToList() ?? new();
         // Typical: the most common type, middle of the list (an interior bay away from ends).
         var common = all.GroupBy(c => c.Type).OrderByDescending(g => g.Count()).FirstOrDefault();
-        var cf = common?.ElementAt(common.Count() / 2);
-        string title = support ? "SUPPORT CROSS FRAME" : "INTERMEDIATE CROSS FRAME";
+        var cf = family != null ? all.FirstOrDefault(c => c.Mark == family.Prototype) : common?.ElementAt(common.Count() / 2);
+        string title = family != null ? $"STANDARD CROSS FRAME {family.Id}" : support ? "SUPPORT CROSS FRAME" : "INTERMEDIATE CROSS FRAME";
         if (cf == null)
         {
             d.Text($"{title}: NONE IN THIS BRIDGE", new Vec2(0, 0), d.TitleH, 0, TextAlign.Center);
@@ -150,12 +155,21 @@ public static class SteelDetailViews
         d.Text("TOP OF WEB", new Vec2(-tf.Width / 2 - d.Paper(0.1), cf.LeftWebTop), d.SmallTextH, 0, TextAlign.Right);
         d.Text("TOP OF BOTT. FL.", new Vec2(-bf.Width / 2 - d.Paper(0.1), cf.LeftWebTop - wd), d.SmallTextH, 0, TextAlign.Right);
         d.Text("WP = WORK POINT; WORK LINES SHOWN AS CENTER LINES", new Vec2(cf.Span / 2, zBot - d.Paper(0.7)), d.SmallTextH, 0, TextAlign.Center);
+        if (family != null && ctx.Steel?.CrossFrameFit is { } fitRep)
+        {
+            // Numbers quoted from the model report (rule: notes that quote numbers come from the model).
+            var sum = fitRep.Standards.FirstOrDefault(s => s.Name == family.Standard);
+            d.Text($"STANDARD {family.Standard.ToUpperInvariant()} - {family.Marks.Count} FRAMES ALIKE, WP SPACING {d.Short(family.Spacing)}\nTOP WP {d.Short(family.TopWorkPoint)} BELOW THE REFERENCE AT THE DEFINED END\nDEPTH {d.Short(family.Depth)} WP TO WP, CHORDS LEVEL IN THE FRAME PLANE\n"
+                   + "HOLES IN THE CONNECTION PLATES PER THE HOLE SHIFT TABLE\nNO SLOTTED HOLES"
+                   + (sum != null ? $"\nDEEPEST COMMON DEPTH {d.Short(sum.MaxCommonDepth)} AT {sum.GoverningMark}" + (sum.Misfits.Count > 0 ? $"; DOES NOT FIT AT {sum.Misfits.Count} FRAMES (SEE TABLE)." : ".") : ""),
+                new Vec2(cf.Span / 2, zBot - d.Paper(1.1)), d.SmallTextH, 0, TextAlign.Center);
+        }
 
         var box = dwg.Extents();
         string type = cf.Type switch { ResolvedCrossFrameType.XFrame => "X-FRAME", ResolvedCrossFrameType.KFrame => "K-FRAME", ResolvedCrossFrameType.InvertedKFrame => "INVERTED K-FRAME", _ => "DIAPHRAGM" };
         d.Title($"{title} — {type} ({cf.Mark} SHOWN)", support ? "Plumb, in the plane of the support line" : "Normal to the flanges; dimensions in the plane of the frame",
             new Vec2(cf.Span / 2, box.MinY - d.Paper(0.3)));
-        return new SheetView(title, support ? "CF Support" : "CF Intermediate", dwg, d.Scale, $"{title.ToLowerInvariant()} as detailed ({cf.Mark}).");
+        return new SheetView(title, family != null ? $"CF Standard {family.Id}" : support ? "CF Support" : "CF Intermediate", dwg, d.Scale, $"{title.ToLowerInvariant()} as detailed ({cf.Mark}).");
     }
 
     /// <summary>Connected clusters of bolt positions (neighbor distance within 1.6 x the largest nearest-neighbor spacing).</summary>
@@ -298,13 +312,32 @@ public static class SteelDetailViews
             x += gapX;
         }
 
+        // Fit notes from the model inputs (StiffenerDefinition.EndFits; plan values only): "MILL TO BEAR ON BOTTOM FLANGE (P.32 F55)"; an end without one where
+        // AASHTO LRFD sets a requirement says so (POTENTIAL NONCOMPLIANCE, nothing assumed).
+        string[] FitNotes(StiffenerFitKind k, bool bottomEnd)
+        {
+            var list = new List<string>();
+            foreach (var end in bottomEnd ? new[] { StiffenerEnd.Top, StiffenerEnd.Bottom } : new[] { StiffenerEnd.Top })
+            {
+                string fl = end == StiffenerEnd.Top ? "TOP FLANGE" : "BOTTOM FLANGE";
+                var fits = StiffenerFits.Of(st, null, k, end);
+                var req = StiffenerFits.Requirement(k, end);
+                if (fits.Count > 0 && req is { } rq && !StiffenerFits.Satisfies(k, end, fits.Select(x => x.Condition)))
+                    list.Add($"{fl}: CHECK {rq.Article.Replace("AASHTO LRFD ", "AASHTO ")}");
+                if (fits.Count > 0)
+                    list.Add(string.Join(", ", fits.Select(x => PartFit.Words(x.Condition).ToUpperInvariant())) + $" TO {fl} ({string.Join("; ", fits.Select(x => x.Source).Distinct()).ToUpperInvariant()})");
+                else if (req is { } r)
+                    list.Add($"{fl} FIT NOT GIVEN - CHECK {r.Article.Replace("AASHTO LRFD ", "AASHTO ")}");
+            }
+            return list.ToArray();
+        }
         Detail("BEARING STIFFENER", st.BearingStiffener, true, 0,
-            new[] { "MILL TO BEAR ON BOTTOM FLANGE", "PLUMB, IN THE PLANE OF THE SUPPORT LINE" });
+            FitNotes(StiffenerFitKind.Bearing, true).Append("PLUMB, IN THE PLANE OF THE SUPPORT LINE").ToArray());
         Detail("CONNECTION PLATE", st.ConnectionPlate, false, 0,
-            new[] { "IN THE CROSS-FRAME PLANE", "NORMAL TO THE FLANGES" });
+            FitNotes(StiffenerFitKind.ConnectionPlate, true).Concat(new[] { "IN THE CROSS-FRAME PLANE", "NORMAL TO THE FLANGES" }).ToArray());
         if (st.IntermediateMaxSpacing > 0)
             Detail("INTERMEDIATE STIFFENER", st.IntermediateStiffener, false, st.IntermediateBottomGap,
-                new[] { "TIGHT FIT TO TOP FLANGE", $"MAX SPACING {d.Len(st.IntermediateMaxSpacing)}, {st.IntermediateSide.ToString().ToUpperInvariant()} FACE" });
+                FitNotes(StiffenerFitKind.Intermediate, false).Append($"MAX SPACING {d.Len(st.IntermediateMaxSpacing)}, {st.IntermediateSide.ToString().ToUpperInvariant()} FACE").ToArray());
         var box0 = dwg.Extents();
         double nx = (box0.MinX + box0.MaxX) / 2;
         d.Text($"FLANGE-TO-WEB WELDS: {d.Short(st.FlangeToWebWeld)} FILLET BOTH SIDES, CONTINUOUS, STOP {d.Short(WeldTermination.HoldBack(def.Welds, st.FlangeToWebWeld))} FROM PL ENDS.",

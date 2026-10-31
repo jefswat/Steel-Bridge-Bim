@@ -50,11 +50,15 @@ public static class CableStayedCommand
                                   (sf == null ? "(not estimated)" : $"{L(sf.Tributary),8} {F(sf.Dead),11} {F(sf.Total),11} {A(sf.RequiredArea),10} {A(sf.Area),10} {sf.Ratio:0.00}"));
             }
             Console.WriteLine($"Pylon self weight {F(f.PylonSelfWeight)}");
-            foreach (var lb in f.Legs) Console.WriteLine($"  {lb.Leg}: self weight {F(lb.SelfWeight)}, stay pull DL (x {F(Proj(lb.StayForceDead, m.PylonFrame.X))}, y {F(Proj(lb.StayForceDead, m.PylonFrame.Y))}, z {F(lb.StayForceDead.Z)})");
-            Console.WriteLine($"Pylon base (stays + pylon self weight about the base point): vertical DL {F(-f.BaseForceDead.Z)} / DL+LL {F(-f.BaseForceTotal.Z)}; " +
-                              $"horizontal along X DL {F(Proj(f.BaseForceDead, m.PylonFrame.X))} / DL+LL {F(Proj(f.BaseForceTotal, m.PylonFrame.X))}");
-            Console.WriteLine($"  longitudinal overturning (+ = tipping toward pylon frame +X): DL {M(f.BaseMomentLongDead)}, DL+LL {M(f.BaseMomentLongTotal)}");
-            Console.WriteLine($"  transverse overturning (+ = toward +Y, right): DL {M(f.BaseMomentTransDead)}, DL+LL {M(f.BaseMomentTransTotal)}");
+            foreach (var lb in f.Legs) Console.WriteLine($"  {lb.Leg}: self weight {F(lb.SelfWeight)}, stay pull DL (along {F(Proj(lb.StayForceDead, m.PylonFrame.X))}, across {F(Proj(lb.StayForceDead, m.PylonFrame.Y))}, z {F(lb.StayForceDead.Z)})");
+            for (int pi = 0; pi < f.Pylons.Count; pi++)
+            {
+                var pb = f.Pylons[pi]; var pfr = m.PylonFrames[pi];
+                Console.WriteLine($"Pylon base at {pb.Support} (stays + pylon self weight {F(pb.SelfWeight)} about the base point): vertical DL {F(-pb.ForceDead.Z)} / DL+LL {F(-pb.ForceTotal.Z)}; " +
+                                  $"horizontal along X DL {F(Proj(pb.ForceDead, pfr.X))} / DL+LL {F(Proj(pb.ForceTotal, pfr.X))}");
+                Console.WriteLine($"  longitudinal overturning (+ = tipping toward pylon frame +X): DL {M(pb.MomentLongDead)}, DL+LL {M(pb.MomentLongTotal)}");
+                Console.WriteLine($"  transverse overturning (+ = toward +Y, right): DL {M(pb.MomentTransDead)}, DL+LL {M(pb.MomentTransTotal)}");
+            }
             foreach (var c in m.Clearances) Console.WriteLine($"Clearance {c.Name}: {L(c.Provided)} at {u.FormatStation(c.AtStation)}, required {L(c.Required)} {(c.Ok ? "OK" : "NOT MET")}");
             foreach (var n in f.Notes) Console.WriteLine("Note: " + n);
             var an = m.Analysis;

@@ -531,5 +531,8 @@ foreach (var (uname, pier) in new[] { ("NHT Unit 3", "Pier 10"), ("NHT Unit 4", 
 foreach (var s in reported) Print("REPORTED " + s);
 foreach (var u in unresolved) Print("UNRESOLVED " + u);
 foreach (var g in gaps) Print("GAP " + g);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "csj-0047-07-228" in sheet-links-nht.json.
+{ const string pdf = @"C:\SBMData\0047-07-228 NHT 100% Plans_09-04-2020_comments_Reduced.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save(outPath);
 Print($"Saved {outPath}");

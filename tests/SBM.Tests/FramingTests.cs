@@ -89,9 +89,18 @@ public class FramingTests
         var (f, a) = Sample(b =>
         {
             foreach (var s in b.Supports) s.SkewDegrees = 45;
+            b.CrossFrames.PlatesAtEachTopOfWeb = true;   // plan layout check: both ends on the radial plan line (legacy plate placement)
         });
         Assert.False(f.HasErrors, string.Join("\n", f.Diagnostics));
         double clear = f.Definition.CrossFrames.MinDistanceFromBearing;
+        // default placement: the location is defined at the reference (left) girder's top of web; the far plate moves onto the frame plane (small move)
+        var (fd, ad) = Sample(b => { foreach (var s in b.Supports) s.SkewDegrees = 45; });
+        foreach (var cf in fd.CrossFrames.Where(c => !c.AtSupport))
+        {
+            var lg = f.CrossFrames.First(c => c.Mark == cf.Mark);
+            Assert.True((cf.Left.XY - lg.Left.XY).Length < 1e-9);
+            Assert.True(Math.Abs(ad.Inverse(cf.Right.XY).Station - a.Inverse(lg.Right.XY).Station) < 0.02);
+        }
         foreach (var cf in f.CrossFrames.Where(c => !c.AtSupport))
         {
             // Normal (radial) frames: both ends at the same station.

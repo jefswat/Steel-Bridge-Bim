@@ -66,6 +66,8 @@ public sealed class TrussModel
     /// <summary>Perforated plates built with their access holes cut: (member mark, piece label, holes).</summary>
     public List<(string Member, string Piece, int Holes)> Perforations { get; } = new();
     public int Rivets => Steel.Bolts.Count(b => b.Kind == BoltKind.Rivet);
+    /// <summary>Drawn rivet positions (<see cref="Bridge.TrussRivetGroup.Positions"/>) that were not placed, with the reason (diagnostics / QC dumps).</summary>
+    public List<TrussDroppedRivet> DroppedRivets { get; } = new();
     public double SlabArea { get; set; }
     public List<Diagnostic> Diagnostics => Steel.Diagnostics;
 
@@ -73,3 +75,7 @@ public sealed class TrussModel
         Points.FirstOrDefault(p => string.Equals(p.Plane, plane, StringComparison.OrdinalIgnoreCase) && string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
     public TrussMemberResult? Member(string mark) => Members.FirstOrDefault(m => string.Equals(m.Mark, mark, StringComparison.OrdinalIgnoreCase));
 }
+
+/// <summary>A drawn rivet position that was dropped: joint frame (u, v) and member coordinates (s along the member from its cut start, y in its section), reason
+/// "range" (beyond the member's cut length), "head" (on another rivet's head), "stack-outside" (outside the section's in-plane extent), "stack" (no clean plate stack).</summary>
+public sealed record TrussDroppedRivet(string Plane, string Point, string Member, double U, double V, double S, double Y, double Diameter, bool Beyond, string Reason);

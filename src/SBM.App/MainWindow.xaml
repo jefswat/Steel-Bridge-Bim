@@ -83,6 +83,9 @@
                         <Button Style="{StaticResource RibbonButton}" Command="{Binding ToggleExactGeometryCommand}" ToolTip="Project setting: curved girder plates, deck slab, haunches and barriers as exact NURBS (meshes tessellated from them). Slower regeneration; off = unchanged behaviour.">
                             <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE879;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="{Binding ExactGeometryText}"/></StackPanel>
                         </Button>
+                        <Button Style="{StaticResource RibbonButton}" Command="{Binding LevelOfDetailCommand}" ToolTip="Project setting: level of detail of the generated model (BIMForum 100-400) for the whole model and per element group; regenerates">
+                            <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE81E;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="{Binding LodText}"/></StackPanel>
+                        </Button>
                         </StackPanel>
                     </HeaderedContentControl>
                 </StackPanel>
@@ -224,6 +227,9 @@
                             </Button>
                             <Button x:Name="ProjectedPlanButton" Style="{StaticResource RibbonButton}" Click="OnProjectedPlanToggle" ToolTip="Projected plan (model): the plan view shows the top view projected from the 3D model for EVERY bridge (framing linework stays where it exists). Bridges without framing linework (tied arch, segmental) always show it.">
                                 <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE81E;"/><TextBlock x:Name="ProjectedPlanLabel" Style="{StaticResource RibbonLabel}" Text="Projected Plan: off"/></StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource RibbonButton}" Click="OnClickViews" ToolTip="Click views: opens a window that shows a PLAN, an ELEVATION and a SECTION of the model at the point you click in the model view (nearest alignment: elevation from its right side, section across it looking up-station). Visible layers and unhidden elements only. Close the window to turn it off.">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE8A9;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Click Views"/></StackPanel>
                             </Button>
                         </StackPanel>
                     </HeaderedContentControl>
@@ -398,6 +404,10 @@
                 </StackPanel>
                 <!-- Navigation: orbit pivot mode + mouse bindings help (top right, clear of the Model / Sheets switch) -->
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" Panel.ZIndex="4">
+                    <ToggleButton x:Name="PickLevelToggle" Content="Pick: member" Style="{StaticResource ModeToggle}" Click="OnPickLevelToggle"
+                                  ToolTip="Pick level for built-up members (truss plies, angles, cover plates, gusset layers). Member (default): a click selects the whole member or joint gusset stack. Part: a click selects the single piece. Alt+click does the other one."/>
+                    <ToggleButton x:Name="SubElementsToggle" Content="Sub-elements" Style="{StaticResource ModeToggle}" Click="OnSubElementsToggle"
+                                  ToolTip="Show sub-elements: the edges between the pieces of the selected (or isolated) members and alternating tints in the selection"/>
                     <ToggleButton x:Name="PivotSelToggle" Content="Pivot: cursor" Style="{StaticResource ModeToggle}" Click="OnPivotModeToggle"
                                   ToolTip="Orbit pivot. Cursor (default): the model point under the cursor when the orbit starts. Selection: the centroid of the selected element (falls back to the cursor when nothing is selected)."/>
                     <ToggleButton x:Name="NavHelp" Content="Mouse ?" Style="{StaticResource ModeToggle}" IsHitTestVisible="True" Focusable="False"
@@ -406,6 +416,11 @@
                 <Canvas Grid.Row="0" IsHitTestVisible="False" Panel.ZIndex="5">
                     <Rectangle x:Name="ZoomRect" Visibility="Collapsed" Stroke="#FF3794FF" StrokeThickness="1.5" StrokeDashArray="4 2" Fill="#223794FF"/>
                 </Canvas>
+                <!-- North arrow (MainWindow.NorthArrow.cs): grid north (+Y) as the camera sees it, below the navigation buttons -->
+                <Border x:Name="NorthArrowOverlay" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,46,14,0"
+                        IsHitTestVisible="False" Panel.ZIndex="4" CornerRadius="6" Background="#A0202020" BorderBrush="#60FFFFFF" BorderThickness="1">
+                    <Canvas x:Name="NorthArrowCanvas" Width="84" Height="102"/>
+                </Border>
                 <!-- Orbit pivot marker (screen overlay: always on top, constant size) -->
                 <Canvas x:Name="PivotOverlay" Grid.Row="0" IsHitTestVisible="False" Panel.ZIndex="6" Visibility="Collapsed" ClipToBounds="True"/>
                 <!-- Isolate banner (MainWindow.Isolate.cs) -->
@@ -620,7 +635,8 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="{Binding Name}" Foreground="{StaticResource MutedText}" TextWrapping="Wrap"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" Margin="6,0,0,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding Value, Mode=OneWay}" TextWrapping="Wrap" Margin="2,0,0,0" IsReadOnly="True"
+                                         BorderThickness="0" Background="Transparent" Padding="0" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListViewItem}}"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

@@ -46,28 +46,97 @@ foreach (var br in bridges)
 
     // ---- slab (p.107): 6 3/4 between the outside faces of the parapets, 1 in thickening 1'-5 wide at the bottom with 12:12 sides over every stringer
     dk.Thickness = In(6.75);
-    dk.LeftOffset = -(Ft(CurbOff) + parapetOut); dk.RightOffset = Ft(CurbOff) + parapetOut;
+    // agent review P07 (2026-10-30): the slab ends 1'-11 outboard of the gutter line (10 in to the CL outer stringer + 1'-1, p.107 A / B, p.91); the outer 11 in of
+    // the parapet overhangs the slab end (its bottom at the slab-top level)
+    dk.LeftOffset = -(Ft(CurbOff) + FI(1, 11)); dk.RightOffset = Ft(CurbOff) + FI(1, 11);
     dk.HaunchDepth = In(1); dk.HaunchBottomWidth = FI(1, 5); dk.HaunchSideSlope = 1;
     dk.Source = "p.107 (half cross section, Section A)";
-    dk.Unresolved = U("p.107, p.55", "slab edge under the parapet and the haunch depth", "Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed; the slab edge under the wall is drawn with a 4 1/4 in drop not dimensioned",
-        "6 3/4 slab (crown 1/8 in per ft) from outside face to outside face of the parapets (82'-2), 1 in x 1'-5 thickening with 12:12 sides under every stringer line; CL key joint / pipe sockets / drip grooves not built.");
+    dk.Unresolved = U("p.107, p.55", "slab edge under the parapet and the haunch depth", "Section A prints 7 3/4 / 7 7/8 at the curb and the 1 in thickening (7 3/4 - 6 3/4) is derived, not printed (the 4 1/4 in in Section A is the drainage opening height)",
+        "6 3/4 slab (crown 1/8 in per ft) to 1'-11 outboard of each gutter line (10 in + 1'-1, p.107 / p.91; the parapet overhangs the slab end by 11 in), 1 in x 1'-5 thickening with 12:12 sides under every stringer line; CL key joint / curb key / pipe sockets / drip grooves not built.");
 
     // ---- curb + parapet (p.107 Section A): U outward from the gutter line, V above the finished grade at the gutter line
-    // curb face 9 in (W.P. at its top), curb top 2'-0 rising 1/8 in per ft, wall 10 in x 1'-9 above the curb top; the bottom follows the slab top (crown 1/8 in per ft)
-    var prof = new List<TrussUV> { UV(0, 0), UV(0, 9), UV(24, 9.25), UV(24, 30.25), UV(34, 30.25), UV(34, -34.0 / 96) };
+    // curb face 9 in battered 1 in outboard at the top (W.P. at the top, agent review P06), curb top 2'-0 rising 1/2 in (printed 9 / 1/2 / 1'-9 stack, P05), wall 10 in x 1'-9
+    // above the curb top; the bottom follows the slab top (crown 1/8 in per ft), the outer 11 in past the slab end at the same level
+    var prof = new List<TrussUV> { UV(0, 0), UV(1, 9), UV(24, 9.5), UV(24, 30.5), UV(34, 30.5), UV(34, -34.0 / 96) };
+    // drainage openings (agent review P10, p.107 elevations + Section A "thru typical drainage opening"): under the curb top the curb is open 4 1/4 in. above the
+    // slab top from the curb face to the slab end (1'-11 outboard of the gutter line) and drops through a 5 1/2 in. slot to the 5 1/2 in. outer wall; openings 2'-2
+    // long, 2'-0 solid between (4'-2 c-c), centred in every floor beam panel: 31'-0 (main) 7 openings, 1'-11 end solids; 30'-5 3/4 (girder spans) 7, 1'-7 7/8;
+    // 26'-11 1/4 (approach trusses) 6, 1'-11 5/8. Omitted (p.43 note): girder spans 1 and 10; (p.58 Note "A"): 4-span truss panels 16'-12' and 8'-4' (spans 16 / 17)
+    // and 13'-12' (span 22). Other panels ("special panels see Sh. 68" = p.108: span 28 panels 30'-1 5/16, the 2'-6 pier panels, partial end panels) stay solid.
+    var profOpen = new List<TrussUV> { UV(4.25 / 9, 4.25), UV(1, 9), UV(24, 9.5), UV(24, 30.5), UV(34, 30.5), UV(34, -34.0 / 96), UV(28.5, -28.5 / 96), UV(28.5, 4.25) };
+    var openings = new List<double>();
+    var damGaps = new List<(double lo, double hi)>();
+    {
+        string Bare(string n) => n.Contains(':') ? n[(n.IndexOf(':') + 1)..] : n;
+        var pts = t.Points.GroupBy(q => q.Name).ToDictionary(g => g.Key, g => g.First());
+        var fbs = t.Members.Where(m => m.Role == TrussMemberRole.FloorBeam).SelectMany(m => new[] { Bare(m.From), Bare(m.To) }).Where(pts.ContainsKey)
+            .Select(n => pts[n].Station).Distinct().OrderBy(x => x).ToList();
+        var omit = new List<(double lo, double hi)>();
+        double P(int i) => fbs[Math.Clamp(i, 0, fbs.Count - 1)];
+        if (br.Name == "PTC Girder spans 1-10" && fbs.Count == 50) { omit.Add((P(0), P(4))); omit.Add((P(45), P(49))); }
+        int c = fbs.Count / 2;
+        if (br.Name == "PTC 4-span truss 14-17" && fbs.Count == 41) { omit.Add((P(c + 4), P(c + 8))); omit.Add((P(c + 12), P(c + 16))); }
+        if (br.Name == "PTC 4-span truss 21-24" && fbs.Count == 41) omit.Add((P(c - 8), P(c - 7)));
+        var pattern = new (double panelIn, int n, double endIn)[] { (372, 7, 23), (365.75, 7, 19.875), (323.25, 6, 23.625) };
+        int nStd = 0, nOmit = 0, nSpecial = 0;
+        // agent review P12 (p.108 'parapet railing expansion joint at piers 1 to 9 incl., 28, 29 & 30', p.46): the curb + parapet break at the CL expansion dam
+        // between the two floor beams 2'-6 c.c. at those piers, 1 1/2 in. open at 68 F (1 in. full expansion, 3 in. full contraction)
+        for (int i = 1; i < fbs.Count; i++)
+            if (Math.Abs((fbs[i] - fbs[i - 1]) / In(1) - 30) < 0.25) { double m = (fbs[i] + fbs[i - 1]) / 2; damGaps.Add((m - In(0.75), m + In(0.75))); }
+        for (int i = 1; i < fbs.Count; i++)
+        {
+            double a0 = fbs[i - 1], a1 = fbs[i], L = (a1 - a0) / In(1);
+            var pat = pattern.FirstOrDefault(q => Math.Abs(q.panelIn - L) < 0.25);
+            if (pat.n == 0) { nSpecial++; continue; }
+            if (omit.Any(o => a0 >= o.lo - 0.01 && a1 <= o.hi + 0.01)) { nOmit++; continue; }
+            nStd++;
+            for (int k = 0; k < pat.n; k++) { double lo = a0 + In(pat.endIn + 50 * k); openings.Add(lo); openings.Add(lo + In(26)); }
+        }
+        Print($"{br.Name}: curb drainage openings: {openings.Count / 2} per side in {nStd} standard panels; {nOmit} panels omitted per p.43 / p.58 notes; {nSpecial} special / partial panels left solid (p.108)");
+    }
+    var solid = new List<double>();
+    {
+        double at = dk.BeginStation;
+        for (int i = 0; i < openings.Count; i += 2) { if (openings[i] > at) { solid.Add(at); solid.Add(openings[i]); } at = openings[i + 1]; }
+        if (dk.EndStation > at) { solid.Add(at); solid.Add(dk.EndStation); }
+        if (damGaps.Count > 0)
+        {
+            var cut = new List<double>();
+            for (int i = 0; i < solid.Count; i += 2)
+            {
+                double lo = solid[i], hi = solid[i + 1];
+                foreach (var g in damGaps.Where(g => g.hi > lo && g.lo < hi).OrderBy(g => g.lo)) { if (g.lo > lo) { cut.Add(lo); cut.Add(g.lo); } lo = g.hi; }
+                if (hi > lo) { cut.Add(lo); cut.Add(hi); }
+            }
+            solid = cut;
+            Print($"{br.Name}: curb + parapet broken at {damGaps.Count} pier expansion dams (1 1/2 in. at 68 F, p.108 / p.46)");
+        }
+    }
+    string curbFlag = U("p.107, p.108, p.91", "curb + parapet details", "printed but not modeled: 3/4 in R at the curb face and 3/4 in chamfers (Typ.), the drip grooves on both sides of every floor beam where openings are provided (Note A), the drainage openings of the special panels (p.108: span 28, pier panels, end panels), the 1/4 in open parapet joints at the rail panel joints and the scoring; the parapet railing joints at the piers (posts 1'-7 1/8 each side of the joint, p.108: railing kept continuous); the breaks at the finger dams between bridges and at W22 (dam curb channels, steel parapet ends of 3/8 in plates, p.91 / p.108 / p.92) are drawn without all dimensions",
+        "curb 2'-0 x 9 in with a 1 in batter, curb top +1/2 in, wall 10 in x 1'-9 above the curb top; drainage openings in the standard panels per p.107 Section A (omissions per p.43 / p.58); 1 1/2 in. open joints at the girder-span pier dams (p.108); ends at the bridge's deck ends (open gap at the finger dams between bridges).");
     foreach (int side in new[] { -1, 1 })
+    {
+        string nm = side < 0 ? "Left curb + parapet" : "Right curb + parapet";
         items.Add(new TrussLineItemDefinition
         {
-            Name = side < 0 ? "Left curb + parapet" : "Right curb + parapet", Kind = TrussLineItemKind.Concrete, ReferenceOffset = side * Ft(CurbOff), Side = side,
+            Name = nm, Kind = TrussLineItemKind.Concrete, ReferenceOffset = side * Ft(CurbOff), Side = side,
             From = dk.BeginStation, To = dk.EndStation, Profile = prof, Material = "Class A concrete", Source = "p.107 Section A / B",
-            Unresolved = U("p.107, p.108", "curb + parapet details", "the 3/4 in radius at the curb face, the chamfers, the drainage openings in the curb (2'-2 / 2'-0 alternating, size not read), scoring and the openings at the expansion dams are drawn without all dimensions",
-                "one solid section (curb 2'-0 x 9 in, curb top +1/4 in, wall 10 in x 1'-9 above the curb top) continuous over the deck length."),
+            Ranges = openings.Count > 0 || damGaps.Count > 0 ? solid : null, Unresolved = curbFlag,
         });
+        if (openings.Count > 0)
+            items.Add(new TrussLineItemDefinition
+            {
+                Name = nm + " at drainage openings", Kind = TrussLineItemKind.Concrete, ReferenceOffset = side * Ft(CurbOff), Side = side,
+                From = dk.BeginStation, To = dk.EndStation, Profile = profOpen, Material = "Class A concrete", Source = "p.107 Section A (thru typical drainage opening), elevations",
+                Ranges = openings, Unresolved = curbFlag,
+            });
+    }
     // ---- parapets on the abutment wing walls (p.108 'Elevation - parapet railing at west / east abutment', 'Parapet details at east & west abutments'): same curb + wall
     // section from the deck end to the end of the wing wall, 67'-9 (west) / 34'-9 (east) from the CL bearing; the railing runs over them (payment length)
     double railBeg = dk.BeginStation, railEnd = dk.EndStation;
     string wingFlag = U("p.108, p.11, p.38", "abutment parapet", "the abutment parapet is drawn as the bridge section (curb seat for the approach curb / sidewalk, 10 in. wall, 2'-7 overall) on the concrete wing wall with joints and scoring; its bottom on the wing wall and the curb end at the wing end are not dimensioned",
-        "the bridge curb + parapet section continued from the deck end to the wing end (67'-9 / 34'-9 from the CL bearing); approach curb / sidewalk seats, joints and scoring not built.");
+        "the bridge curb + parapet section continued from the deck end to the wing end (67'-9 / 34'-9 from the CL bearing); approach curb / sidewalk seats, joints and scoring not built; "
+        + "the west abutment curb scuppers with their 8 in. drain pipes (p.108 scupper / drainage details, p.43 'Scupper for Span #1 only') and the wing wall top under the parapet are not built (agent review P18).");
     if (br.Name == "PTC Girder spans 1-10")
     {
         railBeg = Sta("646+21.463") - FI(67, 9);

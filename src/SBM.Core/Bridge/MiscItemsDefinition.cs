@@ -286,7 +286,50 @@ public sealed class CrashCushionEndPostDefinition
     public double HeightRailEnd { get; set; } = Ft(3) + In(8);
     public double HeightAtEnd { get; set; } = Ft(2) + In(10);
     public double? CushionLength { get; set; }
-    public CrashCushionEndPostDefinition Clone() { var c = (CrashCushionEndPostDefinition)MemberwiseClone(); c.Bars = Bars.Select(b => b.Clone()).ToList(); return c; }
+    /// <summary>OPTIONAL plan outline as rows across the wedge (alignment station, left and right offset, right +), from the rail end to the cushion end, e.g. the
+    /// dimensioned corners of an asymmetric taper; when given (2+ rows) it replaces Station / Offset / DirectionDegrees / PierEndWidth / EndWidth. Heights: HeightRailEnd
+    /// at the first row to HeightAtEnd at TaperLength along the alignment, then HeightAtEnd. Null = the centred wedge.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<EndPostPlanRow>? PlanRows { get; set; }
+    /// <summary>OPTIONAL rail part of the end post (Iowa end post Section C-C: two barrier halves standing back to back, filled solid between them): rows of its
+    /// plan outline (outer toe lines) from the end of slab to the wedge start, the first row usually skewed (<see cref="EndPostPlanRow.RightStation"/>). Null = not built.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<EndPostPlanRow>? RailRows { get; set; }
+    /// <summary>OPTIONAL section of ONE rail half, from its toe inward: (R = distance from the toe line, H = height above the deck top), toe first, last point
+    /// on the top; the two halves are mirrored onto the two toe lines and joined by a flat top (filled between). Required with <see cref="RailRows"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<EndPostRailPoint>? RailHalfProfile { get; set; }
+    public string Source { get; set; } = "";
+    public CrashCushionEndPostDefinition Clone()
+    {
+        var c = (CrashCushionEndPostDefinition)MemberwiseClone(); c.Bars = Bars.Select(b => b.Clone()).ToList();
+        c.PlanRows = PlanRows?.Select(r => r.Clone()).ToList(); c.RailRows = RailRows?.Select(r => r.Clone()).ToList();
+        c.RailHalfProfile = RailHalfProfile?.Select(q => new EndPostRailPoint(q.R, q.H)).ToList();
+        return c;
+    }
+}
+
+/// <summary>Point of an end post rail half section: R inward from the toe line, H above the deck top (m).</summary>
+public sealed class EndPostRailPoint
+{
+    public double R { get; set; }
+    public double H { get; set; }
+    public EndPostRailPoint() { }
+    public EndPostRailPoint(double r, double h) { R = r; H = h; }
+}
+
+/// <summary>One row of an end post plan outline: station and the two side offsets (right +) on the bridge alignment.</summary>
+public sealed class EndPostPlanRow
+{
+    public double Station { get; set; }
+    public double LeftOffset { get; set; }
+    public double RightOffset { get; set; }
+    /// <summary>OPTIONAL station of the right corner when the row is not radial (a skewed end of slab); null = <see cref="Station"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? RightStation { get; set; }
+    public EndPostPlanRow() { }
+    public EndPostPlanRow(double station, double left, double right, double? rightStation = null) { Station = station; LeftOffset = left; RightOffset = right; RightStation = rightStation; }
+    public EndPostPlanRow Clone() => new(Station, LeftOffset, RightOffset, RightStation);
 }
 
 public enum LightingSide { Left, Right }

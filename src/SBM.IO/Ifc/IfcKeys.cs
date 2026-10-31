@@ -16,6 +16,34 @@ public static class IfcKeys
     /// <summary>Stationing IfcReferent i (0 = start station, then the station equations).</summary>
     public static string AlignmentReferent(string ak, int i) => $"{ak}/station/{i}";
     public static string Bridge(string key, string bridgeName) => key + "/" + bridgeName;
+    /// <summary>Roadway corridor (IfcRoad), its component (IfcRoadPart, side "left" / "right"), a course of it (IfcCourse) and its swept section (IfcKerb).</summary>
+    public static string Road(string key, string roadName) => key + "/road/" + roadName;
+    public static string RoadPart(string rk, string side, string component) => rk + "/" + side + "/" + component;
+    public static string RoadCourse(string pk, string course) => pk + "/" + course;
+    public static string RoadKerb(string pk) => pk + "/kerb";
+    /// <summary>Utility network (IfcDistributionSystem), its structures (IfcDistributionChamberElement), pipes (IfcPipeSegment) and their ports.</summary>
+    public static string Utility(string key, string networkName) => key + "/utility/" + networkName;
+    public static string UtilityStructure(string nk, string name) => nk + "/structure/" + name;
+    public static string UtilityPipe(string nk, string name) => nk + "/pipe/" + name;
+    public static string UtilityPort(string elementKey, string end) => elementKey + "/port/" + end;
+    /// <summary>Structure cone is a body item; frame / cover / grate (IfcDiscreteAccessory), wall opening (IfcOpeningElement), pipe hanger, duct bank + conduits.</summary>
+    public static string UtilityPart(string sk, string kind) => sk + "/" + kind;
+    public static string UtilityOpening(string sk, string link) => sk + "/opening/" + link;
+    public static string UtilityHanger(string pk, int i) => pk + "/hanger/" + i;
+    public static string UtilityDuctBank(string nk, string name) => nk + "/ductbank/" + name;
+    public static string UtilityConduit(string dk, int i) => dk + "/conduit/" + i;
+    /// <summary>The subgrade layers of one side of a road (IfcRoadPart 'SUBGRADE'); a layer = <see cref="RoadCourse"/>(this, layer name).</summary>
+    public static string RoadSubgrade(string rk, string side) => rk + "/" + side + "/~subgrade";
+    /// <summary>Retaining wall (IfcElementAssembly 'RETAINING_WALL') and its panel stem (IfcWall) / footing (IfcFooting), panel numbers from 1.</summary>
+    public static string Wall(string key, string wallName) => key + "/wall/" + wallName;
+    public static string WallStem(string wk, int panel) => $"{wk}/stem/{panel}";
+    public static string WallFooting(string wk, int panel) => $"{wk}/footing/{panel}";
+    /// <summary>MSE wall element (facing / facing panel / leveling pad / coping / reinforced zone / reinforcement), number within its role from 1.</summary>
+    public static string WallElement(string wk, string role, int index) => $"{wk}/{role}/{index}";
+    /// <summary>Grading feature (IfcElementAssembly 'GRADING'), its graded surface (IfcGeographicElement TERRAIN) and protection layers (IfcCourse PROTECTION, from 1).</summary>
+    public static string Grading(string key, string name) => key + "/grading/" + name;
+    public static string GradingSurface(string gk) => gk + "/surface";
+    public static string GradingProtection(string gk, int index) => $"{gk}/protection/{index}";
     public static string SuperPart(string bk) => bk + "/super";
     public static string DeckPart(string bk) => bk + "/deck";
     public static string SubPart(string bk) => bk + "/sub";
@@ -23,8 +51,13 @@ public static class IfcKeys
     public static string SubSolid(string uk, int k) => $"{uk}/{k}";
     public static string SubBar(string uk, int n) => $"{uk}/bar/{n}";
     public static string DeckSlab(string bk) => bk + "/deck-slab";
+    /// <summary>Separately cast / placed part of the deck slab (precast panel, closure pour), by its name (IfcBuildingElementPart in the deck slab).</summary>
+    public static string DeckPiece(string bk, string name) => $"{bk}/deck-piece/{name}";
     public static string Barrier(string bk, string name) => bk + "/" + name;
     public static string Joint(string bk, int i) => $"{bk}/joint/{i}";
+    /// <summary>Approach slab beyond the deck end at a support (IfcSlab APPROACH_SLAB) and its sleeper slab.</summary>
+    public static string ApproachSlab(string bk, string support) => $"{bk}/approach-slab/{support}";
+    public static string SleeperSlab(string ak) => ak + "/sleeper";
     public static string JointBlockout(string jk) => jk + "/blockout";
     public static string JointDevice(string jk) => jk + "/device";
     public static string DeckBar(string bk, int n) => $"{bk}/bar/{n}";
@@ -35,6 +68,8 @@ public static class IfcKeys
     public static string MiscElement(string bk, int n) => $"{bk}/misc/el/{n}";
     public static string Assembly(string bk, string mark) => bk + "/asm/" + mark;
     public static string Part(string bk, string mark) => bk + "/part/" + mark;
+    /// <summary>Built-up member / joint gusset stack whose pieces are separate parts (<c>SteelPart.Member</c>).</summary>
+    public static string Member(string bk, string mark) => bk + "/member/" + mark;
     public static string Fastener(string bk, int kind, string assembly, int no) => $"{bk}/fastener/{kind}/{assembly}/{no}";
     public static string PsAssembly(string bk, string mark) => $"{bk}/ps/{mark}";
     public static string PsBeam(string bk, string mark) => $"{bk}/ps/{mark}/beam";
@@ -55,6 +90,10 @@ public static class IfcKeys
     public static string Segment(string bk, string name) => $"{bk}/seg/{name}";
     public static string SegTendon(string bk, string name) => $"{bk}/seg/tendon/{name}";
     public static string SegBearing(string bk, string name) => $"{bk}/seg/bearing/{name}";
+    /// <summary>Segmental box details (OPTIONAL): a block (anchor / erection bar / deviation block) and an opening, by their unique names.</summary>
+    public static string SegBlock(string bk, string name) => $"{bk}/seg/block/{name}";
+    public static string SegOpening(string bk, string name) => $"{bk}/seg/opening/{name}";
+    public static string SegHardware(string bk, string name) => $"{bk}/seg/pt/{name}";
 
     /// <summary>Unquoted 22-character IFC GlobalId of a key.</summary>
     public static string GlobalId(string key) => StepWriter.Guid(key).Trim('\'');

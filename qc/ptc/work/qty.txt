@@ -1,0 +1,115 @@
+PTC 3-span truss 11-13
+    C 519408
+    S 536631
+    conc:barrier 175
+    conc:column 1021
+    conc:deck slab 1139
+    conc:footing 2020
+    conc:pier cap 503
+    forge 982
+    none 19559
+    stainless 633
+    x:grating 11339
+    x:rail member 6082
+    x:railing post 18915
+    x:walkway post 10059
+    x:walkway rail 19029
+    x:walkway stringer 24532
+PTC 3-span truss 25-27
+    C 513904
+    S 536631
+    conc:barrier 175
+    conc:column 1016
+    conc:deck slab 1139
+    conc:footing 1941
+    conc:pier cap 316
+    forge 982
+    none 19559
+    stainless 633
+    x:grating 11339
+    x:rail member 6082
+    x:railing post 18915
+    x:walkway post 10059
+    x:walkway rail 19029
+    x:walkway stringer 24532
+PTC 4-span truss 14-17
+    C 822431
+    S 1058415
+    conc:barrier 292
+    conc:column 4214
+    conc:deck slab 1899
+    conc:footing 4467
+    conc:pier cap 1054
+    forge 1732
+    none 31547
+    other:ASTM A572 Gr. 50 (HP piling) 360246
+    stainless 1852
+    x:grating 17396
+    x:rail member 10137
+    x:railing post 31359
+    x:walkway post 14410
+    x:walkway rail 29284
+    x:walkway stringer 37853
+PTC 4-span truss 21-24
+    C 822431
+    S 1058415
+    conc:barrier 292
+    conc:column 3542
+    conc:deck slab 1899
+    conc:footing 3927
+    conc:pier cap 824
+    forge 1732
+    none 31547
+    stainless 1852
+    x:grating 17396
+    x:rail member 10137
+    x:railing post 31359
+    x:walkway post 14410
+    x:walkway rail 29284
+    x:walkway stringer 37853
+PTC Arch truss 18-20
+    C 1782463
+    S 4477606
+    cast 115859
+    conc:barrier 370
+    conc:column 4759
+    conc:deck slab 2404
+    conc:footing 18409
+    conc:pier cap 417
+    forge 58058
+    none 27585
+    other:ASTM A572 Gr. 50 (HP piling) 1806226
+    x:grating 14643
+    x:rail member 12832
+    x:railing post 39655
+    x:suspender rope 64816
+    x:walkway post 11452
+    x:walkway rail 23363
+    x:walkway stringer 30205
+PTC Girder spans 1-10
+    C 779634
+    S 1122326
+    conc:backwall 864
+    conc:barrier 355
+    conc:column 1632
+    conc:deck slab 2188
+    conc:footing 3409
+    conc:pedestal 49
+    conc:wingwall 74
+    none 17102
+    x:rail member 12315
+    x:railing post 38162
+PTC Girder spans 28-31
+    C 299802
+    S 448570
+    conc:backwall 294
+    conc:barrier 144
+    conc:column 538
+    conc:deck slab 873
+    conc:footing 1033
+    conc:pedestal 14
+    conc:wingwall 55
+    none 6841
+    other:ASTM A572 Gr. 50 (HP piling) 85377
+    x:rail member 4982
+    x:railing post 15597

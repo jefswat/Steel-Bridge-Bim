@@ -101,13 +101,17 @@ public partial class MainWindow
         _dbTagTask = null;
         if (_dbBusy) return;
         OpenDb();
-        if (_db != null)
+        // Index the model objects → GlobalIds in the background (hashing only, no database writes). Always: the Properties panel shows
+        // the picked element's GlobalId (= its IFC GlobalId) with or without a database.
         {
-            // Index the model objects → GlobalIds in the background (hashing only, no database writes).
             var data = DbSnapshotData();
             var project = _vm.Project;
-            _dbTagTask = Task.Run(() => ModelDatabase.BuildTagIndex(project, data));
-            if (_dbScenes > 1) _dbStale = true;
+            var roads = _vm.RoadModels;
+            var walls = _vm.WallModels;
+            var gradings = _vm.GradingModels;
+            var utilities = _vm.UtilityModels;
+            _dbTagTask = Task.Run(() => ModelDatabase.BuildTagIndex(project, data, roads, walls, gradings, utilities));
+            if (_db != null && _dbScenes > 1) _dbStale = true;
         }
         RefreshDbStatus();
         _ = RelinkIfNeededAsync();
@@ -204,12 +208,18 @@ public partial class MainWindow
         RefreshDbStatus();
         var data = DbSnapshotData();
         var project = _vm.Project;
+        var roads = _vm.RoadModels;
+        var walls = _vm.WallModels;
+        var gradings = _vm.GradingModels;
+        var utilities = _vm.UtilityModels;
         string? model = _vm.FilePath;
         try
         {
             var res = await Task.Run(() =>
             {
-                var o = new DatabaseOptions { ModelFile = model, LinksFile = links, Pages = pages, Log = m => ViewModels.MainViewModel.Log("DB: " + m) };
+                var o = new DatabaseOptions { ModelFile = model, LinksFile = links, Pages = pages, Log = m => ViewModels.MainViewModel.Log("DB: " + m),
+                    Roads = roads.Count > 0 ? roads : null, Walls = walls.Count > 0 ? walls : null, Gradings = gradings.Count > 0 ? gradings : null,
+                    Utilities = utilities.Count > 0 ? utilities : null };
                 if (folder != null) o.PlanFolders.Add(folder);
                 return CompanionDatabase.Build(path, project, data, o);
             });
@@ -243,13 +253,14 @@ public partial class MainWindow
         PsBeamPick pb => pb.Beam,
         PsStrandPick ps => ps.Strand,
         PsPadPick pp => pp.Pad,
-        NamedPick => null,
+        NamedPick np => np.Model ?? np.Source,
         _ => tag,
     };
 
-    private void DbOnPicked(object tag, System.Numerics.Vector3 hitLocal)
+    private void DbOnPicked(object tag, System.Numerics.Vector3 hitLocal, string? parentLevel = null)
     {
         _dbPickWorld = _scene != null ? new Vec3(hitLocal.X, hitLocal.Y, hitLocal.Z) + _scene.Origin : null;
+        ShowGlobalIdRow(tag);
         if (_db == null) { _dbShown = null; DbPanel.ShowMessage(DbPath == null ? "Save the model to use the database." : "No database for this model yet: Create database."); return; }
         var task = _dbTagTask;
         if (task == null) { DbPanel.ShowMessage("Indexing the model…"); return; }
@@ -272,6 +283,8 @@ public partial class MainWindow
                     foreach (var c in cats) { gid = _db!.FindByNameNear(c, name, w.X, w.Y, w.Z); if (gid != null) break; }
                 }
                 if (gid == null) { _dbShown = null; DbPanel.ShowMessage("This object is not in the database (rebuild it after model changes)."); return; }
+                // member pick level: show the parent row (level "member") instead of the piece
+                if (parentLevel != null && _db!.Chain(gid) is { Count: >= 2 } ch && ch[^2].Level == parentLevel) gid = ch[^2].GlobalId;
                 ShowDbElement(gid);
                 // G1: a click in the 3D view opens the element's plan sheets in the app (unless the user closed the sheet window).
                 if (!Database.PlanSheetWindow.IsOpen && !Database.PlanSheetWindow.ClosedByUser && _db!.LinkCount > 0
@@ -287,6 +300,32 @@ public partial class MainWindow
             DbPanel.ShowMessage("Indexing the model…");
             task.ContinueWith(_ => Dispatcher.BeginInvoke(Resolve), TaskScheduler.Default);
         }
+    }
+
+    /// <summary>
+    /// "GlobalId" row in the Properties panel (second row, under "Selected") for the picked element = the IFC GlobalId the export writes
+    /// (deterministic, `IfcKeys`), from the background tag index - no database needed. Filled in when the index finishes if it is still building.
+    /// </summary>
+    private void ShowGlobalIdRow(object tag)
+    {
+        var rows = _vm.SelectedProperties;
+        void Put(string v)
+        {
+            int at = rows.ToList().FindIndex(r => r.Name == "GlobalId");
+            var row = new ViewModels.PropertyRow("GlobalId", v);
+            if (at >= 0) rows[at] = row; else rows.Insert(Math.Min(1, rows.Count), row);
+        }
+        string Text(TagIndex t) => t.Lookup(RawModelObject(tag)) ?? "not indexed for this object (see the Database section below)";
+        var task = _dbTagTask;
+        if (task == null) { Put("indexing…"); return; }
+        if (task.IsCompleted) { Put(task.IsFaulted ? "index failed" : Text(task.Result)); return; }
+        if (Environment.GetCommandLineArgs().Contains("--snapshot")) { Put(Text(task.Result)); return; }
+        Put("indexing…");
+        task.ContinueWith(t => Dispatcher.BeginInvoke(() =>
+        {
+            if (!ReferenceEquals(_selectedTag, tag)) return; // selection changed meanwhile
+            Put(t.IsFaulted ? "index failed" : Text(t.Result));
+        }), TaskScheduler.Default);
     }
 
     private string DbLabel(string gid) => _db?.Get(gid) is { } e ? (e.Name.Length > 0 ? e.Name : e.Category) : gid;

@@ -1,0 +1,336 @@
+{
+  "pdfs": [
+    {
+      "file": "Original Existing Bridge Plans from PTC.pdf",
+      "sha256": "2a2d698720e0f6aa704293c9a084a72c38a4ef3217e718a1433f715d238e7bea",
+      "bytes": 11823510,
+      "recordedAt": "2026-10-27"
+    }
+  ],
+  "confirmed": [
+    {
+      "path": "Bridges[PTC 3-span truss 11-13].Truss.Floor.Seats.MinGap",
+      "value": "1/16\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 11-13].Truss.Joints[*].Rivets[*].Rows",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 11-13].Truss.LineItems[*].Side",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 11-13].Truss.Members[*].EndConnections[*].WebClearance",
+      "value": "1/2\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 11-13].Truss.Members[*].Stiffeners[*].PerFace",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 11-13].Truss.Sections[*].AngleCount",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 11-13].Truss.Sections[*].AngleEdges",
+      "value": "both",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 25-27].Truss.Floor.Seats.MinGap",
+      "value": "1/16\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 25-27].Truss.Joints[*].Rivets[*].Rows",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 25-27].Truss.LineItems[*].Side",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 25-27].Truss.Members[*].EndConnections[*].WebClearance",
+      "value": "1/2\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 25-27].Truss.Members[*].Stiffeners[*].PerFace",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 25-27].Truss.Sections[*].AngleCount",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 3-span truss 25-27].Truss.Sections[*].AngleEdges",
+      "value": "both",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Supports[Pier 17 W brg].Substructure.Plan.PileGroups[piles].BatterRatio",
+      "value": "4",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Truss.Floor.Seats.MinGap",
+      "value": "1/16\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Truss.Joints[*].Rivets[*].Rows",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Truss.LineItems[*].Side",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Truss.Members[*].EndConnections[*].WebClearance",
+      "value": "1/2\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Truss.Members[*].Stiffeners[*].PerFace",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Truss.Sections[*].AngleCount",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 14-17].Truss.Sections[*].AngleEdges",
+      "value": "both",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 21-24].Truss.Floor.Seats.MinGap",
+      "value": "1/16\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 21-24].Truss.Joints[*].Rivets[*].Rows",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 21-24].Truss.LineItems[*].Side",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 21-24].Truss.Members[*].EndConnections[*].WebClearance",
+      "value": "1/2\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 21-24].Truss.Members[*].Stiffeners[*].PerFace",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 21-24].Truss.Sections[*].AngleCount",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC 4-span truss 21-24].Truss.Sections[*].AngleEdges",
+      "value": "both",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Supports[Pier 18].Substructure.Plan.PileGroups[piles].BatterRatio",
+      "value": "4",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Supports[Pier 19].Substructure.Plan.PileGroups[piles].BatterRatio",
+      "value": "4",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Supports[Pier 20 main brg].Substructure.Plan.PileGroups[piles].BatterRatio",
+      "value": "4",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Floor.Seats.MinGap",
+      "value": "1/16\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Joints[*].Rivets[*].Rows",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.LineItems[*].Side",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Members[*].EndConnections[*].WebClearance",
+      "value": "1/2\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Members[*].Stiffeners[*].PerFace",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.PlaneItems[*].ArcStepDegrees",
+      "value": "5\u00B0",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Sections[*].AngleCount",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Sections[*].AngleEdges",
+      "value": "both",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Sections[*].CustomPieces[*].Kind",
+      "value": "plate",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Arch truss 18-20].Truss.Suspenders[*].Ropes",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 1-10].Truss.Floor.Seats.MinGap",
+      "value": "1/16\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 1-10].Truss.LineItems[*].Side",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 1-10].Truss.Members[*].RivetLines[*].Along",
+      "value": "x",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 1-10].Truss.Members[*].Stiffeners[*].PerFace",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 1-10].Truss.Sections[*].AngleCount",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 1-10].Truss.Sections[*].AngleEdges",
+      "value": "both",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 28-31].Truss.Floor.Seats.MinGap",
+      "value": "1/16\u0022",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 28-31].Truss.LineItems[*].Side",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 28-31].Truss.Members[*].RivetLines[*].Along",
+      "value": "x",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 28-31].Truss.Members[*].Stiffeners[*].PerFace",
+      "value": "1",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 28-31].Truss.Sections[*].AngleCount",
+      "value": "2",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    },
+    {
+      "path": "Bridges[PTC Girder spans 28-31].Truss.Sections[*].AngleEdges",
+      "value": "both",
+      "note": "agent review 2026-10-28: plan page / script evidence per path in qc/ptc/agent-review-defaults.md",
+      "at": "2026-10-29"
+    }
+  ]
+}

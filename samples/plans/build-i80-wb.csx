@@ -369,4 +369,8 @@ var r = Doc.Regenerate();
 Print($"Regenerated {r.Bridges} bridges in {r.Elapsed.TotalSeconds:F1} s: {r.Parts:N0} parts, {r.Bolts:N0} bolts, {r.SteelMassKg / 907.18474:N0} tons steel.");
 foreach (var e in r.Errors) Print("ERROR " + e);
 foreach (var w in r.Warnings.Take(25)) Print("warning " + w);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`): Design 116 = plan set "design-116" in sheet-links-i80-rampg.json.
+// The I-80 / Ramp G PDFs live in dist\SteelBridgeModeler (not C:\SBMData). Design 316 is attached by build-ramp-g.csx.
+{ const string pdf = @"C:\SBM\dist\SteelBridgeModeler\B00168 - CBIS-ESI-Westbound I-80 - Design 116.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save();

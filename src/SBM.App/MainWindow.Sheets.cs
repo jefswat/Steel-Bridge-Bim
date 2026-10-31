@@ -24,6 +24,7 @@ public partial class MainWindow
         SheetsPanel.Visibility = Visibility.Collapsed;
         ViewSwitch.Visibility = Visibility.Visible;
         UpdateIsolateBanner();
+        UpdateNorthArrow();
     }
 
     private async void OnModeSheets(object sender, RoutedEventArgs e)
@@ -31,6 +32,7 @@ public partial class MainWindow
         SheetsPanel.Visibility = Visibility.Visible;
         ViewSwitch.Visibility = Visibility.Collapsed;
         UpdateIsolateBanner();
+        UpdateNorthArrow();
         if (_sheetsStale) await RebuildSheetsAsync();
     }
 

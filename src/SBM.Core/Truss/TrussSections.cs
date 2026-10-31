@@ -13,6 +13,10 @@ public sealed record TrussSectionPiece(Vec2[] Polygon, string Label, double Leng
     TrussPerforation? Perforation = null)
 {
     public static TrussSectionPiece Of(Vec2[] polygon, string label, TrussPlate p) => new(polygon, label, p.Length, p.Offset, p.Start ?? double.NaN, p.BetweenGussets, p.Perforation);
+    /// <summary>Kind of the piece (web ply, angle, cover plate, channel, rolled shape, plate, ...): the sub-element type when each piece is its own part.</summary>
+    public string Kind { get; init; } = "";
+    /// <summary>Points at which the piece stops at the inlaid gusset (<see cref="Bridge.TrussPly.InlaidAt"/>); null = none.</summary>
+    public IReadOnlyList<string>? InlaidAt { get; init; }
 }
 
 /// <summary>Lacing bar face of a section: bars lie in the plane y = <see cref="Y"/> .. Y + Thickness * Side (outside the face), spanning x = +/- HalfLines.</summary>
@@ -116,7 +120,13 @@ public static class TrussSections
     {
         var r = new TrussBuiltSection { Definition = s };
         if (s.Unresolved.Length > 0) r.Flag = s.Unresolved;
-        switch (s.Kind)
+        if (s.CustomPieces is { Count: > 0 } cps)
+        {
+            foreach (var cp in cps.Where(c => c.Polygon.Count >= 3))
+                r.Pieces.Add(new(cp.Polygon.Select(q => new Vec2(q.U, q.V)).ToArray(), cp.Label.Length > 0 ? cp.Label : "plate") { Kind = cp.Kind.Length > 0 ? cp.Kind : "plate" });
+            r.Notes.Add($"section {s.Name}: {r.Pieces.Count} explicit pieces");
+        }
+        else switch (s.Kind)
         {
             case TrussSectionKind.Box: Box(s, r); break;
             case TrussSectionKind.H: H(s, r); break;
@@ -124,26 +134,27 @@ public static class TrussSections
             case TrussSectionKind.Angles: Angles(s, r); break;
             case TrussSectionKind.Rolled: Rolled(s, r); break;
             case TrussSectionKind.Plate:
-                r.Pieces.Add(new(Rect(-s.Width / 2, s.Width / 2, -s.Depth / 2, s.Depth / 2), $"PL {L(s.Width)} x {L(s.Depth)}"));
+                r.Pieces.Add(new(Rect(-s.Width / 2, s.Width / 2, -s.Depth / 2, s.Depth / 2), $"PL {L(s.Width)} x {L(s.Depth)}") { Kind = "plate" });
                 break;
             case TrussSectionKind.Round:
             {
                 int n = 24;
                 double rr = s.Diameter / 2;
-                r.Pieces.Add(new(Enumerable.Range(0, n).Select(i => Vec2.FromAngle(2 * Math.PI * i / n) * rr).ToArray(), $"round {L(s.Diameter)}"));
+                r.Pieces.Add(new(Enumerable.Range(0, n).Select(i => Vec2.FromAngle(2 * Math.PI * i / n) * rr).ToArray(), $"round {L(s.Diameter)}") { Kind = "round bar" });
                 break;
             }
             default:
-                r.Pieces.Add(new(Rect(-s.Width / 2, s.Width / 2, -s.Depth / 2, s.Depth / 2), $"nominal envelope {L(s.Width)} x {L(s.Depth)}"));
+                r.Pieces.Add(new(Rect(-s.Width / 2, s.Width / 2, -s.Depth / 2, s.Depth / 2), $"nominal envelope {L(s.Width)} x {L(s.Depth)}") { Kind = "envelope" });
                 r.Flag ??= $"UNRESOLVED: section {s.Name} not dimensioned - nominal envelope {L(s.Width)} x {L(s.Depth)}.";
                 break;
         }
+        if (s.Rotated && s.Kind is TrussSectionKind.LacedChannels or TrussSectionKind.Box && r.Pieces.Count > 0) TurnQuarter(s, r);
         if (r.Pieces.Count == 0 || r.Pieces.Any(p => p.Polygon.Length < 3 || Math.Abs(MeshBuilder.SignedArea(p.Polygon)) < 1e-9))
         {
             // Incomplete input: an envelope of whatever is known, flagged.
             double w = s.Width > 0 ? s.Width : s.WebsOutToOut > 0 ? s.WebsOutToOut : In(12), d = s.Depth > 0 ? s.Depth : s.WebDepth > 0 ? s.WebDepth : In(12);
             r.Pieces.Clear();
-            r.Pieces.Add(new(Rect(-w / 2, w / 2, -d / 2, d / 2), $"envelope {L(w)} x {L(d)}"));
+            r.Pieces.Add(new(Rect(-w / 2, w / 2, -d / 2, d / 2), $"envelope {L(w)} x {L(d)}") { Kind = "envelope" });
             r.Flag ??= $"UNRESOLVED: section {s.Name} ({s.Kind}) input incomplete - envelope {L(w)} x {L(d)} built.";
         }
         r.WebCenterY = -s.WorkingLineOffset;
@@ -162,6 +173,18 @@ public static class TrussSections
             r.YMin = Math.Min(r.YMin, y1); r.YMax = Math.Max(r.YMax, y1);
         }
         return r;
+    }
+
+    /// <summary>Built-up section turned 90 degrees about the member axis (<see cref="TrussSectionDefinition.Rotated"/>): (x, y) -> (-y, x). The web / channel
+    /// groups then lie top and bottom (no web faces at +/- x: the box web data are cleared), the outermost cover plate is the ply at the +/- x faces.</summary>
+    private static void TurnQuarter(TrussSectionDefinition s, TrussBuiltSection r)
+    {
+        for (int i = 0; i < r.Pieces.Count; i++) r.Pieces[i] = r.Pieces[i] with { Polygon = r.Pieces[i].Polygon.Select(p => new Vec2(-p.Y, p.X)).ToArray() };
+        if (r.Lacing.Count > 0) { r.Notes.Add($"section {s.Name}: turned 90 degrees - its lacing bars are not built"); r.Lacing.Clear(); }
+        var plates = s.TopPlates.Count > 0 ? s.TopPlates : s.BottomPlates;
+        if (plates.Count > 0) r.OuterPly = plates[^1].Thickness;
+        r.WebOuterX = 0; r.WebInnerX = 0; r.WebDepth = 0;
+        r.Notes.Add($"section {s.Name}: turned 90 degrees about the member axis (back-to-back distance vertical, cover plates on the sides)");
     }
 
     // ---- riveted box: two web groups (plies stacked inward from the outer face), 4 angles at the web edges, cover plates, lacing on the open faces
@@ -216,7 +239,7 @@ public static class TrussSections
                 double pd = PlyDepth(p);
                 bool ins = InsideAngles(k);
                 double xa = ins ? xi : x0;
-                r.Pieces.Add(new(Rect(sg * xa, sg * (xa - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN, p.BetweenGussets, p.Perforation));
+                r.Pieces.Add(new(Rect(sg * xa, sg * (xa - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN, p.BetweenGussets, p.Perforation) { Kind = "web ply", InlaidAt = p.InlaidAt });
                 if (ins) xi -= p.Thickness; else x0 -= p.Thickness;
             }
         }
@@ -236,7 +259,7 @@ public static class TrussSections
                     if (e == 1 && !top || e == -1 && !bot) continue;
                     // (m, v) = (y, x): heel at the web edge (+ projection), leg on the web toward the centre, outstanding leg along x
                     var poly = SteelCatalog.AnglePolygon(a, e * (d / 2 + pr), -e, face, o).Select(q => new Vec2(q.Y, q.X)).ToArray();
-                    r.Pieces.Add(new(poly, $"L {a.Name}"));
+                    r.Pieces.Add(new(poly, $"L {a.Name}") { Kind = "angle" });
                 }
             }
             if (top) yTop = d / 2 + pr;
@@ -246,14 +269,14 @@ public static class TrussSections
         double y = yTop;
         foreach (var p in s.TopPlates)
         {
-            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, y, y + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, y, y + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p) with { Kind = "cover plate" });
             if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             y += p.Thickness;
         }
         double yb = yBot;
         foreach (var p in s.BottomPlates)
         {
-            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yb - p.Thickness, yb), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yb - p.Thickness, yb), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p) with { Kind = "cover plate" });
             if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yb -= p.Thickness;
         }
@@ -272,7 +295,7 @@ public static class TrussSections
         if (d <= 0 || tw <= 0) return;
         r.WebThickness = tw;
         Vec2 Map(Vec2 mn) => s.WebVertical ? new Vec2(mn.Y, mn.X) : new Vec2(mn.X, mn.Y);   // (m along the web, n normal to it)
-        r.Pieces.Add(new(new[] { new Vec2(-d / 2, -tw / 2), new Vec2(d / 2, -tw / 2), new Vec2(d / 2, tw / 2), new Vec2(-d / 2, tw / 2) }.Select(Map).ToArray(), $"web PL {L(d)} x {L(tw)}"));
+        r.Pieces.Add(new(new[] { new Vec2(-d / 2, -tw / 2), new Vec2(d / 2, -tw / 2), new Vec2(d / 2, tw / 2), new Vec2(-d / 2, tw / 2) }.Select(Map).ToArray(), $"web PL {L(d)} x {L(tw)}") { Kind = "web plate" });
         var a = AngleOf(s, r.Notes);
         double edge = d / 2;
         if (a != null)
@@ -280,7 +303,7 @@ public static class TrussSections
             double pr = s.AngleProjection;
             foreach (int e in new[] { 1, -1 })
                 foreach (int side in new[] { 1, -1 })
-                    r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, e * (d / 2 + pr), -e, side * tw / 2, side).Select(Map).ToArray(), $"L {a.Name}"));
+                    r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, e * (d / 2 + pr), -e, side * tw / 2, side).Select(Map).ToArray(), $"L {a.Name}") { Kind = "angle" });
             edge = d / 2 + pr;
         }
         foreach (int e in new[] { 1, -1 })
@@ -290,7 +313,7 @@ public static class TrussSections
             foreach (var p in e < 0 && (s.WebVertical || s.BottomPlates.Count > 0) ? s.BottomPlates : s.TopPlates)
             {
                 var poly = new[] { new Vec2(e * m0, -p.Width / 2), new Vec2(e * (m0 + p.Thickness), -p.Width / 2), new Vec2(e * (m0 + p.Thickness), p.Width / 2), new Vec2(e * m0, p.Width / 2) };
-                r.Pieces.Add(TrussSectionPiece.Of(poly.Select(Map).ToArray(), p.Label.Length > 0 ? p.Label : $"flange PL {L(p.Width)} x {L(p.Thickness)}", p));
+                r.Pieces.Add(TrussSectionPiece.Of(poly.Select(Map).ToArray(), p.Label.Length > 0 ? p.Label : $"flange PL {L(p.Width)} x {L(p.Thickness)}", p) with { Kind = "cover plate" });
                 m0 += p.Thickness;
             }
         }
@@ -313,20 +336,20 @@ public static class TrussSections
         foreach (int sg in new[] { 1, -1 })
         {
             int o = s.FlangesOut ? sg : -sg;
-            r.Pieces.Add(new(SteelCatalog.ChannelPolygon(c, sg * b / 2, o).Select(q => new Vec2(q.Y, q.X)).ToArray(), $"C {c.Name}"));
+            r.Pieces.Add(new(SteelCatalog.ChannelPolygon(c, sg * b / 2, o).Select(q => new Vec2(q.Y, q.X)).ToArray(), $"C {c.Name}") { Kind = "channel" });
         }
         r.WebThickness = c.WebThickness; r.OuterPly = c.WebThickness;
         r.LbPerFt = c.WeightPerFootLb > 0 && s.ShapeArea <= 0 && s.TopPlates.Count == 0 && s.BottomPlates.Count == 0 ? 2 * c.WeightPerFootLb : 0;
         double yt = c.Depth / 2, ybt = -c.Depth / 2;
         foreach (var p in s.TopPlates)
         {
-            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yt, yt + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, yt, yt + p.Thickness), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p) with { Kind = "cover plate" });
             if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             yt += p.Thickness;
         }
         foreach (var p in s.BottomPlates)
         {
-            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, ybt - p.Thickness, ybt), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
+            r.Pieces.Add(TrussSectionPiece.Of(Rect(-p.Width / 2, p.Width / 2, ybt - p.Thickness, ybt), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p) with { Kind = "cover plate" });
             if (p.Perforated && p.Perforation == null) r.Notes.Add($"section {s.Name}: perforated cover plate {p.Label} built solid (access holes not dimensioned)");
             ybt -= p.Thickness;
         }
@@ -349,7 +372,7 @@ public static class TrussSections
             if (w <= 0 || d <= 0) return;
             foreach (int sx in new[] { 1, -1 })
                 foreach (int sy in new[] { 1, -1 })
-                    r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, sy * d / 2, -sy, sx * w / 2, -sx).Select(q => new Vec2(q.Y, q.X)).ToArray(), $"L {a.Name}"));
+                    r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, sy * d / 2, -sy, sx * w / 2, -sx).Select(q => new Vec2(q.Y, q.X)).ToArray(), $"L {a.Name}") { Kind = "angle" });
             r.OuterPly = a.Thickness;
             if (s.Lacing is { } lac)
             {
@@ -362,7 +385,7 @@ public static class TrussSections
         }
         double g = s.BackToBack;
         foreach (int sg in new[] { 1, -1 })
-            r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, a.LegA / 2, -1, sg * g / 2, sg).Select(q => new Vec2(q.Y, q.X)).ToArray(), $"L {a.Name}"));
+            r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, a.LegA / 2, -1, sg * g / 2, sg).Select(q => new Vec2(q.Y, q.X)).ToArray(), $"L {a.Name}") { Kind = "angle" });
         r.OuterPly = a.Thickness;
         if (a.WeightPerFootLb > 0) r.LbPerFt = 2 * a.WeightPerFootLb;
     }
@@ -374,26 +397,26 @@ public static class TrussSections
         if (SteelCatalog.FindWideFlange(n) is { } w)
         {
             w = WithArea(w, s.ShapeArea, r.Notes);
-            r.Pieces.Add(new(SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2).Select(Map).ToArray(), w.Name));
+            r.Pieces.Add(new(SteelCatalog.WideFlangePolygon(w, -w.WebThickness / 2).Select(Map).ToArray(), w.Name) { Kind = "rolled shape" });
             r.LbPerFt = s.ShapeArea > 0 ? 0 : w.WeightPerFootLb; r.WebThickness = w.WebThickness; r.OuterPly = w.FlangeThickness;
             FlangePlates(s, r, w.Depth, Map);
             return;
         }
         if (SteelCatalog.FindChannel(n) is { } c)
         {
-            r.Pieces.Add(new(SteelCatalog.ChannelPolygon(c, -c.WebThickness / 2, 1).Select(Map).ToArray(), c.Name));
+            r.Pieces.Add(new(SteelCatalog.ChannelPolygon(c, -c.WebThickness / 2, 1).Select(Map).ToArray(), c.Name) { Kind = "rolled shape" });
             r.LbPerFt = c.WeightPerFootLb; r.WebThickness = c.WebThickness; r.OuterPly = c.WebThickness;
             return;
         }
         if (SteelCatalog.FindAngle(n) is { } a)
         {
-            r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, a.LegA / 2, -1, 0, 1).Select(Map).ToArray(), a.Name));
+            r.Pieces.Add(new(SteelCatalog.AnglePolygon(a, a.LegA / 2, -1, 0, 1).Select(Map).ToArray(), a.Name) { Kind = "rolled shape" });
             r.LbPerFt = a.WeightPerFootLb; r.WebThickness = a.Thickness; r.OuterPly = a.Thickness;
             return;
         }
         if (SteelCatalog.FindTee(n) is { } t)
         {
-            r.Pieces.Add(new(SteelCatalog.TeePolygon(t, -t.StemThickness / 2).Select(q => Map(new Vec2(-q.X, q.Y))).ToArray(), t.Name));
+            r.Pieces.Add(new(SteelCatalog.TeePolygon(t, -t.StemThickness / 2).Select(q => Map(new Vec2(-q.X, q.Y))).ToArray(), t.Name) { Kind = "rolled shape" });
             r.LbPerFt = t.WeightPerFootLb; r.WebThickness = t.StemThickness; r.OuterPly = t.FlangeThickness;
             return;
         }
@@ -401,7 +424,7 @@ public static class TrussSections
         if (s.Depth > 0 && s.FlangeWidth > 0 && s.WebThickness > 0 && s.FlangeThickness > 0)
         {
             var ws = WithArea(new WideFlangeSize(n, s.Depth, s.FlangeWidth, s.WebThickness, s.FlangeThickness), s.ShapeArea, r.Notes);
-            r.Pieces.Add(new(SteelCatalog.WideFlangePolygon(ws, -ws.WebThickness / 2).Select(Map).ToArray(), n));
+            r.Pieces.Add(new(SteelCatalog.WideFlangePolygon(ws, -ws.WebThickness / 2).Select(Map).ToArray(), n) { Kind = "rolled shape" });
             r.WebThickness = ws.WebThickness; r.OuterPly = s.FlangeThickness;
             r.LbPerFt = s.WeightLbPerFt;
             FlangePlates(s, r, ws.Depth, Map);
@@ -451,7 +474,7 @@ public static class TrussSections
             foreach (var p in e > 0 ? s.TopPlates : s.BottomPlates)
             {
                 var poly = new[] { new Vec2(e * m0, -p.Width / 2), new Vec2(e * (m0 + p.Thickness), -p.Width / 2), new Vec2(e * (m0 + p.Thickness), p.Width / 2), new Vec2(e * m0, p.Width / 2) };
-                r.Pieces.Add(TrussSectionPiece.Of(poly.Select(map).ToArray(), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p));
+                r.Pieces.Add(TrussSectionPiece.Of(poly.Select(map).ToArray(), p.Label.Length > 0 ? p.Label : $"cover PL {L(p.Width)} x {L(p.Thickness)}", p) with { Kind = "cover plate" });
                 m0 += p.Thickness;
             }
         }

@@ -1,0 +1,16 @@
+regen 30.8s
+bracing plates 432, edge angles 272
+bracing rivets 23723: bg-only-multi 96, conn 8618, nobg 3135, own 11874
+bracing member ends 552: no connecting rivet 392 (no bracing plate within 2.5 ft: 60); Strut 64/120, UpperLateral 76/88, Portal 4/4, LowerLateral 156/236, Sway 92/104
+  Truss: bracing plate at N:LM13 stops 1/4" clear of FB13 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:LM13' stops 1/4" clear of FB13' (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:SW7 stops 1/4" clear of FB7 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:SW8 stops 1/4" clear of FB8 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:SW7' stops 1/4" clear of FB7' (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:SW8' stops 1/4" clear of FB8' (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:FX14 stops 1/4" clear of FB14 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:FX14-1 stops 1/4" clear of FB14 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:FX14-1 stops 1/4" clear of FL-X13-15a2 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:FX14-1 stops 1/4" clear of FL-X13-15b2 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:FX14-2 stops 1/4" clear of FB14 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:FX14-2 stops 1/4" clear of FL-X13-15a1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].

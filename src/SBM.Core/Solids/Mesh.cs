@@ -60,6 +60,23 @@ public sealed class Mesh
         (NurbsTriangles ??= new()).Add((triStart, TriangleCount - triStart));
     }
 
+    /// <summary>Records a NURBS solid describing <paramref name="count"/> triangles from <paramref name="triStart"/> (count 0: a further solid of an
+    /// element whose triangles an earlier record already lists, e.g. a block recorded as two exact solids over one mesh).</summary>
+    public void AddNurbs(NurbsSolid solid, int triStart, int count)
+    {
+        (Nurbs ??= new()).Add(solid);
+        (NurbsTriangles ??= new()).Add((triStart, count));
+    }
+
+    /// <summary>Removes the NURBS records from index <paramref name="index"/> on (an exact description that could not be completed).</summary>
+    public void DropNurbsFrom(int index)
+    {
+        if (Nurbs == null) return;
+        Nurbs.RemoveRange(index, Nurbs.Count - index);
+        NurbsTriangles!.RemoveRange(index, NurbsTriangles.Count - index);
+        if (Nurbs.Count == 0) { Nurbs = null; NurbsTriangles = null; }
+    }
+
     /// <summary>True when NURBS solids describe every triangle.</summary>
     public bool HasExactNurbs => Nurbs is { Count: > 0 } && NurbsTriangles!.Sum(r => r.count) == TriangleCount;
 
@@ -156,13 +173,16 @@ public static class MeshBuilder
     /// Builds a closed solid from a sequence of rings (each ring = the same section polygon placed in 3D).
     /// <paramref name="section"/> is the 2D section used to triangulate the end caps; rings must follow its vertex order.
     /// </summary>
-    public static void AddLoft(Mesh mesh, IReadOnlyList<Vec2> section, IReadOnlyList<Vec3[]> rings)
+    public static void AddLoft(Mesh mesh, IReadOnlyList<Vec2> section, IReadOnlyList<Vec3[]> rings) => AddLoft(mesh, section, rings, true);
+
+    /// <param name="exact">false = never record an exact extrusion recipe (twisted sweeps whose rings differ by less than the recipe tolerance).</param>
+    public static void AddLoft(Mesh mesh, IReadOnlyList<Vec2> section, IReadOnlyList<Vec3[]> rings, bool exact)
     {
         int n = section.Count;
         if (rings.Count < 2 || n < 3) return;
         int triStart = mesh.TriangleCount;
         AddLoftCore(mesh, section, rings);
-        mesh.Describe(StraightSweep(rings), triStart);
+        mesh.Describe(exact ? StraightSweep(rings) : null, triStart);
     }
 
     /// <summary>The loft as an exact extrusion when every ring is a uniform translation of the first along one line.</summary>

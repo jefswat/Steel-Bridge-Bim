@@ -244,4 +244,8 @@ Print($"Regenerated {r.Bridges} bridges in {r.Elapsed.TotalSeconds:F1} s: {r.Par
 foreach (var e in r.Errors) Print("ERROR " + e);
 foreach (var w in r.Warnings.Where(w => !w.Contains("cross-frame spacing")).Take(30)) Print("warning " + w);
 Print($"({r.Warnings.Count(w => w.Contains("cross-frame spacing"))} cross-frame spacing warnings not listed)");
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`): Design 316 = plan set "design-316" in sheet-links-i80-rampg.json
+// (Design 116 is attached by build-i80-wb.csx; the PDFs live in dist\SteelBridgeModeler, not C:\SBMData).
+{ const string pdf = @"C:\SBM\dist\SteelBridgeModeler\B00169 - CBIS-ESI-Ramp G - Design 316.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save();

@@ -249,6 +249,13 @@ br.Stiffeners.IntermediateStiffener = new PlateSize(I(6.5), I(7.0 / 16));
 br.Stiffeners.CornerClip = I(1.5);
 br.Stiffeners.ClipToTopFlange = true;   // p.32 Sect. A-A: bearing / jacking stiffeners sized for the bottom flange overhang the narrower top flange at the abutments (1.78" S, ~0.8" N); outer top corner clipped 45 deg to the flange edge, top weld stops there
 br.Stiffeners.FlangeToWebWeld = I(5.0 / 16);
+// Stiffener end fits (p.32 / DS 31, fabrication note F55): girder bearing & jacking stiffeners MILL TO BEAR at the bottom (loaded) flange. The flange welds
+// ("1/4 TYPICAL ALL STIFFENER TO FLANGE WELDS AT DETAIL A", std 1021W on p.32) are added by weld-holdbacks.csx; given here too so the bottom weld stays.
+br.Stiffeners.EndFits = new()
+{
+    new(StiffenerFitKind.Bearing, StiffenerEnd.Bottom, FitCondition.MillToBear, "p.32 F55"),
+    new(StiffenerFitKind.Bearing, StiffenerEnd.Bottom, FitCondition.Welded, "p.32 std. 1021W Detail A"),
+};
 // INTERMEDIATE STIFFENERS as drawn on p.27 (vector linework re-read 2026-10-20, user decision d35): short ticks only in the abutment panels at 9'-6 from the CL bearing
 // ("9'-6 (TYP.)", both abutments), in the two panels on each side of Pier 1 and of Pier 2 (the cap) at mid panel, and one extra on girder D in the FS 4 panel; none in the
 // FS 1 / FS 2 / FS 3 panels = 10 per girder, 11 on D. (The generator's automatic mid-panel rule put 25 per girder and 7 clash groups with the splice plates.)
@@ -372,6 +379,11 @@ var cap = new IntegralSteelCapDefinition
     TopFlange = new PlateSize(I(20), I(1.75)), BottomFlange = new PlateSize(I(20), I(1.75)), PlanFlangeGap = I(3.0 / 16),
     Material = "ASTM A709 Gr. HPS 70W", SecondaryMaterial = "ASTM A709 Gr. 50W",
     BearingStiffener = new PlateSize(I(9), I(1.5)), JackingStiffenerOffset = F(5, 6), StiffenerClip = I(1), StiffenerTopNoWeld = I(4.375), StiffenerWeld = I(5.0 / 16), StiffenerBottomWeld = true,   // p.31 B-B / C-C: 5/16 + 5/16 at the bottom (mill to bear), 4 3/8 no weld at the top
+    StiffenerFits = new()   // p.31 B-B / C-C (fabrication note F51): "MILL TO BEAR (TYP.)" with 5/16 + 5/16 fillets at the bottom
+    {
+        new(StiffenerFitKind.Bearing, StiffenerEnd.Bottom, FitCondition.MillToBear, "p.31 B-B / C-C (F51)"),
+        new(StiffenerFitKind.Bearing, StiffenerEnd.Bottom, FitCondition.Welded, "p.31 B-B / C-C (F51)"),
+    },
     StudLength = I(9),
 };
 // camber diagram (p.29): from the chord between the CL bearings, 6 spa @ 7'-10, tolerances (-0, +x)
@@ -421,6 +433,11 @@ var conn = new CapGirderConnection
 {
     EndPlateThickness = I(0.5), ConnectorPlateThickness = I(0.5), DiaphragmPlateThickness = I(0.75), BottomPlate = new PlateSize(I(24), I(2.5)),
     BottomPlateWeld = I(5.0 / 16),   // p.30 elevation "5/16 + 5/16, mill to bear" at the PL 2 1/2 x 24
+    DiaphragmPlateFits = new()   // p.30 elevation: the diaphragm plate pieces "MILL TO BEAR TYP." on the PL 2 1/2 x 24 with 5/16 + 5/16 fillets
+    {
+        new() { Condition = FitCondition.MillToBear, Source = "p.30 (F43)" },
+        new() { Condition = FitCondition.Welded, Source = "p.30 (F43)" },
+    },
     DiaphragmWeld = I(0.25),         // p.30 weld symbols PL 3/4 to the connector plates carry NO size: drawn at 1/4" and flagged UNRESOLVED (dimension only)
     TopFlangeEndBeyondCapFlange = I(1), CopeRadius = I(2), CopeClearance = 0,
     OuterSplicePlate = new PlateSize(I(24), I(1.375)), InnerSplicePlate = new PlateSize(I(11), I(1.375)), InnerPlateFromWeb = I(1),
@@ -939,5 +956,8 @@ if (md.Substructure is { } subm)
     foreach (var u in subm.Units) Print($"substructure unit {u.Name}: {u.Solids.Count} solids, {u.Foundations.Sum(f => f.Piles.Count)} piles");
 }
 foreach (var u in unresolved) Print(u);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "design-1617" in sheet-links-nebraska-st.json.
+{ const string pdf = @"C:\SBMData\B00167 - Nebraska Ramp B - Design 116.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save(outPath);
 Print($"Saved {outPath}");

@@ -24,6 +24,11 @@ public static class PlateBuilder
         if (walls == null || walls.All(x => x)) mesh.Describe(Extrusion(outline, holes, map, t0, t1), triStart);
     }
 
+    /// <summary>Prism through a general (non-affine) map, e.g. a plate whose edges are bevelled per face: no exact-extrusion recipe; the outer walls are split
+    /// at every face vertex that lies on an outline edge (hole bridges), so the mesh is watertight without T-junctions (faceted IFC solids stay closed).</summary>
+    public static void AddPrismWatertight(Mesh mesh, IReadOnlyList<Vec2> outline, IReadOnlyList<Hole> holes, Func<double, double, double, Vec3> map, double z0, double z1) =>
+        AddPrismCore(mesh, outline, holes, map, _ => z0, _ => z1, null, null, splitWalls: true);
+
     /// <summary>The prism as an exact extrusion, or null if the map bends it, varies its thickness or distorts its holes.</summary>
     private static ExtrudedSolid? Extrusion(IReadOnlyList<Vec2> outline, IReadOnlyList<Hole> holes,
         Func<double, double, double, Vec3> map, Func<Vec2, double> t0, Func<Vec2, double> t1)
@@ -46,7 +51,7 @@ public static class PlateBuilder
 
     private static void AddPrismCore(Mesh mesh, IReadOnlyList<Vec2> outline, IReadOnlyList<Hole> holes,
         Func<double, double, double, Vec3> map, Func<Vec2, double> t0, Func<Vec2, double> t1, IReadOnlyList<bool>? walls,
-        IReadOnlyList<Vec2[]>? openings = null)
+        IReadOnlyList<Vec2[]>? openings = null, bool splitWalls = false)
     {
         var outer = outline.ToList();
         var wallFlags = walls?.ToList() ?? Enumerable.Repeat(true, outer.Count).ToList();
@@ -100,8 +105,33 @@ public static class PlateBuilder
         }
 
         // Walls: outer (CCW) and holes (CW) — quad (a0, b0, b1, a1) faces outward for both.
-        void Walls(IReadOnlyList<Vec2> loop, IReadOnlyList<bool>? flags)
+        void Walls(IReadOnlyList<Vec2> loop0, IReadOnlyList<bool>? flags)
         {
+            var loop = loop0;
+            if (splitWalls && (flags == null || flags.All(x => x)))
+            {
+                flags = null;
+                // insert the face vertices lying inside an edge (in order along it)
+                var split = new List<Vec2>();
+                for (int i = 0; i < loop0.Count; i++)
+                {
+                    var a = loop0[i];
+                    var b = loop0[(i + 1) % loop0.Count];
+                    split.Add(a);
+                    var ab = b - a;
+                    double l2 = Vec2.Dot(ab, ab);
+                    if (l2 < 1e-18) continue;
+                    var on = verts.Where(v =>
+                    {
+                        double u = Vec2.Dot(v - a, ab) / l2;
+                        if (u <= 1e-9 || u >= 1 - 1e-9) return false;
+                        var q = a + ab * u;
+                        return (v - q).Length < 1e-9;
+                    }).Distinct().OrderBy(v => Vec2.Dot(v - a, ab)).ToList();
+                    split.AddRange(on);
+                }
+                loop = split;
+            }
             for (int i = 0; i < loop.Count; i++)
             {
                 if (flags != null && !flags[i]) continue;

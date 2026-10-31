@@ -1,10 +1,10 @@
 # Hairpin zones of a pier (elevation sheet): "N SPA. @ 1'-4 = ..; k-5c5 BARS" labels, left to right.
 import sys, re, json
-sys.path.insert(0, r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\tools')
+sys.path.insert(0, r'C:\SBM\.worktrees\bends\tools')
 import bendx, plantext
 import pymupdf as fitz
 
-W = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends' + '\\'
+W = r'C:\SBM\.worktrees\bends' + '\\'
 # A backtick (the sheets' wide-space glyph) may separate "BARS": "8-5c5`BARS" was missed by "\s*" and its right-end zone was put FIRST
 # (2WB, 3WB, 7WB, 9WB, 10WB, 13WB; fixed by hand in pier-rebar-i80.csx, cap-cover work 2026-10-11).
 LAB = re.compile(r"(\d+)-(\d+[a-z]\d+)(?:[\s`]*BARS)?[\s`]*$", re.I)

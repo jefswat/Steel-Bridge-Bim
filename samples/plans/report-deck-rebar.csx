@@ -3,7 +3,7 @@
 // Prints per bridge: placed bars (3D) / schedule-only marks / plan totals, then every mark (count, length, weight) with the difference.  DR_CSV=1 prints CSV rows.
 using System.Globalization;
 const double LbPerKg = 2.2046226218;
-string csv = new[] { @"docs\plan-data\deck-bar-lists.csv", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\docs\plan-data\deck-bar-lists.csv" }.First(System.IO.File.Exists);
+string csv = new[] { @"docs\plan-data\deck-bar-lists.csv", @"C:\SBM\docs\plan-data\deck-bar-lists.csv" }.First(System.IO.File.Exists);
 var plan = new List<(string Br, int U, string Mark, string Loc, int Count, string Len, bool Varies, double Lb)>();
 foreach (var ln in System.IO.File.ReadAllLines(csv))
 {

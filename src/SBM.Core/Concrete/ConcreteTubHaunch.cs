@@ -20,6 +20,8 @@ public sealed partial class ConcreteGenerator
             if (ss.Count < 2) continue;
             foreach (int side in new[] { -1, 1 })
             {
+                // exact geometry ON: the haunch as a NURBS sweep of the same ring function (exact girder path), mesh tessellated from it
+                if (_geo != null && NurbsTubHaunch(mesh, g, side, T, t.RotateWithDeck)) continue;
                 var rings = new List<Vec3[]>(ss.Count);
                 Vec2[]? sec = null;
                 foreach (double s in HaunchSamples(ss))

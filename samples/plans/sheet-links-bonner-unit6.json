@@ -571,15 +571,25 @@
     {
       "id": "plan-of-spans",
       "sheets": "^SUPERSTRUCTURE PLAN OF SPANS (DETAILS )?UNIT 6",
-      "basis": "Plan of spans sheet 1: bent stations, deck 42'-7 and unit ends (p409); the continuation sheets (deck bars, drains, diaphragms p410-415) are not modeled",
+      "basis": "Plan of spans: bent stations, deck 42'-7, unit ends, A101 / B bars (A101 top 1924 @ 6 / bottom 2199 @ 5 1/4, bottom B107 / B108 / B109 placed); drains not modeled",
       "target": [
         {
           "level": "part",
           "category": "deck"
+        },
+        {
+          "level": "group",
+          "category": "deck reinforcing"
         }
       ],
       "pages": [
-        409
+        409,
+        410,
+        411,
+        412,
+        413,
+        414,
+        415
       ]
     },
     {
@@ -603,7 +613,7 @@
     {
       "id": "girder-span30",
       "sheets": "^SUPERSTRUCTURE SPAN 30 96",
-      "basis": "Span 30 girders: length A, strands, mild steel (not placed), concrete 49.9 CY",
+      "basis": "Span 30 girders: length A, strands, mild steel (S1 / S5 / S6 placed, chains and bar list), concrete 49.9 CY",
       "target": [
         {
           "level": "assembly",
@@ -872,6 +882,88 @@
       "pages": [
         484,
         486
+      ]
+    },
+    {
+      "id": "deck-bill",
+      "sheets": "^SUPERSTRUCTURE BILL OF MATERIAL UNITS 6 AND 7",
+      "pages": [
+        455
+      ],
+      "basis": "Superstructure bill of material Unit 6 (stainless, 299,412 lb): A101 / B107-B109 placed, other marks schedule only; sand-lightweight concrete, MAP concrete quantities",
+      "target": [
+        {
+          "level": "group",
+          "category": "deck reinforcing"
+        }
+      ]
+    },
+    {
+      "id": "deck-bar-sections",
+      "sheets": "^SUPERSTRUCTURE TYPICAL SECTION$",
+      "pages": [
+        404,
+        406
+      ],
+      "basis": "Deck bar covers (3 in top / 2 1/2 in bottom), bottom B bar positions per bay / overhang, interior bent diaphragm section",
+      "target": [
+        {
+          "level": "group",
+          "category": "deck reinforcing"
+        }
+      ]
+    },
+    {
+      "id": "expansion-joints",
+      "sheets": "^(EXPANSION JOINT SEAL DETAILS FOR CONCRETE PARAPET|SUPERSTRUCTURE TYPICAL SECTION DETAILS)$",
+      "pages": [
+        454,
+        407,
+        408
+      ],
+      "basis": "Bent 29 modular joint (DIM A 2'-10, 6'-0 blockout) and bent 35 Transflex joint (DIM A 4 1/4, 1'-3 1/2 x 4 blockout)",
+      "target": [
+        {
+          "level": "group",
+          "category": "joint"
+        },
+        {
+          "level": "element",
+          "category": [
+            "joint blockout",
+            "expansion joint device"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "parapet",
+      "sheets": "^(SUPERSTRUCTURE CONCRETE PARAPET PLAN UNIT 6|CONCRETE PARAPET AND END POST DETAILS)$",
+      "pages": [
+        448,
+        450,
+        451
+      ],
+      "basis": "1'-2 concrete parapet, 1/2 in joints 28'-5 + 4 @ 26'-0 + 28'-5 per span, end posts 3'-9 x 4'-8 at the unit ends; parapet bars S1 / B1 / B6 / B7 placed, B8-B11 and end post bars schedule (p451)",
+      "target": [
+        {
+          "level": "element",
+          "category": "barrier"
+        }
+      ]
+    },
+    {
+      "id": "metal-rail",
+      "sheets": "^RAIL POST SPACING FOR 2 BAR METAL RAIL UNIT 6$",
+      "pages": [
+        452
+      ],
+      "basis": "2 bar metal rail post chains along the outside edge of deck (314 posts = S0-37 p.38 table); rail section S0-36 / S0-37 (p.37-38)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "pedestrian railing"
+        }
       ]
     }
   ]

@@ -181,11 +181,23 @@ public sealed class CrossFrameResult
     /// <summary>As-designed style name (CrossFrameDefinition.Styles), "" = the definition's default members.</summary>
     public string Style { get; init; } = "";
     public required bool AtSupport { get; init; }
-    public required Vec3 Left { get; init; }
-    public required Vec3 Right { get; init; }
+    public required Vec3 Left { get; set; }
+    public required Vec3 Right { get; set; }
     /// <summary>Distance along the left/right girder from the start of that girder's span (CL bearing).</summary>
-    public required double LeftGirderDistance { get; init; }
-    public required double RightGirderDistance { get; init; }
+    public required double LeftGirderDistance { get; set; }
+    public required double RightGirderDistance { get; set; }
+    /// <summary>Reference girder of a <see cref="Bridge.CrossFrameDefinition.Lines"/> frame (the line's distance is measured along it), else -1.</summary>
+    public int LineGirder { get; set; } = -1;
+    /// <summary>True when the frame's location is defined at the RIGHT girder's top of web (the left connection plate was moved onto the frame plane);
+    /// false = defined at the left girder. Only meaningful when <see cref="PlatesOnFramePlane"/>.</summary>
+    public bool ReferenceRight { get; set; }
+    /// <summary>True when the connection plate of the non-reference end was placed where the frame plane meets its girder (default since 2026-10-27);
+    /// false = legacy (<see cref="Bridge.CrossFrameDefinition.PlatesAtEachTopOfWeb"/>), support frames, links.</summary>
+    public bool PlatesOnFramePlane { get; set; }
+    /// <summary>Move of the left / right connection plate along its girder from the top-of-web crossing of the plan line to the frame plane (m, + = toward
+    /// increasing girder distance; 0 for the reference end).</summary>
+    public double LeftShift { get; set; }
+    public double RightShift { get; set; }
     /// <summary>Alignment station of the line anchor.</summary>
     public required double Station { get; init; }
     /// <summary>Support index for support cross frames, otherwise −1.</summary>
@@ -194,8 +206,12 @@ public sealed class CrossFrameResult
     public double LeftGlobalDistance { get; set; }
     public double RightGlobalDistance { get; set; }
     public double PlanLength => (Right.XY - Left.XY).Length;
-    /// <summary>Unit plan direction of the frame line, left girder → right girder.</summary>
-    public Vec2 Direction => (Right.XY - Left.XY).Normalized();
+    /// <summary>Unit plan direction of the frame line, left girder → right girder: the frame plane's horizontal direction when the plates are on the
+    /// frame plane (<see cref="PlaneDirection"/>), else the plan direction between the two web points.</summary>
+    public Vec2 Direction => PlaneDirection ?? (Right.XY - Left.XY).Normalized();
+    /// <summary>Horizontal direction of the frame plane (the plan line's direction through the reference top of web) when the plates were placed on the
+    /// frame plane; the two web points are then not on one horizontal line (the plane leans with the flanges). Null = legacy / support frames.</summary>
+    public Vec2? PlaneDirection { get; set; }
 }
 
 public enum StiffenerKind { Bearing, ConnectionPlate, Intermediate }
@@ -220,6 +236,13 @@ public sealed class StiffenerResult
     public required PlateSize Plate { get; init; }
     /// <summary>Distance along the girder from its start end.</summary>
     public required double GirderDistance { get; init; }
+    /// <summary>Bearing / jacking stiffeners: framing support index (<c>BridgeDefinition.SupportAt</c>); -1 = none.</summary>
+    public int Support { get; init; } = -1;
+    /// <summary>True for a jacking stiffener (<c>SupportDefinition.JackingStiffenerOffsets</c>).</summary>
+    public bool Jacking { get; init; }
+    /// <summary>OPTIONAL plate orientation from the cross frame inputs (<c>CrossFrameDefinition.IntermediatePlane</c> for connection plates,
+    /// <c>BearingStiffenerPlane</c> for bearing stiffeners); null = the kind's rule (bearing plumb, others normal to the flanges).</summary>
+    public Bridge.CrossFramePlaneOrientation? Plane { get; init; }
 }
 
 public sealed class FieldSpliceResult

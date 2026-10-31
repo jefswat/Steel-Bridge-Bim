@@ -207,7 +207,9 @@ foreach (var bn in girders)
             {
                 End = TrussMemberEnd.Start, Label = "2-7/16 corner Pls", Back = gWebHalf + In(0.5), PlateOutline = corner.Select(q => new TrussUV(Math.Max(q.U, (endFb ? In(0.25) : 0) + In(1.0 / 16) + In(0.4)), q.V)).ToList(), PlateThickness = In(7.0 / 16), StandOff = endFb ? In(0.75) : In(0.5),
                 Top = -half + In(19.25), Length = In(18.75), Material = "S", Source = "p.45", Unresolved = gConnFlag,
-                WebRivets = new() { Col(9.0, 3, 3.5, 3.5), Col(13.0, 2, 3.5, 7.0) }, RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
+                // agent review girders G21: p.45 note '1 in. carbon rivets, reamed' at the corner plates (about 15 drawn per plate, not dimensioned: the 5 modeled stay, flagged)
+                WebRivets = new() { Col(9.0, 3, 3.5, 3.5), Col(13.0, 2, 3.5, 7.0) }, RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet (reamed, p.45)",
+                RivetUnresolved = U("p.45", "corner plate rivets", "the note gives 1 in. carbon reamed rivets and the elevation draws about 15 per plate without pitch or gage", "5 rivets per plate (2 columns, 3 1/2 in. pitch) as before; the drawn pattern is not entered."),
             },
             new TrussEndConnection
             {

@@ -19,9 +19,11 @@ namespace SBM.Core.Truss;
 /// </summary>
 public static partial class TrussGenerator
 {
-    public static TrussModel Generate(BridgeFraming framing, UnitSystem units)
+    /// <param name="fasteners">false = the rivet placement passes are skipped (level of detail below 400, <see cref="Project.LodSettings"/>; the
+    /// regeneration cache removes any fastener placed elsewhere).</param>
+    public static TrussModel Generate(BridgeFraming framing, UnitSystem units, bool fasteners = true)
     {
-        var g = new Gen(framing, units);
+        var g = new Gen(framing, units) { Fasteners = fasteners };
         var sw = Stopwatch.StartNew();
         g.Run();
         g.Model.Steel.GenerationTime = sw.Elapsed;
@@ -178,6 +180,8 @@ public static partial class TrussGenerator
         }
 
         public Gen(BridgeFraming f, UnitSystem u) { _f = f; _b = f.Definition; _d = f.Definition.Truss!; _al = f.Alignment; _u = u; }
+        /// <summary>false = skip the rivet placement passes (level of detail below 400).</summary>
+        public bool Fasteners { get; init; } = true;
 
         private string Src => string.IsNullOrWhiteSpace(_d.Source) ? "" : $" [{_d.Source}]";
         private void Warn(string m) { if (_warned.Add(m)) Model.Steel.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, m)); }
@@ -228,19 +232,26 @@ public static partial class TrussGenerator
             foreach (var m in _inst) BuildMember(m);
             BuildJoints();
             BuildJointPlates();
+            if (Fasteners) PlacePlateRivets();
             BuildMemberJointPlates();
             BuildEndConnections();
             BuildBracingGussets();
             BuildPlaneItems();
-            PlaceJointRivets();
-            FlushConnectionRivets();
+            int jointRivet0 = steel.Bolts.Count;
+            if (Fasteners)
+            {
+                PlaceJointRivets();
+                if (_d.JointRivetGripsFromSteel) RegripJointRivets(jointRivet0, steel.Bolts.Count);
+                if (_d.JointRivetsShareHoles) MergeJointRivetHoles(jointRivet0);
+                FlushConnectionRivets();
+            }
             if (_d.Floor != null) BuildFloor(_d.Floor);
             if (_d.LineItems != null) foreach (var li in _d.LineItems) BuildLineItem(li);
             if (_d.LineItems != null) foreach (var li in _d.LineItems.Where(l => l.ClipAngles != null && l.Transverse && l.Kind == TrussLineItemKind.Steel)) BuildClipAngles(li);
-            if (_d.LineItems != null && _d.LineItems.Any(li => li.Rivets is { Count: > 0 } || li.ClipAngles != null)) PlaceLineItemRivets();
+            if (Fasteners && _d.LineItems != null && _d.LineItems.Any(li => li.Rivets is { Count: > 0 } || li.ClipAngles != null)) PlaceLineItemRivets();
             foreach (var s in _d.Suspenders) BuildSuspender(s);
             for (int i = 0; i < _d.Shoes.Count; i++) BuildShoe(_d.Shoes[i], i);
-            if (_d.RivetHeadsFlushAtSolePlates) FlushRivetsAtSolePlates();
+            if (Fasteners && _d.RivetHeadsFlushAtSolePlates) FlushRivetsAtSolePlates();
             if (_d.PlanSteelWeightLb > 0)
             {
                 double lb = steel.SteelMass * 2.20462262;
@@ -319,6 +330,30 @@ public static partial class TrussGenerator
                 }
             }
             foreach (var g in _inst.GroupBy(i => i.Mark).Where(g => g.Count() > 1)) Warn($"Truss: member mark {g.Key} is used {g.Count()} times.");
+            // RollToLateralPlane: cross-plane bracing sections rolled into their lateral plane (after every member exists: a strut needs the chords at its end)
+            int rolled = 0;
+            foreach (var m in _inst.Where(i => i.Def.RollToLateralPlane && IsCrossPlane(i.Def.Role)))
+            {
+                var ax = m.Axis;
+                double sMid = StationOf((m.A + m.B) * 0.5);
+                var tr = Vec3.Cross(Up, Tangent(sMid)).Normalized();
+                Vec3 nrm;
+                if (Math.Abs(Vec3.Dot(ax, tr)) < 0.95) nrm = Vec3.Cross(ax, tr);
+                else
+                {
+                    var chords = InPlaneAt(m.PlaneA, m.PointA, m.A).Where(o => IsChord(o.Def.Role)).ToList();
+                    if (chords.Count == 0) continue;
+                    var tan = Tangent(StationOf(m.A));
+                    var cd = chords.Select(o => Vec3.Dot(o.Axis, tan) >= 0 ? o.Axis : -o.Axis).Aggregate(Vec3.Zero, (a, b) => a + b).Normalized();
+                    nrm = Vec3.Cross(cd, ax);
+                }
+                if (nrm.Length < 1e-6) continue;
+                var y = (nrm - ax * Vec3.Dot(ax, nrm)).Normalized();
+                if (y.Z < 0) y = -y;
+                m.Y = y; m.X = Vec3.Cross(y, ax).Normalized();
+                rolled++;
+            }
+            if (rolled > 0) Info($"Truss: {rolled} bracing members rolled into their lateral plane (section up = normal of the plane through the member and the transverse direction / the chord at a strut end){Src}.");
         }
 
         /// <summary>Local axes: x across the truss plane (in-plane members) or horizontal (cross-plane), y up, both normal to the axis.</summary>
@@ -379,7 +414,15 @@ public static partial class TrussGenerator
                     double? given = start ? m.Def.StartSetback : m.Def.EndSetback;
                     string pl = start ? m.PlaneA : m.PlaneB, pt = start ? m.PointA : m.PointB;
                     double t = 0;
+                    bool parallelCut = (start ? m.Def.StartCut : m.Def.EndCut) == TrussEndCut.ParallelToChord;
                     if (given is { } gv) t = gv;
+                    // OPTIONAL explicit cut on a CHORD-role member that ends on another chord line (wind chord L13-W14 on the kinked lower chord at L13, recheck N08):
+                    // the web members' parallel-to-chord end instead of the chord closure
+                    else if (IsChord(m.Def.Role) && !IsCrossPlane(m.Def.Role) && parallelCut && m.Plane.Length > 0 && ParallelChordEnd(m, start, pl, pt, clr) is { } cpc)
+                    {
+                        t = cpc.t;
+                        if (start) m.MitreA = (cpc.P, cpc.N); else m.MitreB = (cpc.P, -cpc.N);
+                    }
                     else if (IsChord(m.Def.Role) && !IsCrossPlane(m.Def.Role))
                     {
                         // chord: square cut at the point, lengthened so the neighbour chord member closes the joint (no gap at the deflection)
@@ -391,6 +434,12 @@ public static partial class TrussGenerator
                             double defl = Math.Acos(Math.Clamp(-Vec3.Dot(d1, other.d2), -1, 1));
                             if (defl < Numerics.DegToRad(25)) t = -Math.Max(m.Sec.YMax, -m.Sec.YMin) * Math.Tan(defl / 2);
                         }
+                    }
+                    else if (IsWeb(m.Def.Role) && m.Plane.Length > 0 && (start ? m.Def.StartCut : m.Def.EndCut) == TrussEndCut.ParallelToChord
+                             && ParallelChordEnd(m, start, pl, pt, clr) is { } pc)
+                    {
+                        t = pc.t;
+                        if (start) m.MitreA = (pc.P, pc.N); else m.MitreB = (pc.P, -pc.N);
                     }
                     else if (IsWeb(m.Def.Role) && m.Plane.Length > 0)
                     {
@@ -432,6 +481,7 @@ public static partial class TrussGenerator
                     }
                     if (start) m.SA = t; else m.SB = t;
                 }
+            if (_d.JointDefaults.WebToWebClearance is { } wclr) WebToWebSetbacks(wclr);
             foreach (var m in _inst)
             {
                 double len = (m.B - m.A).Length;
@@ -444,12 +494,174 @@ public static partial class TrussGenerator
             }
         }
 
+        /// <summary><see cref="TrussEndCut.ParallelToChord"/>: plane parallel to the chord face(s) the web member meets at the point, <paramref name="clr"/> off the
+        /// face (normal toward the member, mean of the chords at the point); setback = where the member's nearest end corner touches it. Null = no chord.</summary>
+        private (double t, Vec3 P, Vec3 N)? ParallelChordEnd(Inst m, bool start, string pl, string pt, double clr)
+        {
+            if (!_pts.TryGetValue((pl.ToUpperInvariant(), pt.ToUpperInvariant()), out var P)) return null;
+            var d1 = Away(m, start);
+            var chords = At(pl, pt).Where(o => o != m && IsChord(o.Def.Role) && o.Plane == m.Plane).Concat(Through(pl, pt)).Distinct().ToList();
+            if (chords.Count == 0) return null;
+            var nsum = new Vec3(0, 0, 0); double h = 0;
+            foreach (var c in chords)
+            {
+                double side = Vec3.Dot(d1, c.Y) >= 0 ? 1 : -1;
+                nsum += c.Y * side;
+                h = Math.Max(h, side > 0 ? c.Sec.YMax + c.Def.OffsetZ : -c.Sec.YMin - c.Def.OffsetZ);
+            }
+            var n = nsum.Normalized();
+            double den = Vec3.Dot(d1, n);
+            if (den < 0.2) return null;
+            // cut plane at H along the mean normal: every end corner clear of EVERY chord face by clr (a kinked chord: the mean face alone let the corners
+            // dip into the steeper chord piece, batch 8c / recheck N04); one chord = the old plane h + clr
+            double H = h + clr;
+            var corners = new[] { (m.Sec.XMin, m.Sec.YMin), (m.Sec.XMin, m.Sec.YMax), (m.Sec.XMax, m.Sec.YMin), (m.Sec.XMax, m.Sec.YMax) }.Select(q => m.X * q.Item1 + m.Y * q.Item2).ToList();
+            if (chords.Count > 1)
+                foreach (var c in chords)
+                {
+                    double side = Vec3.Dot(d1, c.Y) >= 0 ? 1 : -1;
+                    var nc = c.Y * side;
+                    double hc = side > 0 ? c.Sec.YMax + c.Def.OffsetZ : -c.Sec.YMin - c.Def.OffsetZ, dc = Vec3.Dot(d1, nc);
+                    if (dc < 0.05) continue;
+                    foreach (var off in corners) H = Math.Max(H, Vec3.Dot(off, n) + (hc + clr - Vec3.Dot(off, nc)) * den / dc);
+                }
+            // setback = where the end corner nearest the plane meets it
+            double t = corners.Min(off => (H - Vec3.Dot(off, n)) / den);
+            return (Math.Max(0, t), P + n * H, n);
+        }
+
+        /// <summary><see cref="TrussJointDefaults.WebToWebClearance"/>: web members ending at the same point (same plane) whose end corners lie inside each other
+        /// (in-plane band beyond the other's end face) are separated by setting back the ONE that needs the smaller extra setback; an overlap that would need more than
+        /// 6 in. is reported, not fixed. Setbacks only grow.</summary>
+        private void WebToWebSetbacks(double clr)
+        {
+            int changed = 0, corner = 0; double maxDt = 0;
+            var big = new List<string>();
+            // extra setback of end (m, start) so that none of its end corners lies inside o (o's end at so); 0 = clear; +inf = no solution
+            double Need(Inst m, bool start, Inst o, bool os, string pl, string pt)
+            {
+                var d1 = Away(m, start);
+                double t = start ? m.SA : m.SB, so = os ? o.SA : o.SB;
+                var od = Away(o, os);
+                // in-plane normal of o and o's in-plane half width (section box projected on it)
+                var n = Normal(o.Plane, StationOf(o.A));
+                var ow = Vec3.Cross(n, o.Axis).Normalized();
+                double hwo = Math.Abs(Vec3.Dot(o.X, ow)) * Math.Max(Math.Abs(o.Sec.XMin), Math.Abs(o.Sec.XMax)) + Math.Abs(Vec3.Dot(o.Y, ow)) * Math.Max(Math.Abs(o.Sec.YMin), Math.Abs(o.Sec.YMax)) + clr;
+                double a = Vec3.Dot(d1, ow), ca = Vec3.Dot(d1, od);
+                double need = t;
+                foreach (double x in new[] { m.Sec.XMin, m.Sec.XMax })
+                    foreach (double y in new[] { m.Sec.YMin, m.Sec.YMax })
+                    {
+                        var off = m.X * x + m.Y * y;
+                        double b = Vec3.Dot(off, ow), cb = Vec3.Dot(off, od);
+                        bool Inside(double tt) { double qy = tt * a + b, qd = tt * ca + cb; return Math.Abs(qy) < hwo - 1e-9 && qd > so + clr - 1e-9; }
+                        if (!Inside(need)) continue;
+                        double best = double.PositiveInfinity;
+                        if (Math.Abs(a) > 1e-6) { double tt = (hwo * Math.Sign(a) - b) / a; if (tt >= need - 1e-9) best = Math.Min(best, tt); }
+                        if (ca < -1e-6) { double tt = (so + clr - cb) / ca; if (tt >= need - 1e-9) best = Math.Min(best, tt); }
+                        need = Math.Max(need, best);
+                    }
+                return need - t;
+            }
+            for (int pass = 0; pass < 3; pass++)
+            {
+                var webs = _inst.Where(i => IsWeb(i.Def.Role) && i.Plane.Length > 0).ToList();
+                foreach (var m in webs)
+                    for (int end = 0; end < 2; end++)
+                    {
+                        bool start = end == 0;
+                        string pl = start ? m.PlaneA : m.PlaneB, pt = start ? m.PointA : m.PointB;
+                        foreach (var o in At(pl, pt).Where(o => o != m && IsWeb(o.Def.Role) && o.Plane == m.Plane && string.CompareOrdinal(o.Mark, m.Mark) > 0))
+                        {
+                            bool os = StartsAt(o, pl, pt);
+                            bool fixM = (start ? m.Def.StartSetback : m.Def.EndSetback) == null, fixO = (os ? o.Def.StartSetback : o.Def.EndSetback) == null;
+                            double dm = fixM ? Need(m, start, o, os, pl, pt) : double.PositiveInfinity;
+                            double dO = fixO ? Need(o, os, m, start, pl, pt) : double.PositiveInfinity;
+                            if (dm <= 1e-9 && dO <= 1e-9) continue;
+                            // move the member that needs less (the other one may already be clear of it)
+                            bool moveM = dm <= 1e-9 ? false : dO <= 1e-9 ? true : dm <= dO;
+                            double dt = moveM ? dm : dO;
+                            if (double.IsInfinity(dt) || dt > In(6))
+                            {
+                                // a setback would not clear them reasonably: cut both ends on the bisector plane through the line where their facing sides meet
+                                // (the corner cut the joint sheets draw), unless an end already has a cut plane
+                                bool freeM = (start ? m.MitreA : m.MitreB) == null && (start ? m.Def.StartCut : m.Def.EndCut) == TrussEndCut.Square;
+                                bool freeO = (os ? o.MitreA : o.MitreB) == null && (os ? o.Def.StartCut : o.Def.EndCut) == TrussEndCut.Square;
+                                if (pass == 0 && freeM && freeO && CornerCut(m, start, o, os, pl, pt, clr) is { } cc)
+                                {
+                                    if (start) m.MitreA = (cc.X, cc.N); else m.MitreB = (cc.X, -cc.N);
+                                    if (os) o.MitreA = (cc.X, -cc.N); else o.MitreB = (cc.X, cc.N);
+                                    corner++;
+                                }
+                                else if (pass == 0 && (freeM || freeO) && AbutCut(freeM ? o : m, freeM ? os : start, freeM ? m : o, freeM ? start : os, pl, pt, clr) is { } ab)
+                                {
+                                    // one end already has a cut plane (e.g. parallel to the chord): the other member is cut on that member's facing side
+                                    var cm = freeM ? m : o; bool cs = freeM ? start : os;
+                                    if (cs) cm.MitreA = (ab.X, ab.N); else cm.MitreB = (ab.X, -ab.N);
+                                    corner++;
+                                }
+                                else if (pass == 0) big.Add($"{m.Mark} / {o.Mark} at {pt}");
+                                continue;
+                            }
+                            if (moveM) { if (start) { m.SA += dt; m.MitreA = null; } else { m.SB += dt; m.MitreB = null; } }
+                            else { if (os) { o.SA += dt; o.MitreA = null; } else { o.SB += dt; o.MitreB = null; } }
+                            changed++; maxDt = Math.Max(maxDt, dt);
+                        }
+                    }
+            }
+            if (changed > 0) Info($"Truss {_d.Name}: {changed} web member ends set back clear of the other web members at their panel point (clearance {L(clr)}; largest {L(maxDt)}).");
+            if (corner > 0) Info($"Truss {_d.Name}: {corner} pairs of web member ends cut on the bisector plane where their facing sides meet (corner cut, clearance {L(clr)}).");
+            if (big.Count > 0) Warn($"Truss CHECK {_d.Name}: web members overlapping at their panel point - not separated (an end already has a cut plane, or no corner cut found): {string.Join(", ", big.Distinct().Take(20))}.");
+        }
+
+        /// <summary>Plane of <paramref name="keep"/>'s side face toward <paramref name="cut"/> (+ <paramref name="clr"/>), normal pointing toward <paramref name="cut"/>'s
+        /// material: <paramref name="cut"/>'s end abuts the other member's side.</summary>
+        private (Vec3 X, Vec3 N)? AbutCut(Inst keep, bool keepStart, Inst cut, bool cutStart, string pl, string pt, double clr)
+        {
+            if (!_pts.TryGetValue((pl.ToUpperInvariant(), pt.ToUpperInvariant()), out var P)) return null;
+            var dc = Away(cut, cutStart);
+            var n = Normal(keep.Plane, StationOf(P));
+            var wk = Vec3.Cross(n, keep.Axis).Normalized();
+            double sk = Math.Sign(Vec3.Dot(wk, dc));
+            if (sk == 0) return null;
+            double hw = Math.Abs(Vec3.Dot(keep.X, wk)) * Math.Max(Math.Abs(keep.Sec.XMin), Math.Abs(keep.Sec.XMax)) + Math.Abs(Vec3.Dot(keep.Y, wk)) * Math.Max(Math.Abs(keep.Sec.YMin), Math.Abs(keep.Sec.YMax));
+            var N = wk * sk;
+            if (Vec3.Dot(N, dc) < 0.2) return null;
+            return (P + N * (hw + clr), N);
+        }
+
+        /// <summary>Corner cut of two web member ends at a point: the line where m's side facing o meets o's side facing m (in the truss plane), the bisector
+        /// plane of the two members through it (offset <paramref name="clr"/> / 2 each way is not modeled: the plane itself), normal pointing toward m. Null = parallel.</summary>
+        private (Vec3 X, Vec3 N)? CornerCut(Inst m, bool start, Inst o, bool os, string pl, string pt, double clr)
+        {
+            if (!_pts.TryGetValue((pl.ToUpperInvariant(), pt.ToUpperInvariant()), out var P)) return null;
+            var dm = Away(m, start); var dO = Away(o, os);
+            var n = Normal(m.Plane, StationOf(P));
+            var wm = Vec3.Cross(n, m.Axis).Normalized(); var wo = Vec3.Cross(n, o.Axis).Normalized();
+            double Hw(Inst i, Vec3 w) => Math.Abs(Vec3.Dot(i.X, w)) * Math.Max(Math.Abs(i.Sec.XMin), Math.Abs(i.Sec.XMax)) + Math.Abs(Vec3.Dot(i.Y, w)) * Math.Max(Math.Abs(i.Sec.YMin), Math.Abs(i.Sec.YMax));
+            double sm = Math.Sign(Vec3.Dot(wm, dO)), so = Math.Sign(Vec3.Dot(wo, dm));
+            if (sm == 0 || so == 0) return null;
+            // P + t dm + sm hwm wm = P + u dO + so hwo wo  ->  solve t, u in the plane (least squares on the 3D vectors)
+            var r = wo * (so * (Hw(o, wo) + clr / 2)) - wm * (sm * (Hw(m, wm) + clr / 2));
+            double a11 = Vec3.Dot(dm, dm), a12 = -Vec3.Dot(dm, dO), a22 = Vec3.Dot(dO, dO);
+            double b1 = Vec3.Dot(r, dm), b2 = -Vec3.Dot(r, dO);
+            double det = a11 * a22 - a12 * a12;
+            if (Math.Abs(det) < 1e-6) return null;
+            double t = (b1 * a22 - a12 * b2) / det;
+            var X = P + dm * t + wm * (sm * (Hw(m, wm) + clr / 2));
+            var N = (dm - dO).Normalized();
+            return (X, N);
+        }
+
         private void BuildMember(Inst m)
         {
             double len = (m.B - m.A).Length;
             var a0 = m.A + m.Axis * m.SA + m.Y * m.Def.OffsetZ;
             double cut = len - m.SA - m.SB;
             var mesh = new Mesh();
+            // OPTIONAL TrussDefinition.PartPerPiece: every section piece / lacing face its own part (sub-element of the member)
+            bool split = _d.PartPerPiece;
+            var pieces = new List<(Mesh mesh, TrussSectionPiece? pc, double len)>();
             string? perfFlag = null;
             // tapered member (brackets): the part of the section below its axis rises by DepthReductionStart / End at the cut ends, linear in between
             double rA = Math.Max(0, m.Def.DepthReductionStart), rB = Math.Max(0, m.Def.DepthReductionEnd);
@@ -461,47 +673,100 @@ public static partial class TrussGenerator
             {
                 if (PieceSpan(m, pc, cut) is not { } span) { Warn($"Truss: {pc.Label} of {m.Mark} - no length left on the member{(pc.BetweenGussets ? " between the gussets" : "")}; not built."); continue; }
                 var (ps, pl) = span;
-                if ((notches.Count > 0 || mHoles.Count > 0) && pc.Perforation == null && !taper && NotchedPiece(mesh, m, a0, pc, ps, pl, notches, mHoles)) continue;
+                var pm = split ? new Mesh() : mesh;
+                if (split) pieces.Add((pm, pc, pl));
+                if ((notches.Count > 0 || mHoles.Count > 0) && pc.Perforation == null && !taper && NotchedPiece(pm, m, a0, pc, ps, pl, notches, mHoles)) continue;
                 if (pc.Perforation != null && !taper)
                 {
-                    if (Perforated(mesh, m, a0, pc, ps, pl, cut, out int holes)) { Model.Perforations.Add((m.Mark, pc.Label, holes)); perfFlag ??= pc.Perforation.Unresolved; continue; }
+                    if (Perforated(pm, m, a0, pc, ps, pl, cut, out int holes)) { Model.Perforations.Add((m.Mark, pc.Label, holes)); perfFlag ??= pc.Perforation.Unresolved; continue; }
                     Warn($"Truss: perforated plate {pc.Label} of {m.Mark} - the access holes ({pc.Perforation.Label}) do not fit between the end gussets / in the plate; built solid.");
                 }
                 var ringA = pc.Polygon.Select(q => a0 + m.Axis * ps + m.X * q.X + m.Y * (q.Y + (taper && q.Y < 0 ? Rise(ps) : 0))).ToArray();
                 var ringB = taper
                     ? pc.Polygon.Select(q => a0 + m.Axis * (ps + pl) + m.X * q.X + m.Y * (q.Y + (q.Y < 0 ? Rise(ps + pl) : 0))).ToArray()
                     : ringA.Select(p => p + m.Axis * pl).ToArray();
-                MeshBuilder.AddLoft(mesh, pc.Polygon, new[] { ringA, ringB });
+                MeshBuilder.AddLoft(pm, pc.Polygon, new[] { ringA, ringB });
             }
             if (taper) Info($"Truss: tapered members ({m.Sec.Definition.Name}): depth reduced by {L(rA)} at the start and {L(rB)} at the end (bottom part raised, top straight){(m.Def.Source.Length > 0 ? " (" + m.Def.Source + ")" : "")}.");
-            foreach (var lf in m.Sec.Lacing) Lacing(mesh, m, a0, cut, lf);
+            foreach (var lf in m.Sec.Lacing)
+            {
+                var lm = split ? new Mesh() : mesh;
+                Lacing(lm, m, a0, cut, lf);
+                if (split) pieces.Add((lm, null, cut));
+            }
             if (m.Def.RivetLines is { Count: > 0 }) MemberRivetLines(m, a0, cut);
-            if (m.MitreA != null || m.MitreB != null) mesh = MitreMesh(m, mesh, a0, cut);
-            if (m.Def.StartCut == TrussEndCut.Vertical || m.Def.EndCut == TrussEndCut.Vertical) mesh = VerticalCutMesh(m, mesh, a0, cut);
+            Mesh Ends(Mesh x)
+            {
+                if (m.MitreA != null || m.MitreB != null) x = MitreMesh(m, x, a0, cut);
+                if (m.Def.StartCut == TrussEndCut.Vertical || m.Def.EndCut == TrussEndCut.Vertical) x = VerticalCutMesh(m, x, a0, cut);
+                return x;
+            }
+            if (!split) mesh = Ends(mesh);
+            else for (int i = 0; i < pieces.Count; i++) pieces[i] = (Ends(pieces[i].mesh), pieces[i].pc, pieces[i].len);
             Assumption? asu = null;
             string flag = m.Def.Unresolved.Length > 0 ? m.Def.Unresolved : m.Sec.Flag ?? "";
             if (!string.IsNullOrEmpty(perfFlag) && !flag.Contains(perfFlag)) flag = (flag + " " + perfFlag).Trim();
             if (flag.Length > 0) asu = Assumption.UnresolvedDimension(flag, m.Sec.Definition.Kind == TrussSectionKind.Nominal ? "nominal envelope of the member" : "section as described");
             var cat = CategoryOf(m.Def.Role);
-            var part = new SteelPart
+            var role = m.Def.Role switch
             {
-                Mark = m.Mark, Category = cat, Assembly = m.Assembly, Description = $"{m.Sec.Description} {m.PointA}-{m.PointB}", Mesh = mesh,
-                Material = Material(m.Sec.Definition.Material), Length = cut, NominalWeightLbPerFt = m.Sec.LbPerFt, Assumption = asu,
-                Role = m.Def.Role switch
-                {
-                    TrussMemberRole.UpperChord => MemberRole.TopChord, TrussMemberRole.LowerChord or TrussMemberRole.WindChord => MemberRole.BottomChord,
-                    TrussMemberRole.Diagonal or TrussMemberRole.EndPost => MemberRole.Diagonal,
-                    TrussMemberRole.UpperLateral or TrussMemberRole.LowerLateral or TrussMemberRole.Sway or TrussMemberRole.Portal => MemberRole.Lateral,
-                    _ => MemberRole.None,
-                },
+                TrussMemberRole.UpperChord => MemberRole.TopChord, TrussMemberRole.LowerChord or TrussMemberRole.WindChord => MemberRole.BottomChord,
+                TrussMemberRole.Diagonal or TrussMemberRole.EndPost => MemberRole.Diagonal,
+                TrussMemberRole.UpperLateral or TrussMemberRole.LowerLateral or TrussMemberRole.Sway or TrussMemberRole.Portal => MemberRole.Lateral,
+                _ => MemberRole.None,
             };
-            if (!mesh.IsEmpty) Model.Steel.Parts.Add(part);
+            double mass;
+            if (!split)
+            {
+                var part = new SteelPart
+                {
+                    Mark = m.Mark, Category = cat, Assembly = m.Assembly, Description = $"{m.Sec.Description} {m.PointA}-{m.PointB}", Mesh = mesh,
+                    Material = Material(m.Sec.Definition.Material), Length = cut, NominalWeightLbPerFt = m.Sec.LbPerFt, Assumption = asu, Role = role,
+                };
+                if (!mesh.IsEmpty) Model.Steel.Parts.Add(part);
+                mass = part.Mass;
+            }
+            else
+            {
+                mass = 0;
+                double area = m.Sec.Area;
+                var codeNo = new Dictionary<string, int>();
+                foreach (var (pmesh, pc, plen) in pieces)
+                {
+                    if (pmesh.IsEmpty) continue;
+                    string kind = pc == null ? "lacing" : pc.Kind.Length > 0 ? pc.Kind : "plate";
+                    string code = PieceCode(kind);
+                    int no = codeNo[code] = codeNo.GetValueOrDefault(code) + 1;
+                    double pa = pc != null ? Math.Abs(MeshBuilder.SignedArea(pc.Polygon)) : 0;
+                    var part = new SteelPart
+                    {
+                        Mark = $"{m.Mark}-{code}{no}", Category = cat, Assembly = m.Assembly, Mesh = pmesh, Material = Material(m.Sec.Definition.Material), Length = plen,
+                        Description = $"{(pc != null ? pc.Label : "lacing bars")} ({kind}) of {m.Sec.Description} {m.PointA}-{m.PointB}",
+                        // rolled nominal weight shared by the pieces in proportion to their area (lacing: by volume)
+                        NominalWeightLbPerFt = m.Sec.LbPerFt > 0 && pc != null && area > 0 ? m.Sec.LbPerFt * pa / area : 0,
+                        Assumption = asu, Role = role, Member = m.Mark, Piece = kind,
+                    };
+                    Model.Steel.Parts.Add(part);
+                    mass += part.Mass;
+                }
+                if (pieces.All(x => x.mesh.IsEmpty)) Warn($"Truss: member {m.Mark} - no piece built.");
+            }
             if (asu != null) Warn(asu.Reason);
             if (m.Def.Stiffeners != null) BuildStiffeners(m);
             if (m.Def.LongitudinalStiffeners is { Count: > 0 }) BuildLongStiffeners(m);
             if (m.Def.Panel.Length > 0) Model.PanelOf[m.Mark] = m.Def.Panel;
-            Model.Members.Add(new TrussMemberResult(m.Def.Name, m.Mark, m.Plane, m.PointA, m.PointB, m.A, m.B, len, cut, m.Def.Role, m.Sec.Definition.Name, part.Mass, asu != null));
+            Model.Members.Add(new TrussMemberResult(m.Def.Name, m.Mark, m.Plane, m.PointA, m.PointB, m.A, m.B, len, cut, m.Def.Role, m.Sec.Definition.Name, mass, asu != null));
         }
+
+        /// <summary>Parent mark of a joint's gusset stack (gussets, gusset layers, joint plates) when each piece is its own part.</summary>
+        internal static string JointStack(string plane, string point) => $"{plane}-J{point}";
+
+        /// <summary>Mark code of a sub-element kind (<see cref="TrussDefinition.PartPerPiece"/>).</summary>
+        internal static string PieceCode(string kind) => kind switch
+        {
+            "web ply" or "web plate" => "W", "angle" => "A", "cover plate" => "C", "channel" => "CH", "rolled shape" => "R", "lacing" => "LB", "round bar" => "RB", "envelope" => "E",
+            _ => "P",
+        };
 
         private readonly Dictionary<Inst, (double a, double b)> _gussetSpan = new();
         /// <summary>Extent of a section piece along the member solid (start from the cut start, length): full, partial centred (+ Offset), from
@@ -513,6 +778,15 @@ public static partial class TrussGenerator
             if (!double.IsNaN(pc.Start))
             {
                 double s0 = Math.Clamp(pc.Start - m.SA, 0, cut), s1 = Math.Clamp(pc.Start - m.SA + (pc.Length > 0 ? pc.Length : cut), 0, cut);
+                ps = s0; pl = s1 - s0;
+            }
+            if (pc.InlaidAt is { Count: > 0 } inl)
+            {
+                // the ply stops at the gusset edge of the listed joints only (the gusset is inlaid in its layer there)
+                double len = (m.B - m.A).Length;
+                double s0 = ps, s1 = ps + pl;
+                if (inl.Contains(m.PointA, StringComparer.OrdinalIgnoreCase)) s0 = Math.Max(s0, GussetReach(m, true) - m.SA);
+                if (inl.Contains(m.PointB, StringComparer.OrdinalIgnoreCase)) s1 = Math.Min(s1, len - GussetReach(m, false) - m.SA);
                 ps = s0; pl = s1 - s0;
             }
             if (pc.BetweenGussets)
@@ -682,7 +956,7 @@ public static partial class TrussGenerator
         /// <summary>Gusset outline of a joint in its (u, v) frame about the point: the joint's own outline, else the convex envelope of the member laps.</summary>
         private List<Vec2> GussetOutline(string pl, string pt, List<Inst> here, TrussJointDefinition? jdef, Vec3 P, Vec3 u, Vec3 v)
         {
-            if (jdef is { Outline.Count: >= 3 }) return jdef.Outline.Select(q => new Vec2(q.U, q.V)).ToList();
+            if (jdef is { Outline.Count: >= 3 }) return ExtendGusset(jdef.Outline.Select(q => new Vec2(q.U, q.V)).ToList(), jdef.GussetExtension, $"gusset outline of joint {pt} ({pl})");
             var jd = _d.JointDefaults;
             var pts = new List<Vec2>();
             double margin = jd.Margin;
@@ -706,7 +980,20 @@ public static partial class TrussGenerator
                         }
                 }
             }
-            return MeshBuilder.ConvexHull(pts);
+            return ExtendGusset(MeshBuilder.ConvexHull(pts), jdef?.GussetExtension, $"gusset envelope of joint {pt} ({pl})");
+        }
+
+        /// <summary><see cref="TrussGussetExtension"/>: convex hull of the outline and the bottom edge, cut off below it (null = the outline unchanged).</summary>
+        private List<Vec2> ExtendGusset(List<Vec2> outline, TrussGussetExtension? ext, string what)
+        {
+            if (ext == null || outline.Count < 3) return outline;
+            if (!IsConvex(outline)) { Warn($"Truss: {what} is not convex - not carried down to the bottom edge {L(-ext.BottomV)} below the point{(ext.Source.Length > 0 ? " (" + ext.Source + ")" : "")}."); return outline; }
+            var hull = MeshBuilder.ConvexHull(new List<Vec2>(outline) { new(ext.FromU, ext.BottomV), new(ext.ToU, ext.BottomV) }).ToList();
+            if (MeshBuilder.SignedArea(hull) < 0) hull.Reverse();
+            const double big = 1000;
+            var res = ClipConvex(hull, new List<Vec2> { new(-big, ext.BottomV), new(big, ext.BottomV), new(big, big), new(-big, big) });
+            if (MeshBuilder.SignedArea(res) < 0) res.Reverse();
+            return res;
         }
 
         /// <summary>Members of a joint that get a gusset (null = no gusset at that point), as <see cref="BuildJoints"/> decides.</summary>
@@ -757,6 +1044,7 @@ public static partial class TrussGenerator
             string asmMark = Asm($"TRUSS-{pl}", AssemblyKind.TrussLine, $"{_d.Name} - truss line {pl}");
             if (jdef is not { Outline.Count: >= 3 })
                 flags.Add(jd.Unresolved.Length > 0 ? jd.Unresolved : $"gusset outline of joint {pt} not given - convex envelope of the member laps");
+            if (jdef?.GussetExtension is { Unresolved.Length: > 0 } gx) flags.Add(gx.Unresolved);
             if (outline.Count < 3) return;
             if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
             Assumption? asu = flags.Count > 0 || jdef?.Unresolved.Length > 0
@@ -777,13 +1065,27 @@ public static partial class TrussGenerator
                 {
                     Mark = mark, Category = PartCategory.TrussGusset, Assembly = asmMark, Description = $"gusset PL {TrussSections.FormatIn(tg)} at {pt} ({area / 0.09290304:0.0} SF)",
                     Mesh = mesh, Material = Material(chords.FirstOrDefault()?.Sec.Definition.Material ?? ""), Length = outline.Max(q => q.X) - outline.Min(q => q.X), Assumption = asu,
+                    Member = _d.PartPerPiece ? JointStack(pl, pt) : null, Piece = _d.PartPerPiece ? "gusset" : null,
                 });
                 Model.PanelOf[mark] = $"Joint {pt}";
                 Model.Gussets++;
             }
-            foreach (var m in here.Where(i => i.Sec.HalfWidthAtJoints > X + 1e-4))
-                Warn($"Truss CHECK joint {pt} ({pl}): member {m.Mark} is {L(2 * m.Sec.HalfWidthAtJoints)} wide, more than the gusset inside distance {L(2 * X)} - it overlaps the gusset plates.");
+            // half width of the member over its gusset lap at this point only: pieces present between the member end and the gusset edge (partial plates elsewhere on
+            // the member - e.g. the U11-L11 o.s. 9/16 plates near the floor beam - do not meet the gussets; recheck GN08)
+            double HalfAt(Inst i)
+            {
+                bool st = StartsAt(i, pl, pt);
+                double len = (i.B - i.A).Length, cut = len - i.SA - i.SB, r = GussetReach(i, st);
+                double a0 = st ? 0 : len - r - i.SA, a1 = st ? r - i.SA : cut;
+                if (a1 < a0 + 1e-6) return i.Sec.HalfWidthAtJoints;
+                return i.Sec.Pieces.Where(q => !q.BetweenGussets && !(q.InlaidAt is { Count: > 0 } l2 && l2.Contains(pt, StringComparer.OrdinalIgnoreCase))
+                        && PieceSpan(i, q, cut) is { } sp && sp.ps < a1 - 1e-6 && sp.ps + sp.pl > a0 + 1e-6)
+                    .SelectMany(q => q.Polygon).Select(q => Math.Abs(q.X)).DefaultIfEmpty(0).Max();
+            }
+            foreach (var m in here.Where(i => HalfAt(i) > X + 1e-4))
+                Warn($"Truss CHECK joint {pt} ({pl}): member {m.Mark} is {L(2 * HalfAt(m))} wide, more than the gusset inside distance {L(2 * X)} - it overlaps the gusset plates.");
             var layers = BuildGussetLayers(pl, pt, jdef, outline, X, tg, P, u, v, n, asmMark, chords.FirstOrDefault()?.Sec.Definition.Material ?? "", asu);
+            if (jdef?.EdgeAngles is { Count: > 0 } eas) BuildEdgeAngles(pl, pt, eas, outline, layers, X, tg, P, u, v, n, asmMark);
             Model.GussetStacks.Add(new TrussGussetStack(pl, pt, new[] { tg }.Concat(layers.Select(l => l.t)).ToList(), new[] { area }.Concat(layers.Select(l => Math.Abs(MeshBuilder.SignedArea(l.poly)))).ToList()));
             if (jdef is { Rivets.Count: > 0 }) _jointRivets.Add(new JointCtx(pl, pt, here, jdef, X, tg, P, u, v, n, outline, asmMark, layers));
         }
@@ -804,6 +1106,7 @@ public static partial class TrussGenerator
                 if (ld.Thickness <= 0) { Warn($"Truss: {name} - thickness missing; not built{(ld.Unresolved.Length > 0 ? " (" + ld.Unresolved + ")" : "")}."); continue; }
                 var poly = ld.Outline.Count >= 3 ? ld.Outline.Select(q => new Vec2(q.U, q.V)).ToList() : new List<Vec2>(baseOutline);
                 if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
+                if (ld.Extension != null) poly = ExtendGusset(poly, ld.Extension, name);
                 if (ld.Outline.Count >= 3 && ld.ClipToGusset)
                 {
                     double a0 = MeshBuilder.SignedArea(poly);
@@ -820,8 +1123,9 @@ public static partial class TrussGenerator
                 foreach (var (q, _) in res)
                     if (poly.Any(p => !InsideOrOn(q, p)))
                     { Warn($"Truss CHECK {name}: it extends past layer under it - the stack is built at constant offsets (a gap / fill where the lower layer is missing)."); break; }
-                string flagText = string.Join("; ", new[] { ld.Unresolved }.Where(s => s.Length > 0));
+                string flagText = string.Join("; ", new[] { ld.Unresolved, ld.Extension?.Unresolved ?? "" }.Where(s => s.Length > 0));
                 if (ld.Unresolved.Length > 0) Warn(ld.Unresolved);
+                if (ld.Extension is { Unresolved.Length: > 0 } lx) Warn(lx.Unresolved);
                 var asu = flagText.Length > 0 ? Assumption.UnresolvedDimension(flagText + $" (joint {pt}){Src}", $"gusset layer {TrussSections.FormatIn(ld.Thickness)} stacked outside the inner gusset") : ld.Outline.Count >= 3 ? null : baseFlag;
                 double area = Math.Abs(MeshBuilder.SignedArea(poly));
                 foreach (int side in new[] { -1, 1 })
@@ -835,6 +1139,7 @@ public static partial class TrussGenerator
                         Mark = mark, Category = PartCategory.TrussGusset, Assembly = asmMark,
                         Description = $"gusset PL {TrussSections.FormatIn(ld.Thickness)} at {pt}, layer {k + 2} of {defs.Count + 1} (outside {TrussSections.FormatIn(off)}){(ld.Label.Length > 0 ? " " + ld.Label : "")} ({area / 0.09290304:0.0} SF)",
                         Mesh = mesh, Material = ld.Material.Length > 0 ? Material(ld.Material) : Material(baseMaterial), Length = poly.Max(q => q.X) - poly.Min(q => q.X), Assumption = asu,
+                        Member = _d.PartPerPiece ? JointStack(pl, pt) : null, Piece = _d.PartPerPiece ? "gusset layer" : null,
                     });
                     Model.PanelOf[mark] = $"Joint {pt}";
                     Model.Gussets++;
@@ -913,6 +1218,9 @@ public static partial class TrussGenerator
             var yy = Vec3.Cross(zz, xx).Normalized();
             double g = Grip16(grip);
             Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(origin, xx, yy, zz), Grip = g, Length = g, Assembly = asm, Kind = BoltKind.Rivet, Diameter = dia, Material = material, Assumption = asu });
+            // keep the shared-hole index current: it is built at the first MergeRivet (joint PLATE rivets), and the joint rivets placed afterwards were never in
+            // it - later connection / bracing rivets could not share their holes (2026-10-30, PTC recheck N01: 2,406 head overlaps)
+            if (_rivetCells != null) IndexRivet(Model.Steel.Bolts.Count - 1);
         }
 
         /// <summary><see cref="TrussDefinition.RivetHeadsFlushAtSolePlates"/>: a rivet whose button head would lie inside a shoe sole plate gets that head
@@ -1299,7 +1607,8 @@ public static partial class TrussGenerator
                 bool alongX = !rl.Along.Equals("y", StringComparison.OrdinalIgnoreCase);
                 var asu = RivetFlag(rl.Unresolved, "rule-based positions along the member (pitch from the plan's pitch rules)");
                 int placed = 0, missed = 0;
-                for (double s = rl.FirstFromEnd + rl.Stagger; s <= cut - rl.FirstFromEnd + 1e-9; s += rl.Pitch)
+                double NextPitch(double at) => rl.Zones?.FirstOrDefault(z => z.Pitch > 0 && at >= z.From - 1e-9 && at < z.To - 1e-9)?.Pitch ?? rl.Pitch;
+                for (double s = rl.FirstFromEnd + rl.Stagger; s <= cut - rl.FirstFromEnd + 1e-9; s += NextPitch(s))
                 {
                     var iv = new List<(double lo, double hi)>();
                     foreach (var pc in m.Sec.Pieces)
@@ -1388,6 +1697,37 @@ public static partial class TrussGenerator
             return best;
         }
 
+        /// <summary>Extent along <paramref name="ax"/> (from the point) of the joint's inner gusset outline over the band b0..b1 along <paramref name="yv"/>
+        /// (<see cref="TrussJointPlate.UnderGusset"/>); null = no gusset there.</summary>
+        private (double a0, double a1)? GussetExtentAlong(string pl, string pt, Vec3 P, Vec3 ax, Vec3 yv, double b0, double b1)
+        {
+            if (JointMembers(pl, pt) is not { } jm) return null;
+            double st = StationOf(P);
+            var u = Tangent(st);
+            var n = Normal(pl, st);
+            var v = Vec3.Cross(n, u).Normalized();
+            u = Vec3.Cross(v, n).Normalized();
+            var outline = GussetOutline(pl, pt, jm.here, jm.jdef, P, u, v);
+            if (outline.Count < 3) return null;
+            var poly = outline.Select(q => { var w = u * q.X + v * q.Y; return new Vec2(Vec3.Dot(w, ax), Vec3.Dot(w, yv)); }).ToList();
+            // clip by the band b0 <= y <= b1 (two half planes; the subject may be concave)
+            List<Vec2> Half(List<Vec2> sub, double y0, int sign)
+            {
+                var o = new List<Vec2>();
+                for (int i = 0; i < sub.Count; i++)
+                {
+                    var a = sub[i]; var b = sub[(i + 1) % sub.Count];
+                    double sa = sign * (a.Y - y0), sb = sign * (b.Y - y0);
+                    if (sa >= 0) o.Add(a);
+                    if ((sa >= 0) != (sb >= 0)) { double t = sa / (sa - sb); o.Add(new Vec2(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t)); }
+                }
+                return o;
+            }
+            var c = Half(Half(poly, b0, 1), b1, -1);
+            if (c.Count < 3) return null;
+            return (c.Min(q => q.X), c.Max(q => q.X));
+        }
+
         private void BuildJointPlates()
         {
             foreach (var jdef in _d.Joints.Where(j => j.Plates is { Count: > 0 }))
@@ -1441,8 +1781,21 @@ public static partial class TrussGenerator
                             if (q.f == p.Face && q.a1 > a0 + 1e-4 && q.a0 < a1 - 1e-4 && q.b1 > b0 + 1e-5 && q.b0 < b1 - 1e-5) Take(q.top);
                         return best!.Value;
                     }
+                    // OPTIONAL UnderGusset plates: length / offset = the extent of the joint's inner gusset over the plate band (resolved per plane)
+                    TrussJointPlate Resolve(TrussJointPlate p)
+                    {
+                        if (!p.UnderGusset) return p;
+                        var (b0, b1) = Band(p);
+                        var ext = GussetExtentAlong(pl.Name, jdef.Point, P, ax, yv, b0, b1);
+                        if (ext == null) { Warn($"Truss: plate '{p.Label}' at joint {jdef.Point} ({pl.Name}) - no gusset over its band; not built."); return new TrussJointPlate { Face = p.Face, Width = p.Width, Thickness = p.Thickness, Length = 0, Label = p.Label, Unresolved = p.Unresolved }; }
+                        return new TrussJointPlate
+                        {
+                            Face = p.Face, Width = p.Width, Thickness = p.Thickness, Length = ext.Value.a1 - ext.Value.a0, Offset = (ext.Value.a0 + ext.Value.a1) / 2, Fill = p.Fill,
+                            Label = p.Label, Material = p.Material, Unresolved = p.Unresolved, Source = p.Source, CenterOffset = p.CenterOffset,
+                        };
+                    }
                     // marks keep the listed order (fills first), placement follows the stacking order
-                    var listed = jdef.Plates!.Where(p => p.Member == null).OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
+                    var listed = jdef.Plates!.Where(p => p.Member == null).Select(Resolve).OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
                     var order = new List<(TrussJointPlate p, int k, double baseLevel)>();
                     foreach (bool fillPass in new[] { true, false })
                     {
@@ -1479,6 +1832,33 @@ public static partial class TrussGenerator
                                 foreach (int sx in new[] { -1, 1 }) Box(sx * baseLevel, sx * outer, yc - p.Width / 2, yc + p.Width / 2);
                                 break;
                         }
+                        if (p.RivetCount > 0)
+                        {
+                            // rivet points at mid thickness of the plate (both webs for a web-face plate); kinked (mitred) joints: the side's own chord frame
+                            Vec3 Pt(double a, double x, double y)
+                            {
+                                if (mj is { } mjv2) { var (uu, yy) = a < 0 ? (mjv2.uL, mjv2.yL) : (mjv2.uR, mjv2.yR); return P + uu * a + xv * x + yy * y; }
+                                return P + ax * a + xv * x + yv * y;
+                            }
+                            Vec3 Nrm(double a) => mj is { } mjv3 ? (a < 0 ? mjv3.yL : mjv3.yR) : yv;
+                            double rd = p.RivetDiameter > 0 ? p.RivetDiameter : _d.JointDefaults.RivetDiameter;
+                            double e = 1.5 * rd;
+                            int rows = Math.Max(1, p.RivetRows);
+                            var pts = new List<(Vec3 at, Vec3 dir)>();
+                            var acr = Enumerable.Range(0, rows).Select(i => rows == 1 ? 0.0 : -p.Width / 2 + e + (p.Width - 2 * e) * i / (rows - 1)).ToList();
+                            for (int i = 0; i < rows; i++)
+                            {
+                                int nr = p.RivetCount / rows + (i < p.RivetCount % rows ? 1 : 0);
+                                for (int j = 0; j < nr; j++)
+                                {
+                                    double a = nr == 1 ? (a0 + a1) / 2 : a0 + e + (a1 - a0 - 2 * e) * j / (nr - 1);
+                                    double mid = baseLevel + g * p.Thickness / 2;
+                                    if (p.Face is TrussPlateFace.Top or TrussPlateFace.Bottom) pts.Add((Pt(a, acr[i], mid), Nrm(a) * g));
+                                    else foreach (int sx in new[] { -1, 1 }) pts.Add((Pt(a, sx * mid, yc + acr[i]), xv * (sx * g)));
+                                }
+                            }
+                            _plateRivetJobs.Add((pts, rd, asm, p.RivetMaterial, p.RivetUnresolved, $"{p.Label} at {jdef.Point} ({pl.Name})"));
+                        }
                         if (p.Face == TrussPlateFace.WebInside) _insidePlates.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
                         if (p.Face == TrussPlateFace.WebOutside) _outsidePlates.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
                         string mark = $"{pl.Name}-{(p.Fill ? "F" : "SP")}{jdef.Point}-{k}";
@@ -1489,11 +1869,114 @@ public static partial class TrussGenerator
                             Mark = mark, Category = p.Fill ? PartCategory.FillerPlate : PartCategory.SplicePlate, Assembly = asm, Mesh = mesh, Material = Material(p.Material), Length = p.Length, Assumption = asu,
                             Description = $"{(p.Label.Length > 0 ? p.Label : (p.Fill ? "fill" : "splice") + " PL")} {TrussSections.FormatIn(p.Width)} x {TrussSections.FormatIn(p.Thickness)} x {TrussSections.FormatIn(p.Length)} ({p.Face}) at {jdef.Point}"
                                 + (p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside ? " (pair)" : ""),
+                            Member = _d.PartPerPiece ? JointStack(pl.Name, jdef.Point) : null, Piece = _d.PartPerPiece ? (p.Fill ? "fill" : "splice plate") : null,
                         });
                         Model.PanelOf[mark] = $"Joint {jdef.Point}";
                         Model.SplicePlates++;
                     }
                 }
+        }
+
+        private readonly List<(List<(Vec3 at, Vec3 dir)> pts, double dia, string asm, string? mat, string? flag, string what)> _plateRivetJobs = new();
+
+        /// <summary>Rivets of the joint plates (<see cref="TrussJointPlate.RivetCount"/>): grip = the contiguous steel through the point along the plate normal
+        /// (probed over the parts built so far), head on the plate's outer side. Run after all joint plates.</summary>
+        private void PlacePlateRivets()
+        {
+            if (_plateRivetJobs.Count == 0) return;
+            int placed = 0, missed = 0;
+            foreach (var (pts, dia, asm, mat, flag, what) in _plateRivetJobs)
+            {
+                if (pts.Count == 0) continue;
+                var lo = new Vec3(pts.Min(q => q.at.X), pts.Min(q => q.at.Y), pts.Min(q => q.at.Z)) - new Vec3(1, 1, 1);
+                var hi = new Vec3(pts.Max(q => q.at.X), pts.Max(q => q.at.Y), pts.Max(q => q.at.Z)) + new Vec3(1, 1, 1);
+                var probe = new SteelLineProbe();
+                int k = 0;
+                foreach (var part in Model.Steel.Parts)
+                {
+                    k++;
+                    if (part.Mesh is not { IsEmpty: false } mm) continue;
+                    var b = mm.Bounds();
+                    if (b.Max.X < lo.X || b.Min.X > hi.X || b.Max.Y < lo.Y || b.Min.Y > hi.Y || b.Max.Z < lo.Z || b.Min.Z > hi.Z) continue;
+                    probe.Add(mm, k, lo, hi);
+                }
+                var asu = RivetFlag(flag, "plate rivets: rows and spacing derived (count as read)");
+                int pl0 = 0;
+                foreach (var (at, dir) in pts)
+                {
+                    var d = dir.Normalized();
+                    if (probe.At(at, d, 1.0) is not { } iv || iv.t1 - iv.t0 < In(1.0 / 8)) { missed++; continue; }
+                    // head on the plate's outer side (+dir), shank back through the steel
+                    MergeRivet(at + d * iv.t1, -d, Up, iv.t1 - iv.t0, dia, asm, mat, asu);
+                    placed++; pl0++;
+                }
+            }
+            Info($"Truss {_d.Name}: {placed} rivets through the joint splice / cover plates (grip probed through the steel){(missed > 0 ? $", {missed} positions not in steel" : "")}.");
+        }
+
+        /// <summary><see cref="TrussJointDefinition.EdgeAngles"/>: angles along gusset edges on the outer face of the stack, each gusset face, with their rivets.</summary>
+        private void BuildEdgeAngles(string pl, string pt, List<TrussGussetEdgeAngle> eas, List<Vec2> outline, List<(List<Vec2> poly, double t)> layers, double X, double tg,
+            Vec3 P, Vec3 u, Vec3 v, Vec3 n, string asm)
+        {
+            var cen = new Vec2(outline.Average(q => q.X), outline.Average(q => q.Y));
+            int k = 0;
+            foreach (var ea in eas)
+            {
+                k++;
+                var a = Steel.SteelCatalog.FindAngle(ea.Angle);
+                if (a == null && TrussSections.ParseAngle(ea.Angle) is { } pa) a = new Steel.AngleSize(ea.Angle, pa.a, pa.b, pa.t);      // pre-AISC v16 size (sharp root)
+                if (a == null) { Warn($"Truss: edge angle '{ea.Angle}' at joint {pt} - not understood; not built."); continue; }
+                var p0 = new Vec2(ea.U0, ea.V0); var p1 = new Vec2(ea.U1, ea.V1);
+                var dl = p1 - p0; double len = dl.Length;
+                if (len < In(2)) { Warn($"Truss: edge angle at joint {pt} - line shorter than 2 in.; not built."); continue; }
+                dl = dl * (1 / len);
+                var w2 = new Vec2(-dl.Y, dl.X);
+                var mid = (p0 + p1) * 0.5;
+                if (Vec2.Dot(cen - mid, w2) < 0) w2 = w2 * -1;                         // the gusset leg lies toward the inside of the outline
+                // stack under the angle (the layers present just inside the line)
+                var probeUv = mid + w2 * (a.LegA / 2);
+                double stack = tg;
+                foreach (var (poly, t) in layers) if (InsideOrOn(poly, probeUv)) stack += t;
+                var dW = u * w2.X + v * w2.Y; var dL = u * dl.X + v * dl.Y;
+                var poly2 = Steel.SteelCatalog.AnglePolygon(a, 0, 1, 0, 1).ToList();      // (m along the gusset leg, v out of the plane)
+                string flag = ea.Unresolved;
+                if (flag.Length > 0) Warn(flag);
+                var asu = flag.Length > 0 ? Assumption.UnresolvedDimension(flag + $" (joint {pt})", "edge angle along the drawn gusset edge, length / leg / rivets as read") : null;
+                double rd = ea.RivetDiameter > 0 ? ea.RivetDiameter : _d.JointDefaults.RivetDiameter;
+                foreach (int side in new[] { -1, 1 })
+                {
+                    var nOut = n * side;
+                    var origin = P + u * p0.X + v * p0.Y + nOut * (X + stack);
+                    // right-handed frame: (dW, nOut, z); sweep along +dL or -dL
+                    var z = Vec3.Cross(dW, nOut);
+                    bool fwd = Vec3.Dot(z, dL) > 0;
+                    var fr = new Frame3(fwd ? origin : origin + dL * len, dW, nOut, z);
+                    var mesh = new Mesh();
+                    MeshBuilder.AddExtrusion(mesh, poly2, fr, 0, len);
+                    string mark = $"{pl}-EA{pt}-{(side < 0 ? "L" : "R")}{k}";
+                    Model.Steel.Parts.Add(new SteelPart
+                    {
+                        Mark = mark, Category = PartCategory.TrussConnectionAngle, Assembly = asm, Mesh = mesh, Material = Material(ea.Material), Length = len, Assumption = asu,
+                        Description = $"gusset edge angle {(ea.Label.Length > 0 ? ea.Label : ea.Angle)} x {TrussSections.FormatIn(len)} at {pt}",
+                        NominalWeightLbPerFt = a.WeightPerFootLb > 0 ? a.WeightPerFootLb : 0,
+                        Member = _d.PartPerPiece ? JointStack(pl, pt) : null, Piece = _d.PartPerPiece ? "edge angle" : null,
+                    });
+                    Model.PanelOf[mark] = $"Joint {pt}";
+                    if (ea.Rivets > 0)
+                    {
+                        double gage = ea.Gage > 0 ? ea.Gage : a.LegA / 2;
+                        double e = 1.5 * rd;
+                        var rjob = new List<(Vec3 at, Vec3 dir)>();
+                        for (int i = 0; i < ea.Rivets; i++)
+                        {
+                            double s0 = ea.Rivets == 1 ? len / 2 : e + (len - 2 * e) * i / (ea.Rivets - 1);
+                            var at = P + u * (p0.X + dl.X * s0 + w2.X * gage) + v * (p0.Y + dl.Y * s0 + w2.Y * gage) + nOut * (X + stack + a.Thickness / 2);
+                            rjob.Add((at, nOut));
+                        }
+                        _plateRivetJobs.Add((rjob, rd, asm, null, flag.Length > 0 ? flag : null, $"edge angle at {pt}"));
+                    }
+                }
+            }
         }
 
         // ------------------------------------------------------------------ line items (curbs / parapets, walkways, dams)
@@ -1505,7 +1988,15 @@ public static partial class TrussGenerator
             if (MeshBuilder.SignedArea(poly) < 0) poly.Reverse();
             var sec0 = poly.ToArray();
             var ranges = new List<(double lo, double hi)>();
-            if (li.RepeatPitch > 0 && li.RepeatWidth > 0)
+            if (li.Ranges is { Count: >= 2 } rl)
+            {
+                for (int i = 0; i + 1 < rl.Count; i += 2)
+                {
+                    double lo = Math.Max(li.From, Math.Min(rl[i], rl[i + 1])), hi = Math.Min(li.To, Math.Max(rl[i], rl[i + 1]));
+                    if (hi > lo + 1e-6) ranges.Add((lo, hi));
+                }
+            }
+            else if (li.RepeatPitch > 0 && li.RepeatWidth > 0)
                 for (double a = li.From + li.RepeatStart; a + li.RepeatWidth <= li.To + 1e-9; a += li.RepeatPitch) ranges.Add((a, a + li.RepeatWidth));
             else ranges.Add((li.From, li.To));
             var mesh = new Mesh();
@@ -1522,7 +2013,7 @@ public static partial class TrussGenerator
                     for (int i = 0; i < n; i++)
                     {
                         double s = lo + (hi - lo) * i / (n - 1);
-                        double z0 = li.FromGrade ? _al.ElevationAt(s, li.ReferenceOffset) : 0;
+                        double z0 = (li.FromGrade ? _al.ElevationAt(s, li.ReferenceOffset) : 0) + li.Rise * (s - li.From) / (li.To - li.From);
                         rings.Add(sec.Select(q => _al.PointAt(s, li.ReferenceOffset + side * q.X).WithZ(z0 + q.Y)).ToArray());
                     }
                 }
@@ -1545,10 +2036,12 @@ public static partial class TrussGenerator
             if (li.Kind == TrussLineItemKind.Concrete)
             {
                 Model.Concrete.Barriers.Add((li.Name, mesh));
+                // its material and UNRESOLVED flag reach the IFC (SBM_Status) / database like the steel line items (agent review PTC curbs P23)
+                Model.Concrete.BarrierInfo[li.Name] = (li.Material, li.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(li.Unresolved, "line item section as listed") : null);
                 return;
             }
-            string asm = Asm(li.Assembly.Length > 0 ? li.Assembly : "DECK-ITEMS", li.Category is PartCategory.JointArmor or PartCategory.JointCoverPlate ? AssemblyKind.ExpansionJoint
-                : SteelModel.IsRailing(li.Category) ? AssemblyKind.Railing : AssemblyKind.InspectionWalkway, li.AssemblyDescription.Length > 0 ? li.AssemblyDescription : $"{_d.Name} - {li.Assembly}");
+            string asm = Asm(li.Assembly.Length > 0 ? li.Assembly : "DECK-ITEMS", li.AssemblyKind ?? (li.Category is PartCategory.JointArmor or PartCategory.JointCoverPlate ? AssemblyKind.ExpansionJoint
+                : SteelModel.IsRailing(li.Category) ? AssemblyKind.Railing : AssemblyKind.InspectionWalkway), li.AssemblyDescription.Length > 0 ? li.AssemblyDescription : $"{_d.Name} - {li.Assembly}");
             Model.Steel.Parts.Add(new SteelPart
             {
                 Mark = li.Name, Category = li.Category, Assembly = asm, Mesh = mesh, Material = li.Material.Length > 0 ? Material(li.Material) : _d.DefaultMaterial, Length = length,
@@ -1598,6 +2091,25 @@ public static partial class TrussGenerator
                     if (cross[i + 1].sta - e1 - (cross[i].sta + e0) < 0.1) continue;
                     valid.Add(i);
                 }
+                // OPTIONAL continuous members: run index of every valid bay
+                var runOf = new Dictionary<int, int>();
+                if (line.ContinuousBays is { Count: > 0 } cb)
+                {
+                    int vi = 0;
+                    for (int r = 0; r < cb.Count && vi < valid.Count; r++)
+                        for (int q = 0; q < Math.Max(1, cb[r]) && vi < valid.Count; q++) runOf[valid[vi++]] = r;
+                    int listed = cb.Sum(x => Math.Max(1, x));
+                    if (listed != valid.Count)
+                        Warn($"Truss: stringer line {line.Name} - the continuous members list {listed} bays, the line has {valid.Count}{(listed < valid.Count ? $"; the last {valid.Count - listed} bays stay single pieces" : "; the extra members are not built")}{Src}.");
+                }
+                var run = new List<(int part, int member, string mark)>();
+                int runNo = 0, runCur = -1;
+                void CloseRun()
+                {
+                    if (run.Count == 0) return;
+                    MergeStringerRun(line, run, ++runNo, runCur);
+                    run.Clear();
+                }
                 for (int i = 0; i + 1 < cross.Count; i++)
                 {
                     double e0 = fl.StringersOnTop ? 0 : cross[i].halfWeb + fl.StringerEndClearance, e1 = fl.StringersOnTop ? 0 : cross[i + 1].halfWeb + fl.StringerEndClearance;
@@ -1610,13 +2122,20 @@ public static partial class TrussGenerator
                     no++;
                     var pa = _al.PointAt(s0, line.Offset).WithZ(_al.ElevationAt(s0, line.Offset) - top - sec.YMax);
                     var pb = _al.PointAt(s1, line.Offset).WithZ(_al.ElevationAt(s1, line.Offset) - top - sec.YMax);
-                    var def = new TrussMemberDefinition { Name = $"ST-{line.Name}-{no}", Section = line.Section, Role = TrussMemberRole.Stringer, Panel = $"Bay {no}" };
+                    int ri = runOf.TryGetValue(i, out int rr) ? rr : -1;
+                    if (runOf.Count > 0 && (ri != runCur || ri < 0)) { CloseRun(); runCur = ri; }
+                    string bayMark = runOf.Count > 0 ? $"ST-{line.Name}-bay{no}" : $"ST-{line.Name}-{no}";
+                    var def = new TrussMemberDefinition { Name = bayMark, Section = line.Section, Role = TrussMemberRole.Stringer, Panel = $"Bay {no}" };
                     var inst = new Inst { Def = def, Mark = def.Name, Plane = "", PlaneA = "", PlaneB = "", PointA = $"{_u.FormatStation(s0)}", PointB = $"{_u.FormatStation(s1)}", A = pa, B = pb, Sec = sec, Assembly = asm };
                     Orient(inst);
+                    int p0 = Model.Steel.Parts.Count, m0 = Model.Members.Count;
                     BuildMember(inst);
+                    if (runOf.Count > 0) run.Add((p0, m0, bayMark));
                     seatAt.Add(cross[i].sta); seatAt.Add(cross[i + 1].sta);
-                    pieceStarts.Add(cross[i].sta); pieceEnds.Add(cross[i + 1].sta);
+                    if (runOf.Count == 0 || run.Count == 1) pieceStarts.Add(cross[i].sta);
+                    if (runOf.Count == 0 || ri < 0 || !runOf.TryGetValue(i + 1, out int rn) || rn != ri) pieceEnds.Add(cross[i + 1].sta);
                 }
+                CloseRun();
                 if (fl.Seats != null && fl.StringersOnTop) BuildSeats(fl.Seats, line, sec, top, seatAt, asm);
                 if (fl.Splices != null) { pieceStarts.IntersectWith(pieceEnds); BuildStringerSplices(fl, line, sec, top, cross.Select(c => c.sta).ToList(), pieceStarts, asm); }
                 if (no == 0) Warn($"Truss: stringer line {line.Name} - no floor beam bay found (floor beams are members with role FloorBeam crossing offset {L(line.Offset)}).");
@@ -1626,6 +2145,52 @@ public static partial class TrussGenerator
                 Info($"Truss: stringer seats - {_seatCount} plates (gap {L(_seatGapMin)} - {L(_seatGapMax)}){(_seatSkipped > 0 ? $", {_seatSkipped} crossings bear directly (gap under {L(fl.Seats.MinGap)}) or have no steel under them" : "")}{Src}.");
             if (fl.Splices != null) Info($"Truss: stringer splices - {_spliceCount} splices, {_spliceRivets} rivets{(_spliceRivetMiss > 0 ? $" ({_spliceRivetMiss} rivet positions not in steel, skipped)" : "")}{Src}.");
             if (_seatBelow > 0) Warn($"Truss CHECK stringer seats: {_seatBelow} stringer bottoms lie below the floor beam top (overlap up to {L(_seatBelowMax)}){Src}.");
+        }
+
+        /// <summary>Continuous stringer member (<see cref="TrussStringerLine.ContinuousBays"/>): the bay pieces just built become ONE part / member result
+        /// (meshes appended: one straight solid per bay, kinked at the floor beams).</summary>
+        private void MergeStringerRun(TrussStringerLine line, List<(int part, int member, string mark)> run, int runNo, int runIndex)
+        {
+            var parts = Model.Steel.Parts;
+            var marks = run.Select(r => r.mark).ToHashSet();
+            int p0 = run[0].part, m0 = run[0].member;
+            var bayParts = parts.Skip(p0).Where(p => marks.Contains(p.Mark) || p.Member != null && marks.Contains(p.Member)).ToList();
+            var bayMembers = Model.Members.Skip(m0).Where(m => marks.Contains(m.Mark)).ToList();
+            if (bayParts.Count == 0) return;
+            string mark = $"ST-{line.Name}-{runNo}";
+            string type = line.RunTypes is { } rt && runIndex >= 0 && runIndex < rt.Count && rt[runIndex].Length > 0 ? rt[runIndex] + " " : "";
+            var bm0 = bayMembers.FirstOrDefault(); var bm1 = bayMembers.LastOrDefault();
+            string from = bm0?.From ?? "", to = bm1?.To ?? "";
+            string secDesc = bm0 != null && _sec.TryGetValue(bm0.Section, out var sd) ? sd.Description : line.Section;
+            int at = parts.IndexOf(bayParts[0]);
+            parts.RemoveAll(p => bayParts.Contains(p));
+            // whole parts (one per bay) or the pieces of each bay (PartPerPiece: merged per piece suffix "-R1", ...)
+            var merged = new List<SteelPart>();
+            foreach (var grp in bayParts.GroupBy(p => p.Member != null ? p.Mark[p.Member.Length..] : ""))
+            {
+                var mesh = new Mesh();
+                foreach (var p in grp) mesh.Append(p.Mesh);
+                var f = grp.First();
+                merged.Add(new SteelPart
+                {
+                    Mark = mark + grp.Key, Category = f.Category, Assembly = f.Assembly, Mesh = mesh, Material = f.Material, Role = f.Role, NominalWeightLbPerFt = f.NominalWeightLbPerFt,
+                    Assumption = f.Assumption, Density = f.Density, Length = grp.Sum(p => p.Length), Member = f.Member != null ? mark : null, Piece = f.Piece,
+                    Description = $"{(f.Member != null ? f.Description.Split(" (")[0] + " (" + f.Piece + ") of " : "")}{secDesc} {type}{(run.Count > 1 ? $"{run.Count}-span continuous stringer" : "stringer")} {from}-{to}",
+                });
+            }
+            parts.InsertRange(Math.Min(at, parts.Count), merged);
+            double runMass = merged.Sum(p => p.Mass);
+            if (bm0 != null && bm1 != null)
+            {
+                int mi = Model.Members.IndexOf(bm0);
+                Model.Members.RemoveAll(m => marks.Contains(m.Mark));
+                Model.Members.Insert(Math.Min(mi, Model.Members.Count), new TrussMemberResult(mark, mark, bm0.Plane, from, to, bm0.A, bm1.B, bayMembers.Sum(m => m.WorkLength),
+                    bayMembers.Sum(m => m.CutLength), bm0.Role, bm0.Section, runMass, bm0.Flagged));
+            }
+            foreach (var mk in marks) Model.PanelOf.Remove(mk);
+            int Bay(string mk) => int.Parse(mk[(mk.LastIndexOf("bay", StringComparison.Ordinal) + 3)..]);
+            int b0 = Bay(run[0].mark), b1 = Bay(run[^1].mark);
+            Model.PanelOf[mark] = b0 == b1 ? $"Bay {b0}" : $"Bays {b0}-{b1}";
         }
 
         private int _seatCount, _seatSkipped, _seatBelow;
@@ -1858,6 +2423,7 @@ public static partial class TrussGenerator
             double topHalf = s.BodyTopLength > 0 ? s.BodyTopLength / 2 : Math.Max(s.PinDiameter * 0.75, 0.1 * bl);
             bool pieces = s.Pieces is { Count: > 0 };
             if (pieces) BuildShoePieces(s, asm, pin, u, n, pt);
+            if (s.Fasteners is { Count: > 0 }) BuildShoeFasteners(s, asm, pin, u, n, pt);
             if (!pieces && z1 > z0 + 1e-3 && bl > 0 && bw > 0)
             {
                 var poly = new[] { new Vec2(-bl / 2, z0), new Vec2(bl / 2, z0), new Vec2(topHalf, z1), new Vec2(-topHalf, z1) };
@@ -1975,6 +2541,7 @@ public static partial class TrussGenerator
                     TrussShoePieceKind.Masonry => PartCategory.MasonryPlate,
                     TrussShoePieceKind.Pin or TrussShoePieceKind.Roller => PartCategory.TrussPin,
                     TrussShoePieceKind.Rocker => PartCategory.TrussShoeExpansion,
+                    TrussShoePieceKind.Angle => PartCategory.TrussConnectionAngle,
                     _ => s.Type == TrussShoeType.Expansion ? PartCategory.TrussShoeExpansion : PartCategory.TrussShoeFixed,
                 };
                 string flag = pc.Unresolved.Length > 0 ? pc.Unresolved : s.Unresolved;

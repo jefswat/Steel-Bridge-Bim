@@ -1,7 +1,7 @@
-import sys; sys.path.insert(0, r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\tools')
+import sys; sys.path.insert(0, r'C:\SBM\.worktrees\bends\tools')
 import plantext, pymupdf as fitz, re
 from PIL import Image, ImageDraw
-ROOT = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\dist\SteelBridgeModeler' + '\\'
+ROOT = r'C:\SBM\dist\SteelBridgeModeler' + '\\'
 d = fitz.open(ROOT + 'B00168 - CBIS-ESI-Westbound I-80 - Design 116.pdf')
 found = {}
 for pg in range(18, 95):
@@ -27,6 +27,6 @@ cols = 3
 rows = (len(imgs) + cols - 1) // cols
 sheet = Image.new('L', (W * cols, imgs[0].height * rows), 255)
 for i, im in enumerate(imgs): sheet.paste(im, ((i % cols) * W, (i // cols) * imgs[0].height))
-sheet.save(r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\temp\bend\codes.png')
+sheet.save(r'C:\SBM\.worktrees\bends\temp\bend\codes.png')
 print(sheet.size)
 for k, v in sorted(found.items()): print(k, v)

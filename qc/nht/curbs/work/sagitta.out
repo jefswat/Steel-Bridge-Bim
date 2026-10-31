@@ -1,0 +1,25 @@
+NHT Unit 1 Left curb face R0: 23 rings, max ring spacing 5.53 ft, max chord deviation 0.676" (+ = inward) at sta 2105.74
+NHT Unit 1 Left curb face R10: 23 rings, max ring spacing 5.46 ft, max chord deviation 0.667" (+ = inward) at sta 2105.74
+NHT Unit 1 Right curb face R0: 23 rings, max ring spacing 4.89 ft, max chord deviation -0.519" (+ = inward) at sta 2100.84
+NHT Unit 1 Right curb face R10: 23 rings, max ring spacing 4.89 ft, max chord deviation -0.528" (+ = inward) at sta 2125.28
+NHT Unit 1: min CL radius over the deck 60.0 ft
+NHT Unit 2 Left curb face R0: 21 rings, max ring spacing 5.47 ft, max chord deviation 0.662" (+ = inward) at sta 2212.93
+NHT Unit 2 Left curb face R10: 21 rings, max ring spacing 5.40 ft, max chord deviation 0.654" (+ = inward) at sta 2212.93
+NHT Unit 2 Right curb face R0: 21 rings, max ring spacing 4.84 ft, max chord deviation -0.509" (+ = inward) at sta 2169.40
+NHT Unit 2 Right curb face R10: 21 rings, max ring spacing 4.84 ft, max chord deviation -0.517" (+ = inward) at sta 2212.95
+NHT Unit 2: min CL radius over the deck 60.0 ft
+NHT Unit 3 Left curb face R0: 34 rings, max ring spacing 5.00 ft, max chord deviation 0.145" (+ = inward) at sta 2314.89
+NHT Unit 3 Left curb face R10: 34 rings, max ring spacing 4.99 ft, max chord deviation 0.146" (+ = inward) at sta 2324.71
+NHT Unit 3 Right curb face R0: 35 rings, max ring spacing 4.87 ft, max chord deviation -0.138" (+ = inward) at sta 2290.80
+NHT Unit 3 Right curb face R10: 35 rings, max ring spacing 4.86 ft, max chord deviation -0.138" (+ = inward) at sta 2310.17
+NHT Unit 3: min CL radius over the deck 250.0 ft
+NHT Unit 4 Left curb face R0: 27 rings, max ring spacing 4.81 ft, max chord deviation -0.134" (+ = inward) at sta 2673.02
+NHT Unit 4 Left curb face R10: 27 rings, max ring spacing 4.80 ft, max chord deviation -0.134" (+ = inward) at sta 2654.00
+NHT Unit 4 Right curb face R0: 26 rings, max ring spacing 4.93 ft, max chord deviation 0.141" (+ = inward) at sta 2687.78
+NHT Unit 4 Right curb face R10: 26 rings, max ring spacing 4.93 ft, max chord deviation 0.142" (+ = inward) at sta 2682.86
+NHT Unit 4: min CL radius over the deck 250.0 ft
+NHT Unit 5 Left curb face R0: 36 rings, max ring spacing 4.98 ft, max chord deviation 0.179" (+ = inward) at sta 2850.77
+NHT Unit 5 Left curb face R10: 36 rings, max ring spacing 4.96 ft, max chord deviation 0.178" (+ = inward) at sta 2855.56
+NHT Unit 5 Right curb face R0: 36 rings, max ring spacing 4.98 ft, max chord deviation 0.179" (+ = inward) at sta 2908.27
+NHT Unit 5 Right curb face R10: 36 rings, max ring spacing 4.96 ft, max chord deviation 0.178" (+ = inward) at sta 2903.48
+NHT Unit 5: min CL radius over the deck 200.0 ft

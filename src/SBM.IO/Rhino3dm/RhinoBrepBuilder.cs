@@ -21,6 +21,8 @@ internal sealed class FaceSpec
     /// <summary>Planar faces: outer loop curves, chained end to start (either sense; oriented in the plane by the builder).</summary>
     public List<SCurve> Outer { get; } = new();
     public List<List<SCurve>> Holes { get; } = new();
+    /// <summary>What the face is (the NURBS face role: "top", "end 0", "riser" ...), for messages.</summary>
+    public string Role { get; init; } = "";
 }
 
 /// <summary>
@@ -163,6 +165,15 @@ internal sealed class RhinoBrepBuilder
         var loop = _b.Loops.Add(type, face);
         foreach (var (c3, c2, iso) in segs)
         {
+            if (iso != RG.IsoStatus.None && Collapsed(c3))
+            {
+                int vi = Vertex(c3.PointAtStart);
+                int c2s = _b.AddTrimCurve(c2);
+                var st = _b.Trims.AddSingularTrim(_b.Vertices[vi], loop, iso, c2s);
+                st.IsoStatus = iso;
+                st.SetTolerances(0, 0);
+                continue;
+            }
             var (ei, rev) = Edge(c3);
             int c2i = _b.AddTrimCurve(c2);
             var t = _b.Trims.Add(_b.Edges[ei], rev, loop, c2i);
@@ -170,6 +181,11 @@ internal sealed class RhinoBrepBuilder
             t.SetTolerances(0, 0);
         }
     }
+
+    /// <summary>A 3D boundary curve that is a single point (within the tolerance).</summary>
+    private bool Collapsed(RG.Curve c3) =>
+        c3.PointAtStart.DistanceTo(c3.PointAtEnd) <= _tol && c3.PointAtStart.DistanceTo(c3.PointAt(c3.Domain.Mid)) <= _tol
+        && c3.PointAtStart.DistanceTo(c3.PointAt(c3.Domain.ParameterAt(0.25))) <= _tol;
 
     private static double SignedArea(IReadOnlyList<RG.Point3d> p)
     {
@@ -236,9 +252,6 @@ internal sealed class RhinoBrepBuilder
 
     private void AddSurfaceFace(FaceSpec f, SSurface s)
     {
-        var rs = Surface3(s);
-        int si = _b.AddSurface(rs);
-        var face = _b.Faces.Add(si);
         double u0 = s.U0, u1 = s.U1, v0 = s.V0, v1 = s.V1;
         RG.Curve Rev(RG.Curve c) { var d = c.DuplicateCurve(); d.Reverse(); return d; }
         RG.Curve L2(double a, double b, double c, double d) => new RG.LineCurve(new RG.Point2d(a, b), new RG.Point2d(c, d));
@@ -249,9 +262,41 @@ internal sealed class RhinoBrepBuilder
             (Rev(Curve3(s.Boundary(true, true))), L2(u1, v1, u0, v1), RG.IsoStatus.North),
             (Rev(Curve3(s.Boundary(false, false))), L2(u0, v1, u0, v0), RG.IsoStatus.West),
         };
-        foreach (var (c3, _, _) in segs)
-            if (c3.PointAtStart.DistanceTo(c3.PointAtEnd) <= _tol && c3.PointAtStart.DistanceTo(c3.PointAt(c3.Domain.Mid)) <= _tol)
-                throw new InvalidOperationException("collapsed surface boundary (singular trim) not supported");
+        // a boundary collapsed to a point (a wedge's end, the apex of a ruled triangle) becomes a singular trim at that vertex; at most one
+        // per face and never two opposite ones
+        var col = segs.Select(x => Collapsed(x.Item1)).ToArray();
+        int collapsed = col.Count(x => x);
+        // two OPPOSITE boundaries collapsed: a sliver without area within the tolerance (e.g. a panel row of no length at a skewed end); its
+        // other two boundaries coincide, so the neighbouring faces share that edge directly - the face is left out
+        if (collapsed == 2 && ((col[0] && col[2]) || (col[1] && col[3])) && f.Holes.Count == 0) return;
+        if (collapsed > 1) throw new InvalidOperationException($"collapsed surface boundaries (more than one singular trim) not supported ({f.Role} face)");
+        var rs = Surface3(s);
+        if (collapsed == 1)
+        {
+            // make the collapsed side exactly singular (openNURBS requires it for a singular trim): its control points -> their mean
+            int side = Array.IndexOf(col, true);
+            int nu = rs.Points.CountU, nv = rs.Points.CountV;
+            var idx = side switch
+            {
+                0 => Enumerable.Range(0, nu).Select(i => (i, 0)),
+                1 => Enumerable.Range(0, nv).Select(j => (nu - 1, j)),
+                2 => Enumerable.Range(0, nu).Select(i => (i, nv - 1)),
+                _ => Enumerable.Range(0, nv).Select(j => (0, j)),
+            };
+            var ij = idx.ToList();
+            var m = new RG.Point3d(0, 0, 0);
+            foreach (var (i, j) in ij) { rs.Points.GetPoint(i, j, out RG.Point3d q); m += q; }
+            m /= ij.Count;
+            foreach (var (i, j) in ij)
+            {
+                double w = rs.Points.GetWeight(i, j);
+                if (rs.IsRational) rs.Points.SetPoint(i, j, m, w); else rs.Points.SetPoint(i, j, m);
+            }
+            var (c3, c2, iso) = segs[side];
+            segs[side] = (new RG.LineCurve(m, m + new RG.Vector3d(_tol * 1e-3, 0, 0)), c2, iso);   // a point: Loop() makes it the singular trim
+        }
+        int si = _b.AddSurface(rs);
+        var face = _b.Faces.Add(si);
         Loop(face, RG.BrepLoopType.Outer, segs);
         foreach (var hole in f.Holes)
         {
@@ -301,7 +346,11 @@ internal sealed class RhinoBrepBuilder
         var x = f.X.Normalized();
         var y = f.Y.Normalized();
         var o = f.Origin;
-        var outer = Snap(f.Outer).Select(c => ((RG.Curve)Curve3(c), (RG.Curve)CurveInPlane(c, o, x, y), RG.IsoStatus.None)).ToList();
+        // curves shorter than the tolerance (a riser or side of ~zero height) carry no boundary: dropped, the neighbours are snapped together
+        double tm = _tol / _scale;
+        bool Tiny(SCurve c) => (c.PointAt(c.End) - c.PointAt(c.Start)).Length <= tm && (c.PointAt((c.Start + c.End) / 2) - c.PointAt(c.Start)).Length <= tm;
+        var outerCurves = f.Outer.Count > 3 && f.Outer.Any(Tiny) ? f.Outer.Where(c => !Tiny(c)).ToList() : f.Outer;
+        var outer = Snap(outerCurves).Select(c => ((RG.Curve)Curve3(c), (RG.Curve)CurveInPlane(c, o, x, y), RG.IsoStatus.None)).ToList();
         var holes = f.Holes.Select(h => Snap(h).Select(c => ((RG.Curve)Curve3(c), (RG.Curve)CurveInPlane(c, o, x, y), RG.IsoStatus.None)).ToList()).ToList();
         // plane surface domain = the loops' extent in plane coordinates (+ margin): the trims stay inside the surface
         double minU = double.MaxValue, minV = double.MaxValue, maxU = double.MinValue, maxV = double.MinValue;
@@ -316,11 +365,60 @@ internal sealed class RhinoBrepBuilder
         foreach (var h in holes) Loop(face, RG.BrepLoopType.Inner, Orient(h, false));
     }
 
+    /// <summary>
+    /// Makes the face orientations of a closed manifold B-rep consistent: across every interior edge the two faces must run the edge in opposite
+    /// directions (trim direction x face orientation). Faces are flipped by propagation from face 0, then the whole shell is turned outward. A face
+    /// whose outward direction the generator guessed wrong (heuristics on very skewed / sliver panels: kinked-end blocks) then no longer leaves the
+    /// shell "not solid" with no naked edge. Returns true when something was flipped. Topology and geometry are unchanged.
+    /// </summary>
+    internal static bool OrientConsistently(RG.Brep b)
+    {
+        int nf = b.Faces.Count;
+        if (nf == 0) return false;
+        var adj = new List<(int other, bool flipRel)>[nf];
+        for (int i = 0; i < nf; i++) adj[i] = new();
+        foreach (var e in b.Edges)
+        {
+            var ti = e.TrimIndices();
+            if (ti.Length != 2) return false;   // naked / non-manifold: not a closed shell
+            var t0 = b.Trims[ti[0]]; var t1 = b.Trims[ti[1]];
+            int f0 = t0.Face.FaceIndex, f1 = t1.Face.FaceIndex;
+            bool d0 = t0.IsReversed() ^ t0.Face.OrientationIsReversed, d1 = t1.IsReversed() ^ t1.Face.OrientationIsReversed;
+            bool rel = d0 == d1;   // same direction: exactly one of the two must flip
+            adj[f0].Add((f1, rel)); adj[f1].Add((f0, rel));
+        }
+        var flip = new int[nf];   // 0 unset, 1 keep, 2 flip
+        bool any = false;
+        for (int s = 0; s < nf; s++)
+        {
+            if (flip[s] != 0) continue;
+            flip[s] = 1;
+            var q = new Queue<int>(); q.Enqueue(s);
+            while (q.Count > 0)
+            {
+                int f = q.Dequeue();
+                foreach (var (o, rel) in adj[f])
+                {
+                    int want = rel ? 3 - flip[f] : flip[f];
+                    if (flip[o] == 0) { flip[o] = want; q.Enqueue(o); }
+                    else if (flip[o] != want) return false;   // not orientable: leave it as it is
+                }
+            }
+        }
+        for (int i = 0; i < nf; i++)
+            if (flip[i] == 2) { b.Faces[i].OrientationIsReversed = !b.Faces[i].OrientationIsReversed; any = true; }
+        if (!any) return false;
+        b.SetTolerancesBoxesAndFlags(true, false, false, false, true, true, true, true);
+        if (b.SolidOrientation == RG.BrepSolidOrientation.Inward) b.Flip();
+        return true;
+    }
+
     /// <summary>The finished B-rep (null when Rhino finds it invalid; <see cref="Error"/> says why).</summary>
     public RG.Brep? Finish()
     {
         // vertex / edge / trim tolerances are set when the parts are added (openNURBS cannot recompute edge tolerances here)
         _b.SetTolerancesBoxesAndFlags(true, false, false, false, true, true, true, true);
+        if (!_b.IsSolid && _b.IsManifold && OrientConsistently(_b)) _b.SetTolerancesBoxesAndFlags(true, false, false, false, true, true, true, true);
         if (!_b.IsValid)
         {
             bool t = _b.IsValidTopology(out string l1), g = _b.IsValidGeometry(out string l2), f = _b.IsValidTolerancesAndFlags(out string l3);
@@ -381,7 +479,7 @@ internal sealed class RhinoBrepBuilder
                 }
                 // zero-area face (two opposite boundaries coincide, e.g. a section corner of zero width): its neighbours share that edge directly
                 if (SameCurve(srf.Boundary(true, false), srf.Boundary(true, true)) || SameCurve(srf.Boundary(false, false), srf.Boundary(false, true))) continue;
-                fs = new FaceSpec { Surface = srf };
+                fs = new FaceSpec { Surface = srf, Role = f.Role };
             }
             else
             {
@@ -392,6 +490,24 @@ internal sealed class RhinoBrepBuilder
                 if (pl.Count < 3) continue;
                 var p = pl.ToArray();
                 var n = f.PlaneNormal();
+                if (f.Loop is { Count: >= 2 } loop)
+                {
+                    // planar face bounded by exact curves (slab ends): the loop as the outer boundary
+                    var lx = p[1] - p[0];
+                    lx = (lx - n * Vec3.Dot(lx, n)).Normalized();
+                    var lf = new FaceSpec { Origin = p[0], X = lx, Y = Vec3.Cross(n, lx) };
+                    lf.Outer.AddRange(loop);
+                    res.Add(lf);
+                    continue;
+                }
+                // A polygon that is not planar (a sweep's end ring on a kinked / curved deck end: its corners are the section points where each
+                // one crosses the end, joined by the ruled faces' straight edges) is the generator's own end cap: written as planar pieces of
+                // its triangulation (coplanar neighbours merged), whose outer edges are those straight edges.
+                if (f.Holes.Count == 0 && OffPlane(p, n) > NonPlanarTol && PlanarPieces(p, n) is { } pieces)
+                {
+                    res.AddRange(pieces);
+                    continue;
+                }
                 var x = p[1] - p[0];
                 x = (x - n * Vec3.Dot(x, n)).Normalized();
                 fs = new FaceSpec { Origin = p[0], X = x, Y = Vec3.Cross(n, x) };
@@ -404,6 +520,80 @@ internal sealed class RhinoBrepBuilder
                 seen.Add(h);
                 fs.Holes.Add(HoleLoop(h));
             }
+            res.Add(fs);
+        }
+        return res;
+    }
+
+    private const double NonPlanarTol = 2e-5;   // m
+
+    private static double OffPlane(IReadOnlyList<Vec3> p, Vec3 n)
+    {
+        var c = Vec3.Zero;
+        foreach (var q in p) c += q - p[0];
+        c = p[0] + c * (1.0 / p.Count);
+        return p.Max(q => Math.Abs(Vec3.Dot(q - c, n)));
+    }
+
+    /// <summary>A non-planar polygon (CCW about the outward normal <paramref name="n"/>) as planar faces: ear-clipping in its mean plane, then
+    /// triangles sharing an edge merged while they stay in one plane (within <see cref="NonPlanarTol"/>). Null when the projection is not simple.</summary>
+    private static List<FaceSpec>? PlanarPieces(Vec3[] p, Vec3 n)
+    {
+        var x = (p[1] - p[0]);
+        x = (x - n * Vec3.Dot(x, n)).Normalized();
+        var y = Vec3.Cross(n, x);
+        var p2 = p.Select(q => new Vec2(Vec3.Dot(q - p[0], x), Vec3.Dot(q - p[0], y))).ToList();
+        if (MeshBuilder.SignedArea(p2) <= 0) return null;
+        var tris = MeshBuilder.Triangulate(p2);
+        if (tris.Count != p.Length - 2) return null;
+        // groups: grow from each triangle over shared edges while every vertex stays in the seed's plane
+        var group = Enumerable.Repeat(-1, tris.Count).ToArray();
+        var groups = new List<List<int>>();
+        Vec3 Nrm((int a, int b, int c) t) => Vec3.Cross(p[t.b] - p[t.a], p[t.c] - p[t.a]).Normalized();
+        bool Shares((int, int, int) s, (int, int, int) t) => new[] { s.Item1, s.Item2, s.Item3 }.Intersect(new[] { t.Item1, t.Item2, t.Item3 }).Count() == 2;
+        for (int i = 0; i < tris.Count; i++)
+        {
+            if (group[i] >= 0) continue;
+            var g = new List<int> { i };
+            group[i] = groups.Count;
+            var nn = Nrm(tris[i]); var o = p[tris[i].Item1];
+            for (bool grew = true; grew;)
+            {
+                grew = false;
+                for (int j = 0; j < tris.Count; j++)
+                {
+                    if (group[j] >= 0 || !g.Any(k => Shares(tris[k], tris[j]))) continue;
+                    var t = tris[j];
+                    if (new[] { t.Item1, t.Item2, t.Item3 }.Any(v => Math.Abs(Vec3.Dot(p[v] - o, nn)) > NonPlanarTol)) continue;
+                    group[j] = groups.Count; g.Add(j); grew = true;
+                }
+            }
+            groups.Add(g);
+        }
+        var res = new List<FaceSpec>();
+        foreach (var g in groups)
+        {
+            // boundary = directed edges used once (triangles CCW about n), chained into one loop
+            var edges = new List<(int a, int b)>();
+            foreach (int k in g) { var (a, b, c) = tris[k]; edges.Add((a, b)); edges.Add((b, c)); edges.Add((c, a)); }
+            var once = edges.Where(e => !edges.Contains((e.b, e.a))).ToList();
+            var loop = new List<int> { once[0].a };
+            int cur = once[0].b, guard = 0;
+            while (cur != loop[0] && guard++ < once.Count + 1)
+            {
+                loop.Add(cur);
+                var nx = once.Where(e => e.a == cur).ToList();
+                if (nx.Count != 1) return null;
+                cur = nx[0].b;
+            }
+            if (cur != loop[0] || loop.Count != once.Count) return null;
+            var t0 = tris[g[0]];
+            var nt = Nrm(t0);
+            var q = loop.Select(i => p[i]).ToArray();
+            var gx = q[1] - q[0];
+            gx = (gx - nt * Vec3.Dot(gx, nt)).Normalized();
+            var fs = new FaceSpec { Origin = q[0], X = gx, Y = Vec3.Cross(nt, gx) };
+            for (int i = 0; i < q.Length; i++) fs.Outer.Add(Line(q[i], q[(i + 1) % q.Length]));
             res.Add(fs);
         }
         return res;

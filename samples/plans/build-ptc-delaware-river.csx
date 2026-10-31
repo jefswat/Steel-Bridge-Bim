@@ -149,5 +149,9 @@ Print($"Regenerated {rep.Bridges} bridge(s) in {rep.Elapsed.TotalSeconds:0.0} s;
 foreach (var w in rep.Warnings.Take(10)) Print("  W: " + w);
 foreach (var e in rep.Errors) Print("  E: " + e);
 foreach (var u in unresolved) Print("  " + u);
+// Plan set (CLAUDE.md checklist step 1; fingerprinted by `sbm review`) = plan set "ptc-drb" in sheet-links-ptc-delaware-river.json.
+// "PTC main truss 18-20.sbm" / "PTC approach trusses.sbm" are copies of this model, so they carry it too.
+{ const string pdf = @"C:\SBMData\Original Existing Bridge Plans from PTC.pdf";
+  if (!Doc.Project.PlanPdfs.Contains(pdf, StringComparer.OrdinalIgnoreCase)) Doc.Project.PlanPdfs.Add(pdf); }
 Doc.Save(outPath);
 Print($"Saved {outPath}");

@@ -1,0 +1,244 @@
+bridge Arch span 10, alignment CL NHT (TRAILCLNEW)
+curb def Curb LT: inner -7.000 ft, width 10.00 in, height 4.00 in
+curb def Curb RT: inner 7.000 ft, width 10.00 in, height 4.00 in
+rebar: S1 #4 5.999999999999999 x 9 topcover 2 hook 4.5 count 303 endcover 2
+curb mesh: 3472 tris, volume 4.229 CY, exact -
+== Curb LT: 872 vertices, |offset| 7.0000..7.8333 ft; stations 24+14.57 .. 26+17.75
+   bottom vs finished grade max |dz| 0.000 in; top above grade at inner face 3.941..4.000 in; max top above grade below the vertex 4.045 in
+   inner face plan length (both edges incl.) ~101.494 ft (vertex polyline / 2: top + bottom); stations inner 24+14.85..26+17.75
+   outer face stations 24+14.57..26+17.45
+   end west inner bottom corner 24+14.85 off -7.000: nearest steel 0.88 in (KNUCKLE-WEST-EW)
+   end west outer bottom corner 24+14.57 off -7.833: nearest steel 0.99 in (KNUCKLE-WEST-EW)
+   end east inner bottom corner 26+17.75 off -7.000: nearest steel 1.14 in (KNUCKLE-EAST-EW)
+   end east outer bottom corner 26+17.45 off -7.833: nearest steel 1.26 in (KNUCKLE-EAST-EW)
+   steel parts with vertices inside the curb: KNUCKLE-EAST-T0P-AFI(8), RAIL-HIGH-LT-P1(2), RAIL-HIGH-LT-P2(2), RAIL-HIGH-LT-P3(2), RAIL-HIGH-LT-P4(2), RAIL-HIGH-LT-P5(2), RAIL-HIGH-LT-P6(2), RAIL-HIGH-LT-P7(2), RAIL-HIGH-LT-P8(2), RAIL-HIGH-LT-P9(2), RAIL-HIGH-LT-P10(2), RAIL-HIGH-LT-P11(2), RAIL-HIGH-LT-P12(2), RAIL-HIGH-LT-P13(2), RAIL-HIGH-LT-P14(2), RAIL-HIGH-LT-P15(2), RAIL-HIGH-LT-P16(2), RAIL-HIGH-LT-P17(2), RAIL-HIGH-LT-P18(2), RAIL-HIGH-LT-P19(2), RAIL-HIGH-LT-P20(2), RAIL-HIGH-LT-P21(2), RAIL-HIGH-LT-P22(2), RAIL-HIGH-LT-P23(2), RAIL-HIGH-LT-P24(2), RAIL-HIGH-LT-P25(2)
+== Curb RT: 868 vertices, |offset| 7.0000..7.8333 ft; stations 24+19.81 .. 26+22.98
+   bottom vs finished grade max |dz| 0.000 in; top above grade at inner face 4.000..4.059 in; max top above grade below the vertex 4.159 in
+   inner face plan length (both edges incl.) ~101.494 ft (vertex polyline / 2: top + bottom); stations inner 24+19.81..26+22.70
+   outer face stations 24+20.11..26+22.98
+   end west inner bottom corner 24+19.81 off 7.000: nearest steel 0.07 in (KNUCKLE-WEST-EW)
+   end west outer bottom corner 24+20.11 off 7.833: nearest steel 0.06 in (KNUCKLE-WEST-EW)
+   end east inner bottom corner 26+22.70 off 7.000: nearest steel 0.05 in (KNUCKLE-EAST-EW)
+   end east outer bottom corner 26+22.98 off 7.833: nearest steel 0.06 in (KNUCKLE-EAST-EW)
+   steel parts with vertices inside the curb: KNUCKLE-WEST-T0-AFI(20), RAIL-HIGH-RT-P1(2), RAIL-HIGH-RT-P2(2), RAIL-HIGH-RT-P3(2), RAIL-HIGH-RT-P4(2), RAIL-HIGH-RT-P5(2), RAIL-HIGH-RT-P6(2), RAIL-HIGH-RT-P7(2), RAIL-HIGH-RT-P8(2), RAIL-HIGH-RT-P9(2), RAIL-HIGH-RT-P10(2), RAIL-HIGH-RT-P11(2), RAIL-HIGH-RT-P12(2), RAIL-HIGH-RT-P13(2), RAIL-HIGH-RT-P14(2), RAIL-HIGH-RT-P15(2), RAIL-HIGH-RT-P16(2), RAIL-HIGH-RT-P17(2), RAIL-HIGH-RT-P18(2), RAIL-HIGH-RT-P19(2), RAIL-HIGH-RT-P20(2), RAIL-HIGH-RT-P21(2), RAIL-HIGH-RT-P22(2), RAIL-HIGH-RT-P23(2), RAIL-HIGH-RT-P24(2), RAIL-HIGH-RT-P25(2), RAIL-HIGH-RT-FAB1(14), RAIL-HIGH-RT-FAB2(18), RAIL-HIGH-RT-FAB3(18), RAIL-HIGH-RT-FAB4(18), RAIL-HIGH-RT-FAB5(20), RAIL-HIGH-RT-FAB6(20), RAIL-HIGH-RT-FAB7(20), RAIL-HIGH-RT-FAB8(18), RAIL-HIGH-RT-FAB9(18), RAIL-HIGH-RT-FAB10(18), RAIL-HIGH-RT-FAB11(18), RAIL-HIGH-RT-FAB12(18), RAIL-HIGH-RT-FAB13(20), RAIL-HIGH-RT-FAB14(20), RAIL-HIGH-RT-FAB15(18), RAIL-HIGH-RT-FAB16(18), RAIL-HIGH-RT-FAB17(20), RAIL-HIGH-RT-FAB18(20), RAIL-HIGH-RT-FAB19(20), RAIL-HIGH-RT-FAB20(18), RAIL-HIGH-RT-FAB21(18), RAIL-HIGH-RT-FAB22(20), RAIL-HIGH-RT-FAB23(20), RAIL-HIGH-RT-FAB24(20), RAIL-HIGH-RT-FAB25(20), RAIL-HIGH-RT-FAB26(10)
+mark S1: #4 count 606 length 39.00 in (3.250 ft), total 1969.5 ft, 1316 lb; Arch curb stirrups (p.152)
+mark D4: #5 count 48 length 480.00 in (40.000 ft), total 1713.7 ft, 1787 lb; Arch curb longitudinal (p.152)
+== S1 Curb LT: 303 bars, stations 24+14.99..26+15.73, spacing (CL) 7.973..7.982 in mean 7.976
+   top clear (curb top - bar top - r) 1.999..1.999 in; inner-face clear min 2.000 in; outer-face clear min 2.000 in
+   bar bottom below grade (mid-curb) 6.699..6.699 in; hooks at outer 0 / inner 303; bar points outside the concrete 0; min CL distance to steel 0.01 in (FB32-W)
+   first S1 points: (-7.381,-1.43) (-7.468,-0.38) (-7.485,-0.12) n=44
+== D4 Curb LT: 24 bars, stations 24+14.99..26+15.72, lengths 40.00, 40.00, 40.00, 40.00, 40.00, 14.23, 40.00, 40.00, 40.00, 40.00, 40.00, 14.22, 40.00, 40.00, 40.00, 40.00, 40.00, 14.23, 40.00, 40.00, 40.00, 40.00, 40.00, 14.22
+   D4 points outside concrete 0; min CL distance to steel 0.00 in (FB11-W); top clear 2.500 in, inner clear 2.496 in, outer clear 2.496 in
+== S1 Curb RT: 303 bars, stations 24+21.87..26+22.58, spacing (CL) 7.972..7.979 in mean 7.975
+   top clear (curb top - bar top - r) 1.999..1.999 in; inner-face clear min 2.000 in; outer-face clear min 2.000 in
+   bar bottom below grade (mid-curb) 6.699..6.699 in; hooks at outer 303 / inner 0; bar points outside the concrete 0; min CL distance to steel 0.04 in (FB3-WPA)
+   first S1 points: (7.453,-1.43) (7.365,-0.38) (7.350,-0.15) n=45
+== D4 Curb RT: 24 bars, stations 24+21.86..26+22.57, lengths 40.00, 40.00, 40.00, 40.00, 40.00, 14.20, 40.00, 40.00, 40.00, 40.00, 40.00, 14.21, 40.00, 40.00, 40.00, 40.00, 40.00, 14.20, 40.00, 40.00, 40.00, 40.00, 40.00, 14.21
+   D4 points outside concrete 0; min CL distance to steel 0.03 in (FB13-W); top clear 2.500 in, inner clear 2.496 in, outer clear 2.497 in
+== railing High LT: offset -7.000, 24+14.68..26+17.90, length 203.31 ft, 25 posts at 24+18.74 24+26.74 24+34.74 .. 25+94.74 26+02.74 26+10.74
+   base point 24+14.68 off -7.000: z - (grade at curb line + 4") = -0.04 in, NOT over the curb
+   base point 25+19.43 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+20.45 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+21.47 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+22.48 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+23.50 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+24.51 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+25.53 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+26.54 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+27.56 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+28.57 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+29.59 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+30.60 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+31.62 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+32.63 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+33.65 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+34.66 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+35.68 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+36.69 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+37.71 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+38.72 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+39.74 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+40.75 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+41.77 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+42.78 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+43.80 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+44.81 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+45.83 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+46.84 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+47.86 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+48.87 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+49.89 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+50.90 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+51.92 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+52.93 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+53.95 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+54.96 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+55.98 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+56.99 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+58.01 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+59.02 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+60.04 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+61.05 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+62.07 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+63.08 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+64.10 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+65.11 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+66.13 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+67.14 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+68.16 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+69.17 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+70.19 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+71.20 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+72.22 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+73.23 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+74.25 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+75.26 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+76.28 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+77.29 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+78.31 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+79.32 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+80.34 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+81.35 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+82.37 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+83.38 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+84.40 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+85.41 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+86.43 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+87.44 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+88.46 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+89.47 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+90.49 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+91.50 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+92.52 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+93.53 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+94.55 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+95.56 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+96.58 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+97.59 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+98.61 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 25+99.63 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+00.64 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+01.66 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+02.67 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+03.69 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+04.70 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+05.72 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+06.73 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+07.75 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+08.76 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+09.78 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+10.79 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+11.81 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+12.82 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+13.84 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+14.85 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+15.87 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+16.88 off -7.000: z - (grade at curb line + 4") = -0.03 in, NOT over the curb
+   base point 26+17.90 off -7.000: z - (grade at curb line + 4") = 0.04 in, NOT over the curb
+   base line 205 pts, over the curb max |z - curb top| 0.029 in; 99 pts not over the curb
+   25 posts; base - curb top -0.029..-0.027 in; 0 posts with base vertices off the curb
+   post base |offset| range 7.167..7.667 ft (curb 7.000..7.833)
+== railing High RT: offset 7.000, 24+19.62..26+22.84, length 203.31 ft, 25 posts at 24+26.74 24+34.74 24+42.74 .. 26+02.74 26+10.74 26+18.74
+   base point 24+19.62 off 7.000: z - (grade at curb line + 4") = -0.10 in, NOT over the curb
+   base point 24+20.64 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+21.65 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+22.67 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+23.68 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+24.70 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+25.71 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+26.73 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+27.74 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+28.76 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+29.77 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+30.79 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+31.80 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+32.82 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+33.83 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+34.85 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+35.87 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+36.88 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+37.90 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+38.91 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+39.93 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+40.94 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+41.96 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+42.97 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+43.99 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+45.00 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+46.02 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+47.03 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+48.05 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+49.06 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+50.08 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+51.09 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+52.11 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+53.12 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+54.14 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+55.15 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+56.17 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+57.18 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+58.20 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+59.21 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+60.23 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+61.24 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+62.26 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+63.27 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+64.29 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+65.30 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+66.32 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+67.33 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+68.35 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+69.36 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+70.38 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+71.39 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+72.41 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+73.42 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+74.44 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+75.45 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+76.47 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+77.48 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+78.50 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+79.51 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+80.53 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+81.54 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+82.56 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+83.57 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+84.59 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+85.60 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+86.62 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+87.63 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+88.65 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+89.66 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+90.68 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+91.69 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+92.71 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+93.72 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+94.74 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+95.75 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+96.77 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+97.79 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+98.80 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 24+99.82 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+00.83 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+01.85 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+02.86 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+03.88 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+04.89 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+05.91 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+06.92 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+07.94 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+08.95 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+09.97 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+10.98 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+12.00 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+13.01 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+14.03 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+15.04 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+16.06 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+17.07 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 25+18.09 off 7.000: z - (grade at curb line + 4") = 0.03 in, NOT over the curb
+   base point 26+22.84 off 7.000: z - (grade at curb line + 4") = -1.55 in, NOT over the curb
+   base line 205 pts, over the curb max |z - curb top| 0.028 in; 99 pts not over the curb
+   25 posts; base - curb top 0.027..0.030 in; 0 posts with base vertices off the curb
+   post base |offset| range 7.167..7.667 ft (curb 7.000..7.833)
+DIAG Info: Arch curbs: ends on the knuckle end web inside faces (skewed); continuous, the inside arch flange plate legs are embedded in the curb concrete.

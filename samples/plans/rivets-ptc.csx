@@ -19,6 +19,7 @@ using SBM.Core.Steel;
 
 string outPath = Args.Length > 0 ? Args[0] : (Doc.FilePath ?? @"samples\plans\PTC Delaware River Bridge.sbm");
 var inv = CultureInfo.InvariantCulture;
+double FI(double ft, double inch) => Ft(ft) + In(inch);
 string U(string pages, string item, string why, string then = "") => UnresolvedFlag.Text(pages, item, why, then);
 
 string dataDir = null;
@@ -155,6 +156,9 @@ string ClassAt(string st, TrussMemberDefinition m, string pt, bool mirror)
 {
     if (m.From != pt && m.To != pt) return "CT";
     string other = m.From == pt ? m.To : m.From;
+    // batch 4a (R02, 2026-10-28): members to a point that is not an upper / lower chord point (rigid hanger L14-W14, wind chord L13-W14) form their own class by
+    // role - they used to fall through to the diagonal classes and were laid out in the diagonal's frame
+    if (!tokenRx.IsMatch(other)) return "R:" + m.Role;
     int d = Math.Sign(OrdIn(st, other) - OrdIn(st, pt)); if (mirror) d = -d;
     if (IsChordRole(m.Role)) return d < 0 ? "CL" : "CR";
     var mo = tokenRx.Match(other); var mp = tokenRx.Match(pt);
@@ -164,6 +168,7 @@ string ClassAt(string st, TrussMemberDefinition m, string pt, bool mirror)
 }
 int detCount = 0;
 
+int nSimilarGrid = 0;   // agent review approach R03
 foreach (var (key, bridges, C) in structures)
 {
     var srows = rows.Where(r => r["structure"] == key && Count(r) > 0).ToList();
@@ -184,6 +189,14 @@ foreach (var (key, bridges, C) in structures)
         // the field splice is 2'-1 right of L20, so the symbol count split at the panel point gave 38 / 54 per side = a 3 15/16 / 2 7/8 grid). Lay the
         // chord sides of every joint on one grid, total count kept.
         t.UniformChordRivets = true;
+        // main span review GL08 (2026-10-27): joint rivet grips from the steel along the shank (head on the outer steel, end at the last steel connected),
+        // air left inside a grip (missing fills / plies / inlays) is reported, not closed
+        t.JointRivetGripsFromSteel = true;
+        // main span recheck N01 / N02 (batch 8a, 2026-10-30): bracing edge-angle / plate and floor connection rivets laid on their own pattern overlapped the joint
+        // rivet heads (1,806 rows); p.97 L1 detail draws them between the joint rivets / through the same holes (>= 3 in. spacing): a connection rivet sharing a
+        // hole merges (as before), one whose head would overlap a joint rivet head is not placed (counted per assembly)
+        t.ConnectionRivetsClearOfJointHeads = true;
+        t.JointRivetsShareHoles = true;   // agent review rivets R13: joint groups of different members laid over one drawn rivet share the hole
         foreach (var j in t.Joints) j.Rivets.Clear();
         foreach (var cr in thkCorr)
             foreach (Match m in tokenRx.Matches(cr["joint"]))
@@ -339,7 +352,11 @@ foreach (var (key, bridges, C) in structures)
                     "count as drawn on each " + (inside ? "gusset face" : "member face") + " of both trusses (and both halves of a symmetric unit); positions derived: even square grid over "
                     + (inside ? "the lap the gusset shares with the member" : "the member band beyond the gusset edge") + ", 1.5 d edge distance, a clean plate stack under both heads.");
                 string srcTxt = $"rivet-counts p.{pg} {(inside ? "inside" : "beyond")} {sst} {spt} {r["member"]} ({nShop} shop + {nField} field)";
-                if (!bandJoints.Contains((sst, spt)) && posOf.TryGetValue((sst, spt, r["member"], r["region"]), out var drawnPos) && drawnPos.Count > 0 && drawnDeg.TryGetValue((sst, spt), out var dDeg))
+                // agent review approach R03 (2026-10-30): positions drawn at a 'similar to' joint are copied only onto members of the same section; a different
+                // (narrower) member falls back to the count grid (copied rows would land on its flanges: stack-outside drops)
+                bool similarOtherSection = key != "main" && spt.TrimEnd('\'') != pt.TrimEnd('\'') && targetsFor.Any(x => x.Section != sm.Section);
+                if (similarOtherSection) nSimilarGrid += n;
+                if (!similarOtherSection && !bandJoints.Contains((sst, spt)) && posOf.TryGetValue((sst, spt, r["member"], r["region"]), out var drawnPos) && drawnPos.Count > 0 && drawnDeg.TryGetValue((sst, spt), out var dDeg))
                 {
                     int sgn = (mirror ? -1 : 1) * dirB;
                     double shear = Math.Tan((ChordDeg(t, pt, sgn) ?? dDeg) * Math.PI / 180) - Math.Tan(dDeg * Math.PI / 180);
@@ -447,6 +464,25 @@ foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" }
     double pitch = In(7), first = In(2);
     string flag = U("p.43, p.44", "girder rivet positions", "the sheets give the rivet size (1 in. carbon in the main girders) and the maximum pitch rule (sealing 6 + 4t, 7 in. max; p.43 special notes) but no pitch, gage or count for the flange angles and cover plates",
         "rule-based: flange angles to the web on 2 gage lines per vertical leg (AISC 8 in. leg gages 3 + 3 in. from the heel), cover plates to the horizontal legs on 2 lines each side of the web at the same gages, 7 in. maximum pitch, alternate lines staggered 3 1/2 in., first rivet 2 in. from the girder ends; grip = the angles + web, or the angle leg + the cover plates present at the rivet.");
+    // agent review girders G07 / G08 (2026-10-30): p.43 'staggered pitch' of the flange angle to web rivets per panel: 2 1/2 over the first ~5/9 of the end panel (zone
+    // limit scaled), 2 3/4 to the end floor beam, 3 3/4 from there to the web splice, 4 1/2 between the splices (per gage line = twice that, the two lines staggered);
+    // p.44 cover plate rivets: 4 lines, 4 3/4 max per line, 3 3/4 over the 6'-0 cover plate splice zone (37'-0 to 43'-0 from the CL girder).
+    string zoneFlag = U("p.43, p.44", "girder rivet pitch zones", "p.43 prints the staggered pitch per zone (2 1/2 / 2 3/4 / 3 3/4 / 4 1/2) and p.44 the cover plate pitch (4 3/4 max, 3 3/4 over the splice) but the end of the 2 1/2 zone and the gages are only drawn",
+        "flange angle lines at twice the staggered pitch per gage line (alternate lines offset by half), 2 1/2 zone over 5/9 of the end panel (scaled); cover plate lines 4 3/4 in., 3 3/4 in. from 37'-0 to 43'-0 each side of the CL girder; gages 3 / 6 in. as before.");
+    List<TrussRivetZone> AngleZones(double L)
+    {
+        double e0 = FI(1, 1), pp = (L - 2 * e0) / 4, sp = 4 * pp / 6, mid = L / 2;
+        var z = new List<TrussRivetZone>();
+        foreach (int side in new[] { 1, -1 })
+        {
+            double F(double d) => side > 0 ? d : L - d;
+            void Z(double a, double b, double pIn) { double lo = Math.Min(F(a), F(b)), hi = Math.Max(F(a), F(b)); z.Add(new TrussRivetZone(lo, hi, In(pIn))); }
+            Z(0, e0 + 5.0 / 9 * pp, 5); Z(e0 + 5.0 / 9 * pp, e0 + pp, 5.5); Z(e0 + pp, mid - sp, 7.5);
+        }
+        z.Add(new TrussRivetZone(mid - sp, mid + sp, In(9)));
+        return z;
+    }
+    List<TrussRivetZone> CoverZones(double L) => new() { new(L / 2 - Ft(43), L / 2 - Ft(37), In(3.75)), new(L / 2 + Ft(37), L / 2 + Ft(43), In(3.75)) };
     var lines = new List<TrussRivetLine>();
     foreach (int e in new[] { 1, -1 })
     {
@@ -461,7 +497,19 @@ foreach (var name in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" }
         }
     }
     int n = 0;
-    foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.Girder && m.Section == "G1")) { m.RivetLines = lines; n++; }
+    foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.Girder && m.Section == "G1"))
+    {
+        var pa = t.Points.First(q => q.Name == m.From); var pb = t.Points.First(q => q.Name == m.To);
+        double L = Math.Sqrt(Math.Pow(pb.Station - pa.Station, 2) + Math.Pow(pb.Elevation - pa.Elevation, 2));
+        m.RivetLines = lines.Select(l => new TrussRivetLine
+        {
+            Label = l.Label, Along = l.Along, X = l.X, Y = l.Y, HeadPositive = l.HeadPositive, FirstFromEnd = l.FirstFromEnd, Diameter = l.Diameter, Material = l.Material, Source = l.Source,
+            Pitch = l.Label.Contains("cover") ? In(4.75) : In(9),
+            Stagger = l.Stagger > 0 ? (l.Label.Contains("cover") ? In(4.75) / 2 : In(2.5)) : 0,
+            Zones = l.Label.Contains("cover") ? CoverZones(L) : AngleZones(L), Unresolved = zoneFlag,
+        }).ToList();
+        n++;
+    }
     report.Add($"{name}: {lines.Count} rivet lines on {n} girder members (x {t.Planes.Count} girders)");
     t.Unresolved.RemoveAll(s => s.Contains("rivets (rivets-ptc.csx)"));
     t.Unresolved.Add(U("p.43, p.44", "rivets (rivets-ptc.csx) of the stiffeners, web splice, cover plate splice, floor beams and laterals", "the sheets show these rivet groups without counts or pitch",
@@ -485,5 +533,6 @@ foreach (var br in Doc.Project.Bridges.Where(b => b.Name.StartsWith("PTC ") && b
 }
 Print($"PTC total: {totN:N0} rivets, rivet heads {totLb:N0} lb");
 foreach (var s in report) Print("  " + s);
+Print($"  rivets of 'similar to' joints on a member of another section laid on the count grid instead of the copied drawn positions (agent review approach R03): {nSimilarGrid} per face");
 Doc.Save(outPath);
 Print($"Saved {outPath}");

@@ -134,4 +134,20 @@ public class ViewNavTests
         Assert.Equal(NavAction.None, NavPresets.Resolve(t, NavButton.Left, NavMods.None, false));
         Assert.Contains("Middle-drag", NavPresets.Describe(t));
     }
+
+    [Fact]
+    public void NorthArrow_Plan_Rotated_AndLookingNorth()
+    {
+        // plan, north up: north points straight up the screen (y down), east to the right
+        var plan = new OrthoView(new Vec3(0, 0, 100), new Vec3(0, 0, -1), new Vec3(0, 1, 0), 50);
+        var (n, e) = ViewNav.NorthArrow(plan);
+        Assert.Equal(0, n.x, 9); Assert.Equal(-1, n.y, 9); Assert.Equal(1, e.x, 9); Assert.Equal(0, e.y, 9);
+        // plan with east up the screen: north points left
+        (n, _) = ViewNav.NorthArrow(plan with { Up = new Vec3(1, 0, 0) });
+        Assert.Equal(-1, n.x, 9); Assert.Equal(0, n.y, 9);
+        // 3D from the south looking north 30 deg down: north up the screen, foreshortened by sin 30
+        double c = Math.Cos(Math.PI / 6), s = Math.Sin(Math.PI / 6);
+        (n, e) = ViewNav.NorthArrow(new OrthoView(new Vec3(0, -100, 50), new Vec3(0, c, -s), ViewNav.ZUp, 50));
+        Assert.Equal(0, n.x, 9); Assert.Equal(-s, n.y, 9); Assert.Equal(1, e.x, 9);
+    }
 }

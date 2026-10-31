@@ -16,7 +16,7 @@ using SBM.Core.Substructure;
 
 const double Tol = 0.01;
 var inv = CultureInfo.InvariantCulture;
-string csvPath = new[] { @"samples\plans\substructure-elevations-i80-rampg.csv", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\samples\plans\substructure-elevations-i80-rampg.csv" }.First(System.IO.File.Exists);
+string csvPath = new[] { @"samples\plans\substructure-elevations-i80-rampg.csv", @"C:\SBM\samples\plans\substructure-elevations-i80-rampg.csv" }.First(System.IO.File.Exists);
 var outPath = Environment.GetEnvironmentVariable("SUBELEV_OUT");
 double F = Ft(1), I = In(1);
 

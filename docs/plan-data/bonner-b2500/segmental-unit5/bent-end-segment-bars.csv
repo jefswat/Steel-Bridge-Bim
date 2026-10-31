@@ -1,0 +1,12 @@
+unit,mark,size,count_rule,placement,depth_or_ref,pdf_page,tag
+bent segments,N1,#9,8 @ 8 in. (TOP),top slab top transverse tip to tip,3 in. clear top,279 / 280 (D-D),TEXT count + spacing; full-width extent DRAWN
+bent segments,N4,#5,8 @ 8 in. PAIRED (BOT.),top slab bottom transverse tip to tip,2 in. clear above 9 in. slab underside level,280 (D-D / E-E),TEXT count; depth DERIVED (no underside face inside the solid diaphragm)
+bent segments,N38,#4,20 @ 1'-0 (TOP) per half width,top slab top longitudinal,inside N1,279,TEXT count; positions from CL DRAWN
+bent segments,N3,#9,1 PAIRED (E.F.),diaphragm horizontal across the webs,19 in. below the deck top,279,TEXT; depth SCALED from the left dimension chain (10 in. wing tip + 9 in.)
+bent segments,N12,#7,2 @ 1'-0 (E.F.),diaphragm horizontal across the webs,41 / 53 in. below the deck top,279,TEXT; depths SCALED from the chain (10 + 9 + 10 + 1'-0 / + 1'-0)
+bent segments,N5,#9,1 PAIRED (E.F.),diaphragm horizontal across the webs,62 in. below the deck top,279,TEXT; depth SCALED (chain + 9 in.)
+bent segments,N6,#9,1 PAIRED (E.F.),diaphragm horizontal across the webs,71 in. below the deck top,279,TEXT; depth SCALED (chain + 9 in.)
+bent segments,N7,#9,1 PAIRED (E.F.),diaphragm horizontal across the webs,83 in. below the deck top,279,TEXT; depth SCALED (chain + 1'-0)
+bent segments,N9,#6,19 sets 2 @ 6 in. (one per face),diaphragm horizontal across the webs,from 89 in. below the deck top @ 6 in.,279,TEXT count + spacing; first depth SCALED (chain + 6 in.)
+end segments,E45,#4,21 @ 1'-0 per half width,top slab top longitudinal,3 in. clear top,273,TEXT count; positions from CL DRAWN
+end segments,E9-E15,#7,3 each,end diaphragm horizontals across the webs @ 10 in.,E9 11 1/2 in. above the bottom slab top level (scaled),273,TEXT marks / spacing (7E9 TO 7E15 @ 10 in.); 3 per mark positions along SCALED

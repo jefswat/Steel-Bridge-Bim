@@ -16,8 +16,8 @@ const string Br = "RG", PlanBr = "RampG";
 int[] units = { 1, 2, 3, 4 };
 string BridgeName(int u) => $"Ramp G Unit {u}";
 
-string dataDir = new[] { @"docs\plan-data\camber", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\docs\plan-data\camber" }.First(System.IO.Directory.Exists);
-string tosCsv = new[] { @"samples\plans\top-of-slab-i80-rampg.csv", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\samples\plans\top-of-slab-i80-rampg.csv" }.First(System.IO.File.Exists);
+string dataDir = new[] { @"docs\plan-data\camber", @"C:\SBM\docs\plan-data\camber" }.First(System.IO.Directory.Exists);
+string tosCsv = new[] { @"samples\plans\top-of-slab-i80-rampg.csv", @"C:\SBM\samples\plans\top-of-slab-i80-rampg.csv" }.First(System.IO.File.Exists);
 double Num(string s) => double.Parse(s.Trim().TrimEnd('*'), CultureInfo.InvariantCulture);
 bool Has(string s) => s.Trim().Length > 0;
 // rows[r][c] of a plan table (first column = point or letter); returns header, rows

@@ -80,6 +80,37 @@ public static partial class ArchGenerator
             foreach (var b in bars) Model.Concrete.Bars.Add(new BarPlacement { Mark = mark, Points = b, Group = "Deck" });
         }
 
+        /// <summary>Agent review A03 (NHT arch curbs): deck bars that pass THROUGH floorbeam plates / floorbeam connection plates (no hole or cut on the plans) are
+        /// reported per mark as a plan CONFLICT (warning + check row); the bars are never moved.</summary>
+        private void CheckBarsThroughFloorbeams()
+        {
+            var steel = Misc.MiscMesh.Index(Model.Steel.Parts.Where(p => p.Category is PartCategory.FloorbeamPlate or PartCategory.ArchConnectionPlate));
+            if (steel.Count == 0 || Model.Concrete.Bars.Count == 0) return;
+            var sizes = Model.Concrete.Marks.GroupBy(m => m.Mark).ToDictionary(g => g.Key, g => g.First().Size.Diameter);
+            foreach (var g in Model.Concrete.Bars.GroupBy(b => b.Mark))
+            {
+                double r = sizes.TryGetValue(g.Key, out var d) ? d / 2 : 0;
+                int n = 0; var parts = new HashSet<string>(); double worst = 0;
+                foreach (var bar in g)
+                {
+                    bool hit = false;
+                    for (int i = 1; i < bar.Points.Length; i++)
+                    {
+                        var (c, against, _) = Misc.MiscMesh.Clearance(steel, bar.Points[i - 1], bar.Points[i], r, 0);
+                        if (double.IsNaN(c) || c >= -In(1.0 / 32)) continue;
+                        hit = true; worst = Math.Min(worst, c);
+                        parts.Add(against.Split(' ')[0]);
+                    }
+                    if (hit) n++;
+                }
+                if (n == 0) continue;
+                string list = string.Join(", ", parts.OrderBy(x => x).Take(8)) + (parts.Count > 8 ? $" ... ({parts.Count} parts)" : "");
+                Warn($"CONFLICT (plan vs plan, p.145 / p.152): {n} of {g.Count()} deck bars {g.Key} pass through floorbeam / connection plates ({list}; up to {L(-worst)} into the steel) - the plans give no hole or cut for them; bars not moved.");
+                Model.Checks.Add(new ArchCheck($"deck bar {g.Key}: clear of the floorbeam webs / connection plates (p.145 / p.152)", "no bar through the steel", $"{n} bars through {parts.Count} parts",
+                    n, false, "CONFLICT reported, not adjusted (agent review A03)"));
+            }
+        }
+
         /// <summary>Deck bars (p.152 / 154): A (top transverse, centred on CL NHT), B (bottom transverse, centred on the structure CL) at the transverse spacing
         /// along the structure CL; D1 / D2 longitudinal lines on the grid (bottom ones in the corrugations), split into bars of the plan length with the plan
         /// lap from the west end; curb stirrups along the curbs at the transverse spacing with 4 corner bars.</summary>
@@ -259,7 +290,10 @@ public static partial class ArchGenerator
                         var dir = _al.PointAt(sta, oc + 1) - p0;            // across (toward + offset)
                         double top = _b.Deck.FinishedElevation(_al, sta, c.InnerOffset) + c.Height - rb.CurbTopCover - st.Diameter / 2;
                         Vec3 Pt(double u, double z) => (p0 + dir.Normalized() * u).WithZ(z);
-                        return new[] { Pt(-hw, top), Pt(hw, top), Pt(hw, top - hh), Pt(-hw, top - hh), Pt(-hw, top) };
+                        // the loop (and its hooks) starts at the top corner on the OUTER side (toward the tie girder) for both curbs (p.152; agent review NHT arch curbs A02:
+                        // the right curb had its hooks on the trail side)
+                        double so = c.InnerOffset < 0 ? -1 : 1;
+                        return new[] { Pt(so * hw, top), Pt(-so * hw, top), Pt(-so * hw, top - hh), Pt(so * hw, top - hh), Pt(so * hw, top) };
                     }
                     int ns = rb.CurbStirrupCount > 1 ? rb.CurbStirrupCount : (int)Math.Floor((st1 - st0) / rb.TransSpacing) + 1;
                     double csp = rb.CurbStirrupCount > 1 ? (st1 - st0) / (ns - 1) : rb.TransSpacing;

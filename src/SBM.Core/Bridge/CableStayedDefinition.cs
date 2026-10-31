@@ -22,6 +22,16 @@ public sealed class CableStayedDefinition
     public List<string> Unresolved { get; set; } = new();
     public CsDeckDefinition Deck { get; set; } = new();
     public CsPylonDefinition Pylon { get; set; } = new();
+    /// <summary>OPTIONAL further pylons (two-tower bridges; null = one pylon). Each stands on its own support line with its own frame, legs, cross beams
+    /// and footing. Leg numbers of <see cref="CsStayGroup.Leg"/> run over ALL pylons: <see cref="Pylon"/>'s legs first, then each further pylon's in turn
+    /// (cross beams keep leg numbers within their own pylon). <see cref="Struts"/> belong to the first pylon.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<CsPylonDefinition>? MorePylons { get; set; }
+    /// <summary>The first pylon then <see cref="MorePylons"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IReadOnlyList<CsPylonDefinition> AllPylons => MorePylons is { Count: > 0 } ? MorePylons.Prepend(Pylon).ToList() : new[] { Pylon };
+    /// <summary>Global number of the first leg of pylon <paramref name="p"/> (index into <see cref="AllPylons"/>).</summary>
+    public int FirstLegOf(int p) => AllPylons.Take(p).Sum(x => x.Legs.Count);
     public List<CsStayGroup> Stays { get; set; } = new();
     /// <summary>Straight members between two pylon-frame points (the concept's "legs" / props below the deck, ties).</summary>
     public List<CsStrut> Struts { get; set; } = new();
@@ -34,6 +44,7 @@ public sealed class CableStayedDefinition
         c.Unresolved = Unresolved.ToList();
         c.Deck = Deck.Clone();
         c.Pylon = Pylon.Clone();
+        c.MorePylons = MorePylons?.Select(p => p.Clone()).ToList();
         c.Stays = Stays.Select(s => s.Clone()).ToList();
         c.Struts = Struts.Select(s => s.Clone()).ToList();
         c.Piers = Piers.Clone();
@@ -45,12 +56,18 @@ public sealed class CableStayedDefinition
     {
         var e = new List<string>();
         if (Deck.Section.Count < 3 && (Deck.TopWidth <= 0 || Deck.Depth <= 0)) e.Add("Cable-stayed deck: give Deck.Section (3+ points) or TopWidth and Depth.");
-        if (Pylon.Legs.Count == 0) e.Add("Cable-stayed pylon: at least one leg is required.");
-        if (string.IsNullOrWhiteSpace(Pylon.Support)) e.Add("Cable-stayed pylon: Pylon.Support (support line name) is required.");
-        if (double.IsNaN(Pylon.BaseElevation)) e.Add("Cable-stayed pylon: Pylon.BaseElevation is required.");
+        int pi = 0;
+        foreach (var py in AllPylons)
+        {
+            string w = pi++ == 0 ? "Pylon" : $"MorePylons[{pi - 2}]";
+            if (py.Legs.Count == 0) e.Add($"Cable-stayed pylon: at least one leg is required ({w}).");
+            if (string.IsNullOrWhiteSpace(py.Support)) e.Add($"Cable-stayed pylon: {w}.Support (support line name) is required.");
+            if (double.IsNaN(py.BaseElevation)) e.Add($"Cable-stayed pylon: {w}.BaseElevation is required.");
+        }
+        int legs = AllPylons.Sum(p => p.Legs.Count);
         foreach (var s in Stays)
         {
-            if (s.Leg < 0 || s.Leg >= Pylon.Legs.Count) e.Add($"Stay group '{s.Name}': leg {s.Leg} does not exist.");
+            if (s.Leg < 0 || s.Leg >= legs) e.Add($"Stay group '{s.Name}': leg {s.Leg} does not exist.");
             if (s.Count < 1 && s.GroundAnchors.Count == 0) e.Add($"Stay group '{s.Name}': Count must be 1 or more.");
         }
         return e;
@@ -99,7 +116,13 @@ public sealed class CsDeckDefinition
     public double BarrierInset { get; set; } = 0.15;
     public string BarrierMaterial { get; set; } = "glass";
     public double BarrierDensity { get; set; } = 2500;
-    public CsDeckDefinition Clone() { var c = (CsDeckDefinition)MemberwiseClone(); c.Section = Section.ToList(); return c; }
+    /// <summary>OPTIONAL steel EDGE GIRDER deck (null = the section sweep): two plate girders under the stay planes, floorbeams, a concrete slab, field
+    /// splices past the stay anchorages and stay anchorages on the girders. Between its <see cref="CsEdgeGirderDeck.FromStation"/> /
+    /// <see cref="CsEdgeGirderDeck.ToStation"/>; the rest of the deck stays the section sweep.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public CsEdgeGirderDeck? EdgeGirders { get; set; }
+
+    public CsDeckDefinition Clone() { var c = (CsDeckDefinition)MemberwiseClone(); c.Section = Section.ToList(); c.EdgeGirders = EdgeGirders?.Clone(); return c; }
 
     /// <summary>The outline used: <see cref="Section"/> or the trapezoid (top flat at height 0).</summary>
     public List<Vec2> Outline()
@@ -158,9 +181,13 @@ public sealed class CsPylonDefinition
     public double FootingX { get; set; }
     /// <summary>The deck bears on the pylon (vertical support at the pylon station in the analysis model and the force estimate).</summary>
     public bool DeckBearsOnPylon { get; set; } = true;
+    /// <summary>OPTIONAL steel stay anchorage trays cast into hollow concrete legs (null = the stays end on the leg; see <see cref="CsTowerAnchorage"/>).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public CsTowerAnchorage? Anchorage { get; set; }
     public CsPylonDefinition Clone()
     {
         var c = (CsPylonDefinition)MemberwiseClone();
+        c.Anchorage = Anchorage?.Clone();
         c.TrunkSection = TrunkSection.Clone(); c.Legs = Legs.Select(l => l.Clone()).ToList(); c.CrossBeams = CrossBeams.Select(b => b.Clone()).ToList();
         return c;
     }
@@ -248,6 +275,9 @@ public sealed class CsStayGroup
     public double Diameter { get; set; } = 0.05;
     public double Area { get; set; }
     public string Type { get; set; } = "parallel strand stay";
+    /// <summary>OPTIONAL: the pylon anchors are moved this far from the leg centerline toward the bridge CL (pylon frame y = 0), e.g. to the inner face
+    /// of a tower leg that stands outside the deck (0 = on the leg centerline).</summary>
+    public double PylonAnchorInset { get; set; }
     public CsStayGroup Clone() { var c = (CsStayGroup)MemberwiseClone(); c.GroundAnchors = GroundAnchors.ToList(); return c; }
 }
 
@@ -296,3 +326,136 @@ public sealed class CsAnalysisDefinition
 
 /// <summary>Clearance target: from / to station along the alignment, elevation of the surface below (top of rail, road crown), required clearance.</summary>
 public sealed record CsClearance(string Name, double FromStation, double ToStation, double SurfaceElevation, double Required, string Source = "");
+
+/// <summary>
+/// Steel EDGE GIRDER deck of a cable-stayed bridge (OPTIONAL <see cref="CsDeckDefinition.EdgeGirders"/>): two welded plate girders, web centerlines at
+/// +- <see cref="GirderOffset"/> from the alignment (plumb webs, flanges level), top of steel = finished grade - slab - haunch; floorbeams square to the
+/// alignment framing into the girder webs (top flanges flush with the girder top flanges) every <see cref="FloorbeamSpacing"/> measured from each pylon;
+/// a concrete slab between <see cref="SlabLeft"/> / <see cref="SlabRight"/>; girder field sections split <see cref="SpliceBeyondAnchor"/> past every deck
+/// stay anchorage (away from its pylon), bolted splice plates (web both faces, flange outside + two inside; bolts not modeled); "rocket launcher" stay anchorages
+/// (<see cref="Anchorage"/>) on the outside of the girder web at every stay whose deck point lies on that girder's pipe axis. Metres.
+/// </summary>
+public sealed class CsEdgeGirderDeck
+{
+    /// <summary>Stations of the edge girder unit (NaN = the deck ends).</summary>
+    public double FromStation { get; set; } = double.NaN;
+    public double ToStation { get; set; } = double.NaN;
+    public double GirderOffset { get; set; }
+    public double WebDepth { get; set; }
+    public double WebThickness { get; set; }
+    public double TopFlangeWidth { get; set; }
+    public double TopFlangeThickness { get; set; }
+    public double BottomFlangeWidth { get; set; }
+    public double BottomFlangeThickness { get; set; }
+    public double SlabThickness { get; set; }
+    /// <summary>Slab edges: distance left / right of the alignment.</summary>
+    public double SlabLeft { get; set; }
+    public double SlabRight { get; set; }
+    /// <summary>Top of steel below the slab bottom (0 = slab on the top flanges).</summary>
+    public double Haunch { get; set; }
+    public double FloorbeamSpacing { get; set; }
+    public double FloorbeamWebDepth { get; set; }
+    public double FloorbeamWebThickness { get; set; }
+    public double FloorbeamTopFlangeWidth { get; set; }
+    public double FloorbeamTopFlangeThickness { get; set; }
+    public double FloorbeamBottomFlangeWidth { get; set; }
+    public double FloorbeamBottomFlangeThickness { get; set; }
+    /// <summary>OPTIONAL deeper floorbeams at the stay anchorages (web depth; 0 = <see cref="FloorbeamWebDepth"/>).</summary>
+    public double FloorbeamAtAnchorWebDepth { get; set; }
+    /// <summary>OPTIONAL LONGITUDINAL SUPPORTS (stringers) framed between the floorbeams, top flush with the top of steel: offsets from the alignment
+    /// (right +); empty = none. Each one carries a longitudinal closure pour of a precast deck.</summary>
+    public List<double> StringerOffsets { get; set; } = new();
+    public double StringerWebDepth { get; set; }
+    public double StringerWebThickness { get; set; }
+    public double StringerFlangeWidth { get; set; }
+    public double StringerFlangeThickness { get; set; }
+    /// <summary>OPTIONAL precast deck (null = a cast-in-place slab): panels between the members, cast-in-place closure pours over every member.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public CsPrecastDeck? Precast { get; set; }
+    /// <summary>Field splice this far past the FAR END of each deck stay anchorage (its bearing plate; the anchor point without an anchorage), away from
+    /// its pylon (0 = no splices).</summary>
+    public double SpliceBeyondAnchor { get; set; }
+    public double SpliceLength { get; set; }
+    public double SpliceWebPlateThickness { get; set; }
+    public double SpliceFlangePlateThickness { get; set; }
+    public CsStayAnchorage? Anchorage { get; set; }
+    /// <summary>Top of steel below the finished grade.</summary>
+    public double TopOfSteelBelowGrade => SlabThickness + Haunch;
+    /// <summary>Overall depth: grade to the bottom of the girder bottom flange.</summary>
+    public double Depth => SlabThickness + Haunch + TopFlangeThickness + WebDepth + BottomFlangeThickness;
+    public CsEdgeGirderDeck Clone()
+    {
+        var c = (CsEdgeGirderDeck)MemberwiseClone(); c.Anchorage = Anchorage?.Clone(); c.StringerOffsets = StringerOffsets.ToList(); c.Precast = Precast?.Clone(); return c;
+    }
+}
+
+/// <summary>
+/// PRECAST deck of an edge girder deck (OPTIONAL <see cref="CsEdgeGirderDeck.Precast"/>): full-depth precast panels between the members and cast-in-place
+/// CLOSURE POURS over every member they meet - each floorbeam (transverse), each edge girder (longitudinal, out to the slab edge) and each longitudinal
+/// support (<see cref="CsEdgeGirderDeck.StringerOffsets"/>). A closure is the member's top flange width less a panel seat on each flange edge (the
+/// panels bear on the flange edges); the longitudinal closures run through, the floorbeam closures stop at them. Metres.
+/// </summary>
+public sealed class CsPrecastDeck
+{
+    /// <summary>Panel bearing on each supporting flange edge (closure width = flange width - 2 x seat).</summary>
+    public double PanelSeat { get; set; }
+    /// <summary>Minimum closure width when the flange is narrow (0 = none).</summary>
+    public double MinClosureWidth { get; set; }
+    public CsPrecastDeck Clone() => (CsPrecastDeck)MemberwiseClone();
+}
+
+/// <summary>
+/// "Rocket launcher" stay anchorage (OPTIONAL <see cref="CsEdgeGirderDeck.Anchorage"/>), bolted to the OUTSIDE face of the edge girder web over its full
+/// depth (New NY / Tappan Zee bridge, Scollard et al., Figure 10): a STEM MOUNTING plate flat on the web along the stay, a STEM plate standing out from it
+/// to the ANCHOR PIPE welded on its outer edge, an ANCHOR TOP FLANGE under the girder top flange and an ANCHOR BOTTOM FLANGE on the girder bottom flange
+/// (both from the web face out past the pipe), and the pipe on the stay axis from above the deck down past the girder bottom flange, where the stay socket
+/// bears on a BEARING PLATE (= the stay's lower anchor). The stay group's deck point (DeckOffset / DeckAnchorHeight) is the working point on the pipe
+/// axis; the axis is <see cref="AxisOutboard"/> from the web centerline. Metres.
+/// </summary>
+public sealed class CsStayAnchorage
+{
+    /// <summary>Pipe axis outboard of the girder web centerline (horizontal).</summary>
+    public double AxisOutboard { get; set; }
+    /// <summary>Pipe upper end this far above the top of steel (vertical, measured on the axis).</summary>
+    public double PipeAboveTopOfSteel { get; set; }
+    /// <summary>Pipe lower end (bearing plate) this far below the bottom of the girder bottom flange (vertical, on the axis).</summary>
+    public double PipeBelowBottomFlange { get; set; }
+    public double PipeDiameter { get; set; }
+    public double PipeWall { get; set; }
+    public double BearingPlateSize { get; set; }
+    public double BearingPlateThickness { get; set; }
+    public double StemThickness { get; set; }
+    public double MountingPlateWidth { get; set; }
+    public double MountingPlateThickness { get; set; }
+    /// <summary>Anchor top / bottom flanges: length along the girder and thickness.</summary>
+    public double FlangeLength { get; set; }
+    public double FlangeThickness { get; set; }
+    public CsStayAnchorage Clone() => (CsStayAnchorage)MemberwiseClone();
+}
+
+/// <summary>
+/// Steel STAY ANCHORAGE TRAYS cast into a hollow concrete tower leg (OPTIONAL <see cref="CsPylonDefinition.Anchorage"/>; New NY (Tappan Zee) Bridge,
+/// Scollard et al., Figure 8). One tray per stay level of a leg (stays of one leg at the same height share it: the main-span and the side-span stay, an
+/// OPPOSING PAIR). The tray runs along the bridge between the inner faces of the leg's transverse walls (END PLATES embedded in them), its PRIMARY WEB
+/// on the inner face of the longitudinal wall toward the bridge CL, the SECONDARY WEB <see cref="TrayWidth"/> outboard of it, FLOOR and TOP plates. Each
+/// cable enters through the transverse wall facing its span (GUIDE PIPE from the leg face to the end plate), crosses the tray and anchors on a BEARING
+/// PLATE at the far end (<see cref="BearingFromEnd"/> inside the far end plate) carried by two RIB plates to that end plate: the tray ties the opposing
+/// pull across the leg. The two cables pass side by side, +-<see cref="CableOffset"/> across from the tray centre. Requires a hollow leg section
+/// (<see cref="CsSection.Wall"/> > 0). Studs, spacer plates and the openings in the walls / end plates are not modeled. Metres.
+/// </summary>
+public sealed class CsTowerAnchorage
+{
+    public double TrayWidth { get; set; }
+    public double TrayHeight { get; set; }
+    public double WebThickness { get; set; }
+    public double FloorThickness { get; set; }
+    public double EndPlateThickness { get; set; }
+    public double BearingPlateSize { get; set; }
+    public double BearingPlateThickness { get; set; }
+    public double BearingFromEnd { get; set; }
+    public double RibThickness { get; set; }
+    public double GuidePipeDiameter { get; set; }
+    public double GuidePipeWall { get; set; }
+    public double CableOffset { get; set; }
+    public CsTowerAnchorage Clone() => (CsTowerAnchorage)MemberwiseClone();
+}

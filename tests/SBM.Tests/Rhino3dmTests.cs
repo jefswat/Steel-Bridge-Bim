@@ -9,6 +9,7 @@ using RG = Rhino.Geometry;
 
 namespace SBM.Tests;
 
+[Collection(RhinoNativeCollection.Name)]
 public class Rhino3dmTests
 {
     private static string TempFile(string name) => Path.Combine(Path.GetTempPath(), $"sbm-test-{Guid.NewGuid():N}-{name}");
@@ -410,6 +411,128 @@ public class Rhino3dmTests
             }
             var rm = doc.Export3dm(TempFile("meshes.3dm"), detail: false, exactCurved: false);
             Assert.Equal(0, rm.NurbsBreps);
+        }
+        finally { File.Delete(path); }
+    }
+
+    // ------------------------------------------------------------ deck elements as closed exact B-reps (2026-10-27)
+
+    /// <summary>Exports a bridge and checks every deck element (slab, haunches, bumps, barriers / curbs, joint blockouts / devices / end blocks,
+    /// cap haunches): written as closed, valid B-reps or extrusions (no meshes), each element's read-back volume within 0.1 % of the generator's
+    /// exact volume (user text Volume_m3), every object inside the element's mesh bounds (+ 1 mm).</summary>
+    private static void AssertDeckSolids(SbmDocument doc, string name)
+    {
+        string path = TempFile(name + ".3dm");
+        try
+        {
+            var r = doc.Export3dm(path, detail: false);
+            string why = string.Join("; ", r.FallbackItems.Concat(r.MeshItems)) + " | " + doc.Concrete().Nurbs?.Summary();
+            Assert.True(r.Fallbacks == 0, why);
+            string units = Rhino3dmInfo.Read(path).Units;
+            double s = units == "Feet" ? 0.3048 : units == "Meters" ? 1 : throw new InvalidOperationException(units);
+            var objs = Rhino3dmInfo.Objects(path, "3D-DECK|3D-BARRIER|3D-JOINTS");
+            Assert.NotEmpty(objs);
+            foreach (var o in objs)
+            {
+                Assert.True(o.Type is "Brep" or "Extrusion", $"{o.Name}: {o.Type} ({why})");
+                Assert.True(o.Valid && o.Closed, $"{o.Name}: valid {o.Valid}, closed {o.Closed}");
+            }
+            foreach (var g in objs.GroupBy(o => (o.Element, o.Name)))
+            {
+                double v = g.Sum(o => o.Volume) * s * s * s, model = double.Parse(g.First().ModelVolumeM3, System.Globalization.CultureInfo.InvariantCulture);
+                Assert.True(Math.Abs(v / model - 1) < 0.001, $"{g.Key.Name}: 3dm {v:0.######} m3 vs model {model:0.######} m3");
+            }
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public void DeckElements_KinkedEnd_OverhangSoffit_CustomBarrierZone_JointsAndEndBlocks_AreClosedBreps()
+    {
+        var doc = SbmDocument.Sample();
+        var b = doc.Bridge();
+        doc.Regenerate();
+        // kink the begin deck end (the part left of the alignment 0.4 m into the deck), as KinkedDeckEndTests
+        var al = doc.Alignment(b.AlignmentName);
+        var dr = doc.Model().Framing.Deck!;
+        var o = dr.BeginLinePoint; var t = dr.BeginLineDirection; var n = t.Left;
+        b.Supports[0].DeckEndPoints = new[] { o - t * 30 + n * 0.4, o - t * 0.5 + n * 0.4, o, o + t * 30 }
+            .Select(q => { var so = al.Inverse(q); return new SBM.Core.Bridge.DeckEndPoint(so.Station, so.Offset); }).ToList();
+        // sloped overhang soffit
+        b.Deck.Overhang = new SBM.Core.Bridge.DeckOverhangDefinition { TipThickness = SBM.Core.Units.UnitSystem.In(9), RootThickness = SBM.Core.Units.UnitSystem.In(11.75), Length = SBM.Core.Units.UnitSystem.In(25) };
+        // custom barrier with a bump-out zone on a deck widening
+        double Ft(double x) => SBM.Core.Units.UnitSystem.Ft(x);
+        double In(double x) => SBM.Core.Units.UnitSystem.In(x);
+        b.Deck.Barrier.Type = SBM.Core.Bridge.BarrierType.Custom;
+        b.Deck.Barrier.Profile = new() { new(0, 0), new(Ft(1.5), 0), new(Ft(1), Ft(3), radius: In(2)), new(0, Ft(3)) };
+        b.Deck.Barrier.Zones = new()
+        {
+            new SBM.Core.Bridge.BarrierZone
+            {
+                Name = "bump", Support = b.Supports[1].Name, Length = Ft(4), DeckWidening = Ft(1), DeckWideningLength = Ft(5),
+                Profile = new() { new(-In(6), 0), new(Ft(1.5), 0), new(Ft(1.5), Ft(3)), new(-In(6), Ft(3)) },
+            },
+        };
+        // expansion joints with blockouts (the begin one on the kinked end) and end blocks
+        foreach (var sp in new[] { b.Supports[0], b.Supports[^1] })
+            sp.ExpansionJoint = new SBM.Core.Bridge.ExpansionJointDefinition
+            {
+                Type = SBM.Core.Bridge.ExpansionJointType.Modular, BlockoutWidth = In(25), GapAt50F = In(9), BlockoutDepth = Ft(1) + In(2),
+                EndBlock = new SBM.Core.Bridge.DeckEndBlockDefinition { Depth = Ft(2) + In(2), FlatLength = Ft(3) + In(4.5) },
+            };
+        doc.Regenerate();
+        Assert.False(doc.Model().Framing.HasErrors);
+        var c = doc.Concrete();
+        Assert.Equal(2, c.Joints.Count(j => j.EndBlock != null));
+        Assert.NotEmpty(c.DeckBumps);
+        AssertDeckSolids(doc, "deck-kinked");
+    }
+
+    [Fact]
+    public void DeckElements_ShelfUnderShallowBlockout_And_DefaultBarrier_AreClosedBreps()
+    {
+        var doc = SbmDocument.Sample();
+        var b = doc.Bridge();
+        foreach (var sp in new[] { b.Supports[0], b.Supports[^1] })
+            sp.ExpansionJoint = new SBM.Core.Bridge.ExpansionJointDefinition
+            {
+                Type = SBM.Core.Bridge.ExpansionJointType.Modular, BlockoutWidth = SBM.Core.Units.UnitSystem.In(25), GapAt50F = SBM.Core.Units.UnitSystem.In(9),
+                BlockoutDepth = 0.1,
+            };
+        doc.Regenerate();
+        AssertDeckSolids(doc, "deck-shelf");
+    }
+
+    [Fact]
+    public void CivilItems_RoadUtilities_Layers_GlobalIds_Closed()
+    {
+        var doc = SbmDocument.Sample();
+        var al = doc.Project.Alignments[0];
+        double s0 = al.StartStation + 5;
+        doc.Project.Roads.Add(new SBM.Core.Road.RoadDefinition
+        {
+            Name = "Road R", AlignmentName = al.Name, BeginStation = s0, EndStation = s0 + 20,
+            Right = new() { Components = { new() { Name = "Lane", Width = 3.6, Courses = { new() { Name = "Surface", Thickness = 0.1, Material = "HMA" } } } } },
+        });
+        var p = al.PointAt(s0, 30);
+        var net = new SBM.Core.Utility.UtilityNetworkDefinition { Name = "Storm R" };
+        net.Structures.Add(new() { Name = "MH-1", X = p.X, Y = p.Y, RimElevation = 100, SumpElevation = 97, InnerDiameter = 1.2, WallThickness = 0.125, FloorThickness = 0.2 });
+        net.Pipes.Add(new() { Name = "P-1", From = "MH-1", EndX = p.X + 20, EndY = p.Y, InvertStart = 97.2, InvertEnd = 97.0, InnerDiameter = 0.45, WallThickness = 0.06 });
+        doc.Project.Utilities.Add(net);
+        string path = Path.Combine(Path.GetTempPath(), "sbm-civil-" + Guid.NewGuid().ToString("N")[..8] + ".3dm");
+        try
+        {
+            doc.Export3dm(path, detail: false);
+            var objs = Rhino3dmInfo.Objects(path, "^Roads::|^Utilities::");
+            var road = objs.Where(o => o.Layer.StartsWith("Roads::Road R::3D-ROAD-LANE")).ToList();
+            Assert.Single(road);
+            var util = objs.Where(o => o.Layer.StartsWith("Utilities::Storm R::3D-UTIL-STORM")).ToList();
+            Assert.Equal(2, util.Count);
+            Assert.All(road.Concat(util), o => Assert.True(o.Closed && o.Valid, $"{o.Name}: {o.Type} closed {o.Closed} valid {o.Valid}"));
+            var um = doc.Utilities();
+            var tags = SBM.IO.Database.ModelDatabase.BuildTagIndex(doc.Project, Array.Empty<SBM.IO.Ifc.IfcBridgeData>(), utilities: um);
+            Assert.Contains(util, o => o.Name == "MH-1" && o.GlobalId == tags.Lookup(um[0].Structures[0]));
+            Assert.All(road.Concat(util), o => Assert.Equal(22, o.GlobalId.Length));
         }
         finally { File.Delete(path); }
     }

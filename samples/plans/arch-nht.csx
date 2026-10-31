@@ -462,8 +462,9 @@ deck.PtSystem = new ArchPtSystem
     AnchorWedgeUnresolved = U("p.155 anchorage plan / Section A-A", "PT anchorage block at the end web", "the tapered block between the skewed end web and the anchorage casting is drawn but not labelled (pocket former, bearing block or part of the anchorage)",
         "Part of the anchorage envelope: back on the end web inside face, front square to the tendon 10 1/2\" from the face at the tendon CL (scaled)."),
 };
-deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb LT", InnerOffset = -F(7) });
-deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb RT", InnerOffset = F(7) });
+// 3/4" chamfers on both top edges (p.83 concrete note 3, drawn on p.90 / p.152; agent review NHT arch curbs A01), as the approach curbs
+deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb LT", InnerOffset = -F(7), Chamfer = In(0.75) });
+deck.Curbs.Add(new ArchCurbDefinition { Name = "Curb RT", InnerOffset = F(7), Chamfer = In(0.75) });
 arch.Deck = deck;
 // PT tendons through the floorbeam openings (p.145: A from the north (left looking upstation) tie, B from the south tie, pairs 1'-4, 7" above the flange bottom).
 var tie = arch.Ties.ToDictionary(t => t.Name);

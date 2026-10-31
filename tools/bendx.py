@@ -1,10 +1,10 @@
 # Extract bend-diagram dimensions per mark from a plan sheet; compare to the bar list length.
 import sys, re, csv, itertools, json
-sys.path.insert(0, r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\tools')
+sys.path.insert(0, r'C:\SBM\.worktrees\bends\tools')
 import pymupdf as fitz
 import plantext
 
-ROOT = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler' + '\\'
+ROOT = r'C:\SBM' + '\\'
 PDFS = {'116': ROOT + r'dist\SteelBridgeModeler\B00168 - CBIS-ESI-Westbound I-80 - Design 116.pdf',
         '316': ROOT + r'dist\SteelBridgeModeler\B00169 - CBIS-ESI-Ramp G - Design 316.pdf'}
 FR = {1: 1/2, 2: 1/4, 3: 3/4, 4: 1/8, 5: 3/8, 6: 5/8, 7: 7/8, 8: 1/16, 9: 3/16, 10: 5/16, 11: 7/16, 12: 9/16, 13: 11/16, 14: 13/16, 15: 15/16}

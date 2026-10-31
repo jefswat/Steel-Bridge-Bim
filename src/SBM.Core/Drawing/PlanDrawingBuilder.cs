@@ -204,6 +204,60 @@ public static class PlanDrawingBuilder
 }
 
 /// <summary>Plan outlines of caps, pedestals, columns and foundations (hidden below the deck).</summary>
+/// <summary>Road corridors in plan: template top edges and daylight lines (<see cref="Road.RoadModel"/>).</summary>
+public static class RoadPlanBuilder
+{
+    public static void Add(PlanDrawing dwg, IEnumerable<Road.RoadModel> roads)
+    {
+        foreach (var r in roads)
+        {
+            foreach (var e in r.EdgeLines.Where(e => e.Length >= 2)) dwg.Layer(Layers.RoadEdge).Poly(e);
+            foreach (var d in r.Daylight.Values.Where(d => d.Count >= 2)) dwg.Layer(Layers.RoadDaylight).Poly(d);
+        }
+    }
+}
+
+/// <summary>Grading in plan: the feature lines and the daylight lines (<see cref="Grading.GradingModel"/>).</summary>
+public static class GradingPlanBuilder
+{
+    public static void Add(PlanDrawing dwg, IEnumerable<Grading.GradingModel> gradings)
+    {
+        foreach (var g in gradings)
+        {
+            if (g.FeatureLine.Count >= 2) dwg.Layer(Layers.Grading).Poly(g.FeatureLine.ToArray());
+            foreach (var d in g.Daylight.Where(d => d.Count >= 2)) dwg.Layer(Layers.GradingDaylight).Poly(d.ToArray());
+        }
+    }
+}
+
+/// <summary>Utility networks in plan: pipe centrelines (at the inverts) and structure outlines, labelled with the names (<see cref="Utility.UtilityModel"/>).</summary>
+public static class UtilityPlanBuilder
+{
+    public static void Add(PlanDrawing dwg, IEnumerable<Utility.UtilityModel> networks)
+    {
+        foreach (var n in networks)
+        {
+            var l = dwg.Layer(Layers.Utility(n.Definition.System));
+            foreach (var p in n.Pipes.Where(p => p.IsBuilt)) l.Line(p.Start, p.End);
+            foreach (var s in n.Structures.Where(s => s.IsBuilt && s.Outline.Count >= 3))
+            {
+                var z = s.Rim;
+                l.Poly(s.Outline.Select(q => q.WithZ(z)).Append(s.Outline[0].WithZ(z)).ToArray());
+            }
+        }
+    }
+}
+
+/// <summary>Retaining walls in plan: front face at the top of wall, footing toe and heel lines (<see cref="Wall.RetainingWallModel"/>).</summary>
+public static class WallPlanBuilder
+{
+    public static void Add(PlanDrawing dwg, IEnumerable<Wall.RetainingWallModel> walls)
+    {
+        foreach (var w in walls)
+            foreach (var l in w.PlanLines.Where(l => l.Length >= 2)) dwg.Layer(Layers.Wall).Poly(l);
+    }
+}
+
 public static class SubstructurePlanBuilder
 {
     public static void Add(PlanDrawing dwg, Substructure.SubstructureModel model)

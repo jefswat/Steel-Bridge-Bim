@@ -880,3 +880,174 @@ Results (run order truss-ptc-arch -> ... -> girder-details-ptc -> rivets-ptc on 
 - Steel 35,520,039 -> 35,517,730 lb (91.0 % of p.42 unchanged); approach parts -84 / -72 per unit (no web extensions: the beams reach their angle backs). Rivets 504,376 ->
   504,370. Tests 589 -> 593. IFC (Parametric) 263.0 -> 264.1 MB, 2,662,962 -> 2,646,939 entities (cut / coped members are face sets); validate_ifc 0 schema + 0 EXPRESS issues
   (2,000 instances per type).
+
+## 26. Main span review fixes, batch 1 (2026-10-27; `qc/ptc/main-span/TODO.md` 1a-1e; tests `TrussBatch1Tests`)
+All inputs OPTIONAL, omitted from the .sbm when unset (Woodbury IFC byte-identical).
+- 1a `TrussDefinition.JointRivetGripsFromSteel` (rivets-ptc.csx): after the joint rivets are placed, each grip is re-taken from the steel along the shank
+  (`TrussGeneratorRivetGrips.cs`, `SteelLineProbe` over the parts built so far): head on the outer face of the steel it lies in (outward run > 1 1/2 in. = another
+  part standing on the gusset, e.g. a bracing edge angle leg: head kept, counted as a clash), or onto the first steel when it floats; end = far face of the last
+  steel starting inside the section-rule grip (contiguous steel past it followed up to 1 1/2 in.). Air left inside a grip = one CHECK warning (missing fills /
+  inlays, batch 3). The review probe (work3) mis-counted touching plies as air; corrected probe `qc/ptc/main-span/work4/layers.csx`.
+- 1b `TrussSectionDefinition.Rotated` also turns LacedChannels / Box sections 90 deg ((x, y) -> (-y, x)): p.71 "2'-8 1/4 b.b. [" = depth (STRUT, LAT31, LAT50),
+  "1'-1 5/8 b.b. [" (L13-W14 floor lateral, FLAT21; FLAT21 was 13 in. b.b.). Bracing plates / edge angles / rivets moved with it (batch 5).
+- 1c `TrussStringerLine.ContinuousBays` / `RunTypes`: p.72 diagram = pavement breaks at 2-6-10-14-18-22 (symmetric about 22): 2-span S13-S16 over 0-2 / 2'-0',
+  4-span S9-S12 between, 12 members per line; one part per member (one straight solid per bay, kinked at the floor beams). Which inner 24 WF 94 line is S12 is not
+  legible ("S11 / S12"); the p.72 stringer splice (middle support of the 4-span) is not built.
+- 1d `TrussDefinition.PartPerPiece` (truss-ptc-arch / truss-ptc-approach / girders-ptc.csx): every section piece / lacing face its own part
+  (`SteelPart.Member` = member mark, `SteelPart.Piece` = kind, mark `<member>-<W|A|C|CH|R|P|LB><n>`), gussets / layers / joint plates `Member` = `<plane>-J<point>`.
+  IFC IfcElementAssembly 'BUILT_UP_MEMBER' / 'GUSSET_STACK' (`IfcKeys.Member`) aggregating the pieces (IfcPlate WEB / COVER_PLATE, IfcMember 'ANGLE' / 'CHANNEL');
+  DB level "member"; clash check skips pairs of one member; scripts measure whole members via `SteelPartGroups.WholeMember(s)`; PTC sheet rules at level part
+  also take level member.
+- 1e App (not visually verified): pick level member (default) / part (toggle "Pick: member", Alt+click flips), DB panel "Sub-elements" list, view toggle
+  "Sub-elements" (piece edges + tints), isolate of a member selection = its pieces (`MainWindow.SubElements.cs`, logic `SBM.Core/Geometry/SubElements.cs`).
+
+## 27. Main span review fixes, batch 2: bearings (2026-10-28; `qc/ptc/main-span/TODO.md` 2a-2c, findings BW-B1..B6; tests `TrussBatch2Tests`)
+Generic, all OPTIONAL (omitted from the .sbm when unset; Woodbury IFC byte-identical vs a baseline build of the same tree without these changes):
+- `TrussJointDefinition.GussetExtension` / `TrussGussetLayer.Extension` (`TrussGussetExtension` BottomV / FromU / ToU / Source / Unresolved): the gusset outline (drawn or the
+  envelope) becomes the convex hull of itself and the bottom edge, cut off below it (non-convex outlines: warning, not extended). A layer without its own extension follows the
+  inner gusset (empty outline = the extended joint outline; own outline = clipped to the extended inner gusset); with one it gets its own bottom (batch 3a can stop a layer higher / lower).
+- `TrussShoePieceKind.Angle` (-> PartCategory.TrussConnectionAngle) and `TrussShoeDefinition.Fasteners` (`TrussShoeFastener`: grid Us x Ns x Zs in the shoe frame, mirrors; Rivet =
+  grip = contiguous steel along the shank probed through the parts built so far (`SteelLineProbe`, `MergeRivet`), head away from the truss plane; TapBolt = bolt of its own material
+  (IFC .BOLT. with that material) whose frame starts at the bottom of the tapped hole, so the hex + washer of the bolt solid sit on the plate). `Truss/TrussGeneratorShoeFasteners.cs`.
+PTC (`shoes-ptc.csx`, re-run on the committed model, --no-pipeline):
+- 2a L11 / L11' (p.80 re-read at 400-800 dpi, p.96): Half Section E = 2'-5 from El. 98.2010 to the FIN. line (gusset bottom), 2'-4 to the bottom of the shoe angle, "1 in. KEEP";
+  p.96 = forging shoulders 2'-4 below the panel point with a 2'-6 1/2 Fin. seat 1 in. lower between 10 3/4 shoulders. The seat fits the plan stack (b. to b. of the shoe angles
+  2'-6 1/2 = 2'-5 o. to o. 1 1/8 + 2 x 3/4) but not the modeled stack (1 1/8 at 2'-5 IN to in + 3/4 + 3/4 = 2'-10 1/4 o. to o.) -> every layer carried down to the SHOULDER line
+  2'-4 over 4'-1 along the truss; seat and last inch not built (flag + CONFLICT row "p.80 Section F", batch 3a). Shoe angles: OUTER 1-L 8 x 8 x 7/8 (S) x 4'-1 each side (Section F
+  4'-1 = 2'-0 1/2 + 2'-0 1/2; the review's "8 x 6" are the INNER angles), back on the stack face, 2 x 11 tap bolts, 2 x 10 rivets 1 1/4 through the vertical leg + stack (grip 3 1/2);
+  INNER 4 x 1-L 8 x 6 x 7/8 (6 in. leg on the shoe, 8 in. leg against a transverse plate drawn black in Section F, not in the model; 9 1/4 long, scaled) with 2 tap bolts each.
+  Tap bolts 1 1/4 manganese (p.80 note, ASTM A195-52T; Detail X: shoulder 2 1/2 under the head, 2 in. thread of 1 in.) - not 1 1/2. Ends clipped / gages / pitches drawn only (flagged).
+- 2b L0 / L0' (p.73 dimension column at 600 dpi): CL chord -> sole top 1'-6 3/4, sole 5 3/4 to the pin = 2 1/2 flat + 3 1/4. Sole = 19 in. flat from pin + 3 1/4 to + 5 3/4, top BEVELED
+  to the chord slope (2.864 %, 5 3/4 on the CL as listed) + a 9 in. block over the stem from the pin CL with a half bore on the 3 in. pin (part below the flat flagged); stem top at the pin CL
+  (29 1/4 on the 6 3/4 base). Under the chord: 7/8 plate (fill category) 24 x 19, square to the chord and centred on the pin vertical - the elevation hatches it without a callout; the END
+  VIEW '17 x 7/8 Tension Pl.' / '17 x 13/16 Fills' (rev. 2 3-9-56) are on TOP of the end strut, through gusset slots, not under the chord -> identity / width flagged.
+- 2c pier 19 masonry plate 104 -> 110 in. across (p.96 View A 9'-2 x 9'-2, "Masonry Pl. 110 x 6 3/4 x 9'-2", as-built revision 1 3-9-56; the side view still draws 8'-8).
+Gaps (vertical rays on a grid round each pin, scratch `gaps.csx`; inches):
+| shoe | before | after |
+|---|---|---|
+| L0 / L0' x 2 | chord -> sole 0.24..1.38 (0.49 at the pin), pin 1 1/8 in the sole (clash) | chord -> 7/8 plate -> sole -0.008 (contact; vertical vs square-to-chord chain) over the plate width; 1.49 under the chord angle legs beyond the 24 in. plate (width flagged); pin clear |
+| L11 / L11' x 2 | gussets / chord -> forging 10.1 (13.0 under L11-L12) | gussets -> forging 0.000, angles -> forging 0, angle backs on the stack (rivet grip 3 1/2 = contiguous); box interior between the gussets open as before (transverse plate not built) |
+| all | masonry / casting base -> pier top 0; shoe pieces touching | unchanged 0 |
+Clashes within 6 ft of the shoes 44 -> 40 (pin-in-sole x 4 gone, none new; left: L10-L11 / L11-L12 web ply mitres x 32 = batch 3a / 4c, platform rails / grating x 8 = batch 6).
+Checks: check-truss-ptc 608 PASS / 11 DIFF / 66 INFO (unchanged; steel C + S 14,504,217 -> 14,512,863 lb, L11 gusset envelopes 29.1 -> 35.1 SF), check-ptc-delaware-river 390 PASS / 36 DIFF (unchanged).
+
+## 28. Main span review fixes, batch 3: gusset layering (2026-10-28; `qc/ptc/main-span/TODO.md` 3a-3c, findings GL01-GL11; tests `TrussBatch2Tests.InlaidPly_*`)
+Generic, OPTIONAL (omitted when unset; Woodbury IFC identical): `TrussPly.InlaidAt` (points where the ply stops at the gusset because the gusset is inlaid in its layer; it runs on
+at its other end and counts for the member width elsewhere; the gusset-width CHECK ignores it at those points) and `TrussJointPlate.UnderGusset` (length / centre = the inner gusset
+outline over the plate's band, `GussetExtentAlong`).
+- 3a L11 / L11' (p.80 re-read at 400-600 dpi + dark-line profiles of Half Section E): Section E prints '2'-5 o. to o. 1 1/8 Gus. Pls.' over the post webs '2'-2 3/4 o. to o.' ->
+  the 1 1/8 gussets are 2'-2 3/4 in. to in. (was 29), inlaid in the chord outer 1 1/8 web layer ('End of 1 1/8 webs' on L10-L11 and L11-L12; `InlaidAt` L11 / L11' set by
+  connections-ptc.csx section 5). Four plates per face (1 1/8 + 3 x 3/4, gusset-layers.csv): first 3/4 whole joint; second 3/4 up to ~7'-0 and outer 3/4 up to ~3'-9 above
+  El. 98.2010 (Section E steps at sheet y 0.37 / 0.47, 2.08 pt per in.; the review read 7'-2 / 3'-5). Section F prints 2'-6 1/2 b. to b. of the shoe angles = 1 1/8 + one 3/4 at
+  the shoe, Section E draws all four down to FIN. -> CONFLICT, the printed Section F governs: 1 1/8 + first 3/4 carried down to the 2'-5 FIN. line in the 1 in. forging seat
+  (p.96 2'-6 1/2 Fin., now built in shoes-ptc.csx), second / outer 3/4 cut at the chord bottom; shoe angles back at 15 1/4 = Section F (the batch 2 Section F conflict is resolved).
+  Not built (flag "chord web ply ends and the L11 splice"): the o.s. / i.s. 3/4 web ply ends, '2-Spl. Pls. 34 x 7/8 (S) outside', '31 1/2 x 1/2 (S) inside', '1-3/4 Fill (C)'
+  (extent lines without figures; arrangement in the web stack not determinable). The inner 3/4 / 18 x 1 plies of L10-L11 / L11-L12 still overlap 3/8-1/2 in. at the L11 mitre (12 clash rows).
+- 3b plates under the gussets (GL07): outside web splice plates under the gusset (`UnderGusset`, flagged: extent lines drawn without figures) - U8 / L9 34 x 3/4, U10 / U21 / L21
+  34 x 1 1/8 (L21: splices.csv 'O.S. 34 x 1' vs gussets.csv '34 x 1 1/8' and the printed 2'-7 1/4 in. to in. -> 1 1/8, CONFLICT row), U22 pin plates 34 x 1 1/8 + 34 x 1 + 34 x 1
+  (2'-11 1/4 o. o.). Inlay plates (L10 / L12 / U8 / L9 / U10, same layer as the continuous model ply), inside splice plates, fills and the U22 31 1/2 x 7/8 inside pin plates: not built
+  (inside the web stack, no gusset float). Corrected probe (work4/layers.csx) grid points with air under the inner gusset, one face: U8 262 -> 70, L9 329 -> 84, U10 312 -> 80,
+  U21 473 -> 136, L21 546 -> 159, L11 120 -> 18 (the rest = outside the 34 in. web band / fills at member ends).
+- 3c gusset-layers.csv: U0 in-to-in 34 -> 29 (p.73), rows for L1 (1/2, 'similar to L3'), U22 (1/2, 35 1/4), W14 (p.85 PLAN '2'-5 In to In Guss.', thickness not given -> 3/4 flagged;
+  W14 joint now 29 in. to in.: the gusset no longer overlaps the hanger, G03). L5 '2-3/4 Fills (C)' (p.75): small chamfered fills at the top / bottom flange-angle corners left of L5,
+  no width / length, the model has no step for them to fill (L4-L5 / L5-L6 webs 34 x 1 1/8 both, flat gusset) -> not built, reported. W14 / L5 rows stay flagged.
+Checks: check-truss-ptc 608 PASS / 11 DIFF / 70 INFO (the 4 L11 stack rows now 4 layers / 3 3/8 in., medium confidence; C + S 14,512,863 -> 14,547,702 lb, splice plates +34.8 k lb),
+check-ptc-delaware-river 390 / 36 (unchanged). Shoe gaps unchanged from batch 2 (L11 gussets now bear at 2'-5 in the seat), clashes within 6 ft of the shoes 40 -> 32.
+
+## 29. Main span review fixes, batch 4: joint gussets and rivets (2026-10-28; `qc/ptc/main-span/TODO.md` 4a-4f, findings R01-R08 / G01-G07; tests `TrussBatch4Tests`)
+Generic, OPTIONAL (omitted when unset; other models unchanged):
+- `TrussModel.DroppedRivets` (result only): every drawn rivet position (`TrussRivetGroup.Positions`) that was not placed, with joint (u, v), member (s, y) and the reason
+  "range" (beyond the member's cut length), "head" (on another rivet's head), "stack-outside" (outside the member section's in-plane extent), "stack" (no clean stack).
+- `TrussEndCut.ParallelToChord` (appended): a web member end on a plane parallel to the chord face(s) it meets (+ `WebMemberClearance`); kinked chords = the mean face.
+- `TrussJointDefaults.WebToWebClearance` (null = off): web members ending at the same point are separated - the one needing the smaller extra setback is set back
+  (<= 6 in.); larger overlaps get a corner cut (both ends on the bisector plane through the line where their facing sides meet) or, when one end already has a cut
+  plane, the other end abuts that member's side; what is left is reported (CHECK).
+- `TrussJointPlate.RivetCount / RivetRows / RivetDiameter / RivetMaterial / RivetUnresolved`: rivets through a joint plate (rows equally spaced across, count spread along,
+  1.5 d edge distance), grip probed through the steel under it (`PlacePlateRivets`).
+- `TrussJointDefinition.EdgeAngles` (`TrussGussetEdgeAngle`): angle along a gusset edge on the outer face of the stack (each face), heel on the line, gusset leg toward the
+  inside of the outline, optional rivets on the leg's centre line (grip probed). Pre-AISC sizes via `TrussSections.ParseAngle`.
+PTC (connections-ptc.csx, rivets-ptc.csx; chain connections -> rivets re-run):
+- 4a (R02): rivets-ptc.csx gives members to a point that is not an upper / lower chord point (rigid hanger L14-W14, wind chord L13-W14) their own class by role - they no
+  longer fall into the diagonal classes. The hanger now receives its drawn groups.
+- 4c (G01 / R06): verticals U12-L12 / U13-L13 / U14-L14 and the hanger L14-W14 end parallel to the sloped lower chord (lowest steel 32.8 / 31.1 / 29.7 -> 12.0 / 14.1 / 13.0 in.
+  above the work point); web-to-web clearance 0 in. (gap drawn, not dimensioned): web member overlap clash rows 1,448 -> 124 (left: U11 / U11' post x L10-U11, L10 U9-L10 x
+  U10-L10, reported).
+- 4b (R01): dropped drawn rivets per face (N plane) 3,261 -> 3,233 (range 297 -> 253, stack-outside 1,864 -> 1,892, stack 1,043 -> 1,049, head 57 -> 39); the rest are symbols
+  outside the member section's in-plane extent (profile rivets, plates beyond the gusset) - dump `b4dump.csx` (scratch) / `TrussModel.DroppedRivets`.
+- 4d (G02): 36 edge angle definitions from the 20 drawn strips (rivet-count-zones.csv SKIP '... angle strip ... gusset edge': the outline edge through the strip, clipped to it),
+  2-Ls 4 x 3 1/2 x 7/16 (U11: 5 x 3 1/2 x 7/16), 144 parts; rivets only where a count names one strip (L13 right 7, L15 left 9 / right 4); flagged (length / leg / pitch not
+  dimensioned). U14 / U15 strips: no drawn edge through them (not built, reported); joints without a strip (U8-U10, L9-L12, U18-U21, L18 / L19) not built.
+- 4e (R04): cover splice plates carry the counted rivets (splices.csv rivet_count / rivet_rows, 1 1/8, p.70), grip probed; plates without a scaled length are still not built.
+- 4f (R05 / G04-G07): outlines re-traced on the 300 dpi overlays - L10 top edge on the drawn plate line (7 in. lower; 6 vertical rivets now 'beyond'), U5 top-left corner on the
+  drawn left edge (8 in. right; 5 chord rivets 'beyond'); U11 right edge: the drawn line read as the gusset edge put drawn rivets outside it (it is the chord end line) ->
+  reading kept, unresolved; L11 envelope kept (batch 3a).
+
+## 30. Main span review fixes, batch 5: lateral / sway / portal bracing connections (2026-10-28; `qc/ptc/main-span/TODO.md` 5a-5e, findings B01-B11, C01-C02, BW-S4; tests `TrussBatch5Tests`)
+Generic, all OPTIONAL (omitted from the .sbm when unset; Woodbury IFC identical apart from FILE_NAME):
+- `TrussMemberDefinition.RollToLateralPlane`: a cross-plane bracing section is rolled into its lateral plane (section up = normal of the plane through the axis and
+  the transverse horizontal = the chord panel plane of a K diagonal; a transverse strut: through the axis and the mean chord direction at its first end).
+- `TrussBracingGussetDefinition`: `MemberPlane` (Fitted plate in the plane of the connected members, not the mean chord plane), `MemberFills` (BEVELED fill from the plate face
+  to each member's face plane over its lap where it stands off > 1/16 in.; flat member faces only; PartCategory.FillerPlate `<plate>-F<n>`), `RivetGageEdge` (the 2 / 4 rivet lines
+  spread across each member's own width, outer lines that far from its sides), `PlateToStack` (plate carried to Gap from the stack under the edge angle), `RivetGapTolerance` (grip
+  continues across air gaps up to it, counted in a CHECK warning), `ProbeFaces` (crossing-member face and stack face under the edge angles probed on the built parts - plates /
+  fills of other plates at the point included; plate clipped / carried to them; rivet positions whose steel is one part only are NOT placed, counted per kind in a CHECK warning),
+  `CrossingFaceOffset`, `EdgeAngleAlsoOnStack` (second angle on the stack face beside the one on the crossing member, stopping Gap clear of it; marks `-EA2`).
+- `TrussSectionDefinition.CustomPieces` (`TrussSectionPieceDefinition` Label / Kind / Polygon): the section built from explicit polygons (a skewed built-up box).
+PTC (truss-ptc-arch, bracing-ptc, details-ptc, check-truss-ptc; chain truss-ptc-arch -> rivets-ptc re-run, --no-pipeline):
+- 5a (B01 / B02): laced laterals / struts rolled into the lateral plane, plates in the member plane with beveled fills, 4 rivet lines 2 1/2 in. from each member side, plates
+  carried to the stack under the 2-Ls 7 x 4 x 1/2, faces probed, gap tolerance 3/16 in. Measured (work5/brace.csx, rivets in / at the bracing plates): before 23,723 rivets -
+  11,874 grip only their own plate / angle, 8,618 connect; after 29,472 - 144 own (all floor lateral FX angles, B10), 23,438 connect; bracing member ends without a connecting
+  rivet 392 / 552 -> 56 / 572. Main span bracing rivets placed 16,776 -> 22,992; 3,280 angle-leg positions with no steel behind and 640 within 1 1/4 d of a plate edge not placed
+  (CHECK); 208 grips bridge gaps <= 1/16 in. Joint rivet heads inside an edge angle leg 222 -> 20.
+- 5b (B03, C02): p.71 counts per END (laterals 26, 32 L8-L10, 36 L10-L11, 40 L11-L12, 28 L13-L13 1/2, 38 L15-L16; struts 40, 46 L8-L10, 50 L12, 46 L13 1/2, 16 at L22 / U22;
+  L12-LM13 and the strut through a K apex: no number, p.97 detail kept); check-truss-ptc rows "bracing rivets per end" (15 PASS), CONFLICT rows C01 / C02 (new row kind).
+- 5c (B04 / B05): the sway V was upside down. p.71 SWAY BRACING sketches, p.97 CROSS SECTIONS AT CL BRIDGE and p.85 'Bracing Connection' = diagonals from the floor beam
+  bottom at each truss DOWN to the lower strut CL. Apex at every point 0-12: 2-1/2 Pls + 2-Ls 4 x 4 x 3/4 on the strut / lateral plate (L11: 3 1/2 x 3 x 3/8, 7/8 rivets, p.80);
+  top: 2-1/2 Pls + 4-Ls 6 x 4 x 1/2 (one on the floor beam bottom, one on the post per plate). 26 apex + 52 top plate pairs; sway member ends without a rivet 92 / 104 -> 4 / 104.
+  Not built (flag): 2-Ls 3 1/2 x 3 x 3/8 along the apex plate top edge, 1-Pl 15 x 1 1/8 / 15 x 1 on the strut top (no length).
+- 5d (B06): L13 1/2 at 13'-1 along the CL of chord (p.98), strut 2-18[ 45.8 + 2-Pls 31 x 1/2 (b.b. not printed: 2'-8 1/4 flagged), double K of 33 WF 130: N:L13 1/2 -> F8
+  quarter point (21'-9 from the truss) -> strut CL -> F8 quarter point -> S:L13 1/2. L13 1/2 lies 6.8 ft above L13 (steep chord): the apex gussets on F8 (p.95) are not built (flag) and
+  the 33 WF 130 ends at L13 1/2 are set back far by the corner rule (2 connecting rivets) - open.
+- 5e: portal strut U11 = the p.71 box (W.P. quadrilateral: plumb side PL 34 1/2 x 11/16, side square to CL U11-U12 PL (33-13 1/2) x 11/16, top / bottom parallel to it, 4 corner
+  Ls 6 x 6 x 1/2; manholes, end and knee connections not built, flagged) instead of the 834 sq in envelope (steel -0.29 M lb); LM0 apex plates now built (B07); F8 at L13 (B11):
+  the 3/4 plate selector pointed at the removed L13 plates, now the LM13 apex plates (p.95 Section B). Tongue beam WM22 K connection (B08) unchanged (flag).
+Results: check-truss-ptc 608 / 11 / 70 -> 624 PASS / 11 DIFF / 71 INFO / 2 CONFLICT (C + S steel 14,505,023 -> 14,215,240 lb); check-ptc-delaware-river 390 / 36 (main span
+90.8 -> 89.0 % of p.42). Clash (main span, no bolts) 1,045 -> 1,125: portal box x knee pieces 24 (knee seated on the old envelope, <= 0.28 in.), re-framed sway / plates x CL
+walkway items +24, L13 1/2 edge angle / fill x strut 16 (<= 0.21 in.), sway angle x lateral plate 10. Tests: TrussBatch5Tests 3, Truss* 56 pass; full suite 680 / 681 (the failure is
+DeckSolidsTests.KinkedEnd_* in the Concrete files of the parallel agent).
+
+## 31. Main span review fixes, batch 6: walkways (2026-10-28; `qc/ptc/main-span/TODO.md` 6a-6c, findings BW-W1..W13; tests `TrussBatch6Tests`)
+Generic input (OPTIONAL, omitted when unset): `TrussPlaneItemDefinition.Frame` = `TrussItemFrame` (station / offset / absolute elevation, U = tangent turned `AngleDegrees` toward the
+right, vertical plane or `Horizontal` (V = left of U, W = up)) + `Category` / `AssemblyKind` / `Density`: plane items anywhere along the alignment (wire-rope handlines, ladder cage hoops /
+bars); AgentReview NotRead. All in `walkways-ptc.csx` (main span block rewritten; the approach / girder-span blocks unchanged):
+- 6a (BW-W4, W5): walkway at FB11 / FB11' grating at El. 141.6035 (p.103 Section A; pier 19 'opp. hand' = the same height above FB11'), 3'-0 3/8 to 5'-0 3/8 from the CL floor beam
+  (was 1 3/4 in. above the floor beam bottom, 1'-0 to 3'-0). The grating is 26.5 in. above the FB11 flange angles at the truss end = Section A 2'-2 1/2 (the 27.74 in. printed by the script is measured to the
+  46 ft bottom cover plate; re-review N4). North ladder 53'-2 to it follows.
+- 6b: top chord CAT WALK U0 - U22 on the north truss (p.105, BW-W1): two 1/2 in. ropes 1'-0 each side of the truss CL, 3'-0 above the top chord steel, 2 x 65 posts L 2 1/2x2 1/2x3/8 at
+  10.333 ft (equal spaces, 'about 10'-4'), base probed on a grid over the post footprint on the chord + splice / fill plates; rope = solid 1/2 in. round through the post tops (holes not cut:
+  188 rope x post contact rows); base angles, end posts, sheaves, turnbuckles not built (flag). U22 beacon platform 6'-6 x 5'-1 + strut railing (p.105, BW-W2, W13): railing / posts / toe
+  plates on the highest steel under the platform (El. 264.210 = strut connection plate top; p.105 prints El. 262.762 = the U22 working point); no floor listed (flag). Navigation light
+  platforms W15 / W20 / W19' both wind chords (p.106 Section B, BW-W3): 6'-0 x 4'-6 1/2 grating on 8 [ 13.75, level, seated (5/16 fill) on the highest wind chord top, rails + toe plates on the
+  outboard side and both ends; walk along the wind chord from the cross walk (8 [ 13.75) - level not given (flag); W19' cross walk moved to the light (up-station) side. Main ladders (BW-W9, W10):
+  stiles 9 | 9 (p.103 / p.104), south ladder 15'-0 1/2 at piers 18 / 19, north ladder cage = hoops 2 1/2 x 3/8 R 1'-0 3/8 at ~5'-0 from 6'-9 above the platform to 10 in. under the walkway +
+  5 vertical bars inside (rev. 1); cage depth / connection to the stiles drawn only (flag: semicircle about the ladder CL in the stile plane). Toe plates on the OUTSIDE face of the posts.
+- 6c (BW-W7, W11): pier platform grating 8 13/16 above the top of pier (p.104; was the approach 9 3/8); CONFLICT row text on the cross walks: p.106 WALKWAY MATERIAL 8 [ 13.75 vs the p.106 note
+  'similar to ... Sht. 61' = p.101 10 [ 15.3 - cross walks keep 10 [ 15.3, the walks along the wind chords use 8 [. Platform gratings (all three helpers) now between the channel flange toes,
+  tops flush (they overlapped the top flanges 0.36 in.).
+Not built (flagged): hangers L 4x4x3/8 / connection angles, CL walkway rail make-up per p.106 material list (BW-W12, user decision), light posts / lights, beacon, U0 / U22 rope hardware.
+Results: check-truss-ptc 624 / 11 / 71 / 2 -> 624 PASS / 11 DIFF / 73 INFO / 2 CONFLICT; check-ptc-delaware-river 390 / 36 unchanged. Clash (main span, no bolts) 1,125 -> 1,328, rows with
+walkway parts 122 -> 325 (188 rope through its posts by design; nav walk vs bracing 6 rows <= 0.31 in. (walk level unknown), rail corners 6 rows 0.16 in.; pier platform grating x channel rows gone).
+BW-W12 (user decision 2026-10-28 'follow p.106 and flag it'): the main span CL walkway W15-W15' has ONE rail angle L 3x2 1/2x3/8 per side (p.106 MATERIAL BETWEEN FLOOR BEAMS), no
+posts / mid rail; top 3'-0 above the grating (height drawn only, flagged), connection Ls 6x4x3/8 / PL 14 x 3/8 not built (`Walk(..., singleRail)`).
+Batch 7 (sheet links, `sheet-links-ptc-delaware-river.json`): rules main-truss-joints-w14 (p.84 / 85), main-truss-wind-chords (p.69 / 70 / 71), main-floor-stringer-seats (p.72 + p.55: the seats
+were modeled from the approach typical floor details), main-floor-system without p.55, walkways-main + p.105, platforms-main + p.105 / 106. M4 (LL-CL16) was already in BR-LOWER-LATERALS; S02 kept.
+
+## 32. Gusset / rivet agent reviews applied (2026-10-30; qc/ptc/main-span/{gussets,rivets}-review, qc/ptc/approach/review, qc/ptc/girders/review; tests `TrussRivetReviewTests`)
+
+Generic OPTIONAL inputs (omitted from the .sbm when unset): `TrussDefinition.JointRivetsShareHoles` (after the joint rivets are placed and re-gripped, `RivetHoles.MergeShared`
+merges a rivet whose shank overlaps a parallel rivet by more than 1 mm with the axes closer than 0.5 (d1 + d2): one rivet through both stacks, larger diameter, union grip),
+`TrussEndConnection.OutBoltMaterial` (outstanding-leg fasteners are structural bolts, `BoltGeometry.LengthForGrip`), `TrussRivetLine.Zones` (`TrussRivetZone`: pitch by
+station zone along the member). `SteelModel.RivetMesh`: button heads inscribed in the 1.6 d circle (exactly touching heads no longer report a 1/16 in. clash).
+PTC data: see the outcome sections of the four findings files. R01 (centring the drawn chord fields on the model web) was tried and reverted: it moved the rivets off their
+drawn gusset outlines; the offset has to be corrected in the work point / drawn chord reading. Results: check-truss-ptc 616 PASS / 19 DIFF, location 389 / 37, approach
+1792 / 16, girders 128 / 9; Bolt x Bolt main 650 -> 184, 3-span 36 -> 22, 4-span 86 -> 20.

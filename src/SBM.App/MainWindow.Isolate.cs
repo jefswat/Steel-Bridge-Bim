@@ -90,7 +90,7 @@ public partial class MainWindow
         UpdateIsolateBanner();
         if (_isoZoomOnIsolate) ZoomToIsolated(true);
         StatusText($"Isolated: {_iso.Name} — Esc (nothing selected) or I to exit; Zoom in the banner");
-        ViewModels.MainViewModel.Log($"ISOLATE: {_iso.Kind} '{_iso.Name}', {_iso.Tags.Count} elements, layers {string.Join(", ", _iso.KeptLayers)}");
+        ViewModels.MainViewModel.Log($"ISOLATE: {_iso.Kind} '{_iso.Name}', {_iso.Tags.Count} elements, layers {string.Join(", ", _iso.KeptLayers)}");        RefreshSubElementEdges();
     }
 
     private void ExitIsolate()
@@ -104,7 +104,7 @@ public partial class MainWindow
         ApplySection();
         UpdateIsolateBanner();
         StatusText("Isolate ended: previous visibility restored");
-        ViewModels.MainViewModel.Log($"ISOLATE exit: {_vm.LayerItems.Count(l => l.IsVisible)} of {_vm.LayerItems.Count} layers on, {_hiddenList.Count} hidden");
+        ViewModels.MainViewModel.Log($"ISOLATE exit: {_vm.LayerItems.Count(l => l.IsVisible)} of {_vm.LayerItems.Count} layers on, {_hiddenList.Count} hidden");        RefreshSubElementEdges();
     }
 
     /// <summary>After a regeneration (called with the fresh objects keyed by <see cref="HideKey"/>): the isolate follows the new objects.</summary>
@@ -136,6 +136,7 @@ public partial class MainWindow
     private void ClearSelection()
     {
         ClearHighlight();
+        _selectedMember = null;
         _selectedTag = null;
         _selectedModel = null;
         _groupSel = null;

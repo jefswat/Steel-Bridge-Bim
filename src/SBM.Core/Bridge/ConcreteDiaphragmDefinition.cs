@@ -9,6 +9,9 @@ public enum ConcreteDiaphragmKind
     SemiIntegralEnd,
     /// <summary>Continuity diaphragm over a pier (beams made continuous by the deck and the diaphragm).</summary>
     PierContinuity,
+    /// <summary>End diaphragm of a unit at an expansion joint over a pier / bent (beam ends on bearings, the deck joint above; NCDOT "expansion joint
+    /// diaphragm"). x as for a pier (+ ahead station, from the support line).</summary>
+    ExpansionJointEnd,
 }
 
 /// <summary>Elevation reference of a section point.</summary>
@@ -55,7 +58,15 @@ public sealed class DiaphragmEnd
     public double Distance { get; set; }
     /// <summary>Plan reference of the end (shown in reports).</summary>
     public string Source { get; set; } = "";
+    /// <summary>OPTIONAL sloped end face (<see cref="DiaphragmEndKind.Offset"/> only): alignment offset of the end at the TOP edge of the part; <see cref="Offset"/>
+    /// is then the end at the BOTTOM edge and the face is the plane between the two lines (e.g. NCDOT expansion joint diaphragm: deck edge at the soffit,
+    /// 5" outside the fascia bottom flange at the bottom). Null = a vertical end face (omitted from the .sbm).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? TopOffset { get; set; }
     public static DiaphragmEnd AtOffset(double offset, string source = "") => new() { Kind = DiaphragmEndKind.Offset, Offset = offset, Source = source };
+    /// <summary>Sloped end face between the alignment offsets at the bottom and at the top edge of the part.</summary>
+    public static DiaphragmEnd Sloped(double bottomOffset, double topOffset, string source = "") =>
+        new() { Kind = DiaphragmEndKind.Offset, Offset = bottomOffset, TopOffset = topOffset, Source = source };
     public static DiaphragmEnd Fascia(string source = "") => new() { Kind = DiaphragmEndKind.FasciaOutside, Source = source };
     public static DiaphragmEnd AlongLine(double offset, double distance, string source = "") =>
         new() { Kind = DiaphragmEndKind.AlongLineFromOffset, Offset = offset, Distance = distance, Source = source };

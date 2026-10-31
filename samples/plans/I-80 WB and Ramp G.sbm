@@ -1763,6 +1763,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -1918,6 +1920,8 @@
               "PileBackRowToBearing": 0.5969,
               "PileFrontRowToBearing": 0.5334,
               "PileTopAboveFootingBottom": 0.6096,
+              "PileBatterRatio": 0,
+              "PileBatterRows": [],
               "PileLength": 38.1,
               "Wings": [
                 {
@@ -2805,6 +2809,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -4809,6 +4815,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -6813,6 +6821,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -8552,6 +8562,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 300.301152,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -10273,6 +10285,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 300.63033600000006,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -11740,6 +11754,18 @@
               "FlatLength": 1.0287000000000002,
               "ChamferRun": null,
               "Soffit": []
+            },
+            "BarrierPlate": {
+              "Thickness": 0.009524999999999999,
+              "Depress": 0.00635,
+              "BottomClear": 0.00635,
+              "LengthIn": 0.5334000000000001,
+              "LengthOut": 0.6858,
+              "Left": true,
+              "Right": true,
+              "Material": "ASTM A36, galvanized",
+              "Source": "sheet 203 (PDF 210)",
+              "Unresolved": "UNRESOLVED (sheet 203 (PDF 210)): barrier slider plates at Pier 5WB - the plate lengths along the barrier are dimensioned on the expansion device plans, but the recess in the concrete, the cap screws / bent bolts and the plate bend radii are not modeled; Pier 5WB is \u0027similar\u0027 to the Pier 6A drawing (north barrier shown), so the south plate takes the same split. plate on every barrier face except the base, outer face 1/4 in inside the concrete faces, 1/4 in above the deck on both faces; fasteners and recess not built."
             },
             "Active": true,
             "TypeName": "Modular"
@@ -19914,7 +19940,45 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "EndFits": [
+          {
+            "Kind": "Bearing",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Intermediate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "MillToBear",
+            "Source": "p.120 std. 1021W Bearing \u0026 Jacking Stiffener: MILL TO BEAR"
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -20849,13 +20913,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -21316,6 +21382,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -21670,6 +21738,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 300.61814400000003,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -24099,6 +24169,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 301.422816,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -26240,6 +26312,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 303.07178400000004,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -28578,6 +28652,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 302.69688,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -30350,6 +30426,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 302.136048,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -32147,6 +32225,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 301.907448,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -34398,6 +34478,20 @@
               "ChamferRun": null,
               "Soffit": []
             },
+            "BarrierPlate": {
+              "Thickness": 0.009524999999999999,
+              "Depress": 0.00635,
+              "BottomClear": 0.00635,
+              "LengthIn": 0.6350000000000001,
+              "LengthOut": 0.889,
+              "RightLengthIn": 0.7874000000000001,
+              "RightLengthOut": 0.7366,
+              "Left": true,
+              "Right": true,
+              "Material": "ASTM A36, galvanized",
+              "Source": "sheet 203 (PDF 210)",
+              "Unresolved": "UNRESOLVED (sheet 203 (PDF 210)): barrier slider plates at Pier 11WB - the plate lengths along the barrier are dimensioned on the expansion device plans, but the recess in the concrete, the cap screws / bent bolts and the plate bend radii are not modeled. plate on every barrier face except the base, outer face 1/4 in inside the concrete faces, 1/4 in above the deck on both faces; fasteners and recess not built."
+            },
             "Active": true,
             "TypeName": "Modular"
           },
@@ -34594,6 +34688,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -49957,7 +50053,45 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "EndFits": [
+          {
+            "Kind": "Bearing",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Intermediate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "MillToBear",
+            "Source": "p.120 std. 1021W Bearing \u0026 Jacking Stiffener: MILL TO BEAR"
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -51129,13 +51263,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -51474,9 +51610,9 @@
       },
       "Misc": {
         "Unresolved": [
-          "[cushion] End posts: start of the end block from the CL pier (scaled about 2\u0027-1 on Ramp A), wedge direction, plan width at the pier end (two 1\u0027-5 rails \u002B gap) and the skewed Ramp G plan are not dimensioned; the I.M. 455 crash cushion has no geometry in the plans.",
           "[sign] Unit 2 sign truss: truss CL parallel to the pier at STA 7595\u002B82.22 (pier \u002B 5\u0027-10); sheets 171A/172A give the post lines 2\u0027-2 and 9\u0027-6 ahead of the CL pier (plan sheet 110 \u00222\u0027-2 (TYP.)\u0022); the sheet title-block station 7595\u002B67.24 is the bridge reference, not a sign location.",
-          "[sign] Exit sign bases: station not printed (sheets 104 / 108 show only a tick on the north girder; scaled about 50\u0027-0 back of CL bearing Pier 5WB and about 60\u0027 back of Pier 11WB): not placed."
+          "[sign] Exit sign bases: station not printed (sheets 104 / 108 show only a tick on the north girder; scaled about 50\u0027-0 back of CL bearing Pier 5WB and about 60\u0027 back of Pier 11WB): not placed.",
+          "[cushion] UNRESOLVED (PDF 229 / 230 Section C-C, sheets 222 / 223): the rail part of the end post is built from the end of slab corners (sheets 190 / 191 Detail A) to the wedge start, but its toe height is marked maximum (\u00273*\u0027: may vary with construction) and the joint recess in it (sheet 203) is not built; its bars 5c4 / 6d1 / 6d4 / 5c5 are scheduled only; the I.M. 455 crash cushion unit has no geometry in the plans (user decision for its length)."
         ],
         "Collectors": [
           {
@@ -51975,243 +52111,56 @@
             "PierEndWidth": null,
             "HeightRailEnd": 1.1176000000000001,
             "HeightAtEnd": 0.8636,
-            "CushionLength": null
-          },
-          {
-            "Bars": [
+            "CushionLength": null,
+            "PlanRows": [
               {
-                "Mark": "6c2",
-                "Size": "#6",
-                "Count": 3,
-                "Length": 1.4224,
-                "WeightLb": 21,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "end block vertical"
+                "Station": 231376.273848,
+                "LeftOffset": -8.360664000000002,
+                "RightOffset": -7.315200000000001
               },
               {
-                "Mark": "6c4",
-                "Size": "#6",
-                "Count": 5,
-                "Length": 0,
-                "WeightLb": 37,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "end block vertical, varies"
+                "Station": 231377.79784800002,
+                "LeftOffset": -8.141208000000002,
+                "RightOffset": -7.531608000000003
               },
               {
-                "Mark": "5c5",
-                "Size": "#5",
-                "Count": 7,
-                "Length": 2.159,
-                "WeightLb": 52,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "rail vertical"
-              },
-              {
-                "Mark": "5c11",
-                "Size": "#5",
-                "Count": 2,
-                "Length": 2.2606,
-                "WeightLb": 15,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "rail vertical"
-              },
-              {
-                "Mark": "6d1",
-                "Size": "#6",
-                "Count": 12,
-                "Length": 1.1684,
-                "WeightLb": 69,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "rail horizontal"
-              },
-              {
-                "Mark": "6d2",
-                "Size": "#6",
-                "Count": 8,
-                "Length": 2.1844,
-                "WeightLb": 86,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "end block horizontal"
-              },
-              {
-                "Mark": "6d3",
-                "Size": "#6",
-                "Count": 4,
-                "Length": 2.1844,
-                "WeightLb": 43,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "end block horizontal"
-              },
-              {
-                "Mark": "6d4",
-                "Size": "#6",
-                "Count": 1,
-                "Length": 1.0414,
-                "WeightLb": 5,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "rail horizontal"
-              },
-              {
-                "Mark": "6d5",
-                "Size": "#6",
-                "Count": 1,
-                "Length": 1.524,
-                "WeightLb": 8,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "rail horizontal"
-              },
-              {
-                "Mark": "6d6",
-                "Size": "#6",
-                "Count": 12,
-                "Length": 1.6764000000000001,
-                "WeightLb": 99,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "rail horizontal"
-              },
-              {
-                "Mark": "5d7",
-                "Size": "#5",
-                "Count": 1,
-                "Length": 2.1844,
-                "WeightLb": 7,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "end block horizontal"
-              },
-              {
-                "Mark": "5d8",
-                "Size": "#5",
-                "Count": 1,
-                "Length": 2.2098,
-                "WeightLb": 8,
-                "Lengths": null,
-                "Epoxy": true,
-                "Coating": "",
-                "Location": "end block horizontal"
-              },
-              {
-                "Mark": "6c1",
-                "Size": "#6",
-                "Count": 6,
-                "Length": 1.9050000000000002,
-                "WeightLb": 56,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "end block vertical"
-              },
-              {
-                "Mark": "6c3",
-                "Size": "#6",
-                "Count": 10,
-                "Length": 0,
-                "WeightLb": 100,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "end block vertical, varies"
-              },
-              {
-                "Mark": "5c6",
-                "Size": "#5",
-                "Count": 7,
-                "Length": 1.778,
-                "WeightLb": 43,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "rail vertical"
-              },
-              {
-                "Mark": "5c7",
-                "Size": "#5",
-                "Count": 2,
-                "Length": 1.7018,
-                "WeightLb": 12,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "end block vertical"
-              },
-              {
-                "Mark": "5c8",
-                "Size": "#5",
-                "Count": 2,
-                "Length": 1.7272,
-                "WeightLb": 12,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "end block vertical"
-              },
-              {
-                "Mark": "5c9",
-                "Size": "#5",
-                "Count": 2,
-                "Length": 1.8796000000000002,
-                "WeightLb": 13,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "end block vertical"
-              },
-              {
-                "Mark": "5c10",
-                "Size": "#5",
-                "Count": 2,
-                "Length": 1.9050000000000002,
-                "WeightLb": 13,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "end block vertical"
-              },
-              {
-                "Mark": "5c12",
-                "Size": "#5",
-                "Count": 2,
-                "Length": 1.8288000000000002,
-                "WeightLb": 13,
-                "Lengths": null,
-                "Epoxy": false,
-                "Coating": "stainless",
-                "Location": "rail vertical"
+                "Station": 231378.559848,
+                "LeftOffset": -8.141208000000002,
+                "RightOffset": -7.531608000000003
               }
             ],
-            "Name": "Crash cushion end post Ramp G (Pier 11WB)",
-            "Support": "Pier 11WB",
-            "Station": null,
-            "Offset": null,
-            "DirectionDegrees": null,
-            "Length": 2.286,
-            "TaperLength": 1.524,
-            "EndWidth": 0.6096,
-            "PierEndWidth": null,
-            "HeightRailEnd": 1.1176000000000001,
-            "HeightAtEnd": 0.8636,
-            "CushionLength": null
+            "RailRows": [
+              {
+                "Station": 231375.734352,
+                "LeftOffset": -8.436864000000002,
+                "RightOffset": -7.315200000000001,
+                "RightStation": 231375.74044800003
+              },
+              {
+                "Station": 231376.273848,
+                "LeftOffset": -8.360664000000002,
+                "RightOffset": -7.315200000000001
+              }
+            ],
+            "RailHalfProfile": [
+              {
+                "R": 0,
+                "H": 0
+              },
+              {
+                "R": 0,
+                "H": 0.07619999999999999
+              },
+              {
+                "R": 0.127,
+                "H": 0.254
+              },
+              {
+                "R": 0.21589999999999998,
+                "H": 1.1176
+              }
+            ],
+            "Source": "sheet 190 Detail A (PDF 197), end post PDF 229"
           }
         ],
         "Lighting": {
@@ -52341,6 +52290,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -52677,6 +52628,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 302.108616,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -54918,6 +54871,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 301.41672,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -56923,6 +56878,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 301.502064,
             "ColumnFlareWidth": 2.7432000000000003,
             "ColumnFlareDepth": 1.6764000000000001,
@@ -58634,6 +58591,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -60237,6 +60196,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -60394,6 +60355,8 @@
               "PileBackRowToBearing": 0.5969,
               "PileFrontRowToBearing": 0.5334,
               "PileTopAboveFootingBottom": 0.6096,
+              "PileBatterRatio": 0,
+              "PileBatterRows": [],
               "PileLength": 35.052,
               "Wings": [
                 {
@@ -60992,6 +60955,18 @@
               "FlatLength": 0.8636,
               "ChamferRun": null,
               "Soffit": []
+            },
+            "BarrierPlate": {
+              "Thickness": 0.009524999999999999,
+              "Depress": 0.00635,
+              "BottomClear": 0.00635,
+              "LengthIn": 0.6096000000000001,
+              "LengthOut": 0.6095999999999999,
+              "Left": true,
+              "Right": true,
+              "Material": "ASTM A36, galvanized",
+              "Source": "sheet 203 (PDF 210)",
+              "Unresolved": "UNRESOLVED (sheet 203 (PDF 210)): barrier slider plates at the East Abutment - the plate lengths along the barrier are dimensioned on the expansion device plans, but the recess in the concrete, the cap screws / bent bolts and the plate bend radii are not modeled; the East Abutment is \u0027similar\u0027 to the Pier 6A drawing (beyond = past the backwall face). plate on every barrier face except the base, outer face 1/4 in inside the concrete faces, 1/4 in above the deck on both faces; fasteners and recess not built."
             },
             "Active": true,
             "TypeName": "Modular"
@@ -74340,7 +74315,45 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "EndFits": [
+          {
+            "Kind": "Bearing",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Intermediate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.120 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "MillToBear",
+            "Source": "p.120 std. 1021W Bearing \u0026 Jacking Stiffener: MILL TO BEAR"
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -75199,13 +75212,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -75505,7 +75520,8 @@
           "[sign] CHECK (I-80 PDF 117): girder A sign post lines placed 29\u0027-0 13/16 / 36\u0027-4 15/16 ahead of A\u0027s CL bearing at Pier 13WB (16\u0027-1 15/16 \u002B 12\u0027-10 7/8 \u002B 7\u0027-4 1/8 along girder A); the model\u0027s radial line at the CL pier / roadway point is 16\u0027-0 1/16 from that bearing, 1 7/8\u0022 less than the plan\u0027s 16\u0027-1 15/16 - the plan and the model\u0027s pier / girder geometry differ there, the bearing-based chain is used.",
           "[sign] Sign supports: anchor bolt lengths, the post stub plate lengths, the HSS 14.000x0.500 post height and the sign truss size / elevation are not in the plans.",
           "[drain] UNRESOLVED (I-80 PDF 217): Pier 12WB pier pipe outlet - the elevation shows a ground line and the outlet detail (Piers 11WB and 12WB) ends the 12\u0022 pipe 1\u0022 above the pavement, but no pavement elevation is printed at 12WB; the pipe ends 1\u0022 above the terrain.",
-          "[drain] UNRESOLVED (I-80 PDF 220): couplers / L3x3x3/8 supports of the 8\u0022 collection pipes near Pier 12WB are dimensioned from cross frames that carry no station (4\u0027-0); not modeled."
+          "[drain] UNRESOLVED (I-80 PDF 220): couplers / L3x3x3/8 supports of the 8\u0022 collection pipes near Pier 12WB are dimensioned from cross frames that carry no station (4\u0027-0); not modeled.",
+          "[cushion] UNRESOLVED (PDF 229 / 230 Section C-C, sheets 222 / 223): the rail part of the end post is built from the end of slab corners (sheets 190 / 191 Detail A) to the wedge start, but its toe height is marked maximum (\u00273*\u0027: may vary with construction) and the joint recess in it (sheet 203) is not built; its bars 5c4 / 6d1 / 6d4 / 5c5 are scheduled only; the I.M. 455 crash cushion unit has no geometry in the plans (user decision for its length)."
         ],
         "Collectors": [
           {
@@ -75674,7 +75690,293 @@
             "BlockHeight": 0.762
           }
         ],
-        "EndPosts": [],
+        "EndPosts": [
+          {
+            "Bars": [
+              {
+                "Mark": "6c2",
+                "Size": "#6",
+                "Count": 3,
+                "Length": 1.4224,
+                "WeightLb": 21,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "6c4",
+                "Size": "#6",
+                "Count": 5,
+                "Length": 0,
+                "WeightLb": 37,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block vertical, varies"
+              },
+              {
+                "Mark": "5c5",
+                "Size": "#5",
+                "Count": 7,
+                "Length": 2.159,
+                "WeightLb": 52,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "5c11",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 2.2606,
+                "WeightLb": 15,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "6d1",
+                "Size": "#6",
+                "Count": 12,
+                "Length": 1.1684,
+                "WeightLb": 69,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "6d2",
+                "Size": "#6",
+                "Count": 8,
+                "Length": 2.1844,
+                "WeightLb": 86,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6d3",
+                "Size": "#6",
+                "Count": 4,
+                "Length": 2.1844,
+                "WeightLb": 43,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6d4",
+                "Size": "#6",
+                "Count": 1,
+                "Length": 1.0414,
+                "WeightLb": 5,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "6d5",
+                "Size": "#6",
+                "Count": 1,
+                "Length": 1.524,
+                "WeightLb": 8,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "6d6",
+                "Size": "#6",
+                "Count": 12,
+                "Length": 1.6764000000000001,
+                "WeightLb": 99,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "rail horizontal"
+              },
+              {
+                "Mark": "5d7",
+                "Size": "#5",
+                "Count": 1,
+                "Length": 2.1844,
+                "WeightLb": 7,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "5d8",
+                "Size": "#5",
+                "Count": 1,
+                "Length": 2.2098,
+                "WeightLb": 8,
+                "Lengths": null,
+                "Epoxy": true,
+                "Coating": "",
+                "Location": "end block horizontal"
+              },
+              {
+                "Mark": "6c1",
+                "Size": "#6",
+                "Count": 6,
+                "Length": 1.9050000000000002,
+                "WeightLb": 56,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "6c3",
+                "Size": "#6",
+                "Count": 10,
+                "Length": 0,
+                "WeightLb": 100,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical, varies"
+              },
+              {
+                "Mark": "5c6",
+                "Size": "#5",
+                "Count": 7,
+                "Length": 1.778,
+                "WeightLb": 43,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "rail vertical"
+              },
+              {
+                "Mark": "5c7",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.7018,
+                "WeightLb": 12,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c8",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.7272,
+                "WeightLb": 12,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c9",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.8796000000000002,
+                "WeightLb": 13,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c10",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.9050000000000002,
+                "WeightLb": 13,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "end block vertical"
+              },
+              {
+                "Mark": "5c12",
+                "Size": "#5",
+                "Count": 2,
+                "Length": 1.8288000000000002,
+                "WeightLb": 13,
+                "Lengths": null,
+                "Epoxy": false,
+                "Coating": "stainless",
+                "Location": "rail vertical"
+              }
+            ],
+            "Name": "Crash cushion end post Ramp G (Pier 11WB)",
+            "Support": "Pier 11WB",
+            "Station": null,
+            "Offset": null,
+            "DirectionDegrees": null,
+            "Length": 2.286,
+            "TaperLength": 1.575816,
+            "EndWidth": 0.6096,
+            "PierEndWidth": null,
+            "HeightRailEnd": 1.1176000000000001,
+            "HeightAtEnd": 0.8636,
+            "CushionLength": null,
+            "PlanRows": [
+              {
+                "Station": 231744.02114400003,
+                "LeftOffset": -12.192,
+                "RightOffset": -10.972800000000001
+              },
+              {
+                "Station": 231745.59696,
+                "LeftOffset": -11.798808000000003,
+                "RightOffset": -11.189208000000002
+              },
+              {
+                "Station": 231746.38334400003,
+                "LeftOffset": -11.798808000000003,
+                "RightOffset": -11.189208000000002
+              }
+            ],
+            "RailRows": [
+              {
+                "Station": 231742.80804000003,
+                "LeftOffset": -12.347448000000002,
+                "RightOffset": -10.972800000000001,
+                "RightStation": 231743.560896
+              },
+              {
+                "Station": 231744.02114400003,
+                "LeftOffset": -12.192,
+                "RightOffset": -10.972800000000001
+              }
+            ],
+            "RailHalfProfile": [
+              {
+                "R": 0,
+                "H": 0
+              },
+              {
+                "R": 0,
+                "H": 0.07619999999999999
+              },
+              {
+                "R": 0.127,
+                "H": 0.254
+              },
+              {
+                "R": 0.21589999999999998,
+                "H": 1.1176
+              }
+            ],
+            "Source": "sheet 191 Detail A (PDF 198), end post PDF 230"
+          }
+        ],
         "Lighting": {
           "PoleBases": [
             {
@@ -76247,6 +76549,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -76382,6 +76686,8 @@
               "PileBackRowToBearing": 0.4699,
               "PileFrontRowToBearing": 0.4445,
               "PileTopAboveFootingBottom": 0.6096,
+              "PileBatterRatio": 0,
+              "PileBatterRows": [],
               "PileLength": 38.1,
               "Wings": [
                 {
@@ -77187,6 +77493,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -78438,6 +78746,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 298.53940800000004,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -79753,6 +80063,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 299.136816,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -81060,6 +81372,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 300.234096,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -82379,6 +82693,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 302.065944,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -88128,7 +88444,45 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "EndFits": [
+          {
+            "Kind": "Bearing",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Intermediate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "MillToBear",
+            "Source": "p.103 std. 1021W Bearing \u0026 Jacking Stiffener: MILL TO BEAR"
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -89031,13 +89385,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -89557,6 +89913,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -89883,6 +90241,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 303.14493600000003,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -91202,6 +91562,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 305.674776,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -92677,6 +93039,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 303.27295200000003,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -94104,6 +94468,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 303.23028000000005,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -99327,7 +99693,45 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "EndFits": [
+          {
+            "Kind": "Bearing",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Intermediate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "MillToBear",
+            "Source": "p.103 std. 1021W Bearing \u0026 Jacking Stiffener: MILL TO BEAR"
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -100196,13 +100600,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -100760,6 +101166,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -101086,6 +101494,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 302.913288,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -102513,6 +102923,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 303.4284,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -103962,6 +104374,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 302.45913600000006,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -105411,6 +105825,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 302.081184,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -106730,6 +107146,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 301.41672,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -113109,7 +113527,45 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "EndFits": [
+          {
+            "Kind": "Bearing",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Intermediate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "MillToBear",
+            "Source": "p.103 std. 1021W Bearing \u0026 Jacking Stiffener: MILL TO BEAR"
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -114247,13 +114703,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,
@@ -114720,6 +115178,8 @@
             "ColumnChamferN": 0,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -115046,6 +115506,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": 301.803816,
             "ColumnFlareWidth": 3.3528000000000002,
             "ColumnFlareDepth": 2.286,
@@ -116355,6 +116817,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -117990,6 +118454,8 @@
             "ColumnChamferN": 0.381,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -119617,6 +120083,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -120981,6 +121449,8 @@
             "ColumnChamferN": 0.5334,
             "ColumnProjectionS": 0,
             "ColumnProjectionWidth": 0,
+            "ColumnProjectionBack": 0,
+            "ColumnProjectionBackWidth": 0,
             "ColumnFlareElevation": "NaN",
             "ColumnFlareWidth": 0,
             "ColumnFlareDepth": 0,
@@ -127258,7 +127728,45 @@
         "CornerClip": 0.038099999999999995,
         "IntermediateBottomGap": 0.0508,
         "WeldSize": 0.00635,
-        "FlangeToWebWeld": 0.0079375
+        "FlangeToWebWeld": 0.0079375,
+        "EndFits": [
+          {
+            "Kind": "Bearing",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "ConnectionPlate",
+            "End": "Bottom",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Intermediate",
+            "End": "Top",
+            "Condition": "Welded",
+            "Source": "p.103 std. 1021W Detail A"
+          },
+          {
+            "Kind": "Bearing",
+            "End": "Bottom",
+            "Condition": "MillToBear",
+            "Source": "p.103 std. 1021W Bearing \u0026 Jacking Stiffener: MILL TO BEAR"
+          }
+        ]
       },
       "FieldSplices": [
         {
@@ -127939,13 +128447,15 @@
         "Diameter": 0.022224999999999998,
         "RowsAcross": 3,
         "TransverseSpacing": 0.1143,
+        "EdgeDistance": 0,
         "Pitch": 0.30479999999999996,
         "Penetration": 0.0508,
         "MinCover": 0.0508,
         "HeadDiameter": 0.034925,
         "HeadHeight": 0.009524999999999999,
         "LengthIncrement": 0.0127,
-        "Clearance": 0.038099999999999995
+        "Clearance": 0.038099999999999995,
+        "Zones": []
       },
       "LateralBracing": {
         "Enabled": false,

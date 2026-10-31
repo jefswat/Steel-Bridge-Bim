@@ -128,8 +128,8 @@ Stack at the CL bearing: pedestal el + elastomer + sole plate + 96" girder + bui
 | Camber | `PrestressedBeamDefinition.CamberTable` per girder (168 cells; recorded + checked, geometry uncambered) | built; data error fixed: the CSV labelled the span 35 girder 3 block "INTERIOR GIRDER 2" (p446 prints GIRDER 3) |
 | Haunch | `GirderSpanEnd.Haunches` = build-up at the CL bearings (table 6), 9" slab | built; straight between the two tabulated values |
 | Bearings | `StartBearing` / `EndBearing` (`PrestressedBearingDefinition` E1 / E2 / E3 + `SolePlateDefinition` P-plates, tapered, CL bearing per the plate plans) | built; seats vs printed pedestal tops bents 30-35 within 0.007 ft |
-| Beam mild steel | `BeamReinforcementDefinition` | GAP: bar shapes / positions not transcribed (counts and weights only) |
-| Deck | slab only | GAP: deck bars, parapets, diaphragms, joints not modeled |
+| Beam mild steel | `BeamReinforcementDefinition` (beam-rebar-bonner-unit6.csx) | S1 / S5 / S6 / S8 placed from the girder chains (counts = bar list); S2-S4, S7, V1, WWF not placed (REMAINING.md) |
+| Deck | slab, diaphragms, joints, parapet joints / end posts, deck bars (2026-10-30) | see REMAINING.md (built / schedule only / not built per sheet) |
 | Bents 30-35 | as-designed level `CapProfile` 42'-0 x 6'-6 x 5'-6, plan pedestals 5'-2 x 3'-0 per row (two rows abutting at the bent control line), 2 square columns at +-10'-3 (6'-0 / 5'-0), ONE combined pile cap footing (`FootingDefinition.OnFootingOf`) with the pile layouts of p459 / p462 / p465 / p468, 36" sq PS piles 2:12 (`BatterRatio` 6), heads 4'-0" above the footing bottom, tips at the "no higher than" elevation | built; caps 55.61 CY each (PASS), bents 30 / 31 piles 1,611 LF (PASS) |
 | Bent 29 | support line only (substructure on the Unit 5 sheets / model) | flagged |
 
@@ -143,7 +143,7 @@ Stack at the CL bearing: pedestal el + elastomer + sole plate + 96" girder + bui
 | Which overhang (L / R) is the 4'-6 1/2" side in span 35 | p404 | not needed by the model (deck edges at +-21'-3 1/2" from -L-) |
 | Girder length A | p428-431 | A is the length along the sloped girder (spans 30, 32, 35 reproduce within 1/16"), but one A is printed for spans 31-32 and one for 33-34 whose grades differ: spans 31 / 33 / 34 differ by +0.48" / +0.33" / +0.07" |
 | Cross slope transition 102+46.34 - 102+59.84 | p4 | "varies", roadway plans not in the set (linear modeled) |
-| Deck ends / joints at bents 29 and 35 | p409, p457 | joint sheets not extracted; deck ends on the bent control lines |
+| Deck ends / joints at bents 29 and 35 | p.454, p.407, p.450 | RESOLVED 2026-10-30 (joints-parapet-bonner-unit6.csx): bent 29 deck face 2'-7 1/2" ahead (CL joint "1'-2 1/2" +-" + DIM A / 2: the +- stays UNRESOLVED), bent 35 2 1/8" back; devices proprietary (envelopes) |
 | Span 35 G1-G2 S1 projection "VARIES" | p438 | value not printed |
 | Pile installed tips / driving resistance | p398-399 | fields blank in the plans (filled during construction); tips modeled at the "no higher than" elevation |
 | Pile head embedment | p458 | read as the 4'-0" dimension of the footing elevation (RASTER); reproduces the 1,611 LF quantity of bents 30 / 31 |
@@ -151,8 +151,8 @@ Stack at the CL bearing: pedestal el + elastomer + sole plate + 96" girder + bui
 | Bent 29 cap, columns, footing and piles; bent 29 pedestal tops | p395, Unit 5 sheets | on the Unit 5 sheets |
 | Footing concrete 203 CY computed vs 180.1 CY printed | p459, p460 | difference not explained (model 203.0 CY flat) |
 | Precast segmental columns, PT bars, grout beds, 4" corner radius | p458, p477-480, p489-490 | no segmental column feature: solid square columns footing top to cap soffit (column tops = printed + 2" grout bed, PASS) |
-| Bar shapes of the beam steel and deck K / U / S bars | p428, p455 | not transcribed in detail |
-| Parapet reinforcement, rail posts, joint seals | p448-454 | not extracted for this unit |
+| Bar shapes of the beam steel and deck K / U / S bars | p428, p455 | beam S1 / S5 / S6 / S8 and deck A / B107-B109 placed (2026-10-30); the rest schedule only - REMAINING.md |
+| Parapet reinforcement, rail posts, joint seals | p448-454 | parapet joints / end posts built; parapet bars schedule only (p.451); rail (NCDOT standard not in the set) and cover plates not built - REMAINING.md |
 
 Resolved in the model pass (2026-10-12): side of G1 (LEFT: longest span 35 chord p424) and cross-slope direction (high left, pedestals A > D); strand rows, draped coordinates and debond counts (p439 vector drawing); CL-bearing end distances spans 32-34 (p429 covers spans 31-34: 9" both ends); span 35 CL bearing 1'-4" at bent 35 (p424); sole plate widths and CL-bearing positions (p440-444).
 

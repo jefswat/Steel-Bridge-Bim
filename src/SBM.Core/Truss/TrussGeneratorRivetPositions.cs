@@ -52,14 +52,16 @@ public static partial class TrussGenerator
                     dropped++;
                     var c1 = c.P + c.U * p.X + c.V * p.Y;
                     double s1 = Vec3.Dot(c1 - (m.A + m.Axis * m.SA), m.Axis), cut1 = (m.B - m.A).Length - m.SA - m.SB;
-                    if (s1 < 0 || s1 > cut1) _dropRange++;
-                    else if (!beyond && !Free(c, p, dia)) _dropFree++;
+                    double yl = Vec3.Dot(c1 - m.A, m.Y) - m.Def.OffsetZ;
+                    string why;
+                    if (s1 < 0 || s1 > cut1) { _dropRange++; why = "range"; }
+                    else if (!beyond && !Free(c, p, dia)) { _dropFree++; why = "head"; }
                     else
                     {
                         _dropRun++;
-                        double yl = Vec3.Dot(c1 - m.A, m.Y) - m.Def.OffsetZ;
-                        if (yl > m.Sec.YMax || yl < m.Sec.YMin) _dropOutside++;
+                        if (yl > m.Sec.YMax || yl < m.Sec.YMin) { _dropOutside++; why = "stack-outside"; } else why = "stack";
                     }
+                    Model.DroppedRivets.Add(new TrussDroppedRivet(c.Plane, c.Point, m.Mark, p.X, p.Y, s1, yl, dia, beyond, why));
                     continue;
                 }
                 var at = c.P + c.U * uv.X + c.V * uv.Y;

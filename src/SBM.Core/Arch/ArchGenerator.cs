@@ -17,9 +17,11 @@ namespace SBM.Core.Arch;
 /// </summary>
 public static partial class ArchGenerator
 {
-    public static ArchModel Generate(BridgeFraming framing, UnitSystem units)
+    /// <param name="geometry">OPTIONAL exact geometry (null = off): the concrete deck elements also record their exact sweeps.</param>
+    public static ArchModel Generate(BridgeFraming framing, UnitSystem units, Project.GeometrySettings? geometry = null)
     {
         var g = new Gen(framing, units);
+        g.SetExact(geometry);
         var sw = Stopwatch.StartNew();
         g.Run();
         g.Model.Steel.GenerationTime = sw.Elapsed;
@@ -65,6 +67,8 @@ public static partial class ArchGenerator
         {
             _f = f; _b = f.Definition; _d = f.Definition.Arch!; _al = f.Alignment; _u = u;
         }
+
+        public void SetExact(Project.GeometrySettings? geo) { _geo = geo; _fitTol = geo?.FitToleranceFor(_u) ?? 0; }
 
         private string Src => string.IsNullOrWhiteSpace(_d.Source) ? "" : $" [{_d.Source}]";
         private void Warn(string m) { if (_warned.Add(m)) Model.Steel.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Warning, m)); }
@@ -114,13 +118,13 @@ public static partial class ArchGenerator
         }
 
         private void AddPart(string mark, PartCategory cat, string asm, string desc, Mesh mesh, string material, double length,
-            double lbPerFt = 0, Assumption? assumption = null)
+            double lbPerFt = 0, Assumption? assumption = null, List<PartFit>? fits = null)
         {
             if (mesh.IsEmpty) return;
             Model.Steel.Parts.Add(new SteelPart
             {
                 Mark = mark, Category = cat, Assembly = asm, Description = desc, Mesh = mesh, Material = material, Length = length,
-                NominalWeightLbPerFt = lbPerFt, Assumption = assumption,
+                NominalWeightLbPerFt = lbPerFt, Assumption = assumption, Fits = fits,
                 Role = cat == PartCategory.ArchBracing ? MemberRole.Lateral : MemberRole.None,
             });
             if (assumption != null) Warn(assumption.Reason);
@@ -1341,7 +1345,23 @@ public static partial class ArchGenerator
                 var ex2 = (r0[^1] - r0[0]).Normalized();
                 var ez = _fr.Z;
                 var sec = r0.Select(p => new Vec2(Vec3.Dot(p - r0[0], ex2), Vec3.Dot(p - r0[0], ez))).ToArray();
+                int tri0 = target.TriangleCount;
                 MeshBuilder.AddLoft(target, sec, rings);
+                // exact: the same ring function continuous along the zone (knot distances linear per panel, the end extensions ramped over the
+                // first / last quarter panel as the loft does)
+                double nk = k1 - k0;
+                (double ds, double dn, double ex) At(double t)
+                {
+                    double x = k0 + nk * t;
+                    int k = Math.Clamp((int)Math.Floor(x), k0, k1 - 1);
+                    double fr = x - k;
+                    double e = (ext0z != 0 && x < k0 + 0.25 ? ext0z * (1 - (x - k0) / 0.25) : 0) + (ext1z != 0 && x > k1 - 0.25 ? ext1z * (1 - (k1 - x) / 0.25) : 0);
+                    return (knots[k].s + (knots[k + 1].s - knots[k].s) * fr, knots[k].n + (knots[k + 1].n - knots[k].n) * fr, e);
+                }
+                var zbk = Enumerable.Range(1, k1 - k0 - 1).Select(i => i / nk).ToList();
+                if (ext0z != 0) zbk.Add(0.25 / nk);
+                if (ext1z != 0) zbk.Add(1 - 0.25 / nk);
+                ExactSweep(target, tri0, r0.Length, t => { var a = At(t); return Ring(a.ds, a.dn, a.ex, form, false); }, zbk, form ? "deck slab" : "deck end zone");
                 for (int i = 0; i + 1 < rings.Count; i++)
                 {
                     // Top surface strip between two rings (top polyline = the last topN + 1 points).
@@ -1354,7 +1374,15 @@ public static partial class ArchGenerator
                     var s0 = srings[0];
                     var sx = (s0[s0.Length / 2 - 1] - s0[0]).Normalized();
                     var ssec = s0.Select(p => new Vec2(Vec3.Dot(p - s0[0], sx), Vec3.Dot(p - s0[0], ez))).ToArray();
+                    int st0 = sheet.TriangleCount;
                     MeshBuilder.AddLoft(sheet, ssec, srings);
+                    ExactSweep(sheet, st0, s0.Length, t =>
+                    {
+                        double x = k0 + nk * t;
+                        int k = Math.Clamp((int)Math.Floor(x), k0, k1 - 1);
+                        double fr = x - k;
+                        return Ring(knots[k].s + (knots[k + 1].s - knots[k].s) * fr, knots[k].n + (knots[k + 1].n - knots[k].n) * fr, 0, true, true);
+                    }, Enumerable.Range(1, k1 - k0 - 1).Select(i => i / nk), "form deck");
                 }
             }
             // v7 (KnuckleZonesFromSteel): the knuckle zones end at the end web inside face and keep out of the knuckle steel (rib corners).
@@ -1379,12 +1407,31 @@ public static partial class ArchGenerator
             _deck = (ts, tn, knots.Select(k => (k.s, k.n)).ToList(), ka, kb);
             // Second body of the deck IfcSlab (ConcreteModel.Haunches = the extra deck items): knuckle-zone slab and curbs.
             var extra = new Mesh();
-            foreach (var mm in new[] { Model.SlabEnds, Model.Curbs }) if (mm != null) Append(extra, mm);
+            foreach (var mm in new[] { Model.SlabEnds, Model.Curbs }) if (mm != null) AppendExact(extra, mm);
             Model.Concrete.Haunches = extra;
             foreach (var t in dk.Tendons) Model.Tendons.Add((t.Name, t.Path.Select(p => W(p.Vec)).ToList(), t.Description));
             if (dk.Rebar is { } rb) BuildDeckRebar(dk, rb);
             if (dk.PtSystem is { } pt) BuildPt(dk, pt);
             if (dk.Rebar is { } rb2) CheckBarList(rb2);
+            if (dk.Rebar != null) CheckBarsThroughFloorbeams();
+        }
+
+        /// <summary>Curb ring: inner bottom, outer bottom, outer top, inner top; with <see cref="ArchCurbDefinition.Chamfer"/> both top corners cut (6 points).</summary>
+        private static Vec3[] CurbSection(Vec2 pi, Vec2 po, double gi, double go, double top, ArchCurbDefinition c)
+        {
+            if (!(c.Chamfer > 0)) return new[] { pi.WithZ(gi), po.WithZ(go), po.WithZ(top), pi.WithZ(top) };
+            double w = (po - pi).Length, f = Math.Min(c.Chamfer, Math.Min(w / 2, c.Height / 2)) / Math.Max(w, 1e-9);
+            var po2 = po + (pi - po) * f; var pi2 = pi + (po - pi) * f;
+            return new[] { pi.WithZ(gi), po.WithZ(go), po.WithZ(top - c.Chamfer), po2.WithZ(top), pi2.WithZ(top), pi.WithZ(top - c.Chamfer) };
+        }
+
+        /// <summary>The 2D section of a curb ring (offset, z) for the loft orientation.</summary>
+        private static Vec2[] CurbSec(Vec3[] r, ArchCurbDefinition c)
+        {
+            double outer = c.InnerOffset + Math.Sign(c.InnerOffset) * c.Width, ch = c.Chamfer > 0 ? Math.Sign(c.InnerOffset) * c.Chamfer : 0;
+            return r.Length == 4
+                ? new[] { new Vec2(c.InnerOffset, r[0].Z), new Vec2(outer, r[1].Z), new Vec2(outer, r[2].Z), new Vec2(c.InnerOffset, r[3].Z) }
+                : new[] { new Vec2(c.InnerOffset, r[0].Z), new Vec2(outer, r[1].Z), new Vec2(outer, r[2].Z), new Vec2(outer - ch, r[3].Z), new Vec2(c.InnerOffset + ch, r[4].Z), new Vec2(c.InnerOffset, r[5].Z) };
         }
 
         private void BuildCurbs(ArchDeckDefinition dk, ArchKnuckleDefinition? ka, ArchKnuckleDefinition? kb)
@@ -1426,7 +1473,7 @@ public static partial class ArchGenerator
                     tp.Add(1);
                     var rings = new List<Vec3[]>();
                     Vec2[]? sec = null;
-                    foreach (double t in tp)
+                    Vec3[] CurbRing(double t)
                     {
                         double si = i0 + (i1 - i0) * t, so = o0 + (o1 - o0) * t;
                         var pi = _al.PointAt(si, c.InnerOffset); var po = _al.PointAt(so, outer);
@@ -1434,10 +1481,17 @@ public static partial class ArchGenerator
                         var soO = _al.Inverse(po);
                         double gi = _b.Deck.FinishedElevation(_al, si, c.InnerOffset), go = _b.Deck.FinishedElevation(_al, soO.Station, soO.Offset);
                         double top = gi + c.Height;
-                        rings.Add(new[] { pi.WithZ(gi), po.WithZ(go), po.WithZ(top), pi.WithZ(top) });
-                        sec ??= new[] { new Vec2(c.InnerOffset, gi), new Vec2(outer, go), new Vec2(outer, top), new Vec2(c.InnerOffset, top) };
+                        return CurbSection(pi, po, gi, go, top, c);
                     }
+                    foreach (double t in tp)
+                    {
+                        var r = CurbRing(t);
+                        rings.Add(r);
+                        sec ??= CurbSec(r, c);
+                    }
+                    int tri0 = curbs.TriangleCount;
                     MeshBuilder.AddLoft(curbs, sec!, rings);
+                    ExactSweep(curbs, tri0, rings[0].Length, CurbRing, GradeBreaks(i0, i1).Concat(GradeBreaks(o0, o1)), "curb");
                 }
                 Model.Curbs = curbs;
                 Info($"Arch curbs: ends on the knuckle end web inside faces (skewed); continuous, the inside arch flange plate legs are embedded in the curb concrete.");
@@ -1452,16 +1506,23 @@ public static partial class ArchGenerator
                 int n = Math.Max(2, (int)Math.Ceiling((sta1 - sta0) / 0.5));
                 var rings = new List<Vec3[]>();
                 Vec2[]? sec = null;
-                for (int i = 0; i <= n; i++)
+                Vec3[] CurbRing(double t)
                 {
-                    double s = sta0 + (sta1 - sta0) * i / n;
+                    double s = sta0 + (sta1 - sta0) * t;
                     double gi = _b.Deck.FinishedElevation(_al, s, c.InnerOffset), go = _b.Deck.FinishedElevation(_al, s, outer);
                     double top = gi + c.Height;
                     var pi = _al.PointAt(s, c.InnerOffset); var po = _al.PointAt(s, outer);
-                    rings.Add(new[] { pi.WithZ(gi), po.WithZ(go), po.WithZ(top), pi.WithZ(top) });
-                    sec ??= new[] { new Vec2(c.InnerOffset, gi), new Vec2(outer, go), new Vec2(outer, top), new Vec2(c.InnerOffset, top) };
+                    return CurbSection(pi, po, gi, go, top, c);
                 }
+                for (int i = 0; i <= n; i++)
+                {
+                    var r = CurbRing((double)i / n);
+                    rings.Add(r);
+                    sec ??= CurbSec(r, c);
+                }
+                int tri0 = curbs.TriangleCount;
                 MeshBuilder.AddLoft(curbs, sec!, rings);
+                ExactSweep(curbs, tri0, rings[0].Length, CurbRing, GradeBreaks(sta0, sta1), "curb");
             }
             Model.Curbs = curbs;
 

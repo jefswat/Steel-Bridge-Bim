@@ -837,6 +837,24 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void LineItemRise_ClimbsLinearlyAlongTheRun()
+    {
+        var (p, b) = Model();
+        var t = b.Truss!;
+        var walk = new TrussLineItemDefinition { Name = "walk", Kind = TrussLineItemKind.Steel, Category = PartCategory.Grating, ReferenceOffset = Ft(20), From = Ft(100), To = Ft(120), FromGrade = false,
+            Profile = { new TrussUV(-In(12), 30), new TrussUV(In(12), 30), new TrussUV(In(12), 30 + In(1)), new TrussUV(-In(12), 30 + In(1)) } };
+        t.LineItems = new() { walk };
+        Assert.DoesNotContain("Rise", System.Text.Json.JsonSerializer.Serialize(walk));
+        var flat = Regen(p).Steel!.Parts.Single(x => x.Mark == "walk");
+        Assert.Equal(30 + In(1), flat.Mesh.Bounds().Max.Z, 6);
+        walk.Rise = In(20);
+        var up = Regen(p).Steel!.Parts.Single(x => x.Mark == "walk");
+        Assert.Equal(30, up.Mesh.Bounds().Min.Z, 6);                    // the start stays
+        Assert.Equal(30 + In(21), up.Mesh.Bounds().Max.Z, 6);           // the end is 20 in. higher
+        Assert.Contains("Rise", System.Text.Json.JsonSerializer.Serialize(walk));
+    }
+
+    [Fact]
     public void LineItemRepeat_BuildsCombTeeth()
     {
         var (p, b) = Model();
@@ -860,6 +878,12 @@ public class TrussTests : IDisposable
         var part3 = Regen(p).Steel!.Parts.Single(x => x.Mark == "teeth");
         Assert.Equal(3 * part.Volume, part3.Volume, 9);
         Assert.Equal(part.Mesh.Bounds().Max.Z + In(24), part3.Mesh.Bounds().Max.Z, 6);
+        // explicit Ranges win over the repeat rule and are clipped to From / To (curb drainage openings: PTC p.107)
+        tooth.CopiesV = null;
+        tooth.Ranges = new() { -Ft(12), -Ft(9), Ft(1), Ft(3) };
+        var part4 = Regen(p).Steel!.Parts.Single(x => x.Mark == "teeth");
+        Assert.Equal((Ft(1) + Ft(2)) * In(12) * In(3), part4.Volume, 9);
+        Assert.Contains("Ranges", System.Text.Json.JsonSerializer.Serialize(tooth));
     }
 
     [Fact]
@@ -874,6 +898,41 @@ public class TrussTests : IDisposable
         var part = Regen(p).Steel!.Parts.Single(x => x.Mark == "stile");
         Assert.Equal(In(0.375) * In(3) * Ft(20), part.Volume, 9);
         Assert.InRange(part.Mass / (part.Volume * 7850), 0.99, 1.01);
+    }
+
+    [Fact]
+    public void LineItem_AssemblyKind_OptionalOverridesTheDefaultCategory()
+    {
+        // girder-span tension plates / dam diaphragms built as line items landed in the database as "inspection walkway" (the default kind of a
+        // line-item assembly); the OPTIONAL AssemblyKind gives them their own kind. Null = the default rule (output unchanged, omitted from the .sbm).
+        var (p, b) = Model();
+        var item = new TrussLineItemDefinition { Name = "TP", Kind = TrussLineItemKind.Steel, Category = PartCategory.SplicePlate, Transverse = true, Station = Ft(250),
+            From = -Ft(2), To = Ft(2), Assembly = "GIRDER-DETAILS", AssemblyDescription = "tension plates",
+            Profile = { new TrussUV(0, 0), new TrussUV(In(16.5), 0), new TrussUV(In(16.5), In(0.75)), new TrussUV(0, In(0.75)) } };
+        var walk = new TrussLineItemDefinition { Name = "WALK", Kind = TrussLineItemKind.Steel, Category = PartCategory.WalkwayPlate, Transverse = true, Station = Ft(260),
+            From = -Ft(2), To = Ft(2), Assembly = "WALKWAYS",
+            Profile = { new TrussUV(0, 0), new TrussUV(In(12), 0), new TrussUV(In(12), In(0.25)), new TrussUV(0, In(0.25)) } };
+        b.Truss!.LineItems = new() { item, walk };
+        Assert.DoesNotContain("AssemblyKind", System.Text.Json.JsonSerializer.Serialize(item));
+        Assert.Equal(AssemblyKind.InspectionWalkway, Regen(p).Steel!.Assemblies.Single(a => a.Mark == "GIRDER-DETAILS").Kind);
+
+        item.AssemblyKind = AssemblyKind.PlateGirderLine;
+        var st = Regen(p).Steel!;
+        Assert.Equal(AssemblyKind.PlateGirderLine, st.Assemblies.Single(a => a.Mark == "GIRDER-DETAILS").Kind);
+        Assert.Equal(AssemblyKind.InspectionWalkway, st.Assemblies.Single(a => a.Mark == "WALKWAYS").Kind);
+        Assert.Contains("\"AssemblyKind\":\"PlateGirderLine\"", System.Text.Json.JsonSerializer.Serialize(item, new System.Text.Json.JsonSerializerOptions { Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() } }));
+
+        // .sbm round trip keeps it, and the database category follows the kind
+        var p2 = BridgeProject.FromJson(p.ToJson());
+        Assert.Equal(AssemblyKind.PlateGirderLine, p2.Bridges[0].Truss!.LineItems!.Single(x => x.Name == "TP").AssemblyKind);
+        Assert.Null(p2.Bridges[0].Truss!.LineItems!.Single(x => x.Name == "WALK").AssemblyKind);
+        var doc = SbmDocument.Attach(p2);
+        doc.Regenerate();
+        string db = Path.Combine(_dir, "kind.sqlite");
+        doc.ExportDatabase(db);
+        using var cn = ModelDatabase.Open(db);
+        Assert.Equal("plate girder", ModelDatabase.Scalar<string>(cn, "SELECT category FROM elements WHERE level = 'assembly' AND name = 'GIRDER-DETAILS'"));
+        Assert.Equal("inspection walkway", ModelDatabase.Scalar<string>(cn, "SELECT category FROM elements WHERE level = 'assembly' AND name = 'WALKWAYS'"));
     }
 
     [Fact]

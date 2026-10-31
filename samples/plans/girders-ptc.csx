@@ -74,6 +74,7 @@ foreach (var spec in bridgeSpecs)
 
     var t = new TrussDefinition
     {
+        PartPerPiece = true,   // main span review BW-M1 / user 2026-10-27: every ply / angle / cover plate / gusset layer its own element (sub-element of its member / joint stack)
         Name = spec.name.Replace("PTC ", ""), Source = "PTC DRB-4 sheets 3-5 (as-built 1954-57)", DefaultMaterial = "Structural steel (C / S not given)",
         Materials = { ["C"] = "Structural carbon steel (C)", ["S"] = "Structural silicon steel (S)" },   // p.43 / p.44 notes: silicon steel except carbon where noted (C)
     };
@@ -213,12 +214,17 @@ foreach (var spec in bridgeSpecs)
                 double seat = seatRows.TryGetValue(supName, out var sr) ? Ft(sr.shoe) : double.NaN;
                 t.Shoes.Add(new TrussShoeDefinition
                 {
-                    Name = $"{pl}-{s.n}{end}", Plane = pl, Point = pt, Support = supName, Type = typ, PinDiameter = 0, PinBelowPoint = 0, Height = FI(2, 0.5),    // W.P. to the bottom of the masonry plate 2'-0 1/2 (p.44: 3" sole + 18" shoe + 3 1/2" masonry)
+                    // W.P. to the bottom of the masonry plate: expansion 2'-0 1/2 (p.44: 3" sole + 18" shoe + 3 1/2" masonry); FIXED shoes by pier (agent review girders G04, p.44 stem
+                    // "18 x 9 x Varies"): Pier 1 2'-1 1/8, Pier 2 2'-1 1/4, other piers 2'-1 3/8; abutment fixed shoe height not legible (G05) -> 2'-0 1/2 kept, flagged
+                    Name = $"{pl}-{s.n}{end}", Plane = pl, Point = pt, Support = supName, Type = typ, PinDiameter = 0, PinBelowPoint = 0,
+                    Height = typ != TrussShoeType.Fixed ? FI(2, 0.5) : supName == "Pier 1" ? FI(2, 1.125) : supName == "Pier 2" ? FI(2, 1.25) : supName.StartsWith("Pier") ? FI(2, 1.375) : FI(2, 0.5),
                     BodyLength = typ == TrussShoeType.Fixed ? In(9) : In(9), BodyTopLength = In(9), BodyWidth = typ == TrussShoeType.Fixed ? In(18) : FI(3, 0), BodyTopAbovePin = 0,
                     MasonryLength = typ == TrussShoeType.Fixed ? In(24) : In(19), MasonryWidth = typ == TrussShoeType.Fixed ? FI(3, 0) : FI(4, 0), MasonryThickness = typ == TrussShoeType.Fixed ? In(4) : In(3.5),
                     SeatElevation = seat, Source = "p.43 / p.44",
                     Unresolved = typ == TrussShoeType.Fixed
-                        ? U("p.44", "fixed shoe body (sole plate 11x4 3/4x1'-6 beveled, key, stem plate 18x9, 2 stiffeners 7x1, 2 wing plates 15x1x1'-10)", "the plates are listed with their sizes but their arrangement is only drawn; the sole plate bevel is not dimensioned", "one envelope 9 in. x 18 in. x (W.P. to the masonry plate) including the sole plate; masonry plate 24 x 4 x 3'-0 as listed.")
+                        ? U("p.44", "fixed shoe body (sole plate 11x4 3/4x1'-6 beveled, key, stem plate 18x9, 2 stiffeners 7x1, 2 wing plates 15x1x1'-10)", "the plates are listed with their sizes but their arrangement is only drawn; the sole plate bevel is not dimensioned", "one envelope 9 in. x 18 in. x (W.P. to the masonry plate) including the sole plate; masonry plate 24 x 4 x 3'-0 as listed; height by pier as p.44 prints it (Pier 1 2'-1 1/8, Pier 2 2'-1 1/4, other piers 2'-1 3/8)"
+                            + (supName.StartsWith("Pier") ? "" : "; UNRESOLVED (p.44): the abutment fixed-shoe height is not legible (leader '3\"' and '2'-1 3/8', total unreadable) - 2'-0 1/2 used (agent review G05)")
+                            + (spec.fixedAtBegin ? "." : "; spans 28-31 fixed at the EAST (uphill) end of each span: the p.44 fixed-shoe heights fit only the uphill shoe of each pier pair (agent review G06)."))
                         : U("p.44", "expansion shoe body (sole plate, 17 5/8 x 9 x 3'-0 rocker, key, 2 stainless dowels 2 in x 3 in)", "the rocker radius (1'-6) and the groove are drawn, the sole plate bevel is not dimensioned", "one envelope 9 in. x 3'-0 x (W.P. to the masonry plate) including the sole plate; masonry plate 19 x 3 1/2 x 4'-0 as listed."),
                 });
             }

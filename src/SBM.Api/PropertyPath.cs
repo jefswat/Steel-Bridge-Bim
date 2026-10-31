@@ -121,13 +121,18 @@ public static partial class PropertyPath
     {
         string n = propertyName.ToLowerInvariant();
         if (n.Contains("station")) return ValueKindHint.Station;
-        if (n.Contains("degrees")) return ValueKindHint.Angle;
+        if (n.Contains("degrees") || n.EndsWith("deg")) return ValueKindHint.Angle;
         if (n.Contains("slope")) return ValueKindHint.Slope;
-        if (n.Contains("ratio") || n.Contains("scale") || n.Contains("fraction") || n.Contains("ksi") || n.Contains("opacity") || n.Contains("strength")) return ValueKindHint.Plain;
+        if (n.Contains("ratio") || n.Contains("batter") || n.Contains("scale") || n.Contains("fraction") || n.Contains("ksi") || n.Contains("opacity") || n.Contains("strength")) return ValueKindHint.Plain;
         if (n is "depressedtopatend" or "bearingtoend" or "padlength" or "genericbodylength" or "dowelhooklength" or "dowelpin"
             or "dowelbottomabovefooting" or "couplerlength" or "couplerdiameter"
             or "flangedrop" or "droprun" or "lowflatfrombearing" or "bendradius" or "copeinset" or "coperun" or "coperadius") return ValueKindHint.Short;
         if (n is "maxbarlength") return ValueKindHint.Long;
+        // approach slab / road inputs
+        if (n is "beyondend") return ValueKindHint.Short;
+        if (n is "maxwidth" or "samplespacing" or "minvertical" or "minhorizontal") return ValueKindHint.Long;
+        // MSE walls: panel sizes and design heights in feet
+        if (n is "panelwidth" or "panelheight" or "uptoheight") return ValueKindHint.Long;
         if (n.Contains("cover") || n.Contains("lapoverride") || n.Contains("tolerance")) return ValueKindHint.Short;
         // Cross girder / inspection access inputs: small dimensions in inches, run lengths and spacings in feet.
         if (n is "anglelength" or "endanglelength" or "bracketlength" or "anchorbracketlength" or "supportbracketlength" or "topbelowdiscontinuouswebtop"

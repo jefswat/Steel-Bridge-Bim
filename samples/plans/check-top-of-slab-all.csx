@@ -12,7 +12,7 @@ using System.Text;
 const double Tol = 0.01;       // ft, plan precision
 var verbose = Environment.GetEnvironmentVariable("TOS_VERBOSE") == "1";
 var outPath = Environment.GetEnvironmentVariable("TOS_OUT");
-string csvPath = new[] { @"samples\plans\top-of-slab-i80-rampg.csv", @"C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\samples\plans\top-of-slab-i80-rampg.csv" }.First(System.IO.File.Exists);
+string csvPath = new[] { @"samples\plans\top-of-slab-i80-rampg.csv", @"C:\SBM\samples\plans\top-of-slab-i80-rampg.csv" }.First(System.IO.File.Exists);
 
 var plan = new List<(string Br, int U, int Pt, string Line, double Elev, int Pdf)>();
 var bnds = new Dictionary<(string, int), List<(int Pt, string Kind, string Num)>>();

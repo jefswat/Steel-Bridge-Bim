@@ -26,7 +26,18 @@ public static class ConcreteDiaphragmGenerator
     private const double Big = 1000;           // top of the haunch extension of a beam void (m above the beam)
     private static readonly double Sample = Ft(1);
 
-    public static ConcreteDiaphragmModel? Generate(BridgeFraming f, PrestressedModel? ps, UnitSystem u)
+    /// <param name="exact">OPTIONAL (project setting Geometry.ExactCurvedGeometry): every closed loft also records its exact B-rep (<see cref="NurbsSolid.RuledLoft"/>:
+    /// planar slices, straight between them) on the mesh; the meshes are unchanged.</param>
+    public static ConcreteDiaphragmModel? Generate(BridgeFraming f, PrestressedModel? ps, UnitSystem u, bool exact = false)
+    {
+        _exact = exact;
+        try { return GenerateCore(f, ps, u); }
+        finally { _exact = false; }
+    }
+
+    [ThreadStatic] private static bool _exact;
+
+    private static ConcreteDiaphragmModel? GenerateCore(BridgeFraming f, PrestressedModel? ps, UnitSystem u)
     {
         var def = f.Definition;
         if (!def.Supports.Any(s => s.Diaphragm != null)) return null;
@@ -340,6 +351,50 @@ public static class ConcreteDiaphragmGenerator
                 if (sa0 > sc0) { (sa0, sc0) = (sc0, sa0); (sa1, sc1) = (sc1, sa1); }
                 bb.Add((sb, zb, sa0, sa1 - sa0, sc0, sc1 - sc0, za));
             }
+            // continuity diaphragm over a pier: the back and the ahead beam of one girder line meet in the diaphragm (bottom flanges overlap in S).
+            // One bottom per line: linear in x from the back beam bottom at x = -0.3 m to the ahead beam bottom at x = +0.3 m; flange edges = their union.
+            if (sup.Type != SupportType.Abutment)
+            {
+                var idx = Enumerable.Range(0, ends.Count).OrderBy(i => bb[i].S).ToList();
+                var merged = new List<(double S, double Z, double L0, double P0, double L1, double P1, double A)>();
+                int nMerged = 0; double worst = 0;
+                for (int q = 0; q < idx.Count; q++)
+                {
+                    int i = idx[q];
+                    if (q + 1 < idx.Count)
+                    {
+                        int jn = idx[q + 1];
+                        var (e1, e2) = (ends[i], ends[jn]);
+                        if (e1.AtStart != e2.AtStart && bb[jn].L0 <= bb[i].L1 + 1e-4)
+                        {
+                            var back = e1.AtStart ? e2 : e1; var ahead = e1.AtStart ? e1 : e2;
+                            // slope = mean of the two beam slopes; the line is lowered until it lies under the back beam bottom for x <= 0 and under the
+                            // ahead beam bottom for x >= 0 (sampled to +-1 m), so each beam void crosses the part bottom on the same edge
+                            double A = ((back.Map(k, 1, 0, 0).Z - back.Map(k, 0, 0, 0).Z) + (ahead.Map(k, 1, 0, 0).Z - ahead.Map(k, 0, 0, 0).Z)) / 2;
+                            double Z = double.MaxValue;
+                            for (int t = 0; t <= 10; t++)
+                            {
+                                double xt = t * 0.1;
+                                Z = Math.Min(Z, back.Map(k, -xt * xs, 0, 0).Z - A * (-xt * xs));
+                                Z = Math.Min(Z, ahead.Map(k, xt * xs, 0, 0).Z - A * (xt * xs));
+                            }
+                            Z -= 1e-6;
+                            var uu = (bb[i], bb[jn]);
+                            merged.Add(((uu.Item1.S + uu.Item2.S) / 2, Z, Math.Min(uu.Item1.L0, uu.Item2.L0), (uu.Item1.P0 + uu.Item2.P0) / 2,
+                                        Math.Max(uu.Item1.L1, uu.Item2.L1), (uu.Item1.P1 + uu.Item2.P1) / 2, A));
+                            worst = Math.Max(worst, Math.Abs(uu.Item1.Z - uu.Item2.Z));
+                            nMerged++; q++;
+                            continue;
+                        }
+                    }
+                    merged.Add(bb[i]);
+                }
+                if (nMerged > 0)
+                {
+                    bb = merged;
+                    Info($"bottom of the beams: the back and ahead beams of {nMerged} girder line(s) meet in the diaphragm - one bottom per line at the mean beam slope, under both beam bottoms (they differ by up to {L(worst)} at the CL).");
+                }
+            }
             bb.Sort((a, b) => a.S.CompareTo(b.S));
             if (bb.Count == 0) throw new InvalidOperationException("the BeamBottoms rule needs beams at this support");
             for (int i = 0; i < bb.Count; i++)
@@ -451,7 +506,7 @@ public static class ConcreteDiaphragmGenerator
         foreach (var r in dd.Unresolved) Warn("UNRESOLVED: " + r);
         if (assumption != null) Warn($"UNRESOLVED: {assumption.Reason} - {assumption.Basis}.");
 
-        dia.Description = $"{(dd.Kind == ConcreteDiaphragmKind.PierContinuity ? "Pier continuity" : dd.Kind == ConcreteDiaphragmKind.IntegralEnd ? "Integral abutment" : "Semi-integral end")} diaphragm, " +
+        dia.Description = $"{(dd.Kind == ConcreteDiaphragmKind.PierContinuity ? "Pier continuity" : dd.Kind == ConcreteDiaphragmKind.IntegralEnd ? "Integral abutment" : dd.Kind == ConcreteDiaphragmKind.ExpansionJointEnd ? "Expansion joint end" : "Semi-integral end")} diaphragm, " +
                           $"{dia.Parts.Count} part(s), {ends.Count} beam ends embedded" + (dd.Source != "" ? $" ({dd.Source})" : "");
         if (dia.Parts.Count > 0) model.Diaphragms.Add(dia);
         if (dia.Parts.Count > 0)
@@ -500,6 +555,8 @@ public static class ConcreteDiaphragmGenerator
         var m = new Mesh();
         MeshBuilder.AddLoft(m, section, rings);
         if (Math.Abs(m.Volume()) < 1e-8) return;   // sliver (< 0.01 litre) from nearly coincident events: left out
+        // exact geometry ON: the loft's own definition (planar slices, every vertex straight between them) as a closed B-rep on the piece
+        if (_exact && rings.Count == 2 && NurbsSolid.RuledLoft(rings[0], rings[1], "diaphragm") is { } ns) m.AddNurbs(ns, 0);
         mesh.Append(m);
         PieceTable.GetOrCreateValue(mesh).Add(m);
     }
@@ -509,11 +566,11 @@ public static class ConcreteDiaphragmGenerator
     // ------------------------------------------------------------------------------------------------ prism builder
 
     /// <summary>S of an end at slice x.</summary>
-    private static double EndS(Frame k, DiaphragmEnd e, double x, IReadOnlyList<BeamEnd> beams, bool right)
+    private static double EndS(Frame k, DiaphragmEnd e, double x, IReadOnlyList<BeamEnd> beams, bool right, bool top = false)
     {
         switch (e.Kind)
         {
-            case DiaphragmEndKind.Offset: return k.SAtOffset(e.Offset, x);
+            case DiaphragmEndKind.Offset: return k.SAtOffset(top && e.TopOffset is double t ? t : e.Offset, x);
             case DiaphragmEndKind.AlongLineFromOffset:
             {
                 double s0 = k.SAtOffset(e.Offset, 0) + (right ? 1 : -1) * e.Distance;
@@ -672,17 +729,20 @@ public static class ConcreteDiaphragmGenerator
     private static Plan SlicePlan(Frame k, double x, Edge lo, Edge up, DiaphragmEnd left, DiaphragmEnd right, List<BeamEnd> present, List<BeamEnd> fascia)
     {
         double sl = EndS(k, left, x, fascia, false), sr = EndS(k, right, x, fascia, true);
-        if (sr - sl < 1e-3) throw new InvalidOperationException($"ends cross at x {x:0.###} m");
+        double slT = EndS(k, left, x, fascia, false, top: true), srT = EndS(k, right, x, fascia, true, top: true);     // = sl / sr unless a sloped end
+        if (sr - sl < 1e-3 || srT - slT < 1e-3) throw new InvalidOperationException($"ends cross at x {x:0.###} m");
         // voids sorted by S descending (top edge is walked right to left)
         var order = Enumerable.Range(0, present.Count).OrderByDescending(i => present[i].Map(k, x, 0, present[i].D).S).ToList();
         double sta = k.Al.Inverse(k.W((sl + sr) / 2, x)).Station;
-        var kinkS = k.KinkOffsets(sta).Select(o => k.SAtOffset(o, x)).Where(s => s > sl + 1e-4 && s < sr - 1e-4).ToList();
+        var kinkAll = k.KinkOffsets(sta).Select(o => k.SAtOffset(o, x)).ToList();
+        var kinkS = kinkAll.Where(s => s > sl + 1e-4 && s < sr - 1e-4).ToList();
+        var kinkT = kinkAll.Where(s => s > slT + 1e-4 && s < srT - 1e-4).ToList();
         bool Smooth(DiaphragmZRef r) => r is DiaphragmZRef.DeckTop or DiaphragmZRef.Soffit;
         // a top edge on the stepped / beam-bottom Bottom reference breaks at the risers (piece boundaries)
-        var topK = Smooth(up.Ref) ? kinkS.ToList() : up.Ref == DiaphragmZRef.Bottom ? k.RisersAt(x).Where(s => s > sl + 1e-4 && s < sr - 1e-4).ToList() : new List<double>();
+        var topK = Smooth(up.Ref) ? kinkT.ToList() : up.Ref == DiaphragmZRef.Bottom ? k.RisersAt(x).Where(s => s > slT + 1e-4 && s < srT - 1e-4).ToList() : new List<double>();
         var botK = Smooth(lo.Ref) ? kinkS.ToList() : new List<double>();
         // top segments between events (right end, voids, left end) and kinks
-        var ev = TopEvents(k, x, sl, sr, present, order, topK);
+        var ev = TopEvents(k, x, slT, srT, present, order, topK);
         var topN = new int[ev.Count - 1];
         for (int i = 0; i + 1 < ev.Count; i++) topN[i] = Smooth(up.Ref) && ev[i].kind != 1 ? Math.Max(0, (int)Math.Ceiling(Math.Abs(ev[i].s - ev[i + 1].s) / Sample) - 1) : 0;
         var bev = BottomEvents(k, x, sl, sr, lo, botK);
@@ -735,6 +795,7 @@ public static class ConcreteDiaphragmGenerator
         List<BeamEnd> present, List<BeamEnd> fascia, Plan plan)
     {
         double sl = EndS(k, left, x, fascia, false), sr = EndS(k, right, x, fascia, true);
+        double slT = EndS(k, left, x, fascia, false, top: true), srT = EndS(k, right, x, fascia, true, top: true);
         var poly = new List<(double S, double Z)>();
         double Top(double s) => RefZ(k, up, s, x);
         double Low(double s) => RefZ(k, lo, s, x);
@@ -757,7 +818,7 @@ public static class ConcreteDiaphragmGenerator
 
         // ---- top (right to left)
         var tk = plan.TopKinks.Select(o => k.SAtOffset(o, x)).ToList();
-        var ev = TopEvents(k, x, sl, sr, present, plan.Order, tk);
+        var ev = TopEvents(k, x, slT, srT, present, plan.Order, tk);
         if (ev.Count - 1 != plan.TopSamples.Length) throw new InvalidOperationException("top topology changed (a kink crosses an end or a beam inside a slab)");
         for (int i = 0; i < ev.Count; i++)
         {
@@ -792,6 +853,7 @@ public static class ConcreteDiaphragmGenerator
         List<BeamEnd> present, List<BeamEnd> fascia, PanelSpec[]? spec, out PanelSpec[] made)
     {
         double sl = EndS(k, left, x, fascia, false), sr = EndS(k, right, x, fascia, true);
+        double slT = EndS(k, left, x, fascia, false, top: true), srT = EndS(k, right, x, fascia, true, top: true);   // sloped ends (OPTIONAL TopOffset)
         double Top(double s) => RefZ(k, up, s, x);
         double Low(double s) => RefZ(k, lo, s, x);
         static bool Smooth(DiaphragmZRef r) => r is DiaphragmZRef.DeckTop or DiaphragmZRef.Soffit;
@@ -803,8 +865,8 @@ public static class ConcreteDiaphragmGenerator
         var kinkOff = k.KinkOffsets(sta);
         for (int p = 0; p < np; p++)
         {
-            var lb = p == 0 ? new List<(double S, double Z)> { (sl, Low(sl)), (sl, Top(sl)) } : chains[p - 1].Right;
-            var rb = p == np - 1 ? new List<(double S, double Z)> { (sr, Low(sr)), (sr, Top(sr)) } : chains[p].Left;
+            var lb = p == 0 ? new List<(double S, double Z)> { (sl, Low(sl)), (slT, Top(slT)) } : chains[p - 1].Right;
+            var rb = p == np - 1 ? new List<(double S, double Z)> { (sr, Low(sr)), (srT, Top(srT)) } : chains[p].Left;
             double a = lb[0].S, b = rb[0].S, ta = lb[^1].S, tb = rb[^1].S;
             var sp = spec?[p];
             if (sp == null && (b - a < -1e-6 || tb - ta < -1e-6)) throw new InvalidOperationException($"beams overlap or cross an end at x {x:0.###} m");

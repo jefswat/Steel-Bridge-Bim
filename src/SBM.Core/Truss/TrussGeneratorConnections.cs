@@ -78,6 +78,44 @@ public static partial class TrussGenerator
             return res;
         }
 
+        /// <summary>Thickness along <paramref name="dir"/> of the single part the point lies in (0 = none; the largest when several overlap).</summary>
+        public double OnePartThickness(Vec3 o, Vec3 dir)
+        {
+            var d = dir.Normalized();
+            o += new Vec3(1.37e-6, -0.83e-6, 1.11e-6);
+            var hits = new Dictionary<int, List<(double t, int s)>>();
+            foreach (var (a, b, c, part) in _tris)
+            {
+                var e1 = b - a; var e2 = c - a;
+                var p = Vec3.Cross(d, e2);
+                double det = Vec3.Dot(e1, p);
+                if (Math.Abs(det) < 1e-14) continue;
+                double inv = 1 / det;
+                var s = o - a;
+                double u = Vec3.Dot(s, p) * inv;
+                if (u < 0 || u > 1) continue;
+                var q = Vec3.Cross(s, e1);
+                double v = Vec3.Dot(d, q) * inv;
+                if (v < 0 || u + v > 1) continue;
+                double t = Vec3.Dot(e2, q) * inv;
+                if (Math.Abs(t) > 0.6) continue;
+                if (!hits.TryGetValue(part, out var l)) hits[part] = l = new();
+                l.Add((t, Vec3.Dot(Vec3.Cross(e1, e2), d) < 0 ? 1 : -1));
+            }
+            double best = 0;
+            foreach (var l in hits.Values)
+            {
+                l.Sort((x, y) => x.t != y.t ? x.t.CompareTo(y.t) : y.s.CompareTo(x.s));
+                int depth = 0; double start = 0;
+                foreach (var (t, s) in l)
+                {
+                    if (s > 0) { if (depth == 0) start = t; depth++; }
+                    else if (depth > 0) { depth--; if (depth == 0 && start <= 1e-6 && t >= -1e-6) best = Math.Max(best, t - start); }
+                }
+            }
+            return best;
+        }
+
         /// <summary>The interval containing t = 0 (null = the point is not in steel).</summary>
         public (double t0, double t1)? At(Vec3 o, Vec3 dir, double reach)
         {
@@ -105,7 +143,10 @@ public static partial class TrussGenerator
         /// <summary>Places a rivet unless one already placed shares its hole (parallel shank, axes closer than 0.8 (d1 + d2) = their button heads would overlap: two layouts of the same drawn rivet, shanks overlapping or
         /// touching along the axis): that rivet is replaced by ONE rivet through both stacks (its diameter and axis, union of the grips, head at this rivet's end).
         /// True = shared.</summary>
-        private bool MergeRivet(Vec3 origin, Vec3 z, Vec3 xHint, double grip, double dia, string asm, string? material, Assumption? asu)
+        /// <param name="dropped">OPTIONAL: when given, a rivet that shares no hole but whose button head would overlap the head of a rivet already placed
+        /// (heads closer than 0.8 (d1 + d2), any direction: a bracing / floor connection rivet laid on its own pattern over the joint rivets) is NOT placed and
+        /// its assembly is counted here.</param>
+        private bool MergeRivet(Vec3 origin, Vec3 z, Vec3 xHint, double grip, double dia, string asm, string? material, Assumption? asu, Dictionary<string, int>? dropped = null)
         {
             var bolts = Model.Steel.Bolts;
             if (_rivetCells == null) { _rivetCells = new(); for (int i = 0; i < bolts.Count; i++) if (bolts[i].Kind == BoltKind.Rivet) IndexRivet(i); }
@@ -136,9 +177,50 @@ public static partial class TrussGenerator
                             return true;
                         }
                     }
-            AddRivet(origin, z, xHint, grip, dia, asm, material, asu);
-            IndexRivet(bolts.Count - 1);
+            if (dropped != null && HeadClash(origin, zz, grip, dia))
+            {
+                dropped[asm] = dropped.GetValueOrDefault(asm) + 1;
+                return false;
+            }
+            AddRivet(origin, z, xHint, grip, dia, asm, material, asu);   // indexed by AddRivet
             return false;
+        }
+
+        /// <summary>A button head of the rivet (origin, unit axis z, grip) overlaps a head of a rivet already placed: head centres 0.3 d outside the grip ends,
+        /// closer than 0.8 (d1 + d2) (head diameter 1.6 d).</summary>
+        private bool HeadClash(Vec3 origin, Vec3 zz, double grip, double dia)
+        {
+            var bolts = Model.Steel.Bolts;
+            var mine = new[] { origin - zz * (0.3 * dia), origin + zz * (grip + 0.3 * dia) };
+            foreach (var hp in mine)
+            {
+                var (cx, cy, cz) = CellOf(hp);
+                for (long ix = cx - 1; ix <= cx + 1; ix++)
+                    for (long iy = cy - 1; iy <= cy + 1; iy++)
+                        for (long iz = cz - 1; iz <= cz + 1; iz++)
+                        {
+                            if (!_rivetCells!.TryGetValue((ix, iy, iz), out var l)) continue;
+                            foreach (int i in l)
+                            {
+                                var b = bolts[i];
+                                if (b.Kind != BoltKind.Rivet) continue;
+                                double lim = 0.8 * (dia + b.Diameter);
+                                var h0 = b.Frame.Origin - b.Frame.Z * (0.3 * b.Diameter);
+                                var h1 = b.Frame.Origin + b.Frame.Z * (b.Grip + 0.3 * b.Diameter);
+                                if ((h0 - hp).Length < lim || (!b.FlushEnd && (h1 - hp).Length < lim)) return true;
+                            }
+                        }
+            }
+            return false;
+        }
+
+        /// <summary><see cref="Bridge.TrussDefinition.JointRivetsShareHoles"/> (see <see cref="RivetHoles.MergeShared"/>).</summary>
+        private void MergeJointRivetHoles(int from)
+        {
+            int merged = RivetHoles.MergeShared(Model.Steel.Bolts, from);
+            if (merged == 0) return;
+            _rivetCells = null;   // indices changed: rebuilt at the next MergeRivet
+            Info($"Truss: {merged} joint rivets share a hole with a rivet of another group / member (axes closer than half the diameters, shanks overlapping) - one rivet through both stacks{Src}.");
         }
 
         /// <summary>End connection / stiffener rivets after the joint rivets: one rivet per hole (an outstanding-leg rivet on a gusset where the joint group
@@ -147,8 +229,13 @@ public static partial class TrussGenerator
         {
             if (_pendingConn.Count == 0) return;
             int shared = 0;
-            foreach (var r in _pendingConn) if (MergeRivet(r.o, r.z, r.x, r.grip, r.dia, r.asm, r.mat, r.asu)) shared++;
-            Info($"Truss: end connection / stiffener rivets - {_pendingConn.Count - shared} placed, {shared} in a hole already taken by a joint / other rivet (one rivet through the whole stack, the larger diameter){Src}.");
+            var dropped = _d.ConnectionRivetsClearOfJointHeads ? new Dictionary<string, int>() : null;
+            foreach (var r in _pendingConn) if (MergeRivet(r.o, r.z, r.x, r.grip, r.dia, r.asm, r.mat, r.asu, dropped)) shared++;
+            int nd = dropped?.Values.Sum() ?? 0;
+            Info($"Truss: end connection / stiffener / bracing rivets - {_pendingConn.Count - shared - nd} placed, {shared} in a hole already taken by a joint / other rivet (one rivet through the whole stack, the larger diameter){Src}.");
+            if (nd > 0)
+                Info($"Truss: {nd} connection rivets not placed - their head would overlap a joint rivet head (the drawn rivets lie between / share the holes; per assembly: "
+                    + string.Join(", ", dropped!.OrderByDescending(kv => kv.Value).Take(12).Select(kv => $"{kv.Key} {kv.Value}")) + (dropped!.Count > 12 ? ", ..." : "") + $"){Src}.");
             _pendingConn.Clear();
         }
 
@@ -230,7 +317,7 @@ public static partial class TrussGenerator
             // part bounding boxes once
             var parts = Model.Steel.Parts;
             var boxes = parts.Select(p => p.Mesh is { IsEmpty: false } ? p.Mesh.Bounds() : default).ToList();
-            int nAngles = 0, nPlates = 0, nRiv = 0, nLoose = 0, nNoWeb = 0, nWebExt = 0, nOutFill = 0;
+            int nAngles = 0, nPlates = 0, nRiv = 0, nBolt = 0, nLoose = 0, nNoWeb = 0, nWebExt = 0, nOutFill = 0;
             var outFillT = new List<double>(); var outFillCmp = new List<string>();
             var backs = new List<string>();
             var missed = new List<string>();
@@ -243,7 +330,7 @@ public static partial class TrussGenerator
                 for (int i = 0; i < parts.Count; i++)
                 {
                     var b = boxes.Count > i ? boxes[i] : default;
-                    if (parts[i].Mesh is not { IsEmpty: false } || parts[i].Mark == exclude) continue;
+                    if (parts[i].Mesh is not { IsEmpty: false } || exclude != null && (parts[i].Mark == exclude || parts[i].Member == exclude)) continue;
                     if (b.Max.X < lo.X || b.Min.X > hi.X || b.Max.Y < lo.Y || b.Min.Y > hi.Y || b.Max.Z < lo.Z || b.Min.Z > hi.Z) continue;
                     pr.Add(parts[i].Mesh, i, lo, hi);
                 }
@@ -325,16 +412,20 @@ public static partial class TrussGenerator
                             else
                             {
                                 double ns = back + trimClr;
-                                int pi = parts.FindIndex(p => p.Mark == m.Mark);
-                                if (pi >= 0 && Math.Abs(ns - setb) > 1e-6)
+                                // the member's part, or all its pieces (PartPerPiece)
+                                var pis = Enumerable.Range(0, parts.Count).Where(i => parts[i].Mark == m.Mark || parts[i].Member == m.Mark).ToList();
+                                if (pis.Count > 0 && Math.Abs(ns - setb) > 1e-6)
                                 {
-                                    var op = parts[pi];
                                     // tapered member (DepthReductionStart / End): the lowered bottom continues on its slope over the added / removed length
                                     double rA = Math.Max(0, m.Def.DepthReductionStart), rB = Math.Max(0, m.Def.DepthReductionEnd), cut0 = (m.B - m.A).Length - m.SA - m.SB;
                                     double kT = (rA > 0 || rB > 0) && cut0 > 1e-6 ? (rB - rA) / cut0 : 0, grow = setb - ns;
-                                    var nm = MoveEndFace(op.Mesh, wp + m.Y * zoff, din, setb, ns, m.Y, start ? rA : rB, kT == 0 ? 0 : (start ? -kT : kT) * grow);
-                                    parts[pi] = CopyPart(op, nm, op.Length + setb - ns);
-                                    boxes[pi] = nm.Bounds();
+                                    foreach (int pi in pis)
+                                    {
+                                        var op = parts[pi];
+                                        var nm = MoveEndFace(op.Mesh, wp + m.Y * zoff, din, setb, ns, m.Y, start ? rA : rB, kT == 0 ? 0 : (start ? -kT : kT) * grow);
+                                        parts[pi] = CopyPart(op, nm, op.Length + setb - ns);
+                                        boxes[pi] = nm.Bounds();
+                                    }
                                     trims.Add(setb - ns);
                                     setb = ns;
                                     if (start) m.SA = ns; else m.SB = ns;
@@ -524,7 +615,20 @@ public static partial class TrussGenerator
                                             var q = P(back + a2.t / 2, sx * (heel + col.Gage), y);
                                             if (pr.At(q, din, 0.6) is not { } iv) { nNoWeb++; if (missed.Count < 3) missed.Add($"{lbl} outstanding leg at {where}"); continue; }
                                             if (iv.t1 - iv.t0 < a2.t + In(1.0 / 16)) nLoose++;
-                                            _pendingConn.Add((q + din * iv.t1, -din, Xv, iv.t1 - iv.t0, ec.OutRivetDiameter > 0 ? ec.OutRivetDiameter : ec.RivetDiameter, asmR, ec.RivetMaterial, rasu));
+                                            double od = ec.OutRivetDiameter > 0 ? ec.OutRivetDiameter : ec.RivetDiameter;
+                                            if (ec.OutBoltMaterial is { Length: > 0 } bm)
+                                            {
+                                                // high-strength bolt (head on the angle side, nut on the far face), not merged with rivets
+                                                var bgeo = new BoltGeometry(od);
+                                                double grip = iv.t1 - iv.t0;
+                                                var zz = -din; var bo = q + din * iv.t1;
+                                                var xx = Xv - zz * Vec3.Dot(Xv, zz); xx = xx.Length < 1e-9 ? Vec3.Cross(zz, Up).Normalized() : xx.Normalized();
+                                                Model.Steel.Bolts.Add(new BoltInstance { Frame = new Frame3(bo, xx, Vec3.Cross(zz, xx).Normalized(), zz), Grip = grip, Length = bgeo.LengthForGrip(grip),
+                                                    Assembly = asmR, Kind = BoltKind.Structural, Diameter = od, Material = bm, Assumption = rasu });
+                                                nBolt++;
+                                                continue;
+                                            }
+                                            _pendingConn.Add((q + din * iv.t1, -din, Xv, iv.t1 - iv.t0, od, asmR, ec.RivetMaterial, rasu));
                                             nRiv++;
                                         }
                         }
@@ -566,7 +670,7 @@ public static partial class TrussGenerator
                 nLong++;
             }
             if (_longRivets.Count > 0) Info($"Truss: longitudinal stiffeners - {_longPieces} pieces, {nLong} rivets{(nLongMiss > 0 ? $" ({nLongMiss} positions not in steel, skipped)" : "")}{Src}.");
-            Info($"Truss: end connections - {nAngles} connection angles, {nPlates} end plates, {nWebExt} web extensions, {nRiv} rivets{(nNoWeb > 0 ? $" ({nNoWeb} rivet positions not in steel, skipped; e.g. {string.Join("; ", missed)})" : "")}{Src}.");
+            Info($"Truss: end connections - {nAngles} connection angles, {nPlates} end plates, {nWebExt} web extensions, {nRiv} rivets{(nBolt > 0 ? $", {nBolt} high-strength bolts (outstanding legs)" : "")}{(nNoWeb > 0 ? $" ({nNoWeb} rivet positions not in steel, skipped; e.g. {string.Join("; ", missed)})" : "")}{Src}.");
             if (nOutFill > 0) Info($"Truss: end connections - {nOutFill} fills under the outstanding legs where the angles stand off the post / hanger face (probed, {L(outFillT.Min())} - {L(outFillT.Max())}){(outFillCmp.Count > 0 ? "; vs plan: " + string.Join("; ", outFillCmp.Distinct().Take(6)) : "")}{Src}.");
             if (nLoose > 0) Warn($"Truss CHECK end connections: {nLoose} rivets through the outstanding legs find no steel behind the leg (gap to the post / girder face over 1 mm; fills not drawn?) - placed with the leg as grip{Src}.");
             if (backs.Count > 0) Model.ConnectionBacks.AddRange(backs);
@@ -611,7 +715,7 @@ public static partial class TrussGenerator
                     for (int k = 0; k < wr.Count; k++)
                         cr.Add(new TrussLineItemRivet { U = h + tw * wr.Gage, W = w0 + dir * t / 2, V = ca.Top - wr.First - k * wr.Pitch, Axis = "W", Diameter = ca.RivetDiameter, Unresolved = ca.RivetUnresolved });
             }
-            string asm = Asm(li.Assembly.Length > 0 ? li.Assembly : "DECK-ITEMS", AssemblyKind.InspectionWalkway, li.AssemblyDescription.Length > 0 ? li.AssemblyDescription : $"{_d.Name} - {li.Assembly}");
+            string asm = Asm(li.Assembly.Length > 0 ? li.Assembly : "DECK-ITEMS", li.AssemblyKind ?? AssemblyKind.InspectionWalkway, li.AssemblyDescription.Length > 0 ? li.AssemblyDescription : $"{_d.Name} - {li.Assembly}");
             Model.Steel.Parts.Add(new SteelPart
             {
                 Mark = li.Name + "-CA", Category = PartCategory.TrussConnectionAngle, Assembly = asm, Mesh = mesh, Material = ca.Material.Length > 0 ? Material(ca.Material) : _d.DefaultMaterial,
@@ -664,5 +768,65 @@ public static partial class TrussGenerator
             }
             Info($"Truss: line item rivets - {n} placed{(shared > 0 ? $", {shared} in a hole already taken (angles back to back on one web / another group's rivet: one rivet through the whole stack)" : "")}{(miss > 0 ? $", {miss} positions not in steel (skipped)" : "")}{Src}.");
         }
+    }
+}
+
+/// <summary>One rivet per hole among already placed rivets (generic helper, used by <see cref="Bridge.TrussDefinition.JointRivetsShareHoles"/>).</summary>
+public static class RivetHoles
+{
+    private const double Cell = 0.15;
+    private static (long, long, long) CellOf(Vec3 p) => ((long)Math.Floor(p.X / Cell), (long)Math.Floor(p.Y / Cell), (long)Math.Floor(p.Z / Cell));
+    private static double Grip16(double g) { double q = In(1.0 / 16); return Math.Max(q, Math.Round(g / q) * q); }
+
+    /// <summary>Among the rivets [<paramref name="from"/>, end) of <paramref name="bolts"/>, a rivet whose shank overlaps (more than 1 mm along the axis) a
+    /// parallel rivet placed before it (any index) with the axes closer than 0.5 (d1 + d2) = same hole or shanks touching is merged into that rivet: its axis,
+    /// the union of both shanks, the larger diameter. Returns the number of rivets removed.</summary>
+    public static int MergeShared(List<BoltInstance> bolts, int from)
+    {
+        var cells = new Dictionary<(long, long, long), List<int>>();
+        void Index(int i) { var b = bolts[i]; var k = CellOf(b.Frame.Origin + b.Frame.Z * (b.Grip / 2)); if (!cells.TryGetValue(k, out var l)) cells[k] = l = new(); l.Add(i); }
+        for (int i = 0; i < from && i < bolts.Count; i++) if (bolts[i].Kind == BoltKind.Rivet) Index(i);
+        var gone = new HashSet<int>();
+        for (int i = Math.Max(0, from); i < bolts.Count; i++)
+        {
+            var b = bolts[i];
+            if (b.Kind != BoltKind.Rivet) continue;
+            var zz = b.Frame.Z;
+            var (cx, cy, cz) = CellOf(b.Frame.Origin + zz * (b.Grip / 2));
+            int hit = -1;
+            for (long ix = cx - 1; ix <= cx + 1 && hit < 0; ix++)
+                for (long iy = cy - 1; iy <= cy + 1 && hit < 0; iy++)
+                    for (long iz = cz - 1; iz <= cz + 1 && hit < 0; iz++)
+                    {
+                        if (!cells.TryGetValue((ix, iy, iz), out var l)) continue;
+                        foreach (int k in l)
+                        {
+                            var o = bolts[k];
+                            if (Math.Abs(Vec3.Dot(o.Frame.Z, zz)) < 0.985) continue;
+                            double ta = Vec3.Dot(o.Frame.Origin - b.Frame.Origin, zz), tb = ta + o.Grip * Vec3.Dot(o.Frame.Z, zz);
+                            var perp = (o.Frame.Origin - b.Frame.Origin) - zz * ta;
+                            if (perp.Length >= 0.5 * (b.Diameter + o.Diameter)) continue;
+                            double lo = Math.Min(ta, tb), hi = Math.Max(ta, tb);
+                            if (Math.Min(hi, b.Grip) - Math.Max(lo, 0) < 0.001) continue;
+                            hit = k; break;
+                        }
+                    }
+            if (hit < 0) { Index(i); continue; }
+            var r = bolts[hit];
+            var oz = r.Frame.Z;
+            double t0 = Vec3.Dot(b.Frame.Origin - r.Frame.Origin, oz), t1 = t0 + b.Grip * Vec3.Dot(zz, oz);
+            double u0 = Math.Min(0, Math.Min(t0, t1)), u1 = Math.Max(r.Grip, Math.Max(t0, t1));
+            bolts[hit] = new BoltInstance
+            {
+                Frame = new Frame3(r.Frame.Origin + oz * u0, r.Frame.X, r.Frame.Y, oz), Grip = Grip16(u1 - u0), Length = Grip16(u1 - u0), Assembly = r.Assembly,
+                Kind = BoltKind.Rivet, Diameter = Math.Max(r.Diameter, b.Diameter), Material = r.Material ?? b.Material, Assumption = r.Assumption ?? b.Assumption, FlushEnd = r.FlushEnd,
+            };
+            gone.Add(i);
+        }
+        if (gone.Count == 0) return 0;
+        var keep = new List<BoltInstance>(bolts.Count - gone.Count);
+        for (int i = 0; i < bolts.Count; i++) if (!gone.Contains(i)) keep.Add(bolts[i]);
+        bolts.Clear(); bolts.AddRange(keep);
+        return gone.Count;
     }
 }

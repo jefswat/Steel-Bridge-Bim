@@ -39,10 +39,15 @@ public sealed class Rhino3dmOptions
     public int FileVersion { get; init; } = 8;
     /// <summary>Element centerlines to write as curves on <c>&lt;bridge&gt;::CL-GEOMETRIC</c> / <c>CL-CENTROID</c> (null = none); world points, meters.</summary>
     public IReadOnlyList<Rhino3dmCenterline>? Centerlines { get; init; }
+    /// <summary>OPTIONAL roads / walls / grading / utility networks (top-level layers Roads:: / Walls:: / Grading:: / Utilities::); null = none.</summary>
+    public Rhino3dmCivil? Civil { get; init; }
     /// <summary>Closed polyhedral meshes (no recorded description) as closed B-reps of their planar faces; false = meshes, as before.</summary>
     public bool PlanarBreps { get; init; } = true;
     /// <summary>A polyhedron with more planar faces than this is a faceted curved surface and stays a mesh.</summary>
     public int MaxPlanarFaces { get; init; } = 400;
+    /// <summary>OPTIONAL: only elements whose layer (bare name, e.g. "3D-DECK", or full path "Unit 2::3D-DECK") matches this regular expression
+    /// are written (solids, bars, fasteners); null = everything. For quick checks of a few layers of a large model.</summary>
+    public System.Text.RegularExpressions.Regex? Layers { get; init; }
 }
 
 /// <summary>One element's geometric centerline and section centroid line (see SBM.Core.Solids.Centerlines).</summary>
@@ -67,6 +72,9 @@ public sealed class Rhino3dmResult
     public List<string> MeshItems { get; } = new();
     public int NurbsBreps { get; set; }
     public int NurbsBrepsClosed { get; set; }
+    /// <summary>Bars / strands written as exact pipes (with <c>BarSolids</c>): closed B-reps of quarter cylinders, torus patches and end caps.</summary>
+    public int BarBreps { get; set; }
+    public int BarBrepsClosed { get; set; }
     /// <summary>Exact bodies kept outside the mesh (prestressed beams with a true-arc profile, cut by the skewed end planes) written as closed B-reps.</summary>
     public int ExactBodies { get; set; }
     /// <summary>Solids written as meshes (no exact description), and exact descriptions that failed and fell back to the mesh.</summary>
@@ -102,7 +110,7 @@ public sealed class Rhino3dmResult
 /// coordinates are relative to <see cref="Rhino3dmOptions.BasePoint"/> (the IFC base point), which is recorded in the notes, the document
 /// user text (SBM_BasePoint_*) and the earth anchor point description.
 /// </summary>
-public static class Rhino3dmExporter
+public static partial class Rhino3dmExporter
 {
     private const double CreaseAngleDeg = 30;
 
@@ -117,6 +125,7 @@ public static class Rhino3dmExporter
                 w.Alignment(al);
         w.Lap("alignments");
         foreach (var m in selected) w.Bridge(m);
+        if (o.Civil != null) w.Civil(o.Civil);
         if (o.Terrain != null) foreach (var (name, mesh) in o.Terrain) w.Terrain(name, mesh);
         w.Lap("terrain");
         if (o.Centerlines != null)
@@ -279,7 +288,7 @@ public static class Rhino3dmExporter
         return s / 2;
     }
 
-    private sealed class Writer
+    private sealed partial class Writer
     {
         private readonly RF.File3dm _f = new();
         private readonly BridgeProject _project;
@@ -344,6 +353,15 @@ public static class Rhino3dmExporter
         private string LayerPathOf(int index) => _layers.First(kv => kv.Value.index == index).Key;
         private readonly Dictionary<int, string> _layerPath = new();
 
+        /// <summary>The optional layer filter (<see cref="Rhino3dmOptions.Layers"/>): bare layer name or full path.</summary>
+        private bool Wanted(int layer)
+        {
+            if (_o.Layers == null) return true;
+            if (!_layerPath.TryGetValue(layer, out var p)) _layerPath[layer] = p = LayerPathOf(layer);
+            int cut = p.LastIndexOf("::", StringComparison.Ordinal);
+            return _o.Layers.IsMatch(p) || (cut >= 0 && _o.Layers.IsMatch(p[(cut + 2)..]));
+        }
+
         private void Count(int layer, int n = 1)
         {
             if (!_layerPath.TryGetValue(layer, out var p)) _layerPath[layer] = p = LayerPathOf(layer);
@@ -382,7 +400,7 @@ public static class Rhino3dmExporter
         /// <summary>Writes one model element (its mesh and any exact description) on a layer; several Rhino objects of one element are grouped.</summary>
         private void Solid(SMesh mesh, int layer, Props p, Func<List<FaceSpec>>? faces = null)
         {
-            if (mesh.IsEmpty) return;
+            if (mesh.IsEmpty || !Wanted(layer)) return;
             _cur = (p.Strings.FirstOrDefault(s => s.k == "Bridge").v ?? "") + " / " + p.Name;
             var geoms = new List<RG.GeometryBase>();
             if (!_o.MeshOnly && faces != null)
@@ -431,6 +449,9 @@ public static class Rhino3dmExporter
         }
 
         private string _cur = "";
+        private int _nb, _nbc;
+        /// <summary>Volume of an element (m3): the exact NURBS volume when the mesh has one, else the mesh volume.</summary>
+        private static double Vol(SMesh m) => m.ExactVolume() ?? Math.Abs(m.Volume());
         private void MeshWhy(string why)
         {
             string k = why.Length > 80 ? why[..80] : why;
@@ -464,14 +485,40 @@ public static class Rhino3dmExporter
                         err = bb.Error;
                     }
                     catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) { err = ex.Message; }
-                    if (brep == null) { Fallback($"NURBS solid ({nurbs[k].Kind}): " + err); continue; }
+                    if (brep == null)
+                    {
+                        Fallback($"NURBS solid ({nurbs[k].Kind}): " + err);
+                        // several exact solids describing one triangle range (count 0 = a further solid of the range before): all or nothing
+                        if (mesh.NurbsTriangles!.Any(r => r.count == 0))
+                        {
+                            foreach (var g in geoms) g.Dispose();
+                            geoms.Clear();
+                            _r.NurbsBreps -= _nb; _r.NurbsBrepsClosed -= _nbc; _nb = _nbc = 0;
+                            return;
+                        }
+                        continue;
+                    }
                     for (int i = start; i < start + count; i++) covered[i] = true;
                     geoms.Add(brep);
-                    _r.NurbsBreps++;
-                    if (brep.IsSolid) _r.NurbsBrepsClosed++;
+                    _r.NurbsBreps++; _nb++;
+                    if (brep.IsSolid) { _r.NurbsBrepsClosed++; _nbc++; }
                 }
+                _nb = _nbc = 0;
                 if (geoms.Count == 0) return;
                 var rest = Enumerable.Range(0, mesh.TriangleCount).Where(i => !covered[i]).ToList();
+                // the rest may be exactly the pieces that recorded straight extrusions (a barrier: zone pieces straight, the others curved)
+                if (rest.Count > 0 && mesh.Solids is { Count: > 0 } && mesh.SolidTriangles == rest.Count)
+                {
+                    var ex = new List<RG.GeometryBase>();
+                    foreach (var es in mesh.Solids)
+                    {
+                        var g = FromExtruded(es);
+                        if (g == null) { foreach (var x in ex) x.Dispose(); ex.Clear(); break; }
+                        ex.Add(g);
+                        if (g is RG.Extrusion e) { if (e.IsMiteredAtStart) _r.MiteredExtrusions++; else _r.Extrusions++; } else _r.ObliqueBreps++;
+                    }
+                    if (ex.Count == mesh.Solids.Count) { geoms.AddRange(ex); return; }
+                }
                 if (rest.Count > 0) { geoms.Add(ToMesh(mesh, rest)); _r.Meshes++; }
                 return;
             }
@@ -606,6 +653,7 @@ public static class Rhino3dmExporter
 
         private void Bar(IReadOnlyList<Vec3> pts, double diameter, int layer, int solidLayer, Props p)
         {
+            if (!Wanted(layer)) return;
             var c = Centerline(pts);
             if (c == null) return;
             var a = Attr(layer, p);
@@ -616,6 +664,28 @@ public static class Rhino3dmExporter
             Count(layer);
             if (_o.BarSolids && diameter > 0 && pts.Count >= 2)
             {
+                // exact closed pipe (quarter cylinders / torus patches + caps); the mesh tube only when the centerline has a real kink or the B-rep fails
+                string? why = null;
+                if (!_o.MeshOnly && RhinoBarPipe.Faces(pts, diameter / 2, out why) is { } pf)
+                {
+                    try
+                    {
+                        var bb = new RhinoBrepBuilder(P, _s, _tol);
+                        foreach (var f in pf) bb.AddFace(f);
+                        if (bb.Finish() is { } brep)
+                        {
+                            _f.Objects.Add(brep, Attr(solidLayer, p));
+                            if (brep.IsSolid) _r.BarBrepsClosed++;
+                            brep.Dispose();
+                            _r.BarBreps++;
+                            Count(solidLayer);
+                            return;
+                        }
+                        why = bb.Error;
+                    }
+                    catch (Exception ex) when (ex is InvalidOperationException or ArgumentException) { why = ex.Message; }
+                }
+                if (why != null) { var key = "bar pipe: " + why.Split(':')[0]; _r.MeshReasons[key] = _r.MeshReasons.GetValueOrDefault(key) + 1; }
                 var m = new SMesh();
                 TubeBuilder.AddMitredTube(m, pts, diameter / 2, 8);
                 if (!m.IsEmpty)
@@ -769,6 +839,7 @@ public static class Rhino3dmExporter
                         p.Add("Fab_Toughness", fab.Toughness).Add("Fab_ContactFinish", fab.ContactFinish).Add("Fab_NDT", fab.Ndt).Add("Fab_CoatingExterior", fab.CoatingExterior)
                          .Add("Fab_CoatingInterior", fab.CoatingInterior).Add("Fab_ShopAssembly", fab.ShopAssembly).Add("Fab_Tolerance", fab.Tolerance).Add("Fab_Camber", fab.Camber)
                          .Add("Fab_Weld", fab.Weld).Add("Fab_Notes", fab.Notes.Count > 0 ? string.Join("; ", fab.Notes) : null);
+                    if (part.Fits is { Count: > 0 } fits) p.Add("Fits", string.Join("; ", fits.Select(x => x.Text)));
                     Solid(part.Mesh, L(ModelLayers.SteelLayer(part)), p);
                 }
                 Lap("steel parts");
@@ -831,6 +902,7 @@ public static class Rhino3dmExporter
 
         private void Instance(int def, Frame3 f, int layer, string name, string assembly, string gid, Assumption? flag)
         {
+            if (!Wanted(layer)) return;
             var a = new RD.ObjectAttributes { LayerIndex = layer, Name = name };
             a.SetUserString("Assembly", assembly);
             a.SetUserString("GlobalId", gid);
@@ -854,25 +926,46 @@ public static class Rhino3dmExporter
         private void Concrete(string bn, string bk, BridgeModel m, ConcreteModel c, Func<string, string, Props> Base, Func<string, int> L)
         {
             string deckGid = Gid(IfcKeys.DeckSlab(bk));
-            if (c.Deck is { IsEmpty: false } deck) Solid(deck, L("3D-DECK"), Base("Deck slab", "Deck").Add("Volume_m3", c.DeckVolume).Add("GlobalId", deckGid));
-            if (c.Haunches is { IsEmpty: false } h) Solid(h, L("3D-DECK"), Base("Haunches", "Haunch").Add("Volume_m3", c.HaunchVolume).Add("GlobalId", deckGid).Add("Note", "item of the deck slab in the IFC"));
-            foreach (var (name, mesh) in c.DeckBumps) Solid(mesh, L("3D-DECK"), Base(name, "Deck").Add("GlobalId", deckGid).Add("Note", "item of the deck slab in the IFC"));
-            foreach (var ch in c.CapHaunches) Solid(ch.Mesh, L("3D-DECK"), Base(ch.Name, "CapHaunch").Add("Support", ch.Support).Add("GlobalId", Gid(IfcKeys.CapHaunch(bk, ch.Support))));
+            const string V6 = "0.######";
+            if (c.Deck is { IsEmpty: false } deck) Solid(deck, L("3D-DECK"), Base("Deck slab", "Deck").Add("Volume_m3", Vol(deck), V6).Add("GlobalId", deckGid));
+            if (c.Haunches is { IsEmpty: false } h) Solid(h, L("3D-DECK"), Base("Haunches", "Haunch").Add("Volume_m3", Vol(h), V6).Add("GlobalId", deckGid).Add("Note", "item of the deck slab in the IFC"));
+            foreach (var (name, mesh) in c.DeckBumps) Solid(mesh, L("3D-DECK"), Base(name, "Deck").Add("Volume_m3", Vol(mesh), V6).Add("GlobalId", deckGid).Add("Note", "item of the deck slab in the IFC"));
+            foreach (var dp in c.DeckParts.Where(x => !x.Mesh.IsEmpty))
+                Solid(dp.Mesh, L(dp.IsPanel ? "3D-DECK-PANELS" : "3D-DECK-CLOSURES"), Base(dp.Name, dp.IsPanel ? "PrecastPanel" : "ClosurePour").Add("Volume_m3", Vol(dp.Mesh), V6).Add("GlobalId", Gid(IfcKeys.DeckPiece(bk, dp.Name))));
+            foreach (var ch in c.CapHaunches) Solid(ch.Mesh, L("3D-DECK"), Base(ch.Name, "CapHaunch").Add("Support", ch.Support).Add("Volume_m3", Vol(ch.Mesh), V6).Add("GlobalId", Gid(IfcKeys.CapHaunch(bk, ch.Support))));
             foreach (var (name, mesh) in c.Barriers)
-                Solid(mesh, L("3D-BARRIER"), Base(name, m.Definition.Deck.Barrier.IsCurb ? "Curb" : "Barrier").Add("Volume_m3", Math.Abs(mesh.Volume())).Add("GlobalId", Gid(IfcKeys.Barrier(bk, name))));
+                Solid(mesh, L("3D-BARRIER"), Base(name, m.Definition.Deck.Barrier.IsCurb ? "Curb" : "Barrier").Add("Volume_m3", Vol(mesh), V6).Add("GlobalId", Gid(IfcKeys.Barrier(bk, name))));
+            foreach (var a in c.ApproachSlabs)
+            {
+                string ak = IfcKeys.ApproachSlab(bk, a.Support);
+                Solid(a.Mesh, L("3D-APPROACH-SLABS"), Base(a.Name, "ApproachSlab").Add("Support", a.Support).Add("Owner", a.Definition.Owner?.ToString() ?? "").Add("Volume_m3", Vol(a.Mesh), V6).Add("GlobalId", Gid(ak)).Flag(a.Assumption));
+                if (a.Sleeper is { } slp) Solid(slp, L("3D-APPROACH-SLABS"), Base("Sleeper slab at " + a.Support, "SleeperSlab").Add("Support", a.Support).Add("Volume_m3", Vol(slp), V6).Add("GlobalId", Gid(IfcKeys.SleeperSlab(ak))));
+            }
             int jn = 0;
             foreach (var j in c.Joints)
             {
                 string jk = IfcKeys.Joint(bk, jn++);
-                Solid(j.Blockout, L("3D-JOINTS"), Base(j.BlockoutName, "JointBlockout").Add("Support", j.Support).Add("GlobalId", Gid(IfcKeys.JointBlockout(jk))));
-                if (j.EndBlock is { } eb) Solid(eb.Mesh, L("3D-JOINTS"), Base(eb.Name, "DeckEndBlock").Add("Support", j.Support).Add("GlobalId", Gid(jk + "/endblock")).Flag(eb.Assumption));
-                if (j.Body is { } jb) Solid(jb, L("3D-JOINTS"), Base(j.DeviceName, "JointDevice").Add("Support", j.Support).Add("Placeholder", "yes").Add("GlobalId", Gid(IfcKeys.JointDevice(jk))).Flag(j.Assumption));
+                Solid(j.Blockout, L("3D-JOINTS"), Base(j.BlockoutName, "JointBlockout").Add("Support", j.Support).Add("Volume_m3", Vol(j.Blockout), V6).Add("GlobalId", Gid(IfcKeys.JointBlockout(jk))));
+                if (j.EndBlock is { } eb) Solid(eb.Mesh, L("3D-JOINTS"), Base(eb.Name, "DeckEndBlock").Add("Support", j.Support).Add("Volume_m3", Vol(eb.Mesh), V6).Add("GlobalId", Gid(jk + "/endblock")).Flag(eb.Assumption));
+                if (j.Body is { } jb) Solid(jb, L("3D-JOINTS"), Base(j.DeviceName, "JointDevice").Add("Support", j.Support).Add("Placeholder", "yes").Add("Volume_m3", Vol(jb), V6).Add("GlobalId", Gid(IfcKeys.JointDevice(jk))).Flag(j.Assumption));
             }
             if (c.Segmental is { } sm)
             {
                 foreach (var s in sm.Segments)
                     Solid(s.Mesh, L(s.Assumption != null ? "3D-UNRESOLVED-SEGMENTS" : "3D-SEGMENTS"), Base(s.Name, "Segment").Add("Description", s.Description).Add("Span", s.Span).Add("Bent", s.Bent)
                         .Add("Volume_m3", s.Volume).Add("GlobalId", Gid(IfcKeys.Segment(bk, s.Name))).Flag(s.Assumption));
+                foreach (var bl in sm.Blocks)
+                    Solid(bl.Mesh, L("3D-SEGMENT-BLOCKS"), Base(bl.Name, "SegmentBlock").Add("Description", bl.Description).Add("Segment", bl.Segment)
+                        .Add("Volume_m3", bl.Volume).Add("GlobalId", Gid(IfcKeys.SegBlock(bk, bl.Name))).Flag(bl.Assumption));
+                foreach (var hw in sm.PtHardware)
+                    Solid(hw.Mesh, L("3D-SEGMENT-PT-HARDWARE"), Base(hw.Name, hw.IsPipe ? "SegmentPipe" : "SegmentPtBar").Add("Description", hw.Description).Add("Segment", hw.Segment)
+                        .Add("Material", hw.Material).Add("GlobalId", Gid(IfcKeys.SegHardware(bk, hw.Name))).Flag(hw.Assumption),
+                        // exact B-rep along the centerline: hollow pipe (bore = inside diameter) for deviation / future PT pipes, solid pipe for bars
+                        hw.Points.Count >= 2 && hw.OuterDiameter > 0 ? () => RhinoBarPipe.Faces(hw.Points, hw.OuterDiameter / 2, out var why, hw.IsPipe ? hw.InnerDiameter / 2 : 0)
+                            ?? throw new InvalidOperationException("pipe: " + why) : null);
+                foreach (var op in sm.Openings)
+                    Solid(op.Mesh, L("3D-SEGMENT-OPENINGS"), Base(op.Name, "SegmentOpening").Add("Description", op.Description).Add("Segment", op.Segment)
+                        .Add("GlobalId", Gid(IfcKeys.SegOpening(bk, op.Name))).Flag(op.Assumption));
                 foreach (var b in sm.Bearings)
                     if (b.Mesh != null) Solid(b.Mesh, L("3D-SEGMENTAL-BEARINGS"), Base(b.Name, "Bearing").Add("Description", b.Description).Add("Bent", b.Bent).Add("GlobalId", Gid(IfcKeys.SegBearing(bk, b.Name))).Flag(b.Assumption));
                 if (_o.Detail)
@@ -882,11 +975,11 @@ public static class Rhino3dmExporter
             }
             if (_o.Detail)
             {
-                var marks = c.Marks.GroupBy(x => x.Mark).ToDictionary(g => g.Key, g => g.First());
+                var marks = new BarMarkLookup(c.Marks);
                 for (int i = 0; i < c.Bars.Count; i++)
                 {
                     var b = c.Bars[i];
-                    marks.TryGetValue(b.Mark, out var mk);
+                    var mk = marks.Find(b);
                     string layer = b.Group switch { "Rail" => "3D-REBAR-RAIL", "CapHaunch" => "3D-REBAR-CAP-HAUNCH", _ => "3D-REBAR-DECK" };
                     Bar(b.Points, mk?.Size.Diameter ?? 0, L(layer), L(layer + "-SOLID"), BarProps("Bar " + b.Mark, b, mk).Add("GlobalId", Gid(IfcKeys.DeckBar(bk, i))));
                 }
@@ -985,7 +1078,7 @@ public static class Rhino3dmExporter
             {
                 foreach (var d in cd.Diaphragms)
                     Solid(d.Mesh, L(d.Assumption != null ? "3D-UNRESOLVED-DIAPHRAGMS" : "3D-DIAPHRAGMS"), Base(d.Name, "Diaphragm").Add("Support", d.Support).Add("Description", d.Description)
-                        .Add("Material", d.Material).Add("GlobalId", Gid(IfcKeys.Diaphragm(bk, d.Support))).Flag(d.Assumption));
+                        .Add("Material", d.Material).Add("Volume_m3", d.Volume, "0.######").Add("GlobalId", Gid(IfcKeys.Diaphragm(bk, d.Support))).Flag(d.Assumption));
                 int an = 0;
                 foreach (var a in cd.Accessories)
                     Solid(a.Mesh, L(a.Assumption != null ? "3D-UNRESOLVED-DIAPHRAGMS" : "3D-DIAPHRAGM-FILLERS"), Base(a.Name, a.Kind.ToString()).Add("Support", a.Support).Add("Description", a.Description)
@@ -1015,7 +1108,7 @@ public static class Rhino3dmExporter
             notes.AppendLine($"Units: {_r.Units}. The Rhino origin is the project grid point {bpText} - add it to Rhino coordinates for grid / map coordinates (same base point as the IFC export).");
             notes.AppendLine("Layers: <bridge>::<3D layer> (viewport layer names and colours); Alignments::<name>; Terrain::<name>. Object name = mark; attribute user text: Bridge, Kind, Mark, Assembly, Description, Material, Mass_kg, GlobalId (= IFC GlobalId), Status / Reason / Basis for UNRESOLVED items.");
             notes.AppendLine("Exact solids: plates / rolled shapes / boxes = extrusions (holes as inner profiles, arcs exact); oblique sweeps = extrusions mitered to the profile plane; NURBS solids and true-arc beam bodies = closed polysurfaces; other solids = meshes. Bolts, rivets, studs and anchor bolts are blocks (one definition per size); bars, strands and tendons are curves (lines + true arcs).");
-            notes.AppendLine($"Counts: {_r.Objects:N0} objects, {_r.Extrusions:N0} extrusions, {_r.MiteredExtrusions:N0} mitered extrusions, {_r.ObliqueBreps:N0} oblique B-reps, {_r.ExactBodies:N0} beam bodies, {_r.NurbsBreps:N0} NURBS B-reps, {_r.PlanarBreps:N0} planar B-reps, {_r.Meshes:N0} meshes, {_r.Curves:N0} curves, {_r.BlockInstances:N0} block instances of {_r.BlockDefinitions:N0} definitions.");
+            notes.AppendLine($"Counts: {_r.Objects:N0} objects, {_r.Extrusions:N0} extrusions, {_r.MiteredExtrusions:N0} mitered extrusions, {_r.ObliqueBreps:N0} oblique B-reps, {_r.ExactBodies:N0} beam bodies, {_r.NurbsBreps:N0} NURBS B-reps, {_r.PlanarBreps:N0} planar B-reps, {_r.Meshes:N0} meshes, {_r.BarBreps:N0} bar pipes ({_r.BarBrepsClosed:N0} closed), {_r.Curves:N0} curves, {_r.BlockInstances:N0} block instances of {_r.BlockDefinitions:N0} definitions.");
             if (_fallbackReasons.Count > 0)
             {
                 notes.AppendLine($"Exact geometry that fell back to meshes: {_r.Fallbacks}.");

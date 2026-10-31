@@ -1,6 +1,6 @@
 # Append ";Z=n1,n2,..;M=margin" (hairpin zones: stations per zone for this mark, left to right; margin in inches) to the CapHairpin lines.
 import json, re
-W = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends' + '\\'
+W = r'C:\SBM\.worktrees\bends' + '\\'
 Z = json.load(open(W + r'temp\bend\zones.json'))
 byp = {}
 for k, v in Z.items():

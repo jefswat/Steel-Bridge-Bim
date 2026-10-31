@@ -20,6 +20,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Release: `dotnet publish src/SBM.App -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -o dist/SteelBridgeModeler`
   and the same for `src/SBM.Cli` (same output folder â†’ `sbm.exe` beside the app).
 - Automation docs for the user: `docs/API.md`; example scripts in `samples/scripts`.
+- Windows Sandbox (`sandbox/start.ps1`, see `sandbox/README.md`): full Windows incl. the WPF app; repo mapped at `C:\SBM`, tools/NuGet/Claude login in `C:\sbmcache` (= host `%USERPROFILE%\SBMSandbox`), `dotnet` on PATH (not Program Files).
 
 ## New plan-set model checklist (REQUIRED - a model is not finished without it)
 1. Build script `samples/plans/build-<name>.csx` (run on `sbm new <model.sbm>`), ending with `Doc.Save()`. In it: `Doc.Project.PlanPdfs.Add(@"C:\SBMData\<plan set>.pdf")`
@@ -34,6 +35,15 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 3. Resolve what it prints as UNRESOLVED: write the link rules in the sheet-links file (title regex -> element selectors), correct low-confidence / scanned pages
    (paste a curated `"sheets"` index), set the georeference. Re-run `sbm pipeline <model.sbm>` until it says "nothing open" (or every open item is a reported user decision).
 4. Do not commit .sqlite / DEM / image files (ignored); the .sbm + scripts + sheet-links JSON (+ the small `.auto.json` index) are the source.
+5. AGENT REVIEW (user naming 2026-10-27: never call it "check" or "QC"): `sbm review <model.sbm>` (also the last pipeline step; `SBM.Api/AgentReview.cs`,
+   `SBM.IO/Database/ModelDb.Review.cs`, `SBM.Cli/ReviewCommand.cs`, docs/AGENT-REVIEW.md) flags plan PDFs (attached / present / SHA-256 unchanged), sheet links
+   (unused sheets, elements without a sheet), every input still at the program's starting value (reflection against a fresh object; inputs the generators do
+   not read are skipped by `Unused` / `NotRead` - keep those rules in step when adding inputs; repeats once per pattern `[*]`) and generator UNRESOLVED /
+   CONFLICT. Record `<model>.agent-review.json` (PDF fingerprints, `--confirm`ed values; commit it), db table `agent_review`. Not built yet: the per-element
+   PDF-vs-geometry comparison by an agent and its staleness rule. Every plan-set build script now adds its plan PDF to `Doc.Project.PlanPdfs` (idempotent, just before `Doc.Save()`; 2026-10-27):
+   build-i80-wb (Design 116) + build-ramp-g (Design 316) - both from `dist\SteelBridgeModeler`, not C:\SBMData - build-woodbury, build-br02069, build-nebraska-st,
+   build-nht, build-odot-o-tub, build-bonner-unit5 / -unit6, build-ptc-delaware-river (its copies "PTC main truss 18-20" / "PTC approach trusses" inherit it). The
+   committed .sbm files get it on their next build (until then they still flag it). Concept models without a plan set (build-richmond-*, build-blatnik-*) keep the flag.
 
 ## Projects
 - `src/SBM.Api` â€” `SbmDocument` (open/new/save, typed + text property-path edits, incremental `Regenerate`, export),
@@ -349,6 +359,18 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     else the exact BVH ray cast `SnapIndex.RayCast` (front-to-back, no time budget; the snap `Find` is budgeted and can return a far surface) under the
     cursor -> under the screen center -> previous pivot if on screen -> view target; never a plane point. Marker = WPF overlay `PivotOverlay` (always on top).
     Help: "Mouse ?" button (text from `NavPresets.Describe`). The camera is orthographic only (`DollyToward` / `NearPlaneFor` are there for a perspective one).
+  - North arrow (`MainWindow.NorthArrow.cs`, math `ViewNav.NorthArrow`, test in `ViewNavTests`): WPF overlay top right under the navigation buttons, GRID north = project
+    +Y (the plan / LandXML coordinates, same as the compass views) drawn on the ground plane (turns with the plan, foreshortened in 3D), note "grid N" with a
+    georeference / "local grid +Y" without; no true north (no convergence input). Toggle in Views > North arrow; hidden in Sheets mode.
+  - Click views (`MainWindow.ClickViews.cs`, window `Editors/ClickViewsWindow.cs`; ribbon View > 2D projection > Click Views): while the window is open every
+    viewport pick projects (ModelProjector, visible layers, unhidden elements) a PLAN (horizontal cut at the picked elevation, or top view), an ELEVATION (from the
+    right of the nearest alignment, stations to the right, window along the tangent) and a SECTION (normal to the alignment through the point, looking up-station,
+    Near 0, chosen depth beyond); items + plan boxes cached per scene, only items near the point are projected (Sample: < 1 s); red CLICK-POINT marks; window size /
+    depth / hidden lines options; close = off; I-80 + Ramp G (68.8 M triangles): ~0.7 s per click for the three views (2026-10-30; window has its own dark background). Snapshot `--clickviews --pickafter fx,fy` -> `<stem>_click_{plan,elevation,section,window}.png`.
+  - GlobalId in the Properties panel (`MainWindow.Database.cs` `ShowGlobalIdRow`): every pick shows the element's IFC GlobalId as the second row, from the
+    background `ModelDatabase.BuildTagIndex` (now built on every scene, with or without a .sqlite); NamedPicks resolve by `Model ?? Source` (deck slab / haunch /
+    bumps, barriers, deck parts, cap haunches, joint blockouts / devices register their mesh as `Row.Tag` / `Writer.AlsoTag`). Property values are read-only
+    TextBoxes (selectable / copyable).
   - Detail tiles (`_detailBounds`): culled by distance from the view-center LINE OF SIGHT (`_detailRadius`, 120 m), never from `Position + LookDirection`
     (that point is at the depth of the scene center because `KeepCameraInRange` parks the eye outside the scene: in oblique views it was hundreds of
     meters from what is on screen, so close-up rebar, e.g. Ramp G Pier 7G, vanished). `OnCameraMoved` ignores no-op camera events.
@@ -379,7 +401,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `BearingFromBack`; stack uses the thickness AT the CL bearing) -> `PrestressedPad.BearingMark` / `.SolePlate` (`PrestressedSolePlate`: mesh,
     taper vs beam slope Info; IFC IfcPlate 'SOLE_PLATE' key `IfcKeys.PsSolePlate`, DB element "sole plate", viewport 3D-BEARING-SOLE-PLATES,
     elevation-check row "− Sole plate"); `StartBearingToEnd` / `EndBearingToEnd` (span-layout bearing offsets, 0 = BearingToEnd); `CamberTable`
-    (`PrestressedCamberPoint` fraction / camber / SDL / printed final; recorded + Info check, geometry stays uncambered) + `CamberSource`;
+    (`PrestressedCamberPoint` fraction / camber / SDL / printed final; recorded + Info check + IFC Pset `SBM_Camber` on the IfcBeam (table values by span fraction), geometry stays uncambered) + `CamberSource`;
     `PlanLength` / `PlanConcreteVolume` (check data); `StrandPoint.Diameter` / `Label` (e.g. 1/2" slack strands among 0.6") -> `StrandInstance.Diameter`
     (`DiameterIn(beam)`), IFC tendon diameter / area / description, viewport tube.
     Beam mild reinforcing (OPTIONAL `PrestressedBeamDefinition.Reinforcement` = `Bridge/BeamReinforcementDefinition.cs`, JSON omitted when null = no
@@ -415,7 +437,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   - Concrete END / PIER diaphragms (design feature C, T5/T6): input `SupportDefinition.Diaphragm` = `Bridge/ConcreteDiaphragmDefinition.cs` (OPTIONAL,
     omitted from the .sbm when null): `Parts` (section polygons in (x normal to the support - abutments + toward the span, piers + ahead; z = ref
     DeckTop / Soffit / Bottom (stepped `BottomSteps` per beam line, `Risers` Unresolved = mid-bay drawn + Assumption flag | MidBay | Explicit) /
-    Elevation + dz), vertically convex, non-vertical edges keep one ref), ends `DiaphragmEnd` (Offset line | AlongLineFromOffset | FasciaOutside =
+    Elevation + dz), vertically convex, non-vertical edges keep one ref), ends `DiaphragmEnd` (Offset line, OPTIONAL `TopOffset` = sloped face between the bottom and top lines | AlongLineFromOffset | FasciaOutside =
     top-flange edge line of the fascia beam), a part with `Unresolved` text is NOT built (warning), `OpenBelowBeams` (bearing zone under the beams is
     pads + filler, not concrete), `Fillers` (EndFace / Section / AroundBearings / Interface; thin solids, plan material names), `Keyways`, `BeamHoles`
     (cast web holes: positions + strand clearance, records only), `PlanBearingGap` check. Generator `Diaphragms/ConcreteDiaphragmGenerator.cs`, run in
@@ -507,7 +529,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     `Profile` (`BarrierProfilePoint` R inward from the deck edge / H, Radius, Chamfer, surface Tag of the next edge), `PerpendicularToDeck`, `Begin/EndExtension`
     (square ends beyond the deck ends, along the toe line), `Zones` (`BarrierZone`: own section centred where a support CL crosses the deck edge, shortest zone wins,
     optional `DeckWidening` -> `ConcreteModel.DeckBumps`, part of the deck slab), `PlanLength` check. Output: one mesh per barrier + `BarrierPieces` (closed solid per
-    section length, IFC items) + `TaggedSurfaces` (tagged faces incl. zone "returns") for the surface treatments. Woodbury: `samples/plans/barrier-woodbury.csx`. `Rebar.cs` (A615 sizes, AASHTO 5.10.8 Class B
+    section length, IFC items) + `TaggedSurfaces` (tagged faces incl. zone "returns") for the surface treatments. Woodbury: `samples/plans/barrier-woodbury.csx`. Section spacing follows the curvature (chord sag <= 1/32 in on the tightest line; NHT curbs on R ~ 53 ft sagged 0.68 in at 1.5 m, agent review C01). `Rebar.cs` (A615 sizes, AASHTO 5.10.8 Class B
     laps, `BarShape` centerlines + bend-diagram dims, `BarMark` incl. "varies" marks). Mark rules: â‰¥4 identical =
     own mark; straight bars within `MarkLengthTolerance` snap to the cluster's SHORTEST length; odd closures grouped
     into "varies" marks (â‰¤3 ft range). Negative-moment bars are one length centered on the pier. Equal-piece splits
@@ -549,7 +571,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Last full-model result (2026-10-11, 347 MB, 3.76 M entities): 0 schema + 0 EXPRESS issues; see docs/plan-data/ifc-validation.md.
   RHINO 3DM export (2026-10-26): `Rhino3dm/` = `Rhino3dmExporter` (+ `RhinoBrepBuilder`, `Rhino3dmInfo` read-back) on McNeel rhino3dm 8.17.0 (NuGet
   `Rhino3dm`, MIT, openNURBS; native `librhino3dm_native.dll` via runtimes/win-x64 -> root of a `-r win-x64` publish). `SbmDocument.Export3dm`,
-  `sbm export --3dm out.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids]`, `sbm 3dm-info`, app Output > CAD > Export Rhino (.3dm).
+  `sbm export --3dm out.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids]`, `sbm 3dm-info`, app Output > CAD > Export Rhino (.3dm). `--bar-solids` (2026-10-30) = exact closed pipe B-reps per bar (`Rhino3dm/RhinoBarPipe.cs`: 4 quarter faces over the whole bar, lines degree-elevated, arcs revolved, C0 double knots, planar caps; frame carried exactly through arcs, re-squared on lines; mesh tube for kinks > 10 deg / self-overlapping centerlines; `Rhino3dmResult.BarBreps / BarBrepsClosed`; tests `RhinoBarPipeTests`).
   Mapping: `ExtrudedSolid` -> Rhino Extrusion (holes = inner circle profiles, `ArcPolygon` arcs exact); OBLIQUE sweeps (plates along a grade with plumb
   ends) -> Extrusion along the sweep MITERED to the profile plane at both ends (`MiterPlaneNormalAtStart/End`, profile coords; right section = profile
   projected along the sweep, circles -> ellipses as rational NURBS) - B-reps for them were 3x larger; sweep within 1/32 of the profile plane -> closed
@@ -568,7 +590,35 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   NURBS throughout (2026-10-26): regular 16+-gon outlines -> true circles (`Rhino3dmExporter.RegularPolygon`), closed polyhedral meshes -> planar B-reps
   (`RhinoBrepBuilder.Shells` + `PlanarFaces`: weld 0.01 mm, coplanar groups through overlapping opposite edges, net edge coverage per line, corners shared + inserted
   into neighbour edges, corners < 0.2 mm clustered), export regenerates with ExactCurvedGeometry ON unless `--no-exact`; why meshes remain: `MeshReasons`.
+  DECK as exact closed B-reps (2026-10-27; exact-ON only, every mesh unchanged except where noted, OFF output identical): the generators RECORD the exact solid on the
+  mesh they already build (`Mesh.AddNurbs(solid, start, count)`, count 0 = a further solid of the same triangles; `DropNurbsFrom` = all or nothing):
+  `NurbsSlab.Create(..., bottomRow)` = OPTIONAL exact bottom fitted with the top on one u knot vector, bottoms per band (one-sided rows -> `riser` faces where the
+  bottom steps, e.g. the overhang root), slab ends = ONE planar face per run of coplanar bands bounded by the exact curves (`NurbsFace.Loop` + sampled `Polygon`;
+  `NurbsSolid.LoopAreaVector` for the volume) - used by the deck (overhang soffit now NURBS: `HardColumns` adds the overhang root / blend-crossing columns; the ON
+  slab mesh is tessellated from it), `ConcreteGenerator.RecordEndBlock` (blocks between insets from a deck end: panels across between `EndLines` = edges +- li / ri,
+  crown / gutter / break lines, inset kinked-end vertices; bands at the soffit breaks) for every `EndSlab` (joint blockouts, shelves, device envelopes) and
+  `RecordEndBlockSection` (end blocks / thickened slab ends: two blocks when the blockout steps), cap haunch pieces (split at the deck edge under a widening);
+  `RecordSweep` (NurbsSweep of the generator's corner functions, skipped when the loft already recorded an extrusion) for custom barrier / curb pieces and deck
+  widenings; `NurbsHaunch` clips each bottom corner at the deck ends like `ClipHaunchRings` (the ON haunch projected past skewed ends before). Builder:
+  singular trims (one collapsed side; snapped exactly), faces with two opposite collapsed sides dropped (slivers), tiny planar-loop curves dropped, non-planar
+  end polygons -> planar pieces of their triangulation (`PlanarPieces`). Exporter: NURBS + the remaining recorded extrusions of one mesh, Volume_m3 = exact.
+  Fix: custom-barrier `Map` took every H < 0 as the deck top (deck widenings with PerpendicularToDeck = false had zero thickness). Read-back
+  `Rhino3dmInfo.Objects` / `sbm 3dm-info --objects [layer regex]` (type, closed, valid, volume by own quadrature, bounds, element key). Tests `Rhino3dmTests.DeckElements_*`.
+  Still meshes: arch-span deck (ArchGenerator form-deck slab), concrete diaphragms (faceted slab lofts), tub haunches (lofts), Ramp G U4 19G blockout /
+  end block (kinked-end break points change across the block). Open B-reps: I-80 U1-U3 / Ramp G U4 slabs (kink lines meeting skewed / kinked ends leave gaps
+  in the NurbsDeck panel layout; their tessellated ON slab meshes are open too - pre-existing). IFC of the Sample / Woodbury byte-identical (FILE_NAME only).
   Results: docs/API.md "Rhino export".
+  Civil items (2026-10-30): `Rhino3dmOptions.Civil` = `Rhino3dmCivil` (roads / walls / grading / utilities; `Rhino3dm/Rhino3dmCivil.cs`, partial Writer), top-level layers
+  Roads:: / Walls:: / Grading:: / Utilities::, GlobalIds from `ModelDatabase.BuildTagIndex`; SbmDocument.Export3dm passes them for a whole-model export, the app too.
+  DECK SOLIDS pass 2 (2026-10-28, tests `DeckSolidsTests`): slab panel layout with ONE column set where kink lines meet skewed / kinked ends (I-80 U1-U3 / Ramp G U4 slabs closed),
+  concrete diaphragms / tub haunches / arch deck closed (`ArchGeneratorExact.cs`, `ConcreteTubHaunch`), kinked-end blocks split where the end's break points change
+  (`EndSplits`: also where a break point or a grade kink line crosses a FIXED column - panel order swap), `RhinoBrepBuilder.OrientConsistently` (closed manifold shell whose
+  faces disagree across an edge: faces flipped by propagation, shell outward). PERFORMANCE: inserted slab columns are blends of the two HARD columns (nested blends doubled
+  the cost per column), end-block rows find the end crossing by secant (`EndSecant`) from the row's two lateral crossings (the full `EndD` search per point made Ramp G U4
+  regenerate in 160-410 s; now 19 s, exact overhead ~8 s). Open: I-80 U3 Pier 11WB blockout / end block and Ramp G 19G blocks stay closed meshes (fit 'across' 3.4 mm at a
+  panel edge just after a split; 19G invalid seam trim from a sliver piece), I-80 U2 5WB end block 3dm volume +0.22 % vs exact (a 0.10 m3 sliver piece overlapping its
+  neighbour). Test `KinkedEnd_BreakPointLeavingTheBlock_*` passes since 2026-10-30: end-block rows across up to 128 (was 64: a band next to a moving break
+  point needs 96 rows for 0.1 mm) and the test's break point solved 0.05 m inside the edge in offset (its projection formula put it 0.37 m inside on the skew).
   Exports must be reproducible (test `Ifc_RegeneratedModel_ExportsIdentically`): anything numbered from a parallel
   generator's ConcurrentBag (stiffener marks, bar order, hole order) must be put in a fixed order first. Bar role:
   TIE/HOOP/CROSSTIE/SPIRAL/SSTR-S = LIGATURE.
@@ -760,7 +810,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `GirderEnd`), Points (camber, steel and slab+barrier deflection)): `Framing/CamberBlocking.cs` -> `BridgeFraming.Camber` (per point: final top of web, girder-line haunch
   elevation H = grade - slab + slab deflection, no-load top of web N = web + deflections, BLOCKING = N - N(datum), camber from the no-load shape = N - chord(N) between splices).
   The model geometry stays the final shape. Points between key points are equally spaced along each girder. Girder properties, material report, DB girder-group properties
-  (camber_table), `sbm blocking`. Plan data/results: `docs/plan-data/camber-blocking.md` (section 9), `docs/plan-data/camber/*.csv`; scripts `samples/plans/camber-i80.csx`,
+  (camber_table), `sbm blocking`, IFC Pset `SBM_Camber` on every field section assembly of the girder (one set per girder: IfcPropertyTableValue columns PlanPoint / Camber / deflections / no-load top of web / blocking / haunch elevation by distance along the girder; 2026-10-31). Plan data/results: `docs/plan-data/camber-blocking.md` (section 9), `docs/plan-data/camber/*.csv`; scripts `samples/plans/camber-i80.csx`,
   `camber-ramp-g.csx` (run after the girder/splice/termination scripts) and `check-blocking.csx`.
 - Plan-driven deck reinforcing (OPTIONAL `DeckReinforcementDefinition.Plan` = `DeckPlanReinforcement`, Bridge/DeckPlanReinforcement.cs; null = the generic generator below stays the default):
   `Concrete/ConcretePlanRebar.cs` (partial `ConcreteGenerator`). `DeckTransverseZone` = equally spaced RADIAL lines along a deck edge from the begin deck-end line (`StartAfterPrevious`, `AnchorToEnd`,
@@ -792,6 +842,9 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   `docs/plan-data/superelevation-8wb.md` section 5.
 - Drainage: `BridgeDefinition.Drains` â†’ `SubstructureModel.Drainage` (built in SubstructureGenerator, needs terrain for basins).
 - Raster terrain: `ElevationGrid` (full-res bilinear) + decimated display mesh; `TerrainModel(grid, mesh)`.
+  Aerial (terrain `ImagePath` + world file): draped on the surface in 3D; in PLAN view drawn as one flat textured quad (`ReferenceRender.PlanImage`, same
+  texture) 30 m below the lowest terrain point so plan linework / contours draw over it (`MainWindow._planImageModels` / `_drapedImageModels`; the terrain layer
+  is then not 3D-only).
 - Cross girders as designed (OPTIONAL fields on `CrossGirderSection`; defaults = the simple legacy cross girder): `CrossGirderDetailer.cs`
   (`BuildCrossGirder`, runs in the CONNECTIONS phase so the angle bolts register holes in the continuing girders' webs and in the
   discontinuous girder's web). Frame: x along the XG, -y = near side (the discontinuous girder's side), z = 0 at the top of the top flange.
@@ -855,7 +908,13 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   IfcFooting, IfcMechanicalFastener ANCHORBOLT, proxies for placeholders; deck-piercing inlets void the slab. Database: groups drainage / sign supports / crash cushion / lighting >
   assemblies > elements (`MiscItems` in ModelDatabase; keys `IfcKeys.MiscAssembly/MiscElement`), sheet rules in `sheet-links-i80-rampg.json`. Viewport layers `3D-DRAIN-*`,
   `3D-SIGN-SUPPORT`, `3D-CRASH-CUSHION`, `3D-LIGHTING`, `3D-PLACEHOLDER`. Plan data scripts (re-runnable): `samples/plans/drains-ramp-g.csx`, `signs-i80.csx`, `end-posts.csx`,
-  `lighting.csx`; data/results/unresolved list: `docs/plan-data/misc-items-data.md` (section "Model").
+  `lighting.csx`; data/results/unresolved list: `docs/plan-data/misc-items-data.md` (section "Model"). Crash cushion end posts: OPTIONAL `CrashCushionEndPostDefinition.PlanRows` (station / left / right offset rows = the dimensioned outline, asymmetric tapers) + `Source`;
+  I-80 Ramp A (U2, sheet 190 Detail A) and Ramp G (U3, sheet 191 Detail A) placed from them (end-posts.csx, agent review qc/i80-rampg/curbs); the rail part of the post
+  (OPTIONAL `RailRows` + `RailHalfProfile`, `EndPostPlanRow.RightStation` for the skewed end of slab; Section C-C halves filled solid, agent review I05) is built; barrier cover
+  (slider) plates: OPTIONAL `ExpansionJointDefinition.BarrierPlate` = `JointBarrierPlateDefinition` (plate on every non-base face of the bridge barrier section, Depress inside the
+  faces, BottomClear, LengthIn / LengthOut from the deck-end face, `RightLengthIn/Out` for skewed joints; `ConcreteGenerator.BarrierPlateSection`; part JointCoverPlate in the joint
+  hardware assembly); data `samples/plans/barrier-sliders-i80.csx` (called by joints-i80.csx; I-80 Pier 5WB / 11WB / East Abutment per sheet 203; West Abutment and Ramp G
+  sheet 148 UNRESOLVED; fasteners / recess not built). End post concrete 2.80 / 3.60 CY vs the plan summary 2.4 CY (reported).
   UNRESOLVED WARNING TEXT (user rule): every flag names the plan page AND a short plain reason why it is open - build new ones with
   `UnresolvedFlag.Text(pages, item, why, then)` (SBM.Core/Assumption.cs) -> "UNRESOLVED (p.17): CMP casing bottom - it is the bottom of the EPS fill, which is in the
   road plans, not this set. ..."; generic generators use the definition's `Source` for the page when they have one. Diagnostics have no structured reason field.
@@ -1014,7 +1073,90 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   cantilever" assemblies (`ModelDatabase.Segmental`). Viewport layers 3D-SEGMENTS / 3D-UNRESOLVED-SEGMENTS / 3D-PT-TENDONS / 3D-SEGMENTAL-BEARINGS. Bonner
   Unit 5: `samples/plans/build-bonner-unit5.csx` (reads the segmental-unit5 CSVs; -L- placed in localized NC State Plane EPSG:2264 from monument B2500-2, p.35) ->
   `Bonner Unit 5 segmental.sbm`, `check-bonner-unit5.csx` (169 PASS / 23 DIFF, all reported), links `sheet-links-bonner-unit5.json`. Tests `SegmentalTests`.
-  Not yet: 2D views, keys, rebar, temporary / bar PT, future PT pipes, blocks, openings, parapets, joints, piles, camber.
+  Details v2 (2026-10-30, OPTIONAL `SegmentalDefinition.BlockTypes / Blocks / Openings / Parapet / Bars`, `Bridge/SegmentalDetails.cs`, generator `Segmental/SegmentalGeneratorDetails.cs`,
+  design note section 6): blocks = box void clipped per station (no overlap with the segment) lofted, by segment + side from the bent-side / tip-side joint (`NotBuilt` = counted only);
+  openings = void solids + removed concrete (temporary: none), `NetConcreteVolume`; parapet -> `ConcreteModel.Barriers`; segment bill bars (schedule per mark + straight placed bars,
+  cover-checked) -> `ConcreteModel.Marks / Bars`. IFC IfcBuildingElementPart 'ANCHOR_BLOCK' / 'ERECTION_PT_BAR_BLOCK' in the segment IfcBeam, IfcOpeningElement voids (`IfcKeys.SegBlock / SegOpening`),
+  DB rows under the segment, layers 3D-SEGMENT-BLOCKS / -OPENINGS. Bonner data `samples/plans/details-bonner-unit5.csx` (called by the build script). Tests `SegmentalDetailsTests`.
+  v3 (2026-10-30, design note section 7): OPTIONAL `SegmentalDefinition.Keys` (`SegmentalKeyDefinition` / `SegmentalWebKeyRow`, `Segmental/SegmentalGeneratorKeys.cs`): male match-cast
+  keys (web shear keys per p.283 key-table row, top / bottom slab alignment keys) as `SegmentalBlockResult` Kind `ShearKey` (appended) on the bent-side face of the outer segment, recorded
+  (segments not cut, excluded from BlockVolume, `KeyVolume`), IFC 'SHEAR_KEY', DB "shear key"; OPTIONAL `SegmentalParapetDefinition.JointRuns` + `JointEdgeOffset` (1/2" joints, n x spacing
+  centred along the deck-edge arc per run, printed arcs / ends = check rows, `SegmentalModel.ParapetJoints`). check-bonner-unit5 231 PASS / 25 DIFF. Bonner Unit 6 parapet (custom barrier).
+  Tendon profiles (2026-10-30, `Segmental/SegmentalGeneratorTendonProfiles.cs`): ducts pass every read joint IN their lane hole (hold points kept; a curve may use its leg up to a
+  hold point, half a leg shared with the next curve); P.I. + R that does not fit = per-tendon check row "CONFLICT tendon X: not in its new lane before the joint" (built at the
+  radius that fits; kinks measured relative to the lane). OPTIONAL `SegmentalTendonProfile.ChangePiFromBentFace`, `LaneChangePis` (`SegmentalLaneChangePi`: P.I. pair of listed
+  tendons in segment k, from the bent face), `AnchorBelowTop` / `AnchorFromCl` (top slab anchor blocks in the blister rule: C1 / C2), `FaceCrossings` (`SegmentalFaceCrossing`: joint crossed on a straight diagonal at a
+  printed angle, P.I.s on that line before / after the face - p.304 B2 / B4 5.00 deg). Rhino: `RhinoBarPipe.Faces(..., innerRadius)` = hollow pipe B-rep (bore faces reversed, annular caps),
+  used for the segmental deviation / future PT pipes (and solid PT bars). Lanes: `tools/bonner_tendon_lanes.py` ->
+  tendon-lanes.csv (VECTOR reads + TYPICAL / MATCHED fills, tagged per row).
+  2026-10-31: the top slab read TRACES each tendon's drawn line from its bent label (joints from the lane ticks / label centres; zipping crossings in lane order picked up the
+  C tendon lines and P.I. breaks: p.291 T12 / T13 two lanes off), row B T5 / T6 along their dashes (only when they end at P1 / P2); the lane table was right (p.283 duct location,
+  layout ticks 9/9/9/13x4/9/9/9). OPTIONAL `SegmentalTendonProfile.AnchorExits` (`SegmentalAnchorExit`: tendons + printed plan exit angle, p.303 5.40 / 6.86 deg): straight from the
+  anchor to the anchor P.I. at that angle, check row vs the P.I. on the lane / 3.07 deg diagonal (Bonner: <= 0.056"). Bonner: 0 top slab misfits (was 80), max joint angle 0.89 deg
+  (was 12.9; B tendons following the soffit), lane offset 0, outside concrete 0; the 36 B2 / B4 R 22' misfits were a generator error (fixed 2026-10-31, see below). End-span tendons (2026-10-31): `read_end_span` traces B1-B3 on p.285 / p.296
+  (text strokes < 5 pt and ticks dropped, stops at anchor symbols incl. two-stroke open triangles; start / anchor segments checked against anchor-block-locations.csv,
+  differing = CONFLICT and no lanes) + OPTIONAL `SegmentalTendonProfile.EndFaceAnchors` (`SegmentalEndFaceAnchor`: FromCl, AboveSoffit, SpanFaceFromCl, BendRadius, BendDeg check)
+  -> `EndSpanCtrl` (layout FromEndSegment: end segment anchor face or a start block -> span face -> every joint in its lane, lane changes inside the segment -> anchor block).
+  Bonner: B1 / B2 routed (8 tendons), B3 / C1 / C2 too since the agent review below.
+  PT PROFILE AGENT REVIEW fixes (2026-10-31, qc/bonner-unit5/pt-profiles/findings.md "Fixes applied"): `FilletCtrl` shares a leg between two curves by need (was half each: the
+  36 B2 / B4 R 22' clamps); OPTIONAL (omitted when null) `SegmentalTendonProfile.ChainTendons` (3.07 deg diagonal only for the listed tendons: T7-T12, not T13), `AnchorFromBentFace`
+  (blister / top slab anchor station from the anchor segment's bent-side face; C1 / C2 3'-4"), `SegmentalEndFaceAnchor.BendPiFromAnchor` (p.272 pipe bend P.I. from the anchor face at
+  the closure-joint lane height: B 3'-6" 18 deg, C 3'-10" 26 / 16 deg), `SegmentalLaneChangePi.SecondPiFromBulkheadFace` / `Radius` and `Segment = 0` (= any segment; EndSpanCtrl reads
+  LaneChangePis now); a 5.00 deg face crossing lands its after-P.I. where the line meets the next lane (no extra P.I.; check row vs the printed distance, 0.5-0.7 ft short: the lanes
+  narrow); EndSpanCtrl accepts a mirrored start block type "<type> (...)". Data: C1 / C2 lane 8 (C1 row B -> A in XX-11, R 50'), anchor 2'-7 1/4" (p.290 / 298), top slab block
+  anchor face ramp, end-span C lanes (agent VECTOR read appended to tendon-lanes.csv) + p.272 anchors, B3 start block in XX-13. Remaining CONFLICT rows: 8 end-span B1 / B2
+  (p.272 span-face offsets off the joint-13 lanes, plan conflict). check-bonner-unit5 375 PASS / 31 DIFF.
+  FIXED PT BARS (2026-10-31): OPTIONAL `SegmentalDefinition.FixedBars` (`SegmentalFixedBarDefinition`: Kind Vertical | Longitudinal, SegmentType + Segments regex, From
+  `SegmentalFaceRef` SupportSide (bent half: CL split face; no bent (end segment): the free face) | FarSide, Positions Along / AlongEnd / X / XBottom (inclined), Sides, TopDepth below
+  the deck top, BottomHeight above the soffit, ListedLength / PlanCount check rows) -> `SegmentalModel.PtHardware` (new appended `SegmentalHardwareKind.VerticalPtBar`, IFC IfcTendon
+  .BAR. 'VERTICAL_PT_BAR', DB "vertical PT bar"; longitudinal = PermanentPtBar). Bonner (agent read qc/bonner-unit5/vertical-pt): 80 bent vertical bars (17'-10" = table), 8 end
+  segment bars inclined with the webs (7'-9 7/8" vs 7'-10"), longitudinal bent bars as two pieces per bar; PLAN CONFLICT counts 18 / 9 segments vs 20 halves / 10 bents, 8'-3" vs 8'-7".
+  Tests `SegmentalFixedBarTests`.
+  REBAR IN EVERY SEGMENT (2026-10-30, design note section 8): OPTIONAL `SegmentalDefinition.SectionBars` (`Bridge/SegmentalSectionBars.cs`, generator `Segmental/SegmentalGeneratorBars.cs`,
+  run after BuildDetails): one set = mark / unit / segment regex + a path of `SegmentalBarPoint`s on named section FACES (TOP, TIP, WINGFLAT, WING, WEBOUT, SOFFIT; void TOPIN, HAUNCH, WEBIN,
+  BHAUNCH, BOTIN; "L:" = mirror; offsets normal into the concrete): corner (Face @ off x Face2 @ off2), point on a face at X / Y, free leg (Length along a face / H / V with a direction hint;
+  a free FIRST vertex is measured back from the second), `Hidden` anchors, `FitLeg` (leg solved for the listed out-to-out length); resolved in EACH segment's own section at the bar station
+  (variable depth; void faces at solid diaphragm stations = bar counted, not placed). Transverse (count / spacing centred or from a joint, `Positions`, Spacing 0 = equal spaces between
+  `First` from both joints, `Mirror`) or Longitudinal (distribution polyline, Count equal or centred at Spacing, `EndClear`, `LongSamples`). Marks per (Unit, Mark); length = listed or
+  the model out-to-out (`VaryingLengths` beyond 1"); cover via RebarCover per segment (transverse: first / middle / last of each set), never moved. Bonner: `samples/plans/rebar-bonner-unit5.csx`
+  (called by details-bonner-unit5.csx; replaces the old `Bars`) - all 275 segments: typical units XX-Dk / XX-Uk (17 bill marks; W #6 / #7 and A / B counts per REINFORCING VARIABLES
+  `segment-rebar-variables.csv`; W5 / W6 / A8 / A10 / A12 counted only), closures (p.281 counts), bent halves (N1 / N4 / N38 / N3 / N5-N7 / N9 / N12, scaled), end segments (E45, E9-E15);
+  block J / T / P / D / H bars and the other bent / end marks UNRESOLVED (no bill). Tests `SegmentalSectionBarsTests`.
+  MISC (2026-10-30, design note section 9, inventory `segmental-unit5/MISC-DATA.md`): OPTIONAL `SegmentalDefinition.Misc` (`Bridge/SegmentalMisc.cs`, generator `Segmental/SegmentalGeneratorMisc.cs`,
+  run after BuildDetails): `Foundations` per bent (piles = square precast, plan position at the FOOTING BOTTOM + tip plan direction, `BatterRatio` V per 1 H, `Embedment` (per pile override),
+  tip = `TipElevation`; added to the bent SubstructureUnit as SubSolid Pile + PileInfo -> IfcPile / DB "pile"; `ColumnOffsetS` = column centre S; check rows count / LF vs `PlanTotalLength` /
+  heads inside the footing), `Drains` (round drain normal to the deck through the wing, `EdgeDistance` across the top from the deck edge, LowSide from the cross slope, per segment type /
+  regex -> MiscModel DrainTrench = IfcWasteTerminal), `Joints` (`SegmentalExpansionJointDefinition` at the deck end next to a support: device envelope placeholder centred on `CentreFromSupport`
+  (opening NaN = 2 x deck end - CL joint, flagged), end segment blockout -> `SegmentalOpeningResult` TopSlab (removed concrete clipped to the modeled section), parapet end posts above the
+  parapet, cover plates). Misc items go on `SegmentalModel.Substructure.Misc` (new appended `MiscGroup.ExpansionJoint`, `MiscKind.JointDevice / JointEndPost / JointCoverPlate`: IFC
+  IfcDiscreteAccessory EXPANSION_JOINT_DEVICE / IfcRailing PARAPET_END_POST / IfcPlate JOINT_COVER_PLATE, DB group "expansion joints", layer 3D-EXPANSION-JOINTS). Bonner
+  `samples/plans/misc-bonner-unit5.csx` (called by the build script): 284 piles from the VECTOR footing plans (`tools/bonner_piles.py` -> `piles.csv`, `piles-bents.csv`), Detail C
+  centring of footing / column / cap / bearings on the box soffit CL (2 11/16" .. 10 3/8" left of -L-), 242 deck drains, modular joints at bents 18 / 29 (DIM "A" table not in the set).
+  Piles OPTIONAL `PileChamfer` / `PileVoidDiameter` + `VoidSolidAtHead/Tip` (hollow pile = outer loft + reversed inner cavity shell; p.42 21" void). 2-bar metal rail (S0-36/37 p.37-38) = two generic
+  `PedestrianRailingDefinition` runs on the parapet faces, posts at `FixedStations` converted from the S3-80..83 chains along the theoretical deck edge (1,189 posts = p.38 table).
+  FIXTURES (OPTIONAL `SegmentalMiscDefinition.Fixtures` = `SegmentalFixtureDefinition`, generator `Segmental/SegmentalGeneratorFixtures.cs`): pieces (boxes or straight members:
+  AISC W / L, "PL t x w", "ROD d" = equal-area 32-gon) in a LEVEL frame at -L- stations, `Reference` DeckEdge | WebInside (N from the inclined inner web face at each piece's
+  height, Z above the floor) | Floor | DeckSection (section frame, follows the cross slope), `Side` (0 = not given: DeckEdge / WebInside not built), placeholders by others,
+  flags = DimensionOnly -> MiscElements (new appended MiscGroup SolarPlatform / Access, MiscKind PlatformMember .. AccessDoor -> IfcMember / IfcPlate / IfcSolarDevice /
+  IfcElectricFlowStorageDevice / IfcLightFixture / IfcOutlet / IfcElectricDistributionBoard / IfcJunctionBox; layers 3D-SOLAR-PLATFORMS / 3D-ACCESS-HARDWARE; misc layers now keep
+  DimensionOnly-flagged items on their normal layer). Slab openings OPTIONAL `Stations`, `Side` (Left / Right / LowSide / HighSide), `FromSoffitCorner`, `Depth` (recess).
+  Bonner: 9 solar platforms, nav light sleeves, 71 box luminaires + boxes + receptacles, 2 panels, access doors, vermin screens, 242 vent holes, 121 survey blockouts
+  (misc-bonner-unit5.csx 4b, survey-markers.csv from the p.266 table).
+  Tests `SegmentalMiscTests`. Not yet: 2D views, bent-segment / permanent PT bars, C / end-span tendon lanes, end segment interior,
+  nav lights (channel station not given), lighting / utility conduit runs (shop / utility drawings), camber, block bars.
+  v4 PT HARDWARE / LANES (2026-10-30, design note section 10; all OPTIONAL, omitted when unset; tests `SegmentalPtHardwareTests`). USER DECISION: dimensions along a segment are from the
+  BULKHEAD face = the face farther from the pier (short-line match casting; tip side). Block solids: `Loft` closes a block that clips to nothing in an APEX (the scaled-copy
+  end left zero-area triangles: 64 of 344 anchor blocks meshed open in IfcOpenShell) and fans convex caps from the centroid; station limits `TopBelowDeck` / `ThicknessFromWeb`,
+  `SegmentalJointRef.Centre` (appended; any hollow segment, e.g. a closure). `SegmentalDefinition.PtBars` (`SegmentalPtBarDefinition`: bars between the far faces of the
+  `BlockType` blocks of two segments, `NextTowardTip` | `AcrossBent`, positions, `Alternate` stagger) and `Pipes` (`SegmentalPipeDefinition`: plan "PIPE VARIABLES" A-G /
+  delta / R / L1-L3, P.I. on the segment centre or outer end on a bent half face; delta from the offsets = check row) -> `SegmentalModel.PtHardware`
+  (`SegmentalGeneratorHardware.cs`; IFC IfcTendon .BAR. 'TEMPORARY_ERECTION_PT_BAR' (contained) / IfcTendonConduit .DUCT. 'DEVIATION_PIPE' / 'FUTURE_PT_PIPE' (aggregated
+  into the host segment), key `IfcKeys.SegHardware`, DB elements under the segment, layer 3D-SEGMENT-PT-HARDWARE, Rhino, projection). TENDON LANES: `DuctLanes`
+  (`SegmentalDuctLane`, `FromSoffitCorner` for bottom slab lanes) + `TendonDefinition.Lanes` (lane per arm / joint) + `.Profile` (`SegmentalTendonProfile`: lane changes INSIDE a
+  segment between P.I.s `ChangePiFromFace` from its faces, deviation to the anchor (`AnchorSetback` / `AnchorDepth` / `AnchorPiFromFace`) or into a blister (`AnchorBlockType`,
+  block Label = tendon), printed radii, clamps counted) -> `SegmentalGeneratorTendonProfiles.cs` replaces the straight ducts (joint points exact; check rows lane offset /
+  angle change per tendon, CONFLICT rows for strand bundles outside the concrete). Bonner lanes read from the VECTOR layout plans by `tools/bonner_tendon_lanes.py` ->
+  `tendon-lanes.csv` (row order kept from the bent / closure end); data in `details-bonner-unit5.csx` sections 1 / 2b / 2c.
 - SUPPORT LINES ONLY (OPTIONAL `BridgeDefinition.SupportLinesOnly`, omitted from the .sbm when false; third case where `Girders.Count = 0` is valid, beside Arch / Segmental): for structure types the program cannot build yet (riveted trusses, floor-beam girders). `FramingGenerator.RunArchSupportsOnly` builds the support lines (no deck, girders or bearings); `RegenerationCache` generates NO steel / concrete / substructure; viewport / `PlanDrawingBuilder` draw each support line across the deck definition's edge offsets (drawn length only) with its label; IFC = alignment + IfcBridge + 'Superstructure' part per bridge (0 schema / EXPRESS issues), DB = unit + part elements (sheet rules link units). Other bridges' outputs unchanged (Woodbury IFC identical). Tests `SupportLinesOnlyTests`.
 - PTC / NJTA DELAWARE RIVER BRIDGE (original 1954-57, 31 spans, 6571'-4" as built; PDF `C:\SBMData\Original Existing Bridge Plans from PTC.pdf`, 108 RASTER pages; phase 1a = LOCATION ONLY): `samples/plans/build-ptc-delaware-river.csx` (sbm new + run) -> `PTC Delaware River Bridge.sbm`, check `check-ptc-delaware-river.csx` (132 PASS / 0 DIFF: supports, spans, profile, p.43 / p.69 elevations), links `sheet-links-ptc-delaware-river.json`, data `docs/plan-data/ptc-delaware-river/` (`supports.csv` read by the script, SUMMARY / LOCATION / INDEX). LOCAL grid, origin = CL brg W abutment 646+21.463, ONE tangent S 69 54'15" E, georeference null (UNRESOLVED: fit to aerial / LiDAR in PA South EPSG:2272 + NAVD88 waits for the user's download OK; meridian of the bearing not stated); NGVD29 as printed. Profile: printed GUTTER-line profile (west VPI 644+67.14 El 49.454 L 1060 [entry grade -0.5 % derived], crest VPI 682+80.38 El 163.850 L 1364, +/-3 %) carried on the CL = printed + 38.25/96 ft with a 1/8"/ft crown (p.107). Seven `SupportLinesOnly` bridges (girder spans 1-10, 3-span truss 11-13, 4-span truss 14-17, arch truss 18-20, 4-span truss 21-24, 3-span truss 25-27, girder spans 28-31); supports = pier CL, or the unit's own shoe line where two units meet (piers 10 / 27 4'-8 3/4 apart, 13 / 17 / 20 / 24 4'-0 c.c.). AS-BUILT rule: the sheets revised 1954-56 govern over p.1 (3-9-54): E abutment 711+92.797 (not 711+94.046), girder shoes at piers 10 / 27 (p.9 / p.36 / p.42 / p.43).
 - Steel TRUSS (OPTIONAL `BridgeDefinition.Truss` = `Bridge/TrussDefinition.cs`, omitted from the .sbm when null; design note `docs/plan-data/ptc-delaware-river/TRUSS-DESIGN.md`):
@@ -1074,7 +1216,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   group and item: steel 83.5 % of 39.28 M lb, concrete within 3 %), girders 125 / 6, approach 1014 / 12, arch 381 / 11. Rivets not placed (no pitch / gage; viewport load).
   2026-10-20 (TRUSS-DESIGN.md section 10): `TrussShoeDefinition.Pieces` (`TrussShoePiece`: polygon / circle (segmental `ClipHalfWidth`) in the shoe frame (origin pin, u along,
   n across, z up) swept Across / Along / Vertical, `ShiftsProfileX` / `ShiftsSweep` copies, `MirrorN/U`, Kind -> category Body / Plate / Sole / Masonry / Pin / Roller / Rocker; replaces the
-  body envelope, masonry plate + pin still from the fields), `TrussLineItemDefinition.RepeatPitch/RepeatWidth/RepeatStart` (comb pieces: dam teeth, posts) and `CopiesV` (rungs);
+  body envelope, masonry plate + pin still from the fields), `TrussLineItemDefinition.RepeatPitch/RepeatWidth/RepeatStart` (comb pieces: dam teeth, posts) and `CopiesV` (rungs), OPTIONAL `AssemblyKind` (null = the old rule: joint armor -> expansion joint, railing -> railing, else inspection walkway; PTC girder-details-ptc.csx = TrussFloor (user: floor system));
   tests `TrussTests.ShoePieces_*`, `LineItemRepeat_*`. PTC: all 100 shoes piece by piece (shoes-ptc.csx), finger dams (two plates + 2 in. teeth @ 4 1/4 + 18 I 70 / 18 [ 58 supports),
   walkways / ladders / platforms (walkways-ptc.csx, p.101-106), abutment wing parapets + railing (deck-ptc). Checks: location 378 / 42, castings main 1.34 x p.42 (was 2.8 x),
   forgings 137 k vs 134 k, structural steel 82.6 % (shoe envelopes no longer counted as carbon plate). Gusset outlines NOT scaled (raster, edges not separable; still envelopes).
@@ -1176,6 +1318,52 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   follow (floor-connections-ptc.csx), tension plates parallel to the grade (girder-details-ptc.csx), walkway pieces clear of leaning / two-web floor beams (walkways-ptc.csx);
   approach + main framed beam ends flush with the end angle backs (p.55 'FIN.', p.85 'Fin. Floor Beam'); main suspended beams to the outer edge, coped round the wind chord,
   bent angles on it, pin holes, socket lug slots (p.94). Left: F7 at W22 (p.93, not built), the p.69 / p.94 floor lateral plate conflict, approach UM12 / UM20 lateral plates.
+  MAIN SPAN REVIEW BATCH 1 (2026-10-27, TRUSS-DESIGN.md 26, `qc/ptc/main-span/TODO.md`; all OPTIONAL, omitted when unset; tests `TrussBatch1Tests`): `TrussDefinition.JointRivetGripsFromSteel`
+  (joint rivet grips re-probed along the shank, `TrussGeneratorRivetGrips.cs`), `TrussSectionDefinition.Rotated` for LacedChannels / Box (section turned 90 deg), `TrussStringerLine.ContinuousBays` /
+  `RunTypes` (continuous stringer members), `TrussDefinition.PartPerPiece` (every ply / angle / cover / lacing face its own part: `SteelPart.Member` / `Piece`, marks `<member>-W1/A1/C1/CH1/R1/P1/LB1`,
+  gussets + layers + joint plates under `<plane>-J<point>`; IFC IfcElementAssembly 'BUILT_UP_MEMBER' / 'GUSSET_STACK' key `IfcKeys.Member`, DB level "member", clash skips pairs of one member;
+  whole-member views for scripts `SteelPartGroups.WholeMember(s)`). App: `MainWindow.SubElements.cs` (pick level member / part + Alt, "Sub-elements" edges / tints, DB panel sub-element list;
+  logic `SBM.Core/Geometry/SubElements.cs`) - not visually verified.
+  MAIN SPAN REVIEW BATCH 2 - bearings (2026-10-28, TRUSS-DESIGN.md 27; all OPTIONAL, omitted when unset; tests `TrussBatch2Tests`): `TrussJointDefinition.GussetExtension` /
+  `TrussGussetLayer.Extension` (`TrussGussetExtension`: gusset carried down to a finished bottom edge = convex hull with the edge, cut below it; per layer), `TrussShoePieceKind.Angle`
+  (-> TrussConnectionAngle), `TrussShoeDefinition.Fasteners` (`TrussShoeFastener` Rivet = probed grip / TapBolt = bolt of its own material, frame at the bottom of the tapped hole;
+  `Truss/TrussGeneratorShoeFasteners.cs`). PTC data in `shoes-ptc.csx` (L11 gussets to the forging shoulder + shoe angles + tap bolts / rivets, L0 sole beveled + 7/8 plate under the chord, pier 19 masonry 9'-2).
+  MAIN SPAN REVIEW BATCH 3 - gusset layering (2026-10-28, TRUSS-DESIGN.md 28; OPTIONAL): `TrussPly.InlaidAt` (ply stops at the gusset of the listed points: inlaid gusset) and
+  `TrussJointPlate.UnderGusset` (plate length / centre = the inner gusset over its band). PTC: L11 1 1/8 + 3 x 3/4 at 2'-2 3/4 in. to in. (connections-ptc.csx section 5, gusset-layers.csv),
+  o.s. web splice / pin plates under the gussets at U8 / L9 / U10 / U21 / L21 / U22 (connections-ptc.csx section 1), W14 2'-5 in. to in.
+  MAIN SPAN REVIEW BATCH 4 - joint gussets and rivets (2026-10-28, TRUSS-DESIGN.md 29; OPTIONAL): `TrussEndCut.ParallelToChord`, `TrussJointDefaults.WebToWebClearance` (setback / corner
+  cut / abut so web members at a point do not overlap), `TrussJointPlate.RivetCount/RivetRows/...` (plate rivets, grip probed), `TrussJointDefinition.EdgeAngles` (`TrussGussetEdgeAngle`),
+  result `TrussModel.DroppedRivets` (dropped drawn rivets with reason). rivets-ptc.csx: hanger / wind chord rivet groups by role.
+  MAIN SPAN REVIEW BATCH 5 - bracing connections (2026-10-28, TRUSS-DESIGN.md 30; OPTIONAL; tests `TrussBatch5Tests`): `TrussMemberDefinition.RollToLateralPlane`, `TrussBracingGussetDefinition`
+  `MemberPlane` / `MemberFills` (beveled fills) / `RivetGageEdge` / `PlateToStack` / `RivetGapTolerance` / `ProbeFaces` (faces probed on the built parts, one-part rivet positions not placed) /
+  `CrossingFaceOffset` / `EdgeAngleAlsoOnStack`, `TrussSectionDefinition.CustomPieces` (explicit section polygons). PTC: main sway V re-framed (floor beam at the truss -> strut CL;
+  plates `-SW` suffix), L13 1/2 double K (points L13H / LM13H / LQ13), portal U11 box per p.71, p.71 rivet counts; check-truss-ptc has CONFLICT rows. QC scripts `qc/ptc/main-span/work5/`.
+  MAIN SPAN REVIEW BATCH 8 (2026-10-30, qc/ptc/main-span/TODO.md "Batch 8 results"): FIX AddRivet keeps the shared-hole rivet index current (joint rivets were never indexed,
+  so connection / bracing rivets could not share their holes); OPTIONAL `TrussDefinition.ConnectionRivetsClearOfJointHeads` (connection rivet with a head overlapping a joint rivet
+  head and no shared hole = not placed, counted); `ParallelToChord` clears every chord face of a kinked chord and also applies to chord-role members (wind chord at L13);
+  joint CHECK "member wider than the gusset inside distance" measures over the gusset lap only. PTC main span Bolt x Bolt 2,406 -> 650.
+  Batch 8 continued (2026-10-30): OPTIONAL `TrussLineItemDefinition.Rise` (longitudinal item rises linearly From -> To; nav-light walks "Parallel to Wind Chord", p.106), bracing
+  gusset fills clipped clear of the edge angle on the same plate face (N07), data: web member fills U6 / L7 / U8 / L9 / U10 / U21 / L21 / U22 (connections-ptc.csx BATCH 8b, scaled,
+  flagged), L21 O.S. splice 34 x 1 1/8, L11 layer step 44 in., portal knee top on the lowest p.71 box bottom, sway apex edge angles on the lateral plate (CrossingFaceOffset),
+  CL walkway rail L 3x2 1/2x5/16, nav walk posts. Concrete truss line items carry their material + UNRESOLVED flag to IFC (SBM_Status) / DB (`ConcreteModel.BarrierInfo`).
+  GUSSET / RIVET AGENT REVIEWS applied (2026-10-30; qc/ptc/main-span/{gussets,rivets}-review, qc/ptc/approach/review, qc/ptc/girders/review, outcome columns there; tests
+  `TrussRivetReviewTests`): generic OPTIONAL `TrussDefinition.JointRivetsShareHoles` (`RivetHoles.MergeShared`: a joint rivet whose shank overlaps a parallel rivet with the axes
+  closer than 0.5 (d1 + d2) becomes one rivet through both stacks; set by rivets-ptc.csx), `TrussEndConnection.OutBoltMaterial` (outstanding-leg fasteners = high-strength
+  STRUCTURAL bolts, length from the grip; PTC L11 bottom strut A325-53T 1 1/4 per p.80), `TrussRivetLine.Zones` (`TrussRivetZone` From / To / Pitch: pitch per zone along the
+  member; PTC girder flange angle / cover plate lines per p.43 / p.44); `SteelModel.RivetMesh` button heads INSCRIBED in the 1.6 d circle (touching heads no longer clash).
+  Data: gusset thickness / outline / zone rows (G23 / G42 / G43 / G48-G52 / G56), near-duplicate drawn rivet symbols removed (`connections/rivet-positions-removed.csv`), cover
+  splice rivet counts at 1 1/8 (R06 / R07), approach printed fills `connections/approach-fills.csv` (p.50; computed fills under 1/8 in. not built, "Omit Fills" honoured),
+  approach 'similar to' rivet copies onto another section -> count grid (R03), girder fixed shoe heights by pier (G04), stiffener / splice / corner plate / lateral rivets
+  (G10 / G11 / G21 / G22), long. stiffener 6 in. leg on the web (G17), 21 WF 62 splice web plate 16 1/2 x 6 rows (G24). Not done: chord field centring R01 (moving the drawn
+  rivets off their drawn outlines broke the gusset-cover check: needs the work points re-read), cover splice plate lengths G45, stitch rivets R05, L11 shoe stagger R09, bracing fills R14.
+  PTC curbs agent review (qc/ptc/curbs/curbs-findings.md): curb top +1/2 in., 1 in. face batter, slab ends 1'-11 outboard of the gutter line (parapet overhangs 11 in.), flag texts;
+  railing FixedStations: no rule post in an end stretch shorter than one spacing (wing-end rail overhang). 2026-10-30 later: OPTIONAL `TrussLineItemDefinition.Ranges` (explicit station
+  pairs, wins over RepeatPitch) -> curb drainage openings (P10, p.107 Section A profile, 7 / 7 / 6 openings per 31'-0 / 30'-5 3/4 / 26'-11 1/4 panel, omitted in girder spans 1 / 10 (p.43)
+  and 4-span panels 16'-12' / 8'-4' / 13'-12' (p.58 Note A); special panels p.108 solid) and 1 1/2 in. curb + parapet breaks at the girder-span pier dams (P12). Open: railing joints at the
+  piers, finger-dam / W22 parapet ends (steel 3/8 in. plates), drip grooves.
+  MAIN SPAN REVIEW BATCH 6 - walkways (2026-10-28, TRUSS-DESIGN.md 31; OPTIONAL `TrussPlaneItemDefinition.Frame` = `TrussItemFrame` (station / offset / elevation, vertical or horizontal plane) + `Category` /
+  `AssemblyKind` / `Density`; test `TrussBatch6Tests`): walkways-ptc.csx main span = FB11 walk at El. 141.6035, top chord catwalk + ropes, U22 beacon platform, navigation light platforms, cages, south ladders, toe plates; CL walkway W15-W15' one rail angle per side (p.106, user decision).
+  Batch 7 sheet links: W14 joint p.84 / 85, wind chords + p.71, p.55 only on the main stringer seats.
   REMAINING DETAILS (step 5, 2026-10-21, TRUSS-DESIGN.md section 20; `samples/plans/details-ptc.csx`, run after bracing-ptc, before rivets-ptc): generic OPTIONAL inputs (omitted when unset)
   `TrussBracingGussetDefinition.EdgeAngleOnCrossing` (edge angle on the member crossing the plate edge - highest rank, a face within 0.5 m pulls the plate down to `Gap` from it - instead of the
   truss-plane stack) / `EdgeAngleOutside` (angle on the plate's outer face) / `NoStackClip`; end connections on rolled shapes turned 90 deg (`Rotated`: web plane = axis + section x) and, with a
@@ -1205,13 +1393,26 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   Starting shapes `Bridge/CableStayedConcepts.cs` (`Osprey`: values read from renderings, all flagged). New PartCategory Pylon / PylonCrossBeam / PylonStrut / StayCable / CsDeck,
   AssemblyKind Pylon / StayGroup / CsDeck (IFC IfcColumn 'PYLON', IfcMember STAY_CABLE, IfcElementAssembly PYLON / SUSPENSIONASSEMBLY / DECK; layers 3D-CS-*). First-cut analysis
   (`CableStayedAnalysis`: wireframe + tributary stay forces + pylon base statics; user: analysis comes LATER, do not extend now) and CLI `sbm cable-stayed`. Richmond Greenway concept:
-  `samples/plans/build-richmond-greenway.csx` (site from OSM + 3DEP, UTM 10N). SHAPE NOT YET FITTED to the renderings (camera-matched overlay work in progress). Tests `CableStayedTests`.
+  `samples/plans/build-richmond-greenway.csx` (site from OSM + 3DEP, UTM 10N). OPTIONAL `OspreyFoundation` (null = the older layout): lower-leg feet (x, +-y) on one footing, props from the knees to their own feet (x, +-y, z per side above the base). Richmond (user 2026-10-27): pylon in the 23rd St median at the rendered feet, bridge square to 23rd St (alignment tangent through the pylon), props over the NB lanes to the east bank. Wings still the 180 ft fit (renderings fit ~268 ft above the walkway - open; osprey TABLED by the user 2026-10-27). `CableStayedConcepts.Conventional` = H-pylon (plumb legs, deck beam, cross / top beams) + semi-harp stays in two planes over the main and back spans (starting proportions: pylon 0.45 x main reach above the walkway); `samples/plans/build-richmond-conventional.csx` -> `Richmond Greenway Bridge conventional.sbm` (same site / alignment / pylon point). Note: the tributary stay estimate does not balance the back stays (pylon base shows the full main-span pull). TWO TOWERS (2026-10-27): OPTIONAL `CableStayedDefinition.MorePylons` (null = one pylon, omitted from the .sbm; `AllPylons`, `FirstLegOf(p)`): each pylon on its own support line / frame (`CableStayedModel.PylonFrames`, `CsLegCurve.Pylon`), stay `Leg` numbers run over ALL pylons in order, cross beams keep per-pylon leg numbers, struts belong to the first pylon; marks PY / PY2...; analysis: base node + trunk per pylon, `CsForceReport.Pylons` = base statics per pylon (old fields = the first). EDGE GIRDER DECK (2026-10-27, user): OPTIONAL `CsDeckDefinition.EdgeGirders` = `CsEdgeGirderDeck` (null = section sweep; partial `CableStayed/CableStayedEdgeGirders.cs`): two welded plate girders (webs at +-GirderOffset, top of steel = grade - slab - haunch) between From/ToStation (outside = the section sweep, here the pi-shaped envelope, MassNotCounted), floorbeams every FloorbeamSpacing from the nearest pylon (frame-in, top flanges flush), concrete slab (ConcreteModel.Deck), field sections split SpliceBeyondAnchor past the FAR END of each stay anchorage (built after the stays; NSBA-style splice plates, bolts not modeled; warning if a splice meets a floorbeam), composite deck props (slab / n) + `CableStayedModel.DeckWeightPerLength` for the analysis. ROCKET LAUNCHER anchorage (`CsStayAnchorage`, user: the pipe hung off the side of the edge girder that the cable feeds through, NOT the shark fin; it must reach the bottom flange) = New NY (Tappan Zee) Bridge Fig. 10 (Scollard et al., TAC paper): bolted to the outside of the web over the full girder depth - stem mounting plate on the web along the stay, stem plate out to the anchor pipe, anchor top flange under the girder top flange, anchor bottom flange on the girder bottom flange, pipe on the stay axis from PipeAboveTopOfSteel above the top of steel to PipeBelowBottomFlange below the bottom flange, bearing plate there = the stay's lower end; deck point = WP on the axis. Splices: plates SpliceBeyondAnchor past the anchorage's far end, moved past a floorbeam they would meet. Longitudinal supports `StringerOffsets` (+ section; framed between floorbeams, CsStringerPlate / AssemblyKind.CsStringer, user: the TZ redundancy truss replaced by a longitudinal support; usually ONE longitudinal closure) and `CsPrecastDeck` (panels between members, closure pours over every member: `ConcreteModel.DeckParts` = `DeckPart` (precast panel | closure pour) -> IFC IfcBuildingElementPart PRECASTPANEL / 'CLOSURE_POUR' aggregated into the deck IfcSlab (no own body when Deck is null), key `IfcKeys.DeckPiece`, DB children of the slab, viewport 3D-DECK-PANELS / 3D-DECK-CLOSURES). `CsStayGroup.PylonAnchorInset` moves the tower anchors toward the CL (leg inner face). New PartCategory CsFloorbeamPlate / StayAnchorPipe / StayAnchorPlate, AssemblyKind CsEdgeGirder / CsFloorbeam / CsFieldSplice / CsAnchorage (IFC: GIRDER, 'FLOORBEAM', 'FIELD_SPLICE', 'STAY_ANCHORAGE'; layers 3D-CS-FLOORBEAMS / 3D-CS-ANCHORAGES). TOWER ANCHORAGE TRAYS (2026-10-27, user: 'model the tower and look into the anchorage boxes'): OPTIONAL `CsPylonDefinition.Anchorage` = `CsTowerAnchorage` (New NY Fig. 8; partial `CableStayed/CableStayedTowerTrays.cs`): hollow concrete legs (`CsSection.Wall` > 0 + Concrete -> four wall sweeps + a solid top, SubSolids of the pylon unit; concrete cross beams -> SubSolid Cap); one tray per stay level per leg (stays at the same height share it = opposing pair, +-CableOffset across), primary web on the inboard longitudinal wall, secondary web, floor / top, end plates in the transverse walls; each cable enters through the wall facing its span (guide pipe, leg face -> end plate) LOW in the tray and anchors on a bearing plate where it reaches the tray top or the far end (+ two rib plates to the far end plate). The tower end is computed BEFORE the deck rocket launcher (same line). PartCategory PylonAnchorPlate / PylonGuidePipe, AssemblyKind PylonAnchorTray (IFC 'STAY_ANCHORAGE_TRAY'), layer 3D-CS-PYLON-ANCHORAGES. Studs / spacer plates / openings not modeled. Inspect with `sbm project --near 0` sections (the walls hide the trays). `CableStayedConcepts.TwoTower` = TUNING FORK towers (hollow concrete legs outside the deck, 14 x 20 -> 10 x 16 ft, 2 ft walls, concrete strut below the deck only, trays at 6 ft levels shared by the main / side stays) + the edge girder deck (TZ member sizes, floorbeams 15 ft, CL longitudinal support, precast panels + closure pours, stays every 45 ft at floorbeams, splices just past each anchorage, rocket launchers). Blatnik replacement concept: `samples/plans/build-blatnik-cable-stayed.csx` -> `Blatnik cable-stayed.sbm` (I-535 line from OSM carriageways, UTM 15N; NOAA ENC charted clearances 37.4 m main channel / 31.3 m Howards Bay above LWD 601.1 ft govern the solved profile; MnDOT 720 ft main / 485 ft Howard's Pocket spans; 3DEP terrain). Tests `CableStayedTests`.
 - Bonner Unit 6 (spans 30-35, 4 x FIB-96, `samples/plans/build-bonner-unit6.csx` -> `Bonner Unit 6 FIB.sbm`, reads docs/plan-data/bonner-b2500/fib-unit6
   CSVs; same -L- placement as Unit 5; terrain + georeference `samples/plans/terrain-bonner.csx`, `docs/plan-data/bonner-b2500/TERRAIN.md`): 24 SpanBeams, per-span layouts (G1 LEFT, CL bearing 1'-2" / 3'-2" bent 29 / 1'-4" bent 35), p439 strand pattern
   read from the VECTOR drawing (72 + 4 slack, 8 draped, 20 debonded), E1/E2/E3 + P sole plates, camber tables, bents 30-35 (level precast cap profile,
   two pedestal rows, 2 square columns = precast segmental flagged, one combined footing via `FootingDefinition.OnFootingOf`, battered 36" piles per the
-  footing plans). Check `check-bonner-unit6.csx` (143 PASS / 12 DIFF, all reported: station rounding, plan "A" per span pair); links
-  `sheet-links-bonner-unit6.json`; tests `BonnerFibTests`. Bent 29 substructure = Unit 5 model. GAPs: beam / deck bars, parapets, diaphragms, joints.
+  footing plans). Check `check-bonner-unit6.csx` (220 PASS / 15 DIFF, all reported: station rounding, plan "A" per span pair, deck + diaphragm concrete
+  +19 CY vs the 1,541.1 CY quantity, parapet -0.5 CY, span 30 S4 298 vs listed 302); links `sheet-links-bonner-unit6.json`; tests `BonnerFibTests`, `BonnerUnit6DetailTests`. Bent 29 substructure = Unit 5 model.
+  Details (2026-10-30; inventory + reasons `docs/plan-data/bonner-b2500/fib-unit6/REMAINING.md`; scripts called by the build script): `diaphragms-bonner-unit6.csx`
+  (bent diaphragms 2'-4" bents 30-34, expansion joint diaphragms 1'-10" (min.) + 8" fillet bents 29 / 35 down to the girder bottom line with SLOPED end faces, BeamBottoms rule),
+  `joints-parapet-bonner-unit6.csx` (bent 29 modular: deck face 2'-7 1/2" = CL joint 1'-2 1/2" +- + DIM A / 2, 6'-0" blockout; bent 35 Transflex 4 1/4", 1'-3 1/2" x 4";
+  parapet 1/2" joints + end posts 3'-9" x 4'-8"; 71 x 6" PVC slab pipe drains), `rail-bonner-unit6.csx` (2 bar metal rail as Unit 5, p.452 chains, 314 posts = p.38),
+  `deck-rebar-bonner-unit6.csx` (A101 top / bottom, bottom B107 + 18 B109 + B108 lines, top B101 / B102 / B103 at bents 30-34, B104-B106 (end spans at the minimum laps = reading, flagged) as plan bar sets;
+  other diaphragm marks and H bars schedule only), `parapet-rebar-bonner-unit6.csx` (S1, B1, B6, B7 + end post E1 / E2 / F1 / S2, Element "barrier"),
+  `diaphragm-rebar-bonner-unit6.csx` (K302 all diaphragms, S305 / U309 bent diaphragms, U301-U306 in the sloped ends, Element "diaphragm", + H7 at the TEMPORARY deck access openings p.445 (no hole cut);
+  runs after a first regeneration - needs the girders), `beam-rebar-bonner-unit6.csx`
+  (S1 / S3 / S4 / S5 / S6 / S8 from the girder chains; S2, S7, V1, WWF not placed).
+  Generic OPTIONAL inputs added: `BarrierDefinition.Joints` (`BarrierJoint`: open joints in a custom barrier, support / station + along the deck edge + width; zones ending on
+  a barrier end are clamped to it within 1 in.), `DeckLongZone.StartMark / StartLength` (first bar of every longitudinal line; `AlternateEnds` flips it), `ConcreteDiaphragmKind.
+  ExpansionJointEnd` (appended), BeamBottoms rule at a pier merges the back + ahead beams of a girder line (was an error), `BeamReinforcementDefinition.Unit` (bar schedule unit per girder sheet; null = "{designation} beams"), `DeckDrainDefinition.SlabPipeOnly` (+ `PipeBelowSlab`, `Unresolved`, `Basis`: pipe drain through the slab only), `DiaphragmEnd.TopOffset` / `DiaphragmEnd.Sloped(bottom, top)` (sloped diaphragm end face; other bridges' IFC identical). Open: diaphragm marks other than K302 / S305 / U309 / U301-U306, H1-H6, parapet B8-B11, girder S2 / S7 / V1 / WWF,
+  parapet cover plates in the recess (REMAINING.md).
   Substructure OPTIONAL `SubstructureDefinition.Unresolved` (raised as warnings) and `FootingDefinition.OnFootingOf` (combined footing: no footing / piles of its own).
 - Project georeference (OPTIONAL `BridgeProject.Georeference` = `Project/GeoreferenceDefinition.cs`, null = local grid, omitted from the .sbm): CRS name,
   datum / projection / zone, map unit, `GridScale` (map / project distance, e.g. 1 / TxDOT SAF) -> IFC IfcProjectedCRS + IfcMapConversion Scale with the
@@ -1246,6 +1447,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
 - Rail fence fabric placeholder (OPTIONAL `RailFabricDefinition.MassNotCounted`, `SteelPart.MassNotCounted` -> `Mass` = 0; JSON omitted when false): panels keep their volume / area (viewport, IFC, area quantity "WEIGHT NOT COUNTED") but no weight in the run mass,
   `RailingRun.FabricMass`, material lists. NHT fabric type is undetermined (sheets 224-226 missing; user decision d20 2026-10-20): set in rail-joints-nht.csx, modeled mass 52.4 / 101.2 PLF LOW / HIGH vs the p.83 design 50 / 100 PLF. Test `Railing_FabricMassNotCounted_*`.
 - Curbs: custom barrier with `BarrierDefinition.IsCurb` (OPTIONAL) -> solids "Left/Right curb", IFC IfcKerb (USERDEFINED, ObjectType = ProfileName), DB category "curb".
+  Agent reviews of the curbs (2026-10-30): qc/nht/curbs, qc/nht/arch-curbs, qc/ptc/curbs, qc/i80-rampg/curbs (no curbs there). Applied: curvature-based barrier sections (C01), NHT curb
+  sheet links per unit + p.83 (C04 / C05), CS end stirrups 2" clear at the nearest corner / hook incl. skew (C02), arch curbs OPTIONAL `ArchCurbDefinition.Chamfer` (3/4", A01), arch curb
+  stirrup hooks on the tie-girder side for both curbs (A02). Open (user / plan): p.83 3/4" toe fillet, end chamfers, CS top cover 2" vs 2 1/2", arch D4 / S1 through the floorbeam webs (A03),
+  arch curb ends unreinforced at the obtuse knuckle corners (A04), arch curbs as their own IfcKerb (A05). A03 now reported: `ArchGenerator.CheckBarsThroughFloorbeams` = CONFLICT warning + check row per deck mark whose bars pass through
+  floorbeam / connection plates (bars not moved).
 - Sealed joints without blockout (OPTIONAL `ExpansionJointDefinition` fields): `ExpansionJointType.Sealed` (appended), `BlockoutWidth` 0 = no blockout (deck not
   cut back, no blockout element in IFC / DB), `BodyCentered` (device envelope +-GapAt50F/2 about the deck-end line, for plans that dimension the slab to the
   CL joint), `Designation`, `PlanLength` (check), `Unresolved` / `Basis` (-> `ExpansionJointResult.Assumption`, IFC SBM_Status, DB status).
@@ -1334,6 +1540,51 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   up-station): `SubstructureGenerator.BuildCapless` - per column the nearest seat, pedestal (plan size, turned) from column top = seat - pedestal height, column, foundation;
   `SubstructureUnit.NoCap`, CapTop / CapBottom = column tops; rebar not placed; BentViews draw the integral steel cap outline and a plan Section A-A of the turned column.
 - Per-support girder stiffeners (OPTIONAL): `SupportDefinition.BearingStiffener` (plate) and `JackingStiffenerOffsets` (plumb pairs at distances from the CL bearing).
+- Stiffener BEVEL + FIT CONDITIONS (2026-10-27): skewed I-girder stiffeners (bearing / jacking / connection / intermediate, `SteelModelGenerator.BuildStiffener` + `BevelOutline`)
+  are cut per plate face so the web edge lies in the web face plane and the welded ends in the flange face planes (true flange normal incl. grade), clips keep
+  their legs along the contact lines, welds follow the bevelled roots; applied when the square-cut web mismatch tp/2 |Z.n_web| > 0.01 mm (`BevelTolerance`), so
+  square (zero-skew) stiffeners are untouched (Sample skew 0 IFC: geometry byte-identical, only Psets added). Bevelled plates are faceted (no ExtrudedSolid recipe ->
+  IfcTriangulatedFaceSet). Sample at 30 deg: square cut was +-5.6 mm at the web (7/8 plate), 0.75 mm at the ends; now 0. Since 2026-10-30 (user decision "bevel it") plumb bearing
+  stiffeners on a grade are bevelled at zero skew too (ends on the sloped flanges; they lose the exact-extrusion recipe). FIT CONDITIONS = generic per-face record `Steel/PartFit` (Face, `FitCondition`
+  MillToBear | FinishToBear | TightFit | Welded, Against = part mark, Source) on `SteelPart.Fits` (null = none). USER RULE 2026-10-27: fits come ONLY from plan
+  inputs, nothing assumed: OPTIONAL `StiffenerDefinition.EndFits` / `SupportDefinition.BearingStiffenerFits` / `IntegralSteelCapDefinition.StiffenerFits` /
+  `CapGirderConnection.DiaphragmPlateFits` (`StiffenerEndFit` Kind Bearing | Jacking (falls back to Bearing) | ConnectionPlate | Intermediate, End Top | Bottom,
+  Condition, Source; JSON omitted when null; `Bridge/StiffenerFitDefinition.cs`, resolution `StiffenerFits.Of`). An end with entries but no Welded gets no flange
+  weld. An end without a satisfying entry where AASHTO sets a requirement (`StiffenerFits.Requirement` / `Satisfies`: bearing bottom 6.10.11.2 mill / finish to
+  bear; connection plates both ends 6.6.1.3.1 welded; intermediate top 6.10.11.1 any) = part `Assumption` Status "POTENTIAL NONCOMPLIANCE" (DimensionOnly: stays on
+  its layer; IFC SBM_Status, DB status props, one warning per text). Consumers: app pick properties ("Fit condition"), IFC Pset `SBM_FitConditions` (one per distinct
+  set, Fit1..n), DB props `fit1..n`, Rhino user text `Fits`, `SteelDetailViews.Stiffeners` notes. Also recorded: NHT knuckle plates (AF / SW / ST mill to bear +
+  welded on the end flange, p.124). Plan values set: Nebraska (build-nebraska-st.csx: bearing bottom MillToBear p.32 F55; cap stiffeners p.31 F51; cap diaphragm
+  plates p.30 F43), I-80 / Ramp G / Nebraska `weld-holdbacks.csx` (Welded at every stiffener flange end, std 1021W Detail A). AgentReview: `StiffenerEndFit` is never
+  a starting value (NotRead). Tests `StiffenerFitTests`.
+- STANDARD cross frames (2026-10-27, design note `docs/plan-data/standard-cross-frames-design.md` incl. "User answers"; all OPTIONAL, JSON omitted, off = IFC byte-identical):
+  `CrossFrameDefinition.Standard` / `CrossFrameStyle.Standard` (style wins = one standard per frame type) = `Bridge/StandardCrossFrameDefinition.cs` (Scope / Styles / Supports,
+  DefinedEnd Taller (default) | Left | Right, Reference, TopWorkPoint + Depth (NaN = UNRESOLVED, standard NOT applied), Top/BottomClearance to the WORK POINT (NaN = UNRESOLVED, 0 used),
+  SpacingRounding (NaN = exact family grouping), Plane (null = CrossFrameDefinition.FramePlane, default Midway) Averaged | DefinedEnd | Midway | Warped, twist limits (NaN = report only)). Standard frames: level chords in the frame plane, holes on the
+  connection plates where each bolt axis meets the plate mid-plane (`HolePoint` / `BoltPoint` in `CrossFrameDetailer`; bolts seated on the plate back face); other frames unchanged.
+  Generic plane inputs `CrossFrameDefinition.IntermediatePlane` / `SupportPlane` / `BearingStiffenerPlane` -> frame up axis AND `StiffenerResult.Plane` -> `SteelModelGenerator.PlateUp`
+  (BuildStiffener; the bevel logic reads the plate frame, so it follows). `ReportTwist` = report every frame without geometry change. Pure math `Steel/StandardCrossFrames.cs`
+  (`FramePlaneGeom`, `PlateEndGeometry`, hole centre, gaps, plate coords, flange faces, twist, plane options); rows / families / depth solver / diagnostics `Steel/StandardCrossFrameReport.cs`
+  -> `SteelModel.CrossFrameFit` (`CrossFrameFitReport`), `SbmDocument.CrossFrameFit`, CLI `sbm crossframes` (`SBM.Cli/CrossFramesCommand.cs`, read-only, what-if `--top/--depth`, csv),
+  DB props on cross frame assemblies (`std_*`, headroom, shift_left/right, twist_deg, twist_gap_max; Description text unchanged for `CfName`) + `hole_shift` on plates, IFC Pset
+  `SBM_StandardCrossFrame` (standard frames only), sheets "Standard cross frames" (`SteelDetailViews.StandardCrossFrame`) + `TableViews.CrossFrameHoleShifts`, AgentReview NotRead
+  (WP offsets when a standard covers every frame). Finding: the far-gusset gap is dominated by the plate OFFSET (top of web difference x grade along the girder: the plates are
+  located at the top-of-web crossing), not the twist (Ramp G up to 0.39" built). Tests `StandardCrossFrameTests`.
+- Cross frame PLATES ON THE FRAME PLANE (2026-10-27, user decision; default for every girder model): `FramingGenerator.PlatesOnFramePlane` (after the frames are
+  marked) groups intermediate frames into CHAINS (frames sharing a through-web plate: same girder / span, within 2 cm, parallel = the stiffener pair rule), picks
+  the chain's reference girder (`CrossFrameResult.LineGirder` of a `Lines` frame; else the standard's DefinedEnd Left / Right / Taller = highest top of web; else
+  the leftmost girder), sets `PlaneDirection` (= the plan line direction; `CrossFrameResult.Direction` returns it, so the plates' plan direction = the plane's
+  horizontal) and solves bay by bay outward the far end's girder distance where the plane (anchor top of web, PlaneDirection, mean flange normal) meets that
+  girder's top of web (`SolveOnPlane`: secant, then bracket + bisection because the path's sampled grade makes F jump by microns) -> `LeftShift / RightShift`,
+  `ReferenceRight`, `PlatesOnFramePlane`, Info "connection plates on the frame plane ... max / median". Detailer (`CrossFrameDetailer`): `u3` = PlaneDirection,
+  span = its x; frame plane mode `CrossFrameDefinition.FramePlane` (null = Midway; a standard's nullable `Plane` wins; legacy null = Averaged); default Midway keeps
+  the orientation input's up axis (legacy Midway = mean plate ups); every frame's holes at the bolt-axis hit on the REAL plate (`CrossFrameWarp.cs` `PlateEnd` =
+  the framing's StiffenerResult incl. a pair's direction). OPTIONAL `Warped`: per-end `PlatePlane`s (FramePlane / FramePlaneGeom gained optional `Z0`), centre gusset
+  / X filler on `CenterPlane`, members `WarpMember` (straight WP to WP, axes rolled linearly about the work line; roll < `WarpRollTolerance` 0.001 deg = untwisted
+  exact extrusion, else `MeshBuilder.AddLoft(..., exact: false)` / `AddPrismWatertight`); plate / channel diaphragms and links (plates > 2 deg off the line) not
+  warped. Report rows: `RollDegrees / RollMember / LegTipDeviation / LeftShift / RightShift / ReferenceEnd`, Info "Warped cross frames ...". LEGACY switch
+  `CrossFrameDefinition.PlatesAtEachTopOfWeb` = byte-identical old output (Sample + Nebraska IFC checked); AgentReview NotRead (with ReportTwist). CLI
+  `sbm crossframes --legacy --frame-plane X`. Tests `CrossFramePlateTests`.
 - Fabrication attributes (OPTIONAL `BridgeDefinition.Fabrication` = `FabricationRule` list, Bridge/FabricationDefinition.cs): selectors (category / assembly kind / mark /
   assembly description / description regex, girders) -> `SteelPart.Fabrication` (`FabricationAttributes`: Toughness, ContactFinish, NDT, coating exterior / interior,
   ShopAssembly, Tolerance, Camber, Weld, plan note ids) and optional `Material` override; applied at the end of steel generation. App pick properties, IFC Pset
@@ -1355,6 +1606,71 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   with page + reason in the build script): abutment wing extensions / maskwalls / backwall extension / L-shaped wing footing + wing piles (p.19 / p.21), Pier 1 cap soffit brick, reinforcing marks (user queue item 3).
   Intermediate stiffeners 2026-10-20 (user decision d35): OPTIONAL `StiffenerDefinition.IntermediateLocations` (`IntermediateStiffenerLocation`: Girder -1 = all, Span, Reference SpanBegin | SpanEnd | Panel (index, negative = from the end, Fraction 0.5 = mid panel) | Splice (number + signed Distance), `Unresolved` text raised as a warning; null = the automatic `IntermediateMaxSpacing` rule, list set = REPLACES it; omitted from the .sbm when null). Nebraska: 10 per girder + 1 on D (p.27 ticks), the 7 stiffener x splice plate clash groups are gone (clash 13 -> 6, the rest = cap ContinuityPlate x DiaphragmPlate).
 
+- LEVEL OF DETAIL (2026-10-28, design note `docs/plan-data/roads-walls-utilities-lod-design.md` section 1 + 7a; tests `LodTests`): OPTIONAL `BridgeProject.Lod` =
+  `Project/LodSettings.cs` (Default, per-group `Groups` (Steel, Connections, Fasteners, Welds, Reinforcing, Prestressing), per-bridge `Overrides`; levels 100 / 200 / 300 /
+  350 / 400, user stops at 400), omitted when null. `RegenerationCache` key += `KeyFor(bridge)` ("" at 400); `Project/LodApply.cs` reduces the fresh objects of the entry
+  (phase 1 steel / concrete / prestressed, phase 2 substructure bars): <400 no fasteners / welds / placed bars (marks kept), <350 holes filled (`MeshLod.WithoutHoles`), <300
+  no connection parts (`LodApply.IsConnectionPart`) and no strands, 100 = one envelope per assembly with the assembly weight. `TrussGenerator.Generate(..., fasteners)` skips
+  its rivet passes below 400. IFC Pset `SBM_LOD` on the IfcBridge only when set. CLI global `--lod 300[,Group=lv]` (`SbmDocument.LodOverride`, in memory, `Save` writes
+  the file's own Lod). App ribbon Home > Units & geometry > LOD button (`MainViewModel.LevelOfDetail`, FormDialog). Not done by design: concrete solid reduction,
+  generator-level skipping in the I-girder / rebar generators (docs). Stage 2 (2026-10-30): OPTIONAL `LodSettings.Outputs` caps per `LodOutput` (`ForOutput`; `RegenerationCache.Regenerate(..., output)`,
+  `SbmDocument.AtOutput` for IFC / Rhino / database exports, app viewport + `ModelsForOutput`), per-element IFC Pset SBM_LOD (`IfcExportOptions.Lod`), studs removed below 400.
+  docs/API.md "Level of detail".
+
+- ROADS (stage 1, 2026-10-28; tests `RoadTests`; docs/API.md "Roads"): OPTIONAL `BridgeProject.Roads` (omitted when empty) = `Road/RoadDefinition.cs` (sides of
+  components with courses / swept sections, side slopes with explicit cut / fill ratios), `Road/RoadGenerator.cs` (pure; sections at <= SampleSpacing + kink stations;
+  top = `Alignment.ElevationAt` or the component's own slope from its inner edge; courses with vertical sides; daylight by bisection on the terrain, none = UNRESOLVED),
+  `SbmDocument.Roads()` (terrain from the loaded references), IFC via `IfcExportOptions.Roads` (IfcRoad / IfcRoadPart / IfcCourse / IfcKerb, written before the site
+  aggregation), CLI `sbm roads`. Stage 2 (2026-10-29, docs/API.md "Roads"): viewport `SceneBuilder.AddRoads` (3D-ROAD-*; roads generated in
+  `MainViewModel.RegenerateAsync` with the bridge models, `RoadModels`) + plan `RoadPlanBuilder`; DB rows (`ModelDatabase.Builder.Road`, GlobalIds from
+  `IfcKeys.Road*` - the exporter uses the same keys); earthwork (`RoadModel.CutVolume/FillVolume`); clearances `Road/RoadClearance.cs`
+  (`RoadDefinition.Clearances`, CONFLICT / UNRESOLVED); road ends tied to a bridge end `Road/RoadBridgeTie.cs` (generator takes `beginAt/endAt(offset)`
+  station functions; own-slope components chain their edge elevation as a function of station); approach slabs `SupportDefinition.ApproachSlab`
+  (`Bridge/ApproachSlabDefinition.cs`, `Concrete/ConcreteApproachSlab.cs`, Owner Bridge | Road decides the IFC / DB container). Tests `RoadTests`,
+  `ApproachSlabTests`. Civil 3D corridor import (2026-10-30, `CorridorImportTests`): LandXML PlanFeatures (`SBM.IO/LandXml/LandXmlFeatureLines.cs`) -> OPTIONAL
+  `RoadDefinition.FeatureLines` (+ `FeatureLineCourses`): road built BETWEEN the lines (`Road/RoadGeneratorFeatureLines.cs`, partial RoadGenerator; no courses = top
+  surface in `SideSlopes["finished surface"]`, flagged), `RoadGenerator.ToTemplate` (constant offsets -> Left / Right components), `SbmDocument.ImportCorridor`,
+  CLI `sbm import-corridor`.
+  Subgrade layers (2026-10-30, tests `RoadSubgradeTests`, docs/API.md "Subgrade layers"): OPTIONAL `RoadSide.Subgrade` (`RoadSubgradeLayer` top down: Kind Subbase |
+  TreatedSubgrade | PreparedSubgrade | Other, Thickness, `Under` components, `ExtendBeyond`, `EdgeRatio`) = bands below the course bottoms (top of subgrade), split into
+  closed pieces where a course-depth step >= the layer thickness; earthwork to the bottom of placed Subbase layers only (`LowerEnvelope`); `RoadModel.Levels` (finished grade /
+  top of subgrade / bottom of each layer); IFC IfcRoadPart 'SUBGRADE' > IfcCourse (subbase) / IfcEarthworksFill SUBGRADEBED; layer 3D-ROAD-SUBGRADE.
+
+- RETAINING WALLS (stage 1 cantilever CIP, 2026-10-29; docs/API.md "Retaining walls"; tests `RetainingWallTests`): OPTIONAL `BridgeProject.Walls` (omitted when
+  empty) = `Wall/RetainingWallDefinition.cs` (control line = stem front face at the top of wall; every dimension NaN = not given -> not built, UNRESOLVED),
+  `Wall/RetainingWallGenerator.cs` (pure; panels between `JointStations`, solids split at footing steps, lofts every <= SampleSpacing), `SbmDocument.Walls()`,
+  app (`MainViewModel.WallModels`, `SceneBuilder.AddWalls`, `WallPlanBuilder`), IFC via `IfcExportOptions.Walls` (assembly 'RETAINING_WALL' in the site >
+  IfcWall RETAININGWALL + IfcFooting STRIP_FOOTING per panel, `IfcKeys.Wall*`), DB (`ModelDatabase.Builder.Wall`), CLI `sbm walls`.
+  MSE (2026-10-29, contract-plans envelope per user answer 7a.4): OPTIONAL `RetainingWallDefinition.Mse` = `Wall/MseWallDefinition.cs` (facing, optional panel grid,
+  leveling pad = the footing-top tables, coping polygon, length tables by station / height, `LengthFrom`, supplier `Reinforcement` built only at LOD 400 Reinforcing),
+  `Wall/MseWallGenerator.cs` (partial; `RetainingWallModel.Elements` = `WallElement` by role, `ExportElements()` = what IFC and DB write - keep them in step),
+  IFC IfcWall facing > IfcBuildingElementPart PRECASTPANEL, IfcFooting 'LEVELING_PAD', IfcCovering COPING, IfcReinforcedSoil, IfcMember 'SOIL_REINFORCEMENT'
+  (`IfcKeys.WallElement`). Abutment-on-MSE (2026-10-30, `MseAbutmentTests`): OPTIONAL `MseWallDefinition.Abutments` -> `Wall/MseAbutmentInterface.cs`
+  `MseAbutmentCheck.Run(walls, bridges)` after the bridges (facing clearance, piles through the zone, sleeves = role `PileSleeve`, obstructed reinforcements).
+  Next: cantilever coping, piles, rebar.
+
+- GRADING (stage 1, 2026-10-29; design note section 3b, built before storm drainage at the user's request; docs/API.md "Grading"; tests `GradingTests`): OPTIONAL
+  `BridgeProject.Gradings` (omitted when empty) = `Grading/GradingDefinition.cs` (feature line points station / offset / elevation or X / Y / elevation, open or
+  closed pad, Side Left / Right / Outside, slope = `RoadSideSlope`, protection layers), `Grading/GradingGenerator.cs` (pure; rays + bisection daylight, fans at
+  convex corners, plan-grid cut / fill, `Thicken` = closed solid under a surface), `Grading/SurfaceIndex.cs` (`SurfaceIndex` = highest upward triangle over a plan
+  point; `FinishedGround` = roads > grading > existing ground: storm drainage rims / cover use it), `SbmDocument.Gradings()` / `FinishedGround()`, app
+  (`MainViewModel.GradingModels`, `SceneBuilder.AddGradings`, `GradingPlanBuilder`), IFC 'GRADING' assembly > IfcGeographicElement TERRAIN (open face sets:
+  `FaceSet(..., closed: false)`) + IfcCourse PROTECTION (`IfcKeys.Grading*`), DB (`ModelDatabase.Builder.Grading`), CLI `sbm grading [--at x,y]`.
+  Merged finished-ground TIN (2026-10-30): `FinishedGround.ToTin(extents, spacing)` (grid sampling), `SbmDocument.ExportFinishedGround`, CLI `sbm finished-ground` (LandXML TIN).
+
+- STORM DRAINAGE / UTILITIES (stage 1, 2026-10-30; design note section 4; docs/API.md "Storm drainage"; tests `UtilityTests`): OPTIONAL `BridgeProject.Utilities`
+  (omitted when empty) = `Utility/UtilityDefinition.cs` (network: System, MinCover; structures: kind, X / Y or station / offset, rim (NaN = finished ground),
+  sump, round / box inside size, rotation (null = along the outlet pipe, flagged), wall / floor thickness; pipes: From / To or free ends, inverts at the ends,
+  circular / elliptical / box, wall), `Utility/UtilityGenerator.cs` (pure; structure = ONE closed cup shell, pipes between the inside wall faces, checks as Info /
+  CONFLICT, never applied), LandXML `PipeNetworks` reader `SBM.IO/LandXml/LandXmlPipeNetworks.cs` (hooked into `SbmDocument.ImportLandXml`; same-name network
+  replaced), `SbmDocument.Utilities()` (on `FinishedGround()`), app (`MainViewModel.UtilityModels`, finished ground built from the scene's roads / gradings,
+  `SceneBuilder.AddUtilities` layers 3D-UTIL-<SYSTEM>, `UtilityPlanBuilder` SBM-UTIL-<SYSTEM>, `Layers.Utility(system)` APWA colours), IFC IfcDistributionSystem >
+  IfcDistributionChamberElement / IfcPipeSegment + IfcDistributionPort / IfcRelConnectsPorts (`IfcKeys.Utility*`), DB (`ModelDatabase.Builder.Utility`), CLI
+  `sbm utilities`. Stage 2 (2026-10-30, `UtilityStage2Tests`, partial `UtilityGeneratorDetails.cs`): cones / frames / covers (`UtilityStructure.Parts`), wall openings
+  (`Openings`, IFC voids, volume deducted), valves / hydrants as envelopes, `Cover`-defined inverts, duct banks (encasement = exact extrusion with conduit holes),
+  bridge-hung runs (`Hangers`: rods to the lowest face of the bridge above), clash / clearance check `UtilityClashCheck` (reuses `SteelClashCheck.Run(..., testable)`;
+  `UtilityGenerator.Finish(networks, obstacles)` after the bridges / walls / roads), profiles `Drawing/Views/UtilityProfileViews` (`sbm utilities --profile`).
+
 ## Conventions (bridge engineering)
 - Offsets right-positive (Civil 3D). Skew from the radial line; positive = right end of support line up-station.
 - Girder offsets are measured normal to the alignment; flared layouts via `OffsetsAtSupports` (linear between supports).
@@ -1362,6 +1678,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   thickness only affects top-of-steel and stud length (= haunch âˆ’ tf + penetration, rounded). Webs plumb, flanges level.
 - Intermediate cross frames, connection plates and intermediate stiffeners are NORMAL TO THE FLANGES (tilt with
   grade); support frames and bearing stiffeners are PLUMB. Connection/bearing stiffeners lie in the frame/support plane.
+- Cross frame STATION / location (user decision 2026-10-27) is defined at the TOP OF WEB of the frame's reference girder (`Lines` girder; else the standard's
+  DefinedEnd; else the left girder of the bay). The frame plane = that point + the line's horizontal plan direction + the frame up axis; EVERY intermediate
+  connection plate sits where that plane meets its girder (plates flat on the frame plane; one line across several bays is solved outward from the reference
+  girder so shared through-web plates stay one plate). Default frame plane Midway (exact extrusions; the remaining true twist between the two plates is a
+  reported far-gusset gap); Warped = members rolled between the plates. Legacy (plates at each girder's top-of-web crossing): `PlatesAtEachTopOfWeb`.
 - Shop splices: 1:2.5 width and thickness tapers on the larger plate. Field splices: wider flange tapers (1:2.5) to the
   narrower at the joint; thickness differences â†’ fillers on the outside. Splices are NSBA-style (outer full-width +
   2 inner flange plates, 2 web plates); bolt quantities are inputs.

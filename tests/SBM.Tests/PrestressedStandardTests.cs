@@ -193,6 +193,7 @@ public class PrestressedStandardTests(Xunit.Abstractions.ITestOutputHelper outpu
             p.StrandLayout = layout;
             p.StrandCount = layout.Count;
             p.PadLength = In(10); p.PadWidth = In(24); p.PadThickness = In(2.5);
+            p.CamberTable = new() { new() { Fraction = 0 }, new() { Fraction = 0.5, Camber = In(2), Deflection = In(0.5), FinalCamber = In(1.5) }, new() { Fraction = 1 } };
         });
         Assert.Empty(doc.Regenerate().Errors);
         var ps = doc.Model().Prestressed!;
@@ -212,6 +213,9 @@ public class PrestressedStandardTests(Xunit.Abstractions.ITestOutputHelper outpu
             string text = File.ReadAllText(path);
             Assert.Equal(ps.Beams.Count * 14 * 2, CountOf(text, "=IFCTENDONCONDUIT("));
             Assert.Equal(ps.Beams.Count * 14, CountOf(text, "'SBM_Debonding'"));
+            // plan camber table -> Pset SBM_Camber per beam (3 table columns)
+            Assert.Equal(ps.Beams.Count, CountOf(text, "'SBM_Camber'"));
+            Assert.Equal(ps.Beams.Count * 3, CountOf(text, "=IFCPROPERTYTABLEVALUE("));
             // Exact profile with arcs.
             Assert.Equal(ps.Beams.Count, CountOf(text, "=IFCARBITRARYCLOSEDPROFILEDEF(.AREA.,'MN 30MH'"));
             Assert.Contains("IFCARCINDEX(", text);

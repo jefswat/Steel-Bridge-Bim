@@ -1,0 +1,34 @@
+regen 60.1s
+bracing plates 584, edge angles 524
+bracing rivets 29472: bg-only-multi 3360, conn 23438, nobg 2530, own 144
+bracing member ends 572: no connecting rivet 56 (no bracing plate within 2.5 ft: 18); Strut 8/124, UpperLateral 0/88, Portal 4/4, LowerLateral 40/252, Sway 4/104
+  Truss: bracing plate at N:L11-a stops 1/4" clear of LS-L11 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:L11'-a stops 1/4" clear of LS-L11' (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:L13H stops 1/4" clear of FL-X13-15a1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:L13H' stops 1/4" clear of FL-X13'-15'a1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L11-a stops 1/4" clear of LS-L11 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L11'-a stops 1/4" clear of LS-L11' (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L13H stops 1/4" clear of FL-X13-15b1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at S:L13H' stops 1/4" clear of FL-X13'-15'b1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:LM0-SW stops 1/4" clear of LL-NL1-LM0 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:LM0-SW stops 1/4" clear of LL-SL1-LM0 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:LM1-SW stops 1/4" clear of LL-NL2-LM1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+  Truss: bracing plate at N:LM1-SW stops 1/4" clear of LL-SL2-LM1 (crosses the plate, not connected to it) [PTC DRB-4 (as-built 1954-57)].
+edge angles 524: without a connecting rivet 8; e.g. N-BGSW11-SW-B-EA, N-BGSW11-SW-T-EA, S-BGSW11-SW-B-EA, S-BGSW11-SW-T-EA, N-BGSW11'-SW-B-EA, N-BGSW11'-SW-T-EA, S-BGSW11'-SW-B-EA, S-BGSW11'-SW-T-EA
+bracing plates 584: without a rivet to a member 20; e.g. N-BGLM12-SW-B, N-BGLM12-SW-T, N-BGLM12'-SW-B, N-BGLM12'-SW-T, N-BGFX14-1, N-BGFX14-2, N-BGFX16-1, N-BGFX16-2, N-BGFX18-1, N-BGFX18-2, N-BGFX20-1, N-BGFX20-2
+clash (no bolts) 1125
+  478 RailMember x RailPost max 2.83 in
+  124 TrussChord x TrussChord max 0.53 in
+  124 TrussDiagonal x TrussVertical max 0.56 in
+  76 TrussChord x TrussVertical max 0.51 in
+  60 SuspenderSocket x TrussPin max 2.43 in
+  40 TrussChord x TrussHanger max 0.57 in
+  27 JointArmor x TrussStringer max 0.36 in
+  24 TrussBracing x TrussBracing max 0.28 in
+  21 TrussBracing x WalkwayStringer max 0.32 in
+  20 IntermediateStiffener x WalkwayRail max 0.22 in
+  20 WalkwayPost x WalkwayRail max 1.41 in
+  12 TrussChord x TrussFloorBeam max 0.28 in
+  10 Grating x TrussBracing max 0.32 in
+  10 TrussConnectionAngle x TrussConnectionPlate max 0.41 in
+  10 TrussConnectionPlate x WalkwayPost max 0.22 in

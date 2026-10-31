@@ -2,7 +2,7 @@
 // sheet-links-i80-rampg.json (header) and docs/API.md "Companion database". Sheet index: docs/plan-data/bonner-b2500/sheet-index.csv (S3-01..S3-144 =
 // PDF pages 249-392, all current). Hierarchy: unit > superstructure > group "segmental box" > assembly "Bent n cantilever" (typical / bent segments,
 // cantilever + transverse tendons) | closure joints / end segments | span continuity tendon groups | disc bearings; unit > substructure > pier (Bent n).
-// Sheets without a rule (LRFR, parapets, rail, lighting, misc.) cover items that are not modeled.
+// Sheets without a rule (LRFR, parapets, construction sequence ...) cover items that are not modeled. S0 pages 37-39, 42, 58 added to the index (rail, pile, survey blockout standards).
 {
   "models": [
     "Bonner Unit 5 segmental.sbm"
@@ -17,6 +17,31 @@
       "pdf": "B-2500 Bonner - Revision 3 Combined Plan Set*.pdf",
       "bridgeGroup": "Bonner",
       "sheets": [
+        {
+          "p": 37,
+          "s": "S0-36",
+          "t": "2 BAR METAL RAIL DETAILS"
+        },
+        {
+          "p": 38,
+          "s": "S0-37",
+          "t": "2 BAR METAL RAIL DETAILS"
+        },
+        {
+          "p": 39,
+          "s": "S0-38",
+          "t": "END OF RAIL DETAILS FOR 2 BAR METAL RAILS"
+        },
+        {
+          "p": 42,
+          "s": "S0-41",
+          "t": "36\" SQUARE PRESTRESSED CONCRETE PILE"
+        },
+        {
+          "p": 58,
+          "s": "S0-55",
+          "t": "BLOCKOUT DETAILS FOR SURVEY DISCS"
+        },
         {
           "p": 249,
           "s": "S3-01",
@@ -835,6 +860,132 @@
       ]
     },
     {
+      "id": "anchor-blocks-bottom",
+      "sheets": "^BOTTOM SLAB ANCHOR BLOCK DETAIL",
+      "basis": "Bottom slab PT anchor blocks (B tendons, 22-0.6 anchors): 4'-0 from the joint, 8'-6 long, 2'-10 wide (details-bonner-unit5.csx)",
+      "target": [
+        {
+          "level": "element",
+          "category": "anchor block",
+          "name": "%bottom slab anchor block%"
+        }
+      ]
+    },
+    {
+      "id": "anchor-blocks-top",
+      "sheets": "^TOP SLAB ANCHOR BLOCK DETAIL",
+      "basis": "Top slab PT anchor blocks (C tendons, 12-0.6 anchors): 3'-5 from the joint, 6'-9 long",
+      "target": [
+        {
+          "level": "element",
+          "category": "anchor block",
+          "name": "%top slab anchor block%"
+        }
+      ]
+    },
+    {
+      "id": "anchor-block-locations",
+      "sheets": "^LONGITUDINAL POST-TENSIONING LAYOUT",
+      "basis": "Segments holding each B / C tendon anchor block (p.285-296)",
+      "target": [
+        {
+          "level": "element",
+          "category": "anchor block"
+        }
+      ]
+    },
+    {
+      "id": "erection-bar-blocks",
+      "sheets": "^BOTTOM ERECTION PT BAR ANCHOR BLOCK DETAILS",
+      "basis": "Temporary bottom PT bar blocks Type B: 1'-8 x 2'-0, 2'-11 from the joint, top 1'-0 1/2 above the soffit",
+      "target": [
+        {
+          "level": "element",
+          "category": "erection PT bar block"
+        }
+      ]
+    },
+    {
+      "id": "shear-keys",
+      "sheets": "^BULKHEAD AND SHEAR KEY DETAILS",
+      "basis": "Match-cast web shear keys (key table A / B / C per section) and top / bottom slab alignment keys; male on the match-cast face",
+      "target": [
+        {
+          "level": "element",
+          "category": "shear key"
+        }
+      ]
+    },
+    {
+      "id": "access-openings-ao",
+      "sheets": "^ACCESS OPENING \\(A\\.O\\.\\) DETAILS",
+      "basis": "A.O. access openings 3'-0 x 4'-0 in the bottom slab",
+      "target": [
+        {
+          "level": "element",
+          "category": "opening",
+          "name": "%A.O. access opening%"
+        }
+      ]
+    },
+    {
+      "id": "access-openings-aob",
+      "sheets": "^ACCESS OPENING \\(A\\.O\\.B\\.\\) DETAILS",
+      "basis": "A.O.B. 3'-0 dia. openings at the bent CL (one void per bent half)",
+      "target": [
+        {
+          "level": "element",
+          "category": "opening",
+          "name": "%A.O.B.%"
+        }
+      ]
+    },
+    {
+      "id": "temporary-openings",
+      "sheets": "^MISCELLANEOUS DETAILS",
+      "basis": "T.A.O. temporary access openings 3'-6 x 2'-6 in the top slab (repaired; no concrete deducted)",
+      "target": [
+        {
+          "level": "element",
+          "category": "temporary opening"
+        }
+      ]
+    },
+    {
+      "id": "bent-diaphragm-openings",
+      "sheets": "^BENT SEGMENT DIMENSIONS",
+      "basis": "Bent diaphragm opening and utility opening through the solid diaphragm",
+      "target": [
+        {
+          "level": "element",
+          "category": "opening",
+          "name": "%diaphragm opening%"
+        }
+      ]
+    },
+    {
+      "id": "parapets",
+      "sheets": "^CONCRETE PARAPET",
+      "basis": "1'-2 x 2'-6 concrete parapet, inside face 20'-0 from -L-, 1/2 in. joints @ 30'-0 along the theoretical edge of deck (p.323-327)",
+      "target": [
+        {
+          "level": "element",
+          "category": "barrier"
+        }
+      ]
+    },
+    {
+      "id": "typical-segment-bars",
+      "sheets": "^TYPICAL SEGMENT REINFORCEMENT",
+      "basis": "XX-D3 / XX-U3 bill (17 marks, 8,511 lb per segment); A1 / A7 / B1 placed, the rest schedule-only with reasons",
+      "target": [
+        {
+          "level": "group",
+          "category": "deck reinforcing"
+        }
+      ]
+    },
+    {
       "id": "closure-joint",
       "sheets": "^CLOSURE JOINT",
       "basis": "Closure joint 4'-0 / 3'-6, deviation block",
@@ -1175,6 +1326,390 @@
             "Bent 27",
             "Bent 28"
           ]
+        }
+      ]
+    },
+    {
+      "id": "piles-bent-18",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 18 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 18"
+          ]
+        }
+      ],
+      "pages": [
+        335,
+        254
+      ]
+    },
+    {
+      "id": "piles-bent-19",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 19 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 19"
+          ]
+        }
+      ],
+      "pages": [
+        338,
+        254
+      ]
+    },
+    {
+      "id": "piles-bent-20",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 20 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 20"
+          ]
+        }
+      ],
+      "pages": [
+        341,
+        255
+      ]
+    },
+    {
+      "id": "piles-bent-21",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 21 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 21"
+          ]
+        }
+      ],
+      "pages": [
+        341,
+        255
+      ]
+    },
+    {
+      "id": "piles-bent-22",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 22 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 22"
+          ]
+        }
+      ],
+      "pages": [
+        341,
+        256
+      ]
+    },
+    {
+      "id": "piles-bent-23",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 23 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 23"
+          ]
+        }
+      ],
+      "pages": [
+        344,
+        256
+      ]
+    },
+    {
+      "id": "piles-bent-24",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 24 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 24"
+          ]
+        }
+      ],
+      "pages": [
+        344,
+        257
+      ]
+    },
+    {
+      "id": "piles-bent-25",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 25 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 25"
+          ]
+        }
+      ],
+      "pages": [
+        349,
+        257
+      ]
+    },
+    {
+      "id": "piles-bent-26",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 26 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 26"
+          ]
+        }
+      ],
+      "pages": [
+        352,
+        258
+      ]
+    },
+    {
+      "id": "piles-bent-27",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 27 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 27"
+          ]
+        }
+      ],
+      "pages": [
+        352,
+        258
+      ]
+    },
+    {
+      "id": "piles-bent-28",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 28 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 28"
+          ]
+        }
+      ],
+      "pages": [
+        352,
+        259
+      ]
+    },
+    {
+      "id": "piles-bent-29",
+      "sheets": "^SUBSTRUCTURE BENT|^PILE DATA UNIT 5",
+      "basis": "Bent 29 piles: footing plan positions + 2:12 batter arrows, Section D-D embedment, pile data table tip / load (piles.csv, piles-bents.csv)",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile",
+          "support": [
+            "Bent 29"
+          ]
+        }
+      ],
+      "pages": [
+        335,
+        259
+      ]
+    },
+    {
+      "id": "deck-drains",
+      "sheets": "^MISCELLANEOUS DETAILS$",
+      "basis": "6 in deck drains, CL 1'-7 1/2 from the deck edge, low side, one per segment (p322 notes)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "deck drain"
+        }
+      ],
+      "pages": [
+        322
+      ]
+    },
+    {
+      "id": "modular-joints",
+      "sheets": "^MODULAR EXPANSION JOINT SEAL DETAILS|^CONCRETE PARAPET AND END POST DETAILS|^END SEGMENT DIMENSIONS",
+      "basis": "CL modular joint 1'-0 1/2 / 1'-2 1/2 from the bent control line (S2-19 p161 N-N / S4-15 p407 K-K: outside the S3 index), end segment blockout (Section C-C), end posts, cover plates",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "expansion joint"
+        }
+      ],
+      "pages": [
+        271,
+        327,
+        333
+      ]
+    },
+    {
+      "id": "rail-2-bar",
+      "sheets": "^2 BAR METAL RAIL DETAILS|^END OF RAIL DETAILS FOR 2 BAR METAL RAILS|^RAIL POST SPACING FOR UNIT 5",
+      "basis": "NCDOT 2-bar metal rail: posts / base plates / anchors / rails (S0-36..38), post chains S3-80..83",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "pedestrian railing"
+        }
+      ]
+    },
+    {
+      "id": "solar-platforms",
+      "sheets": "^SOLAR ARRAY SUPPORT PLATFORM|^NAVIGATIONAL LIGHTING AND CONDUIT SYSTEM|^MISCELLANEOUS DETAILS|^SEGMENT DESIGNATIONS",
+      "basis": "Solar array support platforms: p.332 framing + bill, p.322 / 392 station tables (segments XX-U4), S.A.P. labels p.264-266, solar array / battery placeholders (p.392)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "solar array support platform"
+        }
+      ],
+      "pages": [
+        332,
+        322,
+        392,
+        264,
+        265,
+        266
+      ]
+    },
+    {
+      "id": "nav-light-conduit",
+      "sheets": "^NAVIGATIONAL LIGHTING AND CONDUIT SYSTEM|^SEGMENT DESIGNATIONS",
+      "basis": "2 1/2 in PVC sleeves for the nav light conduit at each platform station (p.392 approximate location, N.L. labels p.263-266)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "conduit"
+        }
+      ],
+      "pages": [
+        392,
+        263,
+        264,
+        265,
+        266
+      ]
+    },
+    {
+      "id": "box-girder-lighting",
+      "sheets": "^BOX GIRDER LIGHTING",
+      "basis": "Luminaires / junction boxes / receptacles at the p.388-391 arcs, mounting heights p.385, panels A / B p.387, service boxes in the railing",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "box girder lighting"
+        }
+      ]
+    },
+    {
+      "id": "access-doors-ao",
+      "sheets": "^ACCESS OPENING \\(A\\.O\\.\\) DETAILS",
+      "basis": "A.O. access door leaves on the bottom slab openings",
+      "target": [
+        {
+          "level": "element",
+          "category": "access door",
+          "name": "%A.O. access door%"
+        }
+      ]
+    },
+    {
+      "id": "access-doors-aob",
+      "sheets": "^ACCESS OPENING \\(A\\.O\\.B\\.\\) DETAILS",
+      "basis": "A.O.B. access doors at the bent CL",
+      "target": [
+        {
+          "level": "element",
+          "category": "access door",
+          "name": "%A.O.B. access door%"
+        }
+      ]
+    },
+    {
+      "id": "vermin-screens",
+      "sheets": "^VERMIN SCREEN DETAILS|^END SEGMENT DIMENSIONS",
+      "basis": "Vermin screen + door on the end segment anchor faces (p.314, p.271 note 8)",
+      "target": [
+        {
+          "level": "assembly",
+          "category": "vermin screen"
+        }
+      ]
+    },
+    {
+      "id": "vent-holes",
+      "sheets": "^SEGMENT DIMENSIONS|^MISCELLANEOUS DETAILS",
+      "basis": "2 in vent holes at the centre of each typical segment, low side, CL 4'-1 1/2 from the soffit corner (p.268 note 3, p.322)",
+      "target": [
+        {
+          "level": "element",
+          "category": "opening",
+          "name": "%vent hole%"
+        }
+      ],
+      "pages": [
+        268,
+        322
+      ]
+    },
+    {
+      "id": "survey-blockouts",
+      "sheets": "^SEGMENT DESIGNATIONS|^BLOCKOUT DETAILS FOR SURVEY DISCS",
+      "basis": "Survey disc blockouts 3 1/2 in square: p.266 SURVEY MARKERS table (N pairs 14'-0 L / R, TP 2'-0 from the high-side barrier), p.58 detail",
+      "target": [
+        {
+          "level": "element",
+          "category": "opening",
+          "name": "%survey disc%"
+        }
+      ],
+      "pages": [
+        266,
+        263,
+        58
+      ]
+    },
+    {
+      "id": "piles-36in-standard",
+      "sheets": "^36\" SQUARE PRESTRESSED CONCRETE PILE",
+      "basis": "36 in square PS pile standard: 21 in void, solid ends, 1 in chamfers",
+      "target": [
+        {
+          "level": "element",
+          "category": "pile"
         }
       ]
     }

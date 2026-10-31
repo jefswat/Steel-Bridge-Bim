@@ -8,7 +8,12 @@ using SBM.Core.Steel;
 namespace SBM.Core.Checks;
 
 /// <summary>One solid taking part in the clash check: a steel part, a bolt or a misc element.</summary>
-public sealed record ClashItem(string Kind, string Mark, string Assembly, string Description, Mesh Mesh);
+public sealed record ClashItem(string Kind, string Mark, string Assembly, string Description, Mesh Mesh)
+{
+    /// <summary>OPTIONAL parent built-up member / joint stack (<see cref="SteelPart.Member"/>): pieces of one member are one element of the old model (their own
+    /// overlaps were inside one solid), so they are not tested against each other.</summary>
+    public string? Member { get; init; }
+}
 
 /// <summary>Options of <see cref="SteelClashCheck"/>. Lengths in meters.</summary>
 public sealed class ClashOptions
@@ -66,7 +71,7 @@ public static class SteelClashCheck
             foreach (var p in st.Parts)
             {
                 if (p.Mesh.IsEmpty || (p.Category == PartCategory.Weld && !o.Welds)) continue;
-                res.Add(new ClashItem(p.Category.ToString(), p.Mark, p.Assembly, p.Description, p.Mesh));
+                res.Add(new ClashItem(p.Category.ToString(), p.Mark, p.Assembly, p.Description, p.Mesh) { Member = p.Member });
             }
             if (o.Bolts)
             {
@@ -114,7 +119,8 @@ public static class SteelClashCheck
         return rep;
     }
 
-    public static ClashReport Run(string bridge, IReadOnlyList<ClashItem> items, ClashOptions o)
+    /// <param name="testable">OPTIONAL pair filter replacing the steel / concrete rule (other checks reuse the engine: utilities).</param>
+    public static ClashReport Run(string bridge, IReadOnlyList<ClashItem> items, ClashOptions o, Func<ClashItem, ClashItem, bool>? testable = null)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         var rep = new ClashReport { Bridge = bridge, Items = items.Count };
@@ -137,7 +143,7 @@ public static class SteelClashCheck
                 int j = order[l];
                 var bj = solids[j].Box;
                 if (bj.Min.X > bi.Max.X - tol) break;
-                if (Overlap(bi, bj, -tol) && Testable(items[i], items[j])) pairs.Add((i, j));
+                if (Overlap(bi, bj, -tol) && (testable ?? Testable)(items[i], items[j])) pairs.Add((i, j));
             }
         }
         rep.CandidatePairs = pairs.Count;
@@ -201,6 +207,7 @@ public static class SteelClashCheck
     /// <summary>Concrete is tested only against drains / misc items.</summary>
     private static bool Testable(ClashItem a, ClashItem b)
     {
+        if (a.Member != null && a.Member == b.Member) return false;
         bool ca = a.Kind.StartsWith("Concrete.", StringComparison.Ordinal), cb = b.Kind.StartsWith("Concrete.", StringComparison.Ordinal);
         if (!ca && !cb) return true;
         if (ca && cb) return false;

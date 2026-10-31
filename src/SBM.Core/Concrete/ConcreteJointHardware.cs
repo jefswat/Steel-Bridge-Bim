@@ -14,10 +14,45 @@ namespace SBM.Core.Concrete;
 /// </summary>
 public sealed partial class ConcreteGenerator
 {
+    /// <summary>Section (R inward from the deck edge, H above the base) of a plate on every non-base face of the barrier polygon, its outer face
+    /// <c>Depress</c> inside the concrete, thickness inward, cut at <c>BottomClear</c> above the base on both ends. Null = no exposed face.</summary>
+    public static List<Vec2>? BarrierPlateSection(IReadOnlyList<Vec2> prof, JointBarrierPlateDefinition bp)
+    {
+        int n = prof.Count;
+        int start = -1;
+        for (int i = 0; i < n; i++) { var a = prof[i]; var b = prof[(i + 1) % n]; if (a.Y < 1e-9 && b.Y < 1e-9) start = (i + 1) % n; }
+        if (start < 0) return null;
+        var chain = new List<Vec2>();
+        for (int k = 0; k < n; k++) { var p = prof[(start + k) % n]; chain.Add(p); if (k > 0 && p.Y < 1e-9) break; }
+        if (chain.Count < 3) return null;
+        double area = 0; for (int i = 0; i < n; i++) area += prof[i].X * prof[(i + 1) % n].Y - prof[(i + 1) % n].X * prof[i].Y;
+        double sgn = area > 0 ? 1 : -1;   // CCW polygon: inward = left of each edge
+        List<Vec2> Offset(double dist)
+        {
+            var ns = new List<Vec2>();
+            for (int i = 0; i + 1 < chain.Count; i++) { var t = (chain[i + 1] - chain[i]).Normalized(); ns.Add(new Vec2(-t.Y, t.X) * sgn); }
+            var o = new List<Vec2> { chain[0] + ns[0] * dist };
+            for (int i = 1; i + 1 < chain.Count; i++)
+            {
+                var m = (ns[i - 1] + ns[i]).Normalized(); double c = Vec2.Dot(m, ns[i]);
+                o.Add(chain[i] + m * (dist / Math.Max(0.2, c)));
+            }
+            o.Add(chain[^1] + ns[^1] * dist);
+            return o;
+        }
+        var outer = Offset(bp.Depress); var inner = Offset(bp.Depress + bp.Thickness);
+        Vec2 Cut(Vec2 a, Vec2 b, Vec2 keep) { if (Math.Abs(b.Y - a.Y) < 1e-12) return keep; double t = (bp.BottomClear - a.Y) / (b.Y - a.Y); return a + (b - a) * t; }
+        outer[0] = Cut(outer[0], outer[1], outer[0]); inner[0] = Cut(inner[0], inner[1], inner[0]);
+        outer[^1] = Cut(outer[^2], outer[^1], outer[^1]); inner[^1] = Cut(inner[^2], inner[^1], inner[^1]);
+        var sec = new List<Vec2>(outer);
+        for (int i = inner.Count - 1; i >= 0; i--) sec.Add(inner[i]);
+        return sec;
+    }
+
     private (SteelAssembly? asm, List<SteelPart> parts) BuildJointHardware(bool begin, SupportDefinition sup, ExpansionJointDefinition j)
     {
         var parts = new List<SteelPart>();
-        if (!j.Body || (j.Armor == null && j.CoverPlate == null)) return (null, parts);
+        if (!j.Body || (j.Armor == null && j.CoverPlate == null && j.BarrierPlate == null)) return (null, parts);
         string mark = "EJ-" + new string(sup.Name.Select(c => char.IsLetterOrDigit(c) ? char.ToUpperInvariant(c) : '-').ToArray()).Trim('-');
         string where = $"Expansion joint at {sup.Name}";
         double gap = j.GapAt50F;
@@ -193,6 +228,46 @@ public sealed partial class ConcreteGenerator
                         });
                     }
                 }
+            }
+        }
+        // ---------------------------------------------------------------- barrier cover (slider) plates
+        if (j.BarrierPlate is { } bp)
+        {
+            var prof = BarrierProfiles.For(Deck.Barrier);
+            if (prof is not { Length: >= 3 }) Warn($"{where}: barrier cover plate - the bridge has no barrier section; not built.");
+            else if (bp.LengthIn + bp.LengthOut < 0.01) Warn($"{where}: barrier cover plate length not given; not built.");
+            else
+            {
+                var flag = bp.Unresolved is { Length: > 0 } bw ? Assumption.UnresolvedDimension(bw, bp.Basis ?? "plate bent to the barrier section") : null;
+                if (bp.Unresolved is { Length: > 0 } bw2 && bw2 != j.Unresolved) Warn($"{where}: {bw2}");
+                var sec = BarrierPlateSection(prof, bp);
+                if (sec == null) Warn($"{where}: barrier cover plate - the barrier section has no exposed faces above the base clearance; not built.");
+                else
+                    foreach (var (side, on) in new[] { (-1, bp.Left && Deck.Barrier.Left), (1, bp.Right && Deck.Barrier.Right) })
+                    {
+                        if (!on) continue;
+                        double lIn = side < 0 ? bp.LengthIn : bp.RightLengthIn ?? bp.LengthIn, lOut = side < 0 ? bp.LengthOut : bp.RightLengthOut ?? bp.LengthOut;
+                        if (lIn + lOut < 0.01) continue;
+                        var rings = new List<Vec3[]>();
+                        int nx = Math.Max(2, (int)Math.Ceiling((lIn + lOut) / 0.3) + 1);
+                        for (int i = 0; i < nx; i++)
+                        {
+                            double x = -lOut + (lIn + lOut) * i / (nx - 1);
+                            double e0 = side < 0 ? Deck.LeftEdgeOffset : Deck.RightEdgeOffset;
+                            double d = EndD(_ => e0, begin, x);
+                            double edge = side < 0 ? LeftAtD(d) : RightAtD(d);
+                            d = EndD(_ => edge, begin, x);
+                            rings.Add(sec.Select(q => _a.PointAtDistance(d, edge - side * q.X).WithZ(Top(d, edge) + q.Y)).ToArray());
+                        }
+                        var m = new Mesh();
+                        MeshBuilder.AddLoft(m, sec, rings);
+                        parts.Add(new SteelPart
+                        {
+                            Mark = $"{mark}-BP{(side < 0 ? "L" : "R")}", Category = PartCategory.JointCoverPlate, Assembly = mark, Mesh = m, Length = lIn + lOut, Material = bp.Material,
+                            Description = $"Barrier cover (slider) PL {Sh(bp.Thickness)} bent to the barrier, {Sh(lIn + lOut)} long ({Sh(lOut)} beyond the deck end){(bp.Source.Length > 0 ? $" ({bp.Source})" : "")}",
+                            Assumption = flag,
+                        });
+                    }
             }
         }
         if (parts.Count == 0) return (null, parts);

@@ -1,0 +1,332 @@
+walkway CL W15-W15' 1 grating	Grating	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=0
+walkway CL W15-W15' 1 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=0
+walkway CL W15-W15' 1 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=0
+walkway CL W15-W15' 1 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=0
+walkway CL W15-W15' 1 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=72
+walkway CL W15-W15' 1 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=72
+walkway CL W15-W15' 1 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=0
+walkway CL W15-W15' 1 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=0
+walkway CL W15-W15' 1 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=0
+walkway CL W15-W15' 1 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=72
+walkway CL W15-W15' 1 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68063.526..68094.234	pitch=72
+walkway CL W15-W15' 2 grating	Grating	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=0
+walkway CL W15-W15' 2 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=0
+walkway CL W15-W15' 2 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=0
+walkway CL W15-W15' 2 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=0
+walkway CL W15-W15' 2 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=72
+walkway CL W15-W15' 2 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=72
+walkway CL W15-W15' 2 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=0
+walkway CL W15-W15' 2 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=0
+walkway CL W15-W15' 2 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=0
+walkway CL W15-W15' 2 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=72
+walkway CL W15-W15' 2 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68094.526..68125.234	pitch=72
+walkway CL W15-W15' 3 grating	Grating	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=0
+walkway CL W15-W15' 3 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=0
+walkway CL W15-W15' 3 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=0
+walkway CL W15-W15' 3 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=0
+walkway CL W15-W15' 3 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=72
+walkway CL W15-W15' 3 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=72
+walkway CL W15-W15' 3 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=0
+walkway CL W15-W15' 3 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=0
+walkway CL W15-W15' 3 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=0
+walkway CL W15-W15' 3 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=72
+walkway CL W15-W15' 3 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68125.526..68156.234	pitch=72
+walkway CL W15-W15' 4 grating	Grating	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=0
+walkway CL W15-W15' 4 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=0
+walkway CL W15-W15' 4 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=0
+walkway CL W15-W15' 4 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=0
+walkway CL W15-W15' 4 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=72
+walkway CL W15-W15' 4 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=72
+walkway CL W15-W15' 4 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=0
+walkway CL W15-W15' 4 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=0
+walkway CL W15-W15' 4 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=0
+walkway CL W15-W15' 4 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=72
+walkway CL W15-W15' 4 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68156.526..68187.234	pitch=72
+walkway CL W15-W15' 5 grating	Grating	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=0
+walkway CL W15-W15' 5 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=0
+walkway CL W15-W15' 5 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=0
+walkway CL W15-W15' 5 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=0
+walkway CL W15-W15' 5 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=72
+walkway CL W15-W15' 5 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=72
+walkway CL W15-W15' 5 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=0
+walkway CL W15-W15' 5 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=0
+walkway CL W15-W15' 5 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=0
+walkway CL W15-W15' 5 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=72
+walkway CL W15-W15' 5 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68187.526..68218.234	pitch=72
+walkway CL W15-W15' 6 grating	Grating	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=0
+walkway CL W15-W15' 6 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=0
+walkway CL W15-W15' 6 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=0
+walkway CL W15-W15' 6 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=0
+walkway CL W15-W15' 6 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=72
+walkway CL W15-W15' 6 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=72
+walkway CL W15-W15' 6 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=0
+walkway CL W15-W15' 6 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=0
+walkway CL W15-W15' 6 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=0
+walkway CL W15-W15' 6 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=72
+walkway CL W15-W15' 6 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68218.526..68249.234	pitch=72
+walkway CL W15-W15' 7 grating	Grating	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=0
+walkway CL W15-W15' 7 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=0
+walkway CL W15-W15' 7 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=0
+walkway CL W15-W15' 7 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=0
+walkway CL W15-W15' 7 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=72
+walkway CL W15-W15' 7 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=72
+walkway CL W15-W15' 7 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=0
+walkway CL W15-W15' 7 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=0
+walkway CL W15-W15' 7 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=0
+walkway CL W15-W15' 7 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=72
+walkway CL W15-W15' 7 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68249.526..68279.135	pitch=72
+walkway CL W15-W15' 8 grating	Grating	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=0
+walkway CL W15-W15' 8 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=0
+walkway CL W15-W15' 8 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=0
+walkway CL W15-W15' 8 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=0
+walkway CL W15-W15' 8 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=72
+walkway CL W15-W15' 8 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=72
+walkway CL W15-W15' 8 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=0
+walkway CL W15-W15' 8 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=0
+walkway CL W15-W15' 8 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=0
+walkway CL W15-W15' 8 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=72
+walkway CL W15-W15' 8 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68281.625..68311.234	pitch=72
+walkway CL W15-W15' 9 grating	Grating	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=0
+walkway CL W15-W15' 9 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=0
+walkway CL W15-W15' 9 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=0
+walkway CL W15-W15' 9 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=0
+walkway CL W15-W15' 9 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=72
+walkway CL W15-W15' 9 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=72
+walkway CL W15-W15' 9 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=0
+walkway CL W15-W15' 9 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=0
+walkway CL W15-W15' 9 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=0
+walkway CL W15-W15' 9 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=72
+walkway CL W15-W15' 9 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68311.526..68342.234	pitch=72
+walkway CL W15-W15' 10 grating	Grating	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=0
+walkway CL W15-W15' 10 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=0
+walkway CL W15-W15' 10 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=0
+walkway CL W15-W15' 10 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=0
+walkway CL W15-W15' 10 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=72
+walkway CL W15-W15' 10 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=72
+walkway CL W15-W15' 10 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=0
+walkway CL W15-W15' 10 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=0
+walkway CL W15-W15' 10 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=0
+walkway CL W15-W15' 10 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=72
+walkway CL W15-W15' 10 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68342.526..68373.234	pitch=72
+walkway CL W15-W15' 11 grating	Grating	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=0
+walkway CL W15-W15' 11 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=0
+walkway CL W15-W15' 11 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=0
+walkway CL W15-W15' 11 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=0
+walkway CL W15-W15' 11 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=72
+walkway CL W15-W15' 11 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=72
+walkway CL W15-W15' 11 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=0
+walkway CL W15-W15' 11 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=0
+walkway CL W15-W15' 11 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=0
+walkway CL W15-W15' 11 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=72
+walkway CL W15-W15' 11 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68373.526..68404.234	pitch=72
+walkway CL W15-W15' 12 grating	Grating	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=0
+walkway CL W15-W15' 12 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=0
+walkway CL W15-W15' 12 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=0
+walkway CL W15-W15' 12 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=0
+walkway CL W15-W15' 12 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=72
+walkway CL W15-W15' 12 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=72
+walkway CL W15-W15' 12 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=0
+walkway CL W15-W15' 12 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=0
+walkway CL W15-W15' 12 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=0
+walkway CL W15-W15' 12 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=72
+walkway CL W15-W15' 12 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68404.526..68435.234	pitch=72
+walkway CL W15-W15' 13 grating	Grating	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=0
+walkway CL W15-W15' 13 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=0
+walkway CL W15-W15' 13 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=0
+walkway CL W15-W15' 13 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=0
+walkway CL W15-W15' 13 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=72
+walkway CL W15-W15' 13 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=72
+walkway CL W15-W15' 13 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=0
+walkway CL W15-W15' 13 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=0
+walkway CL W15-W15' 13 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=0
+walkway CL W15-W15' 13 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=72
+walkway CL W15-W15' 13 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68435.526..68466.234	pitch=72
+walkway CL W15-W15' 14 grating	Grating	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=0
+walkway CL W15-W15' 14 channel L	WalkwayStringer	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=0
+walkway CL W15-W15' 14 top rail L	WalkwayRail	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=0
+walkway CL W15-W15' 14 mid rail L	WalkwayRail	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=0
+walkway CL W15-W15' 14 posts L a	WalkwayPost	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=72
+walkway CL W15-W15' 14 posts L b	WalkwayPost	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=72
+walkway CL W15-W15' 14 channel R	WalkwayStringer	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=0
+walkway CL W15-W15' 14 top rail R	WalkwayRail	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=0
+walkway CL W15-W15' 14 mid rail R	WalkwayRail	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=0
+walkway CL W15-W15' 14 posts R a	WalkwayPost	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=72
+walkway CL W15-W15' 14 posts R b	WalkwayPost	tr=False	sta=0	ref=-2	68466.526..68497.234	pitch=72
+cross walk W15 N grating	Grating	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=0
+cross walk W15 N channel L	WalkwayStringer	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=0
+cross walk W15 N top rail L	WalkwayRail	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=0
+cross walk W15 N mid rail L	WalkwayRail	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=0
+cross walk W15 N posts L a	WalkwayPost	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=72
+cross walk W15 N posts L b	WalkwayPost	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=72
+cross walk W15 N channel R	WalkwayStringer	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=0
+cross walk W15 N top rail R	WalkwayRail	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=0
+cross walk W15 N mid rail R	WalkwayRail	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=0
+cross walk W15 N posts R a	WalkwayPost	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=72
+cross walk W15 N posts R b	WalkwayPost	tr=True	sta=68065.422	ref=0	-40.792..-3	pitch=72
+cross walk W15 S grating	Grating	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=0
+cross walk W15 S channel L	WalkwayStringer	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=0
+cross walk W15 S top rail L	WalkwayRail	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=0
+cross walk W15 S mid rail L	WalkwayRail	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=0
+cross walk W15 S posts L a	WalkwayPost	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=72
+cross walk W15 S posts L b	WalkwayPost	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=72
+cross walk W15 S channel R	WalkwayStringer	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=0
+cross walk W15 S top rail R	WalkwayRail	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=0
+cross walk W15 S mid rail R	WalkwayRail	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=0
+cross walk W15 S posts R a	WalkwayPost	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=72
+cross walk W15 S posts R b	WalkwayPost	tr=True	sta=68065.422	ref=0	-1..40.792	pitch=72
+cross walk W20 N grating	Grating	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=0
+cross walk W20 N channel L	WalkwayStringer	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=0
+cross walk W20 N top rail L	WalkwayRail	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=0
+cross walk W20 N mid rail L	WalkwayRail	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=0
+cross walk W20 N posts L a	WalkwayPost	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=72
+cross walk W20 N posts L b	WalkwayPost	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=72
+cross walk W20 N channel R	WalkwayStringer	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=0
+cross walk W20 N top rail R	WalkwayRail	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=0
+cross walk W20 N mid rail R	WalkwayRail	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=0
+cross walk W20 N posts R a	WalkwayPost	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=72
+cross walk W20 N posts R b	WalkwayPost	tr=True	sta=68220.422	ref=0	-40.792..-3	pitch=72
+cross walk W20 S grating	Grating	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=0
+cross walk W20 S channel L	WalkwayStringer	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=0
+cross walk W20 S top rail L	WalkwayRail	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=0
+cross walk W20 S mid rail L	WalkwayRail	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=0
+cross walk W20 S posts L a	WalkwayPost	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=72
+cross walk W20 S posts L b	WalkwayPost	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=72
+cross walk W20 S channel R	WalkwayStringer	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=0
+cross walk W20 S top rail R	WalkwayRail	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=0
+cross walk W20 S mid rail R	WalkwayRail	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=0
+cross walk W20 S posts R a	WalkwayPost	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=72
+cross walk W20 S posts R b	WalkwayPost	tr=True	sta=68220.422	ref=0	-1..40.792	pitch=72
+cross walk W19' N grating	Grating	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=0
+cross walk W19' N channel L	WalkwayStringer	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=0
+cross walk W19' N top rail L	WalkwayRail	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=0
+cross walk W19' N mid rail L	WalkwayRail	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=0
+cross walk W19' N posts L a	WalkwayPost	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=72
+cross walk W19' N posts L b	WalkwayPost	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=72
+cross walk W19' N channel R	WalkwayStringer	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=0
+cross walk W19' N top rail R	WalkwayRail	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=0
+cross walk W19' N mid rail R	WalkwayRail	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=0
+cross walk W19' N posts R a	WalkwayPost	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=72
+cross walk W19' N posts R b	WalkwayPost	tr=True	sta=68371.338	ref=0	-40.792..-3	pitch=72
+cross walk W19' S grating	Grating	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=0
+cross walk W19' S channel L	WalkwayStringer	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=0
+cross walk W19' S top rail L	WalkwayRail	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=0
+cross walk W19' S mid rail L	WalkwayRail	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=0
+cross walk W19' S posts L a	WalkwayPost	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=72
+cross walk W19' S posts L b	WalkwayPost	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=72
+cross walk W19' S channel R	WalkwayStringer	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=0
+cross walk W19' S top rail R	WalkwayRail	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=0
+cross walk W19' S mid rail R	WalkwayRail	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=0
+cross walk W19' S posts R a	WalkwayPost	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=72
+cross walk W19' S posts R b	WalkwayPost	tr=True	sta=68371.338	ref=0	-1..40.792	pitch=72
+cross walk W15' N grating	Grating	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=0
+cross walk W15' N channel L	WalkwayStringer	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=0
+cross walk W15' N top rail L	WalkwayRail	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=0
+cross walk W15' N mid rail L	WalkwayRail	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=0
+cross walk W15' N posts L a	WalkwayPost	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=72
+cross walk W15' N posts L b	WalkwayPost	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=72
+cross walk W15' N channel R	WalkwayStringer	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=0
+cross walk W15' N top rail R	WalkwayRail	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=0
+cross walk W15' N mid rail R	WalkwayRail	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=0
+cross walk W15' N posts R a	WalkwayPost	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=72
+cross walk W15' N posts R b	WalkwayPost	tr=True	sta=68495.338	ref=0	-40.792..-3	pitch=72
+cross walk W15' S grating	Grating	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=0
+cross walk W15' S channel L	WalkwayStringer	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=0
+cross walk W15' S top rail L	WalkwayRail	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=0
+cross walk W15' S mid rail L	WalkwayRail	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=0
+cross walk W15' S posts L a	WalkwayPost	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=72
+cross walk W15' S posts L b	WalkwayPost	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=72
+cross walk W15' S channel R	WalkwayStringer	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=0
+cross walk W15' S top rail R	WalkwayRail	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=0
+cross walk W15' S mid rail R	WalkwayRail	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=0
+cross walk W15' S posts R a	WalkwayPost	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=72
+cross walk W15' S posts R b	WalkwayPost	tr=True	sta=68495.338	ref=0	-1..40.792	pitch=72
+walkway on strut L11 grating	Grating	tr=True	sta=67939.38	ref=0	-11..11	pitch=0
+walkway on strut L11 channel L	WalkwayStringer	tr=True	sta=67939.38	ref=0	-11..11	pitch=0
+walkway on strut L11 top rail L	WalkwayRail	tr=True	sta=67939.38	ref=0	-11..11	pitch=0
+walkway on strut L11 mid rail L	WalkwayRail	tr=True	sta=67939.38	ref=0	-11..11	pitch=0
+walkway on strut L11 posts L a	WalkwayPost	tr=True	sta=67939.38	ref=0	-11..11	pitch=72
+walkway on strut L11 posts L b	WalkwayPost	tr=True	sta=67939.38	ref=0	-11..11	pitch=72
+walkway on strut L11 channel R	WalkwayStringer	tr=True	sta=67939.38	ref=0	-11..11	pitch=0
+walkway on strut L11 top rail R	WalkwayRail	tr=True	sta=67939.38	ref=0	-11..11	pitch=0
+walkway on strut L11 mid rail R	WalkwayRail	tr=True	sta=67939.38	ref=0	-11..11	pitch=0
+walkway on strut L11 posts R a	WalkwayPost	tr=True	sta=67939.38	ref=0	-11..11	pitch=72
+walkway on strut L11 posts R b	WalkwayPost	tr=True	sta=67939.38	ref=0	-11..11	pitch=72
+walkway at FB11 grating	Grating	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=0
+walkway at FB11 channel L	WalkwayStringer	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=0
+walkway at FB11 top rail L	WalkwayRail	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=0
+walkway at FB11 mid rail L	WalkwayRail	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=0
+walkway at FB11 posts L a	WalkwayPost	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=72
+walkway at FB11 posts L b	WalkwayPost	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=72
+walkway at FB11 channel R	WalkwayStringer	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=0
+walkway at FB11 top rail R	WalkwayRail	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=0
+walkway at FB11 mid rail R	WalkwayRail	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=0
+walkway at FB11 posts R a	WalkwayPost	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=72
+walkway at FB11 posts R b	WalkwayPost	tr=True	sta=67941.38	ref=0	-36.969..0	pitch=72
+platform L11 N grating	Grating	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=0
+platform L11 N channel B	WalkwayStringer	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=0
+platform L11 N top rail B	WalkwayRail	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=0
+platform L11 N mid rail B	WalkwayRail	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=0
+platform L11 N posts B	WalkwayPost	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=18.03
+platform L11 N channel A	WalkwayStringer	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=0
+platform L11 N top rail A	WalkwayRail	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=0
+platform L11 N mid rail A	WalkwayRail	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=0
+platform L11 N posts A	WalkwayPost	tr=True	sta=67939.38	ref=0	-38.167..-34.911	pitch=18.03
+ladder L11 N stile B 1	WalkwayPost	tr=True	sta=67941.38	ref=0	-37.094..-36.844	pitch=0
+ladder L11 N stile B 2	WalkwayPost	tr=True	sta=67941.38	ref=0	-36.875..-36.844	pitch=0
+ladder L11 N stile A 1	WalkwayPost	tr=True	sta=67941.38	ref=0	-37.094..-36.844	pitch=0
+ladder L11 N stile A 2	WalkwayPost	tr=True	sta=67941.38	ref=0	-36.875..-36.844	pitch=0
+ladder L11 N rungs	WalkwayRail	tr=True	sta=67941.38	ref=0	-36.996..-36.941	pitch=0
+platform L11 S grating	Grating	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=0
+platform L11 S channel B	WalkwayStringer	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=0
+platform L11 S top rail B	WalkwayRail	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=0
+platform L11 S mid rail B	WalkwayRail	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=0
+platform L11 S posts B	WalkwayPost	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=18.03
+platform L11 S channel A	WalkwayStringer	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=0
+platform L11 S top rail A	WalkwayRail	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=0
+platform L11 S mid rail A	WalkwayRail	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=0
+platform L11 S posts A	WalkwayPost	tr=True	sta=67939.38	ref=0	34.911..38.167	pitch=18.03
+walkway on strut L11' grating	Grating	tr=True	sta=68621.38	ref=0	-11..11	pitch=0
+walkway on strut L11' channel L	WalkwayStringer	tr=True	sta=68621.38	ref=0	-11..11	pitch=0
+walkway on strut L11' top rail L	WalkwayRail	tr=True	sta=68621.38	ref=0	-11..11	pitch=0
+walkway on strut L11' mid rail L	WalkwayRail	tr=True	sta=68621.38	ref=0	-11..11	pitch=0
+walkway on strut L11' posts L a	WalkwayPost	tr=True	sta=68621.38	ref=0	-11..11	pitch=72
+walkway on strut L11' posts L b	WalkwayPost	tr=True	sta=68621.38	ref=0	-11..11	pitch=72
+walkway on strut L11' channel R	WalkwayStringer	tr=True	sta=68621.38	ref=0	-11..11	pitch=0
+walkway on strut L11' top rail R	WalkwayRail	tr=True	sta=68621.38	ref=0	-11..11	pitch=0
+walkway on strut L11' mid rail R	WalkwayRail	tr=True	sta=68621.38	ref=0	-11..11	pitch=0
+walkway on strut L11' posts R a	WalkwayPost	tr=True	sta=68621.38	ref=0	-11..11	pitch=72
+walkway on strut L11' posts R b	WalkwayPost	tr=True	sta=68621.38	ref=0	-11..11	pitch=72
+walkway at FB11' grating	Grating	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=0
+walkway at FB11' channel L	WalkwayStringer	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=0
+walkway at FB11' top rail L	WalkwayRail	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=0
+walkway at FB11' mid rail L	WalkwayRail	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=0
+walkway at FB11' posts L a	WalkwayPost	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=72
+walkway at FB11' posts L b	WalkwayPost	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=72
+walkway at FB11' channel R	WalkwayStringer	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=0
+walkway at FB11' top rail R	WalkwayRail	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=0
+walkway at FB11' mid rail R	WalkwayRail	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=0
+walkway at FB11' posts R a	WalkwayPost	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=72
+walkway at FB11' posts R b	WalkwayPost	tr=True	sta=68619.38	ref=0	-36.969..0	pitch=72
+platform L11' N grating	Grating	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=0
+platform L11' N channel B	WalkwayStringer	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=0
+platform L11' N top rail B	WalkwayRail	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=0
+platform L11' N mid rail B	WalkwayRail	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=0
+platform L11' N posts B	WalkwayPost	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=18.03
+platform L11' N channel A	WalkwayStringer	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=0
+platform L11' N top rail A	WalkwayRail	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=0
+platform L11' N mid rail A	WalkwayRail	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=0
+platform L11' N posts A	WalkwayPost	tr=True	sta=68621.38	ref=0	-38.167..-34.911	pitch=18.03
+ladder L11' N stile B 1	WalkwayPost	tr=True	sta=68619.38	ref=0	-37.094..-36.844	pitch=0
+ladder L11' N stile B 2	WalkwayPost	tr=True	sta=68619.38	ref=0	-36.875..-36.844	pitch=0
+ladder L11' N stile A 1	WalkwayPost	tr=True	sta=68619.38	ref=0	-37.094..-36.844	pitch=0
+ladder L11' N stile A 2	WalkwayPost	tr=True	sta=68619.38	ref=0	-36.875..-36.844	pitch=0
+ladder L11' N rungs	WalkwayRail	tr=True	sta=68619.38	ref=0	-36.996..-36.941	pitch=0
+platform L11' S grating	Grating	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=0
+platform L11' S channel B	WalkwayStringer	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=0
+platform L11' S top rail B	WalkwayRail	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=0
+platform L11' S mid rail B	WalkwayRail	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=0
+platform L11' S posts B	WalkwayPost	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=18.03
+platform L11' S channel A	WalkwayStringer	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=0
+platform L11' S top rail A	WalkwayRail	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=0
+platform L11' S mid rail A	WalkwayRail	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=0
+platform L11' S posts A	WalkwayPost	tr=True	sta=68621.38	ref=0	34.911..38.167	pitch=18.03

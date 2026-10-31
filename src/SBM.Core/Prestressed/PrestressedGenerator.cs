@@ -109,7 +109,8 @@ public static class PrestressedGenerator
     }
 
     /// <summary>Schedule unit of the beam bars of a definition: "{designation} beams".</summary>
-    public static string BarUnit(PrestressedBeamDefinition pd, TxGirderShape shape) => $"{(pd.Designation != "" ? pd.Designation : shape.Name)} beams";
+    public static string BarUnit(PrestressedBeamDefinition pd, TxGirderShape shape) =>
+        pd.Reinforcement?.Unit is { Length: > 0 } un ? un : $"{(pd.Designation != "" ? pd.Designation : shape.Name)} beams";
 
     /// <summary>Beam bar marks (one per unit + mark, counts over all beams) and the checks: UNRESOLVED items, bars crossing an end face,
     /// bar list counts per beam, weight per beam vs the printed weight.</summary>

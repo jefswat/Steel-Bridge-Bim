@@ -42,6 +42,12 @@ public enum PartCategory
     // Cable-stayed footbridge (appended; OPTIONAL BridgeDefinition.CableStayed, CableStayed/CableStayedGenerator): pylon legs / trunk / cross beams / struts,
     // stay cables (IfcMember STAY_CABLE), steel deck segments.
     Pylon, PylonCrossBeam, PylonStrut, StayCable, CsDeck,
+    // Cable-stayed edge girder deck (appended): floorbeam plates, stay anchorage pipes and plates (bearing plate, anchor plate).
+    CsFloorbeamPlate, StayAnchorPipe, StayAnchorPlate,
+    // Cable-stayed longitudinal support (stringer) plates between the floorbeams (appended).
+    CsStringerPlate,
+    // Cable-stayed tower stay anchorage trays (appended): tray plates (webs, floor, top, end, bearing, rib plates) and guide pipes.
+    PylonAnchorPlate, PylonGuidePipe,
 }
 
 public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice, LateralBracing, InspectionCable, InspectionWalkway,
@@ -57,7 +63,13 @@ public enum AssemblyKind { GirderFieldSection, CrossFrame, Bearing, FieldSplice,
     /// <summary>Riveted plate girder line of a truss-generator bridge (appended): girder member of one line (TrussMemberRole.Girder).</summary>
     PlateGirderLine,
     /// <summary>Cable-stayed footbridge (appended): the pylon (legs, trunk, cross beams, struts), one stay group, the deck, the deck barriers.</summary>
-    Pylon, StayGroup, CsDeck }
+    Pylon, StayGroup, CsDeck,
+    /// <summary>Cable-stayed edge girder deck (appended): one edge girder field section, one floorbeam, one field splice, one stay anchorage.</summary>
+    CsEdgeGirder, CsFloorbeam, CsFieldSplice, CsAnchorage,
+    /// <summary>Cable-stayed longitudinal support (stringer) piece between two floorbeams (appended).</summary>
+    CsStringer,
+    /// <summary>Stay anchorage tray in a tower leg (appended).</summary>
+    PylonAnchorTray }
 
 /// <summary>Member role, used for IFC predefined types and reports.</summary>
 public enum MemberRole { None, TopChord, BottomChord, Diagonal, Diaphragm, Lateral }
@@ -102,8 +114,15 @@ public sealed class SteelPart
     /// <summary>OPTIONAL fabrication attributes from the plan notes (toughness, contact faces, NDT, coating, shop assembly, tolerances); null = none.
     /// IFC Pset SBM_FabricationAttributes.</summary>
     public Bridge.FabricationAttributes? Fabrication { get; set; }
+    /// <summary>OPTIONAL per-face contact / fit conditions (<see cref="PartFit"/>: mill to bear, finish to bear, tight fit, welded); null = none recorded.</summary>
+    public List<PartFit>? Fits { get; set; }
     /// <summary>OPTIONAL: placeholder part whose weight is not determined (rail fence fabric of an undetermined type); <see cref="Mass"/> = 0.</summary>
     public bool MassNotCounted { get; init; }
+    /// <summary>OPTIONAL sub-element of a built-up member (truss <c>PartPerPiece</c>): mark of the parent member / joint gusset stack this part is one piece of
+    /// (null = the part is a whole element). IFC: aggregated into one IfcElementAssembly per parent; database level "member" between the group and the part.</summary>
+    public string? Member { get; init; }
+    /// <summary>OPTIONAL kind of the piece within its <see cref="Member"/> (web ply, angle, cover plate, channel, rolled shape, plate, lacing, gusset, ...).</summary>
+    public string? Piece { get; init; }
     public double Mass => MassNotCounted ? 0 : NominalWeightLbPerFt > 0 ? NominalWeightLbPerFt * 1.48816394 * Length : Category switch
     {
         PartCategory.BearingPad or PartCategory.BearingDisc => Volume * 1150,
@@ -198,6 +217,8 @@ public sealed class SteelModel
     public double StudHeadHeight { get; init; }
     public List<BearingSeat> BearingSeats { get; } = new();
     public List<CrossFrameDetail2D> CrossFrameDetails { get; } = new();
+    /// <summary>Standard cross frame depth / hole shift / twist report (OPTIONAL <c>CrossFrameDefinition.Standard</c> or <c>ReportTwist</c>; null when neither is set).</summary>
+    public CrossFrameFitReport? CrossFrameFit { get; set; }
     public List<Diagnostic> Diagnostics { get; } = new();
     public TimeSpan GenerationTime { get; set; }
     /// <summary>Exact-geometry option: what was built as NURBS (null when the option is off).</summary>
@@ -264,7 +285,9 @@ public sealed class SteelModel
     {
         var m = new Mesh();
         var f = Frame3.World;
-        double hr = 0.8 * diameter / Math.Cos(Math.PI / segments), hh = 0.6 * diameter;
+        // button heads INSCRIBED in the 1.6 d circle (vertices on it): two heads exactly touching (pitch 0.8 (d1 + d2), allowed by the placement rules) no longer
+        // overlap in the faceted solid (agent review PTC rivets R04: the circumscribed octagon gave 1/16 in. clash rows); the mass is analytic (RivetHeadMass)
+        double hr = 0.8 * diameter, hh = 0.6 * diameter;
         MeshBuilder.AddPrism(m, f, hr, segments, -hh, 0);
         MeshBuilder.AddPrism(m, f, diameter / 2 / Math.Cos(Math.PI / segments), segments, 0, grip);
         if (!flushEnd) MeshBuilder.AddPrism(m, f, hr, segments, grip, grip + hh);

@@ -1,7 +1,7 @@
 # Reduce the extracted diagram dimensions of every mark to the subset that reproduces the bar-list length (bar list length = plain sum of the
 # out-to-out dimensions) and classify simple shapes. Output: temp/bend/plan_shapes.json
 import json, itertools, re, sys
-W = r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\temp\bend' + '\\'
+W = r'C:\SBM\.worktrees\bends\temp\bend' + '\\'
 D = json.load(open(W + 'plan_dims.json'))
 
 

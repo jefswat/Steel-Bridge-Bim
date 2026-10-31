@@ -13,7 +13,7 @@ namespace SBM.Core.CableStayed;
 /// alignment / profile, pylon trunk + curved legs + cross beams + struts, stays, piers / abutment seats / footings, then the analysis wireframe and the
 /// first-cut forces (<see cref="CableStayedAnalysis"/>). Every value is an input; inputs that are missing are reported, nothing is assumed.
 /// </summary>
-public sealed class CableStayedGenerator
+public sealed partial class CableStayedGenerator
 {
     private readonly BridgeFraming _f;
     private readonly CableStayedDefinition _d;
@@ -21,7 +21,7 @@ public sealed class CableStayedGenerator
     private readonly CableStayedModel _m = new();
     private readonly Alignments.Alignment _al;
     private Assumption? _flag;
-    private SupportLineResult? _pylonSupport;
+    private readonly List<SupportLineResult?> _pylonSupports = new();
 
     private CableStayedGenerator(BridgeFraming f, UnitSystem u)
     {
@@ -50,16 +50,28 @@ public sealed class CableStayedGenerator
             _flag = Assumption.UnresolvedDimension(string.Join(" | ", _d.Unresolved.Take(3)) + (_d.Unresolved.Count > 3 ? " ..." : ""),
                 (_d.Concept.Length > 0 ? _d.Concept : "concept values") + (_d.Source.Length > 0 ? $" ({_d.Source})" : ""));
         if (_f.Supports.Count < 2) { Warn("Cable-stayed: at least two support lines are required (deck ends)."); return; }
+        var pylons = _d.AllPylons;
         foreach (var s in _f.Supports)
-            _m.Supports.Add((s.Name, s.Station, s.Name.Equals(_d.Pylon.Support, StringComparison.OrdinalIgnoreCase)));
-        _pylonSupport = _f.Supports.FirstOrDefault(s => s.Name.Equals(_d.Pylon.Support, StringComparison.OrdinalIgnoreCase));
-        if (_pylonSupport == null) Warn($"Cable-stayed: the pylon support line '{_d.Pylon.Support}' does not exist (supports: {string.Join(", ", _f.Supports.Select(s => s.Name))}).");
+            _m.Supports.Add((s.Name, s.Station, pylons.Any(py => s.Name.Equals(py.Support, StringComparison.OrdinalIgnoreCase))));
+        foreach (var py in pylons)
+        {
+            var sl = _f.Supports.FirstOrDefault(s => s.Name.Equals(py.Support, StringComparison.OrdinalIgnoreCase));
+            if (sl == null) Warn($"Cable-stayed: the pylon support line '{py.Support}' does not exist (supports: {string.Join(", ", _f.Supports.Select(s => s.Name))}).");
+            _pylonSupports.Add(sl);
+        }
 
         BuildDeck();
-        if (_pylonSupport != null && !double.IsNaN(_d.Pylon.BaseElevation))
+        bool all = true;
+        for (int p = 0; p < pylons.Count; p++)
+            if (_pylonSupports[p] != null && !double.IsNaN(pylons[p].BaseElevation)) BuildPylon(p);
+            else all = false;
+        if (all) BuildStays();
+        if (Eg != null && _deckStations.Count > 1)
         {
-            BuildPylon();
-            BuildStays();
+            // after the stays: the splices go past each anchorage's far end
+            var slab = _m.Concrete.Deck ?? new Mesh();
+            BuildEdgeGirderDeck(_deckStations[0], _deckStations[^1], _deckStations, slab);
+            _m.Concrete.Deck = slab.IsEmpty ? null : slab;
         }
         BuildPiers();
         CableStayedAnalysis.Build(_f, _d, _m);
@@ -74,20 +86,29 @@ public sealed class CableStayedGenerator
     private void BuildDeck()
     {
         var dd = _d.Deck;
-        var outline = dd.Outline();
+        var outline = Eg != null ? EdgeGirderOutline() : dd.Outline();
         if (outline.Count < 3) return;
         if (MeshBuilder.SignedArea(outline) < 0) outline.Reverse();
         _m.DeckSection.AddRange(outline);
         _m.DeckProps = CableStayedAnalysis.PolygonProps(outline, dd.WallThickness);
+        if (Eg != null) EdgeGirderProps();
         double s0 = double.IsNaN(dd.BeginStation) ? _f.Supports[0].Station - dd.EndOverhang : dd.BeginStation;
         double s1 = double.IsNaN(dd.EndStation) ? _f.Supports[^1].Station + dd.EndOverhang : dd.EndStation;
         if (s1 <= s0) { Warn("Cable-stayed deck: the end station is not after the begin station."); return; }
         _m.DeckBegin = s0; _m.DeckEnd = s1;
         var stations = DeckStations(s0, s1);
+        if (Eg != null)
+        {
+            _egFrom = double.IsNaN(Eg.FromStation) ? s0 : Eg.FromStation; _egTo = double.IsNaN(Eg.ToStation) ? s1 : Eg.ToStation;
+            stations.AddRange(new[] { _egFrom, _egTo }.Where(x => x > s0 && x < s1));
+            stations = stations.Distinct().OrderBy(x => x).ToList();
+        }
 
         // one piece per span (between support stations inside the deck)
         var cuts = new List<double> { s0 };
-        cuts.AddRange(_f.Supports.Select(s => s.Station).Where(x => x > s0 + 0.01 && x < s1 - 0.01).OrderBy(x => x));
+        cuts.AddRange(_f.Supports.Select(s => s.Station).Where(x => x > s0 + 0.01 && x < s1 - 0.01));
+        if (Eg != null) cuts.AddRange(new[] { _egFrom, _egTo }.Where(x => x > s0 + 0.01 && x < s1 - 0.01));
+        cuts = cuts.Distinct().OrderBy(x => x).ToList();
         cuts.Add(s1);
         bool steel = dd.Material == CsMaterial.Steel;
         string asm = "CSD";
@@ -95,6 +116,7 @@ public sealed class CableStayedGenerator
         var concrete = new Mesh();
         for (int k = 0; k + 1 < cuts.Count; k++)
         {
+            if (Eg != null && cuts[k] >= _egFrom - 1e-6 && cuts[k + 1] <= _egTo + 1e-6) continue;   // edge girder unit: built below
             var st = stations.Where(x => x > cuts[k] + 1e-6 && x < cuts[k + 1] - 1e-6).Prepend(cuts[k]).Append(cuts[k + 1]).ToList();
             var mesh = steel ? new Mesh() : concrete;
             Sweep(mesh, outline, u => Ring(outline, u), st, "deck");
@@ -103,17 +125,20 @@ public sealed class CableStayedGenerator
                 {
                     Mark = $"CSD-{k + 1}", Category = PartCategory.CsDeck, Assembly = asm, Mesh = mesh, Length = st[^1] - st[0],
                     Description = $"Deck {L(dd.TopWidth > 0 ? dd.TopWidth : outline.Max(p => p.X) - outline.Min(p => p.X))} wide, sta {_u.FormatStation(st[0])} to {_u.FormatStation(st[^1])}"
-                        + (dd.WallThickness > 0 ? $" (envelope of a box; equivalent wall {L(dd.WallThickness)})" : ""),
+                        + (Eg != null ? " (envelope of the edge girder section outside the edge girder unit: approach structure not designed; mass not counted)"
+                           : dd.WallThickness > 0 ? $" (envelope of a box; equivalent wall {L(dd.WallThickness)})" : ""),
                     Assumption = _flag,
-                    Density = dd.WallThickness > 0 ? CableStayedAnalysis.EquivalentDensity(_m.DeckProps.A, Math.Abs(MeshBuilder.SignedArea(outline)), _d.Analysis.SteelDensity) : 0,
+                    Density = dd.WallThickness > 0 && Eg == null ? CableStayedAnalysis.EquivalentDensity(_m.DeckProps.A, Math.Abs(MeshBuilder.SignedArea(outline)), _d.Analysis.SteelDensity) : 0,
+                    MassNotCounted = Eg != null,   // placeholder of an approach structure that is not designed
                 });
         }
         if (!steel) _m.Concrete.Deck = concrete;
+        _deckStations = stations;
 
         // barrier panels on both edges
         if (dd.BarrierHeight > 0)
         {
-            double xr = outline.Max(p => p.X), xl = outline.Min(p => p.X), top = outline.Max(p => p.Y);
+            double xr = Eg?.SlabRight ?? outline.Max(p => p.X), xl = Eg != null ? -Eg.SlabLeft : outline.Min(p => p.X), top = outline.Max(p => p.Y);
             _m.Steel.Assemblies.Add(new SteelAssembly { Mark = "CSB", Kind = AssemblyKind.Railing, Description = $"Deck barrier panels ({dd.BarrierMaterial})",
                 PredefinedType = "GUARDRAIL" });
             foreach (var (side, x) in new[] { ("L", xl + dd.BarrierInset), ("R", xr - dd.BarrierInset - dd.BarrierThickness) })
@@ -160,17 +185,21 @@ public sealed class CableStayedGenerator
 
     private Vec3 P(Vec3 local) => _pf.ToWorld(local);
 
-    private void BuildPylon()
+    private void BuildPylon(int pIndex)
     {
-        var py = _d.Pylon;
-        var sl = _pylonSupport!;
+        var py = _d.AllPylons[pIndex];
+        var sl = _pylonSupports[pIndex]!;
+        string pm = pIndex == 0 ? "PY" : $"PY{pIndex + 1}";
+        int leg0 = _m.Legs.Count;
+        if (!_pylonConcrete.TryGetValue(sl, out var concrete)) _pylonConcrete[sl] = concrete = new();
         double a = _al.AngleAt(sl.Station) + py.RotationDeg * Math.PI / 180;
         var x = Vec2.FromAngle(a);
         var y = x.Right;
         var o = sl.AlignmentPoint + x * py.OriginX + y * py.OriginY;
         _pf = new Frame3(o.WithZ(py.BaseElevation), x.WithZ(0), y.WithZ(0), new Vec3(0, 0, 1));
-        _m.PylonFrame = _pf;
-        _m.Steel.Assemblies.Add(new SteelAssembly { Mark = "PY", Kind = AssemblyKind.Pylon, Description = $"Pylon at {sl.Name}" });
+        if (pIndex == 0) _m.PylonFrame = _pf;
+        _m.PylonFrames.Add(_pf);
+        _m.Steel.Assemblies.Add(new SteelAssembly { Mark = pm, Kind = AssemblyKind.Pylon, Description = $"Pylon at {sl.Name}" });
 
         // trunk: base to the leg junction
         if (py.TrunkHeight > 0)
@@ -178,39 +207,65 @@ public sealed class CableStayedGenerator
             var a0 = P(Vec3.Zero); var a1 = P(new Vec3(py.TrunkTopX, py.TrunkTopY, py.TrunkHeight));
             var mesh = Member(new[] { a0, a1 }, py.TrunkSection, _pf.Y);
             if (py.TrunkSection.Material == CsMaterial.Steel)
-                _m.Steel.Parts.Add(new SteelPart { Mark = "PY-T", Category = PartCategory.Pylon, Assembly = "PY", Mesh = mesh, Length = (a1 - a0).Length,
+                _m.Steel.Parts.Add(new SteelPart { Mark = $"{pm}-T", Category = PartCategory.Pylon, Assembly = pm, Mesh = mesh, Length = (a1 - a0).Length,
                     Description = $"Pylon trunk {Sec(py.TrunkSection)}", Assumption = _flag, Density = Dens(py.TrunkSection) });
-            else _pylonConcrete.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} pylon trunk", $"Pylon trunk {Sec(py.TrunkSection)}", mesh) { Assumption = _flag });
+            else concrete.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} pylon trunk", $"Pylon trunk {Sec(py.TrunkSection)}", mesh) { Assumption = _flag });
         }
         // legs
         for (int i = 0; i < py.Legs.Count; i++)
         {
             var leg = py.Legs[i];
             string name = leg.Name.Length > 0 ? leg.Name : $"Leg {i + 1}";
-            var curve = LegCurve(leg, name);
+            var curve = LegCurve(leg, name, pIndex);
             _m.Legs.Add(curve);
             int n = Math.Max(2, leg.Segments);
             var mesh = new Mesh();
             var rect = new List<Vec2> { new(-0.5, -0.5), new(0.5, -0.5), new(0.5, 0.5), new(-0.5, 0.5) };
             Sweep(mesh, rect, t => LegRing(leg, t), Enumerable.Range(0, n + 1).Select(k => (double)k / n).ToList(), "pylon leg");
-            var part = new SteelPart { Mark = $"PY-L{i + 1}", Category = PartCategory.Pylon, Assembly = "PY", Mesh = mesh, Length = curve.Length,
+            var part = new SteelPart { Mark = $"{pm}-L{i + 1}", Category = PartCategory.Pylon, Assembly = pm, Mesh = mesh, Length = curve.Length,
                 Description = $"Pylon leg {name}, {Sec(leg.Section)}, {L(curve.Length)} long, tip {L(leg.Tip.Z)} above the base", Assumption = _flag, Density = Dens(leg.Section) };
             if (leg.Section.Material == CsMaterial.Steel) _m.Steel.Parts.Add(part);
-            else _pylonConcrete.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} pylon leg {name}", part.Description, mesh) { Assumption = _flag });
+            else if (leg.Section.Wall > 0)
+            {
+                // hollow concrete leg: the four walls (transverse walls full width, longitudinal walls between them) and a solid top of one wall thickness
+                double tw = leg.Section.Wall, tCap = Math.Max(0, 1 - tw / Math.Max(1e-6, curve.Length));
+                var ts = Enumerable.Range(0, n + 1).Select(k => tCap * k / n).ToList();
+                foreach (var (wn, f) in new (string, Func<double, double, (double a0, double a1, double b0, double b1)>)[]
+                {
+                    ("back wall", (hw, hd) => (-hw, hw, -hd, -hd + tw)), ("front wall", (hw, hd) => (-hw, hw, hd - tw, hd)),
+                    ("left wall", (hw, hd) => (-hw, -hw + tw, -hd + tw, hd - tw)), ("right wall", (hw, hd) => (hw - tw, hw, -hd + tw, hd - tw)),
+                })
+                {
+                    var wm = new Mesh();
+                    Sweep(wm, rect, t => LegRingBox(leg, t, f), ts, "pylon wall");
+                    concrete.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} pylon leg {name} {wn}", $"{part.Description}, {wn} {L(tw)} thick", wm) { Assumption = _flag });
+                }
+                var cap = new Mesh();
+                Sweep(cap, rect, t => LegRing(leg, t), new List<double> { tCap, 1 }, "pylon top");
+                concrete.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} pylon leg {name} top", $"Solid top of the leg, {L(tw)}", cap) { Assumption = _flag });
+            }
+            else concrete.Add(new SubSolid(SubElementKind.Column, $"{sl.Name} pylon leg {name}", part.Description, mesh) { Assumption = _flag });
         }
         // cross beams
         int cb = 1;
         foreach (var c in py.CrossBeams)
         {
-            if (c.LegA >= _m.Legs.Count || c.LegB >= _m.Legs.Count) { Warn($"Pylon cross beam '{c.Name}': leg {c.LegA} / {c.LegB} does not exist."); continue; }
-            var pa = AtHeight(_m.Legs[c.LegA], c.Height); var pb = AtHeight(_m.Legs[c.LegB], c.Height);
+            if (c.LegA < 0 || c.LegB < 0 || c.LegA >= py.Legs.Count || c.LegB >= py.Legs.Count) { Warn($"Pylon cross beam '{c.Name}' at {sl.Name}: leg {c.LegA} / {c.LegB} does not exist."); continue; }
+            var pa = AtHeight(_m.Legs[leg0 + c.LegA], c.Height); var pb = AtHeight(_m.Legs[leg0 + c.LegB], c.Height);
             var mesh = Member(new[] { pa, pb }, c.Section, _pf.X);
-            _m.Steel.Parts.Add(new SteelPart { Mark = $"PY-X{cb++}", Category = PartCategory.PylonCrossBeam, Assembly = "PY", Mesh = mesh, Length = (pb - pa).Length,
+            if (c.Section.Material == CsMaterial.Concrete)
+            {
+                concrete.Add(new SubSolid(SubElementKind.Cap, $"{sl.Name} pylon {(c.Name.Length > 0 ? c.Name : $"cross beam {cb}")}",
+                    $"Pylon cross beam {(c.Name.Length > 0 ? c.Name + " " : "")}at {L(c.Height)} above the base, {Sec(c.Section)}", mesh) { Assumption = _flag });
+                cb++;
+                continue;
+            }
+            _m.Steel.Parts.Add(new SteelPart { Mark = $"{pm}-X{cb++}", Category = PartCategory.PylonCrossBeam, Assembly = pm, Mesh = mesh, Length = (pb - pa).Length,
                 Description = $"Pylon cross beam {(c.Name.Length > 0 ? c.Name + " " : "")}at {L(c.Height)} above the base, {Sec(c.Section)}", Assumption = _flag, Density = Dens(c.Section) });
         }
         // struts
         int si = 1;
-        foreach (var s in _d.Struts)
+        foreach (var s in pIndex == 0 ? _d.Struts : new())
         {
             var p0 = P(s.From); var p1 = P(s.To);
             var mesh = Member(new[] { p0, p1 }, s.Section, _pf.Y);
@@ -221,7 +276,7 @@ public sealed class CableStayedGenerator
                 var low = s.From.Z <= s.To.Z ? s.From : s.To;
                 var fm = new Mesh();
                 MeshBuilder.AddBox(fm, _pf with { Origin = P(low) }, -s.FootingLength / 2, s.FootingLength / 2, -s.FootingWidth / 2, s.FootingWidth / 2, -s.FootingThickness, 0);
-                _pylonConcrete.Add(new SubSolid(SubElementKind.Footing, $"{sl.Name} strut {si} footing", $"Strut footing {L(s.FootingLength)} x {L(s.FootingWidth)} x {L(s.FootingThickness)}", fm) { Assumption = _flag });
+                concrete.Add(new SubSolid(SubElementKind.Footing, $"{sl.Name} strut {si} footing", $"Strut footing {L(s.FootingLength)} x {L(s.FootingWidth)} x {L(s.FootingThickness)}", fm) { Assumption = _flag });
             }
             si++;
         }
@@ -229,11 +284,11 @@ public sealed class CableStayedGenerator
         {
             var fm = new Mesh();
             MeshBuilder.AddBox(fm, _pf, py.FootingX - py.FootingLength / 2, py.FootingX + py.FootingLength / 2, -py.FootingWidth / 2, py.FootingWidth / 2, -py.FootingThickness, 0);
-            _pylonConcrete.Add(new SubSolid(SubElementKind.Footing, $"{sl.Name} pylon footing", $"Pylon footing {L(py.FootingLength)} x {L(py.FootingWidth)} x {L(py.FootingThickness)}", fm) { Assumption = _flag });
+            concrete.Add(new SubSolid(SubElementKind.Footing, $"{sl.Name} pylon footing", $"Pylon footing {L(py.FootingLength)} x {L(py.FootingWidth)} x {L(py.FootingThickness)}", fm) { Assumption = _flag });
         }
     }
 
-    private readonly List<SubSolid> _pylonConcrete = new();
+    private readonly Dictionary<SupportLineResult, List<SubSolid>> _pylonConcrete = new();
 
     /// <summary>A section swept through exact rings: the corner curves are fitted as NURBS (one knot vector, 0.1 mm) and the mesh is tessellated from
     /// them at <paramref name="us"/> (Rhino / IFC get the exact surfaces); when the fit does not converge the mesh alone is built from the exact rings.</summary>
@@ -287,7 +342,7 @@ public sealed class CableStayedGenerator
         + (s.Wall > 0 ? $" box, wall {L(s.Wall)} (envelope modeled)" : s.Material == CsMaterial.Concrete ? " concrete" : " solid");
 
     /// <summary>The leg as a cubic curve in the pylon frame, sampled densely in world coordinates (arc-length table for the stay anchors).</summary>
-    private CsLegCurve LegCurve(CsPylonLeg leg, string name)
+    private CsLegCurve LegCurve(CsPylonLeg leg, string name, int pylon)
     {
         const int n = 600;
         var pts = new Vec3[n + 1];
@@ -297,7 +352,7 @@ public sealed class CableStayedGenerator
             pts[i] = P(Bezier(leg, (double)i / n).p);
             if (i > 0) s[i] = s[i - 1] + (pts[i] - pts[i - 1]).Length;
         }
-        return new CsLegCurve { Name = name, Definition = leg, Points = pts, S = s };
+        return new CsLegCurve { Name = name, Definition = leg, Points = pts, S = s, Pylon = pylon };
     }
 
     private static Vec3 AtHeight(CsLegCurve c, double hLocalAboveBase)
@@ -346,6 +401,7 @@ public sealed class CableStayedGenerator
             gi++;
             if (g.Leg < 0 || g.Leg >= _m.Legs.Count) continue;
             var leg = _m.Legs[g.Leg];
+            _pf = _m.PylonFrames[leg.Pylon];
             string asm = $"ST{gi}";
             string gname = g.Name.Length > 0 ? g.Name : $"group {gi}";
             _m.Steel.Assemblies.Add(new SteelAssembly { Mark = asm, Kind = AssemblyKind.StayGroup, Description = $"Stays {gname} ({leg.Name})" });
@@ -366,7 +422,14 @@ public sealed class CableStayedGenerator
             {
                 double fr = n == 1 ? g.PylonTo : g.PylonTo - (g.PylonTo - g.PylonFrom) * k / (n - 1);
                 var up = leg.At(fr);
-                var lo = order[k].p;
+                if (g.PylonAnchorInset != 0)
+                {
+                    double dy = Vec3.Dot(up - _pf.Origin, _pf.Y);
+                    up -= _pf.Y * (Math.Sign(dy) * g.PylonAnchorInset);
+                }
+                // tower end first (the line deck working point -> tray), then the deck anchorage on the same line
+                if (_d.AllPylons[leg.Pylon].Anchorage != null && leg.Definition.Section.Wall > 0) up = TowerTray($"{asm}-{k + 1}", g.Leg, leg, fr, order[k].p);
+                var lo = RocketLauncher($"{asm}-{k + 1}", order[k].p, up, order[k].sta, g.DeckOffset);
                 var stay = new CsStay { Name = $"{asm}-{k + 1}", Group = gname, Leg = g.Leg, Lower = lo, Upper = up, Station = order[k].sta, PylonFraction = fr, Diameter = g.Diameter, Area = area };
                 _m.Stays.Add(stay);
                 var mesh = new Mesh();
@@ -386,6 +449,7 @@ public sealed class CableStayedGenerator
                 });
             }
         }
+        BuildTowerTrays();
         if (_m.Stays.Count > 0)
             Info($"Cable-stayed: {_m.Stays.Count} stays, {_m.Stays.Min(s => s.AngleDeg):0.0} - {_m.Stays.Max(s => s.AngleDeg):0.0} deg to the horizontal, "
                 + $"{L(_m.Stays.Min(s => s.Length))} - {L(_m.Stays.Max(s => s.Length))} long.");
@@ -413,8 +477,8 @@ public sealed class CableStayedGenerator
             {
                 SupportIndex = i, Name = sl.Name, Type = sl.Type, Definition = SubstructureDefinition.Default(sl.Type), Origin = sl.AlignmentPoint, D = dir, N = nn, Station = sl.Station,
             };
-            bool isPylon = ReferenceEquals(sl, _pylonSupport);
-            if (isPylon) foreach (var so in _pylonConcrete) unit.Solids.Add(so);
+            bool isPylon = _pylonSupports.Any(p => ReferenceEquals(p, sl));
+            if (isPylon) { if (_pylonConcrete.TryGetValue(sl, out var pc)) foreach (var so in pc) unit.Solids.Add(so); }
             else
             {
                 double soffit = Grade(sl.Station) + soffitBelowGrade;

@@ -82,36 +82,62 @@ foreach (var bn in approach)
     report.Add($"{bn}: {lm.Count} sway plate pairs, {hbs.Count} hanger bracing members with end angles");
 }
 
-// p.97 "SWAY BRACING AT L7 AS SHOWN, SWAY BRACING AT L8 SIMILAR": at the CL apex "2-1/2 Pls." on the channel webs of the 2-15[ 33.9 diagonals, "2-Ls 3 1/2 x 3 x 3/8"
-// along the top edge (field rivets) and "2-Ls 4 x 4 x 3/4" along the strut; ~12 shop rivets per diagonal per plate drawn. Other sway points: not detailed (flag kept).
-string mainSwayFlag = U("p.97", "main span sway gusset plates at L7 / L8 (2-1/2 Pls., 2-Ls 3 1/2 x 3 x 3/8)",
-    "the detail draws the plates, angles and rivets without outline dimensions or gages",
-    "1/2 in. plates on both channel webs = envelope of the member laps clipped 1/4 in. clear of the floor beam and the strut, 12 rivets per diagonal per plate in 4 lines (5 1/2 / 2 1/2 in. from the member CL, 3 in. pitch); edge angle L 3 1/2 x 3 x 3/8 on the plate's outer face along the floor beam bottom, 10 rivets per leg; the strut's 4 x 4 x 3/4 angles are part of the strut section.");
+// p.97 "SWAY BRACING AT L7 AS SHOWN, SWAY BRACING AT L8 SIMILAR" + the CROSS SECTIONS AT CL BRIDGE (L1, L7, L8, L10, L12: "Details to be similar to those shown
+// for L7, except as noted" / "Other details similar to those shown for L8 / L9"): the 2-15[ 33.9 diagonals land on the lower strut at the CL on "2-1/2 Pls." with
+// "2-Ls 4 x 4 x 3/4" on the strut top ("1-Pl 15 x 1 1/8" at L7 / L8, "15 x 1" at L10 under them) and "2-Ls 3 1/2 x 3 x 3/8" along the plate top edge; ~12 rivets
+// per diagonal per plate. p.71 SWAY BRACING "At Pt. 0, and 1 to 10 incl., and 12" + "At U11 - L11": V from the floor beam at each truss down to the strut CL
+// (truss-ptc-arch.csx batch 5c). Top: p.85 Section D-D / elevation "Bracing Connection: 2-1/2 Gusset Pls, 4-Ls 6 x 4 x 1/2, 1 in. (C) Rivets" under the floor
+// beam beside the truss post (typical framed floor beam P.P. 0 to 10 incl. & 12; L11 = the same 1/2 plates / Ls, p.80 for the bottom end).
+string mainSwayFlag = U("p.97, p.71", "main span sway frame bottom connections at the strut CL (2-1/2 Pls., 2-Ls 4 x 4 x 3/4, 2-Ls 3 1/2 x 3 x 3/8)",
+    "the detail at L7 ('L8 similar', other points 'similar to L7 / L8 / L9') draws the plates, angles and rivets without outline dimensions or gages; the 1-Pl 15 x 1 1/8 (L7 / L8) / 15 x 1 (L10) under the angles has no length",
+    "1/2 in. plates on both channel webs = envelope of the member laps standing on the lateral gusset plate on the strut top (1/4 in. gap), 12 rivets 1 in. per diagonal per plate in 4 lines, edge angle L 4 x 4 x 3/4 on each plate's outer face on the strut, 10 rivets per leg; the 2-Ls 3 1/2 x 3 x 3/8 along the plate top edge and the 15 in. strut plate not built.");
+string mainSwayTopFlag = U("p.85", "main span sway frame top connections under the floor beam (2-1/2 Gusset Pls, 4-Ls 6 x 4 x 1/2, 1 in. rivets)",
+    "Section D-D and the elevation draw the plates, the four angles and the rivets with only the 1'-4 / 6 in. / 5 in. edge dimensions; no outline, gages or rivet count",
+    "1/2 in. plates on both channel webs = envelope of the member laps stopping 1/4 in. under the floor beam and clear of the truss post; per plate one L 6 x 4 x 1/2 on the floor beam bottom and one on the post face (outer face), 6 rivets per leg; 12 rivets per diagonal per plate.");
 if (T(Main) is { } tmS)
 {
     var t = tmS;
     Flag(t, "main span sway gusset plates at L7 / L8", null);
-    t.Unresolved.RemoveAll(s => s.Contains("main span sway frame connections"));
-    t.Unresolved.Add(U("p.97, p.71", "main span sway frame connections other than L7 / L8 (2-15[ 33.9 / 2-18[ 42.7 at L11)",
-        "p.97 details the sway connection at L7 only ('L8 similar'); the other points are not drawn",
-        "not built; the sway members stop 1/2 in. clear of the strut, the laterals and the floor beam."));
+    Flag(t, "main span sway frame connections", null);
+    Flag(t, "main span sway frame bottom connections", mainSwayFlag);
+    Flag(t, "main span sway frame top connections", mainSwayTopFlag);
     t.BracingGussets ??= new();
-    t.BracingGussets.RemoveAll(b => b.Label == "2-1/2 Pls. (sway)");
-    int n = 0;
-    foreach (var p in new[] { "SW7", "SW8", "SW7'", "SW8'" })
+    t.BracingGussets.RemoveAll(b => b.Label is "2-1/2 Pls. (sway)" or "2-1/2 Pls. (sway top)" or "2-1/2 Guss. Pls. (sway L11)");
+    int n = 0, nt = 0;
+    foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.Sway && m.System == "Sway frames" && m.From.StartsWith("N:")).ToList())
     {
-        if (!t.Members.Any(m => m.Role == TrussMemberRole.Sway && (m.To == "N:" + p || m.From == "N:" + p))) continue;
+        string apex = m.To;                                   // N:LM<n>
+        string pt = apex[(apex.IndexOf(':') + 1)..];          // LM<n>
+        bool l11 = pt is "LM11" or "LM11'";
+        var both = t.Members.Where(x => x.Role == TrussMemberRole.Sway && (x.To == apex || x.To == "S:" + pt)).Select(x => x.Name).ToList();
+        bool lateralPlate = t.Members.Any(x => x.Role == TrussMemberRole.LowerLateral && (x.To == apex || x.From == apex || x.To == "S:" + pt));
         t.BracingGussets.Add(new TrussBracingGussetDefinition
         {
-            Point = "N:" + p, Label = "2-1/2 Pls. (sway)", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
-            EdgeAngle = "L3-1/2x3x3/8", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeRivets = 10,
-            RivetsPerMember = 12, RivetPitch = In(3), RivetGage = In(5.5), RivetGage2 = In(2.5), RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet",
-            Material = "C", Unresolved = mainSwayFlag, Source = "p.97",
+            Point = apex, Members = both, Label = "2-1/2 Pls. (sway)", Suffix = "-SW", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
+            EdgeAngle = l11 ? "L3-1/2x3x3/8" : "L4x4x3/4", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeRivets = l11 ? 8 : 10,
+            ProbeFaces = true, RivetGapTolerance = In(3.0 / 16),   // the angles sit on the probed strut top or the lateral plate / fill on it
+            // batch 8 (recheck N07, 2026-10-30): where a lower lateral meets the apex its 1/2 in. lateral plate (p.97 "2-1/2 Pls") lies on the strut top under the
+            // edge angle - the angle stood on the strut top and ran 0.41 in. into the plate; it now sits on the plate
+            CrossingFaceOffset = lateralPlate ? In(0.5) : 0,
+            RivetsPerMember = 12, RivetPitch = In(3), RivetGage = In(5.5), RivetGage2 = In(2.5), RivetDiameter = l11 ? In(0.875) : In(1),
+            RivetMaterial = l11 ? "7/8 in carbon steel rivet" : "1 in carbon steel rivet", Material = "C", Unresolved = mainSwayFlag, Source = l11 ? "p.80" : "p.97",
         });
         n++;
+        foreach (var top in new[] { m.From, m.From.Replace("N:", "S:") })
+        {
+            var tm = t.Members.FirstOrDefault(x => x.Role == TrussMemberRole.Sway && x.From == top);
+            if (tm == null) continue;
+            t.BracingGussets.Add(new TrussBracingGussetDefinition
+            {
+                Point = top, Members = new() { tm.Name }, Label = "2-1/2 Pls. (sway top)", Suffix = "-SW", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
+                EdgeAngle = "L6x4x1/2", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeAngleAlsoOnStack = true, PlateToStack = true, EdgeRivets = 6, ProbeFaces = true, RivetGapTolerance = In(3.0 / 16),
+                RivetsPerMember = 12, RivetPitch = In(3), RivetGage = In(5.5), RivetGage2 = In(2.5), RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet",
+                Material = "C", Unresolved = mainSwayTopFlag, Source = "p.85",
+            });
+            nt++;
+        }
     }
-    t.Unresolved.Add(mainSwayFlag);
-    report.Add($"{Main}: {n} sway plate pairs (L7 / L8)");
+    report.Add($"{Main}: {n} sway apex plate pairs (strut CL), {nt} sway top plate pairs (under the floor beams)");
 }
 
 // ================================================================ 2. portal knee braces at U11 / U11' (p.100)
@@ -134,10 +160,24 @@ if (T(Main) is { } tmK)
     Flag(t, "portal knee braces at U11", kneeFlag);
     t.PlaneItems ??= new();
     t.PlaneItems.RemoveAll(p => p.Name.StartsWith("PK"));
-    double h = In(18.375), zQ = -(Ft(20) + In(1.125)), zc = -In(17.25) - h, Rc = Ft(20) - In(17.875);
+    double h = In(18.375), zQ = -(Ft(20) + In(1.125)), Rc = Ft(20) - In(17.875);
     foreach (var pr in new[] { "", "'" })
     {
         if (!t.Points.Any(p => p.Name == "U11" + pr)) { report.Add($"portal U11{pr}: point not found"); continue; }
+        // knee top cover on the portal strut bottom: the p.71 box bottom is parallel to CL U11-U12 (batch 5e), so take its LOWEST point over the knee width
+        // (+-14 3/4 in. along the bridge); the old flat 17 1/4 in. (half the 34 1/2 plate) let the knee into the sloped bottom by 0.28 in. (recheck N07)
+        double zTop = -In(17.25);
+        var bot = t.Sections.FirstOrDefault(sx => sx.Name == "PORTAL U11" + pr)?.CustomPieces?.FirstOrDefault(pc => pc.Label.StartsWith("PL (35 1/2-13 1/2)"));
+        if (bot != null)
+        {
+            // outer bottom edge: the lower point of the two leftmost and of the two rightmost corners
+            var byU = bot.Polygon.OrderBy(q => q.U).ToList();
+            var lowPts = new List<TrussUV> { byU.Take(2).OrderBy(q => q.V).First(), byU.Skip(byU.Count - 2).OrderBy(q => q.V).First() };
+            double Yb(double x) => lowPts[0].V + (lowPts[1].V - lowPts[0].V) * (x - lowPts[0].U) / (lowPts[1].U - lowPts[0].U);
+            zTop = Math.Min(Yb(-In(14.75)), Yb(In(14.75)));
+        }
+        double zc = zTop - h;
+        report.Add($"portal U11{pr}: knee top cover {-zTop / 0.0254:0.000} in. below the strut working line (lowest strut bottom over the knee width)");
         double Lh = Math.Abs(t.Planes.First(p => p.Name == "S").Offset - t.Planes.First(p => p.Name == "N").Offset) / 2;   // planes plumb, U11 points level across
         double dyp = (zc - Rc) - zQ;
         double F(double th) => Lh * Math.Sin(th) - dyp * Math.Cos(th) - Rc;
@@ -287,7 +327,7 @@ if (T(Main) is { } tmE)
             }
             else ec.Unresolved = (ec.Unresolved + " " + f5Flag).Trim();
         }
-    foreach (var bg in (t.BracingGussets ?? new()).Where(b => b.Point is "N:L13" or "S:L13" or "N:L13'" or "S:L13'" && b.Label == "2-1/2 Pls."))
+    foreach (var bg in (t.BracingGussets ?? new()).Where(b => b.Point is "N:LM13" or "N:LM13'" && b.Label == "2-1/2 Pls."))
     { bg.Thickness = In(0.75); bg.Label = "3/4 Gusset Pl. (L13)"; bg.Source = "p.95 Section B"; }
     Flag(t, "lower strut at L13 = the floor beam F8", null);
     Flag(t, "F8 extra angles", f8ExtraFlag);
@@ -343,7 +383,7 @@ string l0EndFlag = U("p.73", "L0 strut end angles 2-Ls 8 x 8 x 5/8 (1 1/8 H.S. r
     "angles on the outer faces of both webs, 28 in. long centred on the web, back on the probed gusset face, 2 x 7 rivets @ 4 in. per leg (1 1/8 H.S. into the gusset, 1 in. through the web); tension plates and the gusset slots not built.");
 string l11EndFlag = U("p.80", "L11 strut end tees 'Cut from 24 WF 94' with 11/16 fills (1 1/4 H.S. rivets)",
     "Section A draws the tees and rivet bands at the strut end without their length or gages",
-    "each tee modeled as an angle 4 1/2 (half the 24 WF 94 flange, on the post / gusset) x 11 1/2 (stem on the web) x 7/8 on the outer face of both webs over an 11/16 fill, 38 in. long, 2 x 9 rivets @ 4 in. per leg (1 1/4 H.S. / 1 in.).");
+    "each tee modeled as an angle 4 1/2 (half the 24 WF 94 flange, on the post / gusset) x 11 1/2 (stem on the web) x 7/8 on the outer face of both webs over an 11/16 fill, 38 in. long; into the post 1 1/4 in. A325 high tensile BOLTS per the p.80 note (9 per tee flange half at 4 in.; p.80 prints '46 - 1 1/4 in. High Tensile Steel Bolts', their layout is not dimensioned), 2 x 9 1 in. rivets in the stem.");
 string l11SwayFlag = U("p.80", "sway gusset plates at L11 (2-1/2 Guss. Pls., 2-Ls 3 1/2 x 3 x 3/8)",
     "the detail draws the plates on the bottom strut with rivets but no outline dimensions or gages",
     "1/2 in. plates on both channel webs of the 2-18[ 42.7 = envelope of the member laps stopping 1/4 in. above the strut and clear of the truss joint, 12 rivets 7/8 per plate, edge angle on the strut on the plate's outer face, 8 rivets per leg.");
@@ -355,7 +395,6 @@ if (T(Main) is { } tmB)
         "the lateral plates lie on the laterals and stop 1/4 in. clear of the box strut."));
     Flag(t, "L0 strut end angles 2-Ls 8 x 8 x 5/8", l0EndFlag);
     Flag(t, "L11 strut end tees", l11EndFlag);
-    Flag(t, "sway gusset plates at L11", l11SwayFlag);
     int nE = 0;
     foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.Strut && (m.Section == "STRUT L0" || m.Section == "STRUT L11")))
     {
@@ -370,30 +409,14 @@ if (T(Main) is { } tmB)
                : new TrussEndConnection { End = TrussMemberEnd.Both, Label = "tees cut from 24 WF 94 + 11/16 fills", Angle = "L4-1/2x11-1/2x7/8", StandOff = outer - tw / 2,
                     FillThickness = In(11.0 / 16), FillWidth = In(11.5), Top = In(19), Length = In(38),
                     WebRivets = new() { Col(3.5, 9, 4, 3), Col(8.5, 9, 4, 3) }, OutRivets = new() { Col(2.25, 9, 4, 3) },
-                    RivetDiameter = In(1), OutRivetDiameter = In(1.25), RivetMaterial = "1 1/4 in H.S. rivet (into the post), 1 in carbon (web)", Material = "S", Source = "p.80", Unresolved = l11EndFlag },
+                    RivetDiameter = In(1), OutRivetDiameter = In(1.25), RivetMaterial = "1 in carbon rivet (web)", Material = "S", Source = "p.80", Unresolved = l11EndFlag,
+                    // agent review rivets R08 (p.80 note): 'Provide 1 1/4 in. dia High Tensile Steel Bolts for connecting Bottom Transverse Strut at L11 ... A325-53T' - bolts, not rivets
+                    OutBoltMaterial = "ASTM A325-53T high tensile steel bolt 1 1/4 in. (carburized washers, p.80)" },
         };
         nE++;
     }
-    t.BracingGussets ??= new();
-    t.BracingGussets.RemoveAll(b => b.Label == "2-1/2 Guss. Pls. (sway L11)");
-    foreach (var pt in new[] { "N:L11", "S:L11", "N:L11'", "S:L11'" })
-    {
-        var sw = t.Members.Where(m => m.Role == TrussMemberRole.Sway && m.From == pt).Select(m => m.Name).ToList();
-        if (sw.Count == 0) continue;
-        t.BracingGussets.Add(new TrussBracingGussetDefinition
-        {
-            Point = pt, Members = sw, Label = "2-1/2 Guss. Pls. (sway L11)", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
-            EdgeAngle = "L3-1/2x3x3/8", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeRivets = 8,
-            RivetsPerMember = 12, RivetPitch = In(3), RivetGage = In(6.5), RivetGage2 = In(3.5), RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
-            Material = "C", Unresolved = l11SwayFlag, Source = "p.80",
-        });
-    }
-    // the main sway flag now excludes L11 too
-    t.Unresolved.RemoveAll(s => s.Contains("main span sway frame connections other than L7 / L8"));
-    t.Unresolved.Add(U("p.97, p.71", "main span sway frame connections other than L7 / L8 / L11 (2-15[ 33.9)",
-        "p.97 details the sway connection at L7 only ('L8 similar') and p.80 the one at L11; the other points are not drawn",
-        "not built; the sway members stop 1/2 in. clear of the strut, the laterals and the floor beam."));
-    report.Add($"{Main}: {nE} box strut end connections (L0 / L11), sway plates at L11");
+    Flag(t, "sway gusset plates at L11", null);   // batch 5c: the L11 sway plates are built with the other sway apexes (section 1)
+    report.Add($"{Main}: {nE} box strut end connections (L0 / L11)");
 }
 
 // ---------------------------------------------------------------- wind chord vs the suspended floor beams (re-check, p.69 / p.94 / p.99)

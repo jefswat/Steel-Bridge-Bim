@@ -1,8 +1,8 @@
 import sys, re, json
-sys.path.insert(0, r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\tools')
+sys.path.insert(0, r'C:\SBM\.worktrees\bends\tools')
 import bendx, plantext
 import pymupdf as fitz
-R = json.load(open(r'C:\Users\jefsw\OneDrive\Desktop\Steel Bridge Modeler\.worktrees\bends\temp\bend\plan_shapes.json'))
+R = json.load(open(r'C:\SBM\.worktrees\bends\temp\bend\plan_shapes.json'))
 pages = sorted({(r['design'], r['page'], r['sheet']) for r in R if 'PIER' in r['sheet']})
 pat = re.compile(sys.argv[1])
 for design, page, sheet in pages:

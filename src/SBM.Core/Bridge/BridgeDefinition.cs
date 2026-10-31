@@ -57,6 +57,10 @@ public sealed class SupportDefinition
     /// <summary>Deck expansion joint at this END support (blockout + generic device); null = none.</summary>
     public ExpansionJointDefinition? ExpansionJoint { get; set; }
 
+    /// <summary>OPTIONAL approach slab beyond the deck end at this END support (<see cref="ApproachSlabDefinition"/>); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ApproachSlabDefinition? ApproachSlab { get; set; }
+
     /// <summary>
     /// OPTIONAL kinked end of slab at this END support (first or last support of the bridge): the plan's break points of the end-of-slab
     /// line as station / offset on the bridge alignment, LEFT to RIGHT, monotone along the line; the first and last segments extend to the
@@ -88,6 +92,11 @@ public sealed class SupportDefinition
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<double>? JackingStiffenerOffsets { get; set; }
 
+    /// <summary>OPTIONAL plan fit conditions of the bearing / jacking stiffener ends at this support (<see cref="StiffenerEndFit"/>, Kind Bearing / Jacking);
+    /// given (kind, end) entries win over <see cref="StiffenerDefinition.EndFits"/>; null = the bridge's.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<StiffenerEndFit>? BearingStiffenerFits { get; set; }
+
     [System.Text.Json.Serialization.JsonIgnore]
     public SubstructureDefinition ResolvedSubstructure => Substructure ?? SubstructureDefinition.Default(Type);
 
@@ -101,9 +110,11 @@ public sealed class SupportDefinition
         c.DeckEndPoints = DeckEndPoints?.Select(p => p.Clone()).ToList();
         c.Diaphragm = Diaphragm?.Clone();
         c.GirderEndDap = GirderEndDap?.Clone();
+        c.ApproachSlab = ApproachSlab?.Clone();
         c.IntegralSteelCap = IntegralSteelCap?.Clone();
         c.BearingStiffener = BearingStiffener?.Clone();
         c.JackingStiffenerOffsets = JackingStiffenerOffsets?.ToList();
+        c.BearingStiffenerFits = BearingStiffenerFits?.Select(x => x.Clone()).ToList();
         return c;
     }
 }
@@ -563,12 +574,16 @@ public sealed class BarrierDefinition
     /// IFC IfcKerb instead of IfcRailing GUARDRAIL, database category "curb". OPTIONAL, omitted from the .sbm when false.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsCurb { get; set; }
+    /// <summary>Custom barrier: open joints (gaps across the section) along the deck edge, see <see cref="BarrierJoint"/>. OPTIONAL, omitted when null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<BarrierJoint>? Joints { get; set; }
 
     public BarrierDefinition Clone()
     {
         var c = (BarrierDefinition)MemberwiseClone();
         c.Profile = Profile?.Select(p => p.Clone()).ToList();
         c.Zones = Zones?.Select(z => z.Clone()).ToList();
+        c.Joints = Joints?.Select(j => j.Clone()).ToList();
         return c;
     }
 }
@@ -789,11 +804,45 @@ public sealed class CrossFrameDefinition
     /// girder F at Pier 5WB).</summary>
     public List<CrossFrameLink> Links { get; set; } = new();
 
+    /// <summary>OPTIONAL standard ("horizontal") cross frame (<see cref="StandardCrossFrameDefinition"/>); null = off (output unchanged). A style's own
+    /// <see cref="CrossFrameStyle.Standard"/> wins for frames of that style (one standard per frame type).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public StandardCrossFrameDefinition? Standard { get; set; }
+    /// <summary>OPTIONAL plane of intermediate frames AND their connection plates (null = normal to the flanges, as before).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public CrossFramePlaneOrientation? IntermediatePlane { get; set; }
+    /// <summary>OPTIONAL plane of support frames (null = plumb, as before). The bearing stiffener they bolt to follows <see cref="BearingStiffenerPlane"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public CrossFramePlaneOrientation? SupportPlane { get; set; }
+    /// <summary>OPTIONAL orientation of the bearing (and jacking) stiffeners (null = plumb, as before). A support frame plane that differs shows up in the twist report.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public CrossFramePlaneOrientation? BearingStiffenerPlane { get; set; }
+    /// <summary>OPTIONAL report switch (false = off, omitted): measure the twist between the two connection plates of EVERY frame (angle, plate offset,
+    /// far-gusset gap per bolt for both frame-plane options) without a standard; geometry unchanged.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool ReportTwist { get; set; }
+    /// <summary>OPTIONAL LEGACY switch (false = off, omitted). Default (user's detailing practice, 2026-10-27): a cross frame's location is defined at the
+    /// TOP OF WEB of its reference girder (the <see cref="CrossFrameLine.Girder"/> of a line; the standard's defined end; otherwise the left girder of the bay)
+    /// and every intermediate connection plate is placed where the frame plane actually meets its girder, so the gussets bear flat on the plates.
+    /// true = the pre-2026-10-27 output: each plate at the plan line's crossing with its own girder's top of web (the plate is off the frame plane by about
+    /// the top of web difference x grade) and frames built in the averaged plane.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PlatesAtEachTopOfWeb { get; set; }
+    /// <summary>OPTIONAL plane the frames are built in (null = <see cref="StandardFramePlane.Midway"/> (user decision 2026-10-27: members stay exact
+    /// extrusions), or Averaged with <see cref="PlatesAtEachTopOfWeb"/>). A standard's own <see cref="StandardCrossFrameDefinition.Plane"/> wins for its
+    /// frames. Midway / Averaged / DefinedEnd = one plane (with the plates on the frame plane Midway = Averaged; the far gussets carry the remaining true
+    /// twist as gaps, reported); DefinedEnd = the plane of the defined end's plate (standard) or the reference end's plate. Warped: each end's gussets lie
+    /// in their own connection plate's plane (gap 0 at every bolt) and the members roll linearly between the two plate orientations (twisted members,
+    /// faceted in IFC when the roll exceeds 0.001 deg).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public StandardFramePlane? FramePlane { get; set; }
+
     public CrossFrameStyle? FindStyle(string name) => Styles.FirstOrDefault(s => s.Name == name);
 
     public CrossFrameDefinition Clone()
     {
         var c = (CrossFrameDefinition)MemberwiseClone();
+        c.Standard = Standard?.Clone();
         c.Styles = Styles.Select(s => s.Clone()).ToList();
         c.SupportStyles = new Dictionary<string, string>(SupportStyles);
         c.SupportBayStyles = SupportBayStyles.ToDictionary(k => k.Key, k => new Dictionary<int, string>(k.Value));
@@ -863,9 +912,14 @@ public sealed class CrossFrameStyle
     /// <summary>Pitch of the diaphragm bolt column; 0 = equal spaces over the web plate with <see cref="DiaphragmBoltEnd"/> at both ends.</summary>
     public double DiaphragmBoltPitch { get; set; } = In(6);
     public double DiaphragmBoltEnd { get; set; } = In(3);
+    /// <summary>OPTIONAL standard frame of this type (null = the definition's <see cref="CrossFrameDefinition.Standard"/> when the style is in its scope).
+    /// Its <see cref="StandardCrossFrameDefinition.Scope"/> / <see cref="StandardCrossFrameDefinition.Supports"/> still limit where it applies; its Styles list is not read.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public StandardCrossFrameDefinition? Standard { get; set; }
     public CrossFrameStyle Clone()
     {
         var c = (CrossFrameStyle)MemberwiseClone();
+        c.Standard = Standard?.Clone();
         c.TiePlateOffsets = TiePlateOffsets.ToList();
         c.Unresolved = Unresolved.ToList();
         return c;
@@ -1050,6 +1104,11 @@ public sealed class StiffenerDefinition
     /// plan draws them, one entry per location (and girder). When the list is set it REPLACES the automatic spacing rule (an empty list = no intermediate stiffeners).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<IntermediateStiffenerLocation>? IntermediateLocations { get; set; }
+    /// <summary>OPTIONAL plan fit conditions of the stiffener ends (mill to bear / finish to bear / tight fit / welded per kind and end,
+    /// <see cref="StiffenerEndFit"/>); null or no entry for a (kind, end) = the AASHTO LRFD rule as a flagged assumption (<see cref="StiffenerFits.Default"/>).
+    /// Omitted from the file when null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<StiffenerEndFit>? EndFits { get; set; }
     public StiffenerDefinition Clone() => new()
     {
         BearingStiffener = BearingStiffener.Clone(), ConnectionPlate = ConnectionPlate.Clone(),
@@ -1057,6 +1116,7 @@ public sealed class StiffenerDefinition
         IntermediateSide = IntermediateSide, CornerClip = CornerClip, IntermediateBottomGap = IntermediateBottomGap,
         WeldSize = WeldSize, FlangeToWebWeld = FlangeToWebWeld, ClipToTopFlange = ClipToTopFlange,
         IntermediateLocations = IntermediateLocations?.Select(l => l.Clone()).ToList(),
+        EndFits = EndFits?.Select(x => x.Clone()).ToList(),
     };
 }
 
@@ -1335,6 +1395,19 @@ public sealed class DeckDrainDefinition
     /// not built (the misc items build the drain tube down to that collector).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string? Collector { get; set; }
+    /// <summary>OPTIONAL: the drain is only a pipe of <see cref="PipeDiameter"/> through the slab (vertical, deck top to the soffit + <see cref="PipeBelowSlab"/>),
+    /// no grate, inlet box or downspout (NCDOT "6\" PVC pipe deck drains"). False = the simple inlet + downspout above.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool SlabPipeOnly { get; set; }
+    /// <summary>OPTIONAL projection of a slab pipe below the slab soffit.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public double PipeBelowSlab { get; set; }
+    /// <summary>OPTIONAL plan item not fixed (page + reason, <c>UnresolvedFlag.Text</c>): raised once as a warning and carried by the drain solid as a
+    /// dimension-only status (the drain exists, its position is open).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unresolved { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Basis { get; set; }
     public DeckDrainDefinition Clone() { var c = (DeckDrainDefinition)MemberwiseClone(); c.Trench = Trench?.Clone(); return c; }
 }
 
