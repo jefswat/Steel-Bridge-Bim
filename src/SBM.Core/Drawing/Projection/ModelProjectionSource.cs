@@ -253,7 +253,7 @@ public static class ModelProjectionSource
             }
             if (o.Rebar)
                 foreach (var b in concrete.Bars)
-                    Add(null, b.Group switch { "Rail" => "3D-REBAR-RAIL", "CapHaunch" => "3D-REBAR-CAP-HAUNCH", _ => "3D-REBAR-DECK" }, $"bar/{b.Unit}/{b.Mark}", "Rebar", b.Mark, b, -1, false, new[] { b.Points });
+                    Add(null, b.Group switch { "Rail" => "3D-REBAR-RAIL", "CapHaunch" => "3D-REBAR-CAP-HAUNCH", "Segment" => "3D-REBAR-SEGMENT", _ => "3D-REBAR-DECK" }, $"bar/{b.Unit}/{b.Mark}", "Rebar", b.Mark, b, -1, false, new[] { b.Points });
         }
         if (sub != null && o.Substructure)
         {

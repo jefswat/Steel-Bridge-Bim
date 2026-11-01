@@ -13,7 +13,7 @@ namespace SBM.Core.Steel;
 /// </summary>
 public static class TubSection
 {
-    /// <summary>Web centerline x at height y (y â‰¤ 0) of web side Â±1.</summary>
+    /// <summary>Web centerline x at height y (y ≤ 0) of web side ±1.</summary>
     public static double WebX(TubGirderDefinition t, int side, double y) => side * (t.TopWebSpacing / 2 + t.WebSlope * y);
 
     /// <summary>Web length along the slope for a vertical web depth D.</summary>
@@ -22,13 +22,13 @@ public static class TubSection
     /// <summary>Horizontal width of a web of thickness tw (thickness measured normal to the web).</summary>
     public static double HorizontalThickness(TubGirderDefinition t, double tw) => tw * Math.Sqrt(1 + t.WebSlope * t.WebSlope);
 
-    /// <summary>Unit vector down along web side Â±1.</summary>
+    /// <summary>Unit vector down along web side ±1.</summary>
     public static Vec2 WebDown(TubGirderDefinition t, int side) => new Vec2(-side * t.WebSlope, -1).Normalized();
 
-    /// <summary>Unit normal of web side Â±1 pointing OUT of the tub.</summary>
+    /// <summary>Unit normal of web side ±1 pointing OUT of the tub.</summary>
     public static Vec2 WebOut(TubGirderDefinition t, int side) => new Vec2(side, -t.WebSlope).Normalized();
 
-    /// <summary>Point of web side Â±1 at slope distance w below its top working point and normal offset n (+ = outside).</summary>
+    /// <summary>Point of web side ±1 at slope distance w below its top working point and normal offset n (+ = outside).</summary>
     public static Vec2 WebPoint(TubGirderDefinition t, int side, double w, double n) =>
         new Vec2(side * t.TopWebSpacing / 2, 0) + WebDown(t, side) * w + WebOut(t, side) * n;
 
@@ -74,6 +74,6 @@ public readonly record struct TubFrame(Vec3 Origin, Vec3 Lateral, Vec3 Up, Vec3 
         return At(x, y, h * k) + new Vec3(0, 0, Grade * h * k);   // the girder rises / falls with its grade over the skew shift
     }
 
-    /// <summary>Right-handed plate frame in the section plane: X = lateral, Y = up, Z = back (âˆ’ahead).</summary>
+    /// <summary>Right-handed plate frame in the section plane: X = lateral, Y = up, Z = back (−ahead).</summary>
     public Frame3 Plane => new(Origin, Lateral, Up, Ahead * -1);
 }

@@ -361,6 +361,7 @@ public static class SceneBuilder
             () => RebarLayer(models, o, "Deck", "3D-REBAR-DECK"),
             () => RebarLayer(models, o, "Rail", "3D-REBAR-RAIL"),
             () => RebarLayer(models, o, "CapHaunch", "3D-REBAR-CAP-HAUNCH"),
+            () => RebarLayer(models, o, "Segment", "3D-REBAR-SEGMENT"),   // segmental box section bars
         };
         var results = new SolidLayer?[jobs.Length];
         Parallel.For(0, jobs.Length, i => results[i] = jobs[i]());

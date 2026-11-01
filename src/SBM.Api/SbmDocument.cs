@@ -381,7 +381,7 @@ public sealed class SbmDocument
         Model(bridgeName).Concrete?.Segmental ?? throw new InvalidOperationException("This bridge has no segmental box (or framing errors).");
     public SBM.Core.Concrete.ConcreteModel Concrete(string? bridgeName = null) => Model(bridgeName).Concrete ?? throw new InvalidOperationException("Concrete was not generated (framing errors).");
 
-    /// <summary>Hand-checkable elevation chains (profile grade â†’ deck â†’ haunch â†’ web â†’ flange â†’ sole plate â†’ bearing seat) for every bearing.</summary>
+    /// <summary>Hand-checkable elevation chains (profile grade → deck → haunch → web → flange → sole plate → bearing seat) for every bearing.</summary>
     public List<SBM.Core.Checks.ElevationChain> BearingElevations(string? bridgeName = null)
     {
         var m = Model(bridgeName);
@@ -421,7 +421,7 @@ public sealed class SbmDocument
     }
 
     /// <summary>The plan set on 11x17 (or another format): layout, typical section, girder elevations, steel and bearing
-    /// details, bents, bar lists â€” each view at the largest standard scale that fits.</summary>
+    /// details, bents, bar lists — each view at the largest standard scale that fits.</summary>
     public List<SBM.Core.Drawing.Sheets.Sheet> Sheets(string? bridgeName = null, double widthIn = 17, double heightIn = 11)
     {
         var m = Model(bridgeName);

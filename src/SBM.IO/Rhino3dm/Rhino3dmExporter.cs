@@ -981,7 +981,7 @@ public static partial class Rhino3dmExporter
                 {
                     var b = c.Bars[i];
                     var mk = marks.Find(b);
-                    string layer = b.Group switch { "Rail" => "3D-REBAR-RAIL", "CapHaunch" => "3D-REBAR-CAP-HAUNCH", _ => "3D-REBAR-DECK" };
+                    string layer = b.Group switch { "Rail" => "3D-REBAR-RAIL", "CapHaunch" => "3D-REBAR-CAP-HAUNCH", "Segment" => "3D-REBAR-SEGMENT", _ => "3D-REBAR-DECK" };
                     Bar(b.Points, mk?.Size.Diameter ?? 0, L(layer), L(layer + "-SOLID"), BarProps("Bar " + b.Mark, b, mk).Add("GlobalId", Gid(IfcKeys.DeckBar(bk, i))));
                 }
             }

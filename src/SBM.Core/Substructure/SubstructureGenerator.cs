@@ -38,7 +38,7 @@ public sealed partial class SubstructureGenerator
     public static SubstructureModel Generate(BridgeFraming framing, SteelModel steel, UnitSystem units, Func<Vec2, double?>? ground = null) =>
         Generate(framing, steel.BearingSeats, units, ground);
 
-    /// <summary>From explicit bearing seats (steel bearings, or prestressed beam pads â€” two per girder at interior bents).</summary>
+    /// <summary>From explicit bearing seats (steel bearings, or prestressed beam pads — two per girder at interior bents).</summary>
     public static SubstructureModel Generate(BridgeFraming framing, IReadOnlyList<BearingSeat> seats, UnitSystem units, Func<Vec2, double?>? ground = null) =>
         Generate(framing, seats, units, ground, null, null);
 
@@ -185,13 +185,13 @@ public sealed partial class SubstructureGenerator
             }
             foreach (var x in seats)
                 if (x.Footprint.Any(q => q.X < s0 || q.X > s1))
-                    Warn($"{sl.Name}: bearing {(x.Label != "" ? x.Label : $"G{x.Girder + 1}")} is not fully on the as-designed cap â€” check the cap profile against the bearing locations.");
+                    Warn($"{sl.Name}: bearing {(x.Label != "" ? x.Label : $"G{x.Girder + 1}")} is not fully on the as-designed cap — check the cap profile against the bearing locations.");
         }
         foreach (double cs in colS)
         {
             if (profile != null)
             {
-                if (cs - colHalf < s0 - In(1.0 / 32) || cs + colHalf > s1 + In(1.0 / 32)) Warn($"{sl.Name}: column at {L(cs)} is not under the as-designed cap â€” check the column locations.");
+                if (cs - colHalf < s0 - In(1.0 / 32) || cs + colHalf > s1 + In(1.0 / 32)) Warn($"{sl.Name}: column at {L(cs)} is not under the as-designed cap — check the column locations.");
                 continue;
             }
             if (cs - colHalf < s0 || cs + colHalf > s1)
@@ -386,7 +386,7 @@ public sealed partial class SubstructureGenerator
                 unit.Pedestals.Add(ped);
                 tallest = Math.Max(tallest, ped.Height);
                 if (profile != null && ped.Height < -In(0.25))
-                    Warn($"{sl.Name}: bearing seat {(x.Label != "" ? x.Label : $"G{x.Girder + 1}")} is {Sh(-ped.Height)} BELOW the as-designed cap top â€” check the bearing stack and the cap elevations.");
+                    Warn($"{sl.Name}: bearing seat {(x.Label != "" ? x.Label : $"G{x.Girder + 1}")} is {Sh(-ped.Height)} BELOW the as-designed cap top — check the bearing stack and the cap elevations.");
             }
             var block = new PedestalInfo(grp[0].Girder, sMid, nMid, ps1 - ps0, pn1 - pn0, unit.CapTopAt(grp[0].S, grp[0].N), zTop);
             unit.PedestalBlocks.Add(block);
@@ -788,7 +788,7 @@ public sealed partial class SubstructureGenerator
             // Inlet: steel box through the slab, 6" below it.
             var f = new Frame3(p.WithZ(0), new Vec3(t.X, t.Y, 0), new Vec3(-t.Y, t.X, 0), Up);
             var inlet = new Mesh();
-            // Grate at the deck surface (Â¼" proud so it shows over the cross slope); the box passes through the slab.
+            // Grate at the deck surface (¼" proud so it shows over the cross slope); the box passes through the slab.
             MeshBuilder.AddBox(inlet, f, -dr.InletLength / 2, dr.InletLength / 2, -dr.InletWidth / 2, dr.InletWidth / 2, zSlabBot - In(6), zTop + In(0.25));
             m.Drainage.Add(new SubSolid(SubElementKind.DeckDrain, name, $"Deck drain {dr.Type}, {Sh(dr.InletLength)} x {Sh(dr.InletWidth)} grate", inlet, IsConcrete: false));
             double r = dr.PipeDiameter / 2;
@@ -1019,7 +1019,7 @@ public sealed partial class SubstructureGenerator
     private static void ExtrudeProfile(Mesh mesh, SubstructureUnit unit, List<Vec2> top, List<Vec2> bottom, double n0, double n1)
     {
         var ss = top.Select(p => p.X).Concat(bottom.Select(p => p.X)).Distinct().OrderBy(x => x).ToList();
-        // Polygon in (S, Z): top leftâ†’right, bottom rightâ†’left.
+        // Polygon in (S, Z): top left→right, bottom right→left.
         var poly = new List<Vec2>();
         foreach (double s in ss) poly.Add(new Vec2(s, SubstructureUnit.Interp(top, s)));
         foreach (double s in Enumerable.Reverse(ss)) poly.Add(new Vec2(s, SubstructureUnit.Interp(bottom, s)));
