@@ -324,3 +324,69 @@ anchor 3'-4" from the bent-side face 2'-7 1/4" below the deck top (plan exit 2.8
 CONFLICT p.304 elevation vs p.290 / 285 / 296, p.290 modeled); end-span C lanes read from the p.285 / p.296 vectors (C1 lane 10 -> 8 in XX-12 at the p.304 3'-0" /
 4'-0" P.I.s, R 22'); B3 start block in XX-13 (p.297 block mirrored, flagged). Remaining: 8 end-span B1 / B2 CONFLICT rows (p.272 span-face offsets vs the joint-13 lanes).
 check-bonner-unit5 375 PASS / 31 DIFF.
+
+
+## PT bar anchor plates and stressing pockets (2026-10-31)
+
+User: "Include nominal stressing pockets and anchor plates. Those are vendor determined." OPTIONAL `SegmentalFixedBarDefinition.Anchors`
+(`SegmentalBarAnchorDefinition`) per bar end: square plate normal to the bar on the outward side of the bearing face, optional square frustum pocket from
+the plate to the surface the bar points to (depth measured normal to that surface, void 1" past it). Pockets are grouted after stressing (p.278 note 6), so
+they remove no concrete from the quantities. Every plate / pocket carries a dimension-only UNRESOLVED flag (vendor determined).
+
+| bars | end | plate | pocket | basis |
+|---|---|---|---|---|
+| vertical (bent + end segments) | top, stressing | 5" x 5" x 1 3/4" | 8 1/4" at the deck top to 5 1/2" at the plate, 10 1/2" deep | depth dimensioned; sizes SCALED (qc/bonner-unit5/vertical-pt) |
+| vertical | bottom, dead | 5" x 5" x 1 3/4", cast in | none | scaled |
+| longitudinal (bent) | bulkhead end | 10" x 10" x 1 3/4" | 10 1/2" x 10 1/2" x 8 1/2" | plate / pocket per p.278 LONGITUDINAL PT BAR DETAILS; thickness nominal; jacking end not stated (both modeled as stressing) |
+
+Result: 256 plates (168 stressing ends), 168 pockets; IFC IfcTendonAnchor 'ANCHOR_PLATE' (contained in the superstructure, not aggregated into the
+segment, since viewers apply the segment's opening voids to its parts) + IfcOpeningElement 'STRESSING_POCKET'; validate 0 schema / EXPRESS issues, all
+424 new products mesh. check-bonner-unit5 375 PASS / 31 DIFF (unchanged).
+
+
+## Temporary erection bar hardware and couplers (2026-10-31)
+
+User: "Model them" (the temporary bar anchors and couplers). p.299 / p.300 COUPLER DETAIL (rendered and read): 2 3/4" duct, anchor plate on the concrete face,
+spherical nut, coupler 3 1/8" dia. x 6 3/4" (dimensioned), 3 5/8" min. bar protrusion past the nut and 3 3/8" to the coupler centre -> the coupler starts 1/4" past
+the nut. Plate and nut are drawn only: scaled at the detail's 1:4 scale (calibrated on the 6 3/4" coupler: 39.6 px/in at 2.2x) -> plate 2.27" thick x 9.0" tall,
+nut 3.08" dia. x 2.85" -> nominal 9" x 9" x 2 1/4" (square assumed) and 3" x 2 7/8", flagged vendor determined.
+
+Positions: top D1-U1 bars = three pieces, threaded couplers drawn at both end faces of the bent segment on the bent bar's anchor (TEMPORARY PT BARS AT BENT) ->
+plate bearing face on each bent segment end face (5'-0" from the bent CL). Bottom D1-U1 bars = two pieces, BAR COUPLER drawn on the dead-end anchor of the bent & U1
+bar, which bears on the down-station face of the solid bent diaphragm (vector-scaled 3.53 ft from the bent CL = the model's 3'-6" `BentDiaphragm`). Each bar is still
+one straight line (block far face to block far face); the hardware sits on it. Every temporary bar end gets a plate + nut on the far block face.
+Result: 3,140 anchor plates, 2,884 nuts, 100 couplers; IFC 0 schema / EXPRESS issues, all 3,084 new fasteners / anchors mesh.
+
+
+Nuts on the fixed PT bar anchors (2026-11-01): `SegmentalBarAnchorDefinition.NutDiameter` / `NutLength` (OPTIONAL) add a nut envelope on the outer plate face (p.278 draws one at the top, bottom and longitudinal anchors). Bonner: nominal 3" dia. x 2 7/8" (the 1 3/4" bar nut scaled on the p.299 coupler detail), flagged with the plate: the nut shape varies by supplier. A plate + nut deeper than its pocket is a warning (none on Bonner).
+
+
+## Segment interiors, erection bar pieces, as-designed piers (2026-11-01)
+
+Agent reviews: `qc/bonner-unit5/segments/bent-segment.md`, `end-segment.md`, `erection-bars.md`, `qc/bonner-unit5/substructure/caps.md`, `columns-footings.md`.
+
+- **Interiors** (`SegmentalDefinition.Interiors`): a segment type is built as consecutive closed pieces along the segment from its support-side face, each with
+  the standard outer outline (or its own `Outer0/1`) and its own void (`Void0/1`, lerped). Bent half (p.277 / 278 / 280): hollow cell 0 .. 1'-6" (one 3'-0" cell
+  across the split, reached through the A.O.B. opening), 2'-0" solid diaphragm 1'-6" .. 3'-6" (the vertical PT bars at 2'-6" sit at its centre; the bottom
+  temporary bar dead-ends on its 3'-6" face), hollow 3'-6" .. 5'-0"; top blocks 3'-6" deep outside |x| 38.76" from 0 to 1'-6" and 3'-6" to 4'-6" (the T-B bar
+  anchors bear on their 4'-6" faces); bottom slab 2'-9" to 3'-6", its top then dropping 6" to the p.268 section 1 slab as the soffit rises 3". End segment
+  (p.271): top slab nose 0 .. 11", anchor recess 11 .. 26" with the C1 / C2 top wedge (bearing face (17", 26") .. (26", 45")) and the B1 / B2 bottom wedge
+  ((20", 98") .. (26", 80")), 5'-0" diaphragm 26 .. 86" pierced by the access passage (diaphragm-opening shape to 66", rectangle to 86"), typical box 86 .. 104";
+  wings 2'-2" thick to 51", tip taper to 66". A vanishing wedge keeps a 0.004" sliver so the outlines never repeat a point.
+- **Openings**: diaphragm openings over 1'-6" .. 3'-6", two 3 1/2" conduit holes (run inferred, flagged), 8" pintle blockouts at 1'-1" from the bent CL, the end
+  segment bottom slab notch (plan outline).
+- **End-span tendons** anchor on the wedges (`AnchorFromFace`): the printed bends are the wedge face slopes (18.4 / 26.3 / 16.6 deg vs 18 / 26 / 16). With the
+  hollow end segment the B / C pipes poke ~1" out of the bottom slab haunch / top slab at the span face (16 CONFLICT rows) - the p.272 span-face offsets that do
+  not lie on the lane holes (already a reported plan conflict) were hidden by the solid envelope.
+- **Erection bars D1 - U1** are modeled as their pieces (`Pieces`): top T-D1 (D1 block -> C-D), T-B (DB top block face -4'-6" stressing + 3'-0" tail + C-D ..
+  UB top block face +4'-6" dead end + 3 5/8" + C-U), T-U1 (C-U -> U1 block); bottom B-D1 (D1 block -> C-B), B-U1 (DB diaphragm face -3'-6" dead end + C-B ->
+  U1 block). Stages p.313: T-B steps 2-5, T-U1 / B-U1 steps 6-7, T-D1 / B-D1 steps 8-9. FINAL STATE: every temporary bar is destressed and removed at
+  completion of the cantilever, the ducts grouted (p.299 notes 3 / 4) - the bars stay in the model as the erection set, marked ERECTION ONLY (user decision 2026-11-01): bars, plates, nuts and couplers
+  are on their own layer 3D-SEGMENT-ERECTION-PT (viewport, projection, Rhino), carry IFC Pset `SBM_ConstructionPhase` (Phase = ERECTION ONLY, IsTemporary, FinalState) and
+  database props phase / final_state.
+  Open: C-U / C-D sit inside the 2 3/4" duct where no recess is shown (PLAN CONFLICT), plates / nuts / tails vendor or minimum values.
+- **Piers**: end bent caps 43'-6" x 8'-0" + 23'-0" stem with 1'-0" chamfers (the old outline was 6'-6" deep, ~5.9 CY short), cap access openings, hollow
+  precast column segments 16'-0" x 11'-0" (core 13'-0" x 8'-0", 1'-0" chamfers) on a 3" grout bed over the solid CIP base, bents 23 / 24 included, sloped
+  footing tops, PT bars that reach the cap (2 1/2" in 4" ducts, dead end 5'-0" below the footing top, 12" x 12" x 3 1/2" plate 1'-6" below the cap top) and the
+  corner bars at 23-28; couplers / lower groups not read (flagged). Footing / base bills scheduled per bent (weights reproduce the printed totals).
+  Pockets are concreted after stressing, so the final caps carry no pocket voids.

@@ -1,5 +1,6 @@
 using SBM.Core.Alignments;
 using SBM.Core.Bridge;
+using SBM.Core.Concrete;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
 using SBM.Core.Solids;
@@ -148,6 +149,14 @@ public sealed partial class SegmentalGenerator
 
     private (double h, double t, bool hollow) SectionIn(SegmentDefinition d, SegmentResult r, double sta)
     {
+        var b = SectionBase(d, r, sta);
+        if (InteriorAt(r, sta, b.h) is { } ia) return (b.h, double.IsNaN(ia.t) ? b.t : ia.t, ia.hollow);
+        return b;
+    }
+
+    /// <summary>Depth / bottom slab / hollow by the standard rule of the segment type (no <see cref="SegmentalDefinition.Interiors"/>).</summary>
+    private (double h, double t, bool hollow) SectionBase(SegmentDefinition d, SegmentResult r, double sta)
+    {
         switch (d.Type)
         {
             case SegmentType.Closure: return (_d.ConstantDepth, _d.ConstantBottomSlab, true);
@@ -212,8 +221,10 @@ public sealed partial class SegmentalGenerator
                 _segs.Add((r, d, sp));
             }
         }
+        SetupInteriors();
         foreach (var (r, d, _) in _segs)
         {
+            if (BuildInterior(r, d)) { _m.Segments.Add(r); continue; }
             var stas = RingStations(r, d);
             // interval states (hollow / solid diaphragm); a ring carries the void when it bounds a hollow interval -> ONE closed shell
             var hollowIv = Enumerable.Range(0, stas.Count - 1).Select(i => SectionIn(d, r, (stas[i] + stas[i + 1]) / 2).hollow).ToArray();
@@ -238,9 +249,9 @@ public sealed partial class SegmentalGenerator
                     "solid diaphragm over its plan length; soffit step over the plan's 1'-6\" bulkhead zone");
             _m.Segments.Add(r);
         }
-        if (_m.Segments.Any(s => s.Type == SegmentType.End))
+        if (_m.Segments.Any(s => s.Type == SegmentType.End && !_interior.ContainsKey(s.Name)))
             Warn(UnresolvedFlag.Text("p.271", "end segment interior", "the end diaphragm, vermin screen opening and expansion joint blockout are drawn but not fully dimensioned", "End segments are modeled as the solid outer envelope (flagged on the element)."));
-        if (_m.Segments.Any(s => s.Type == SegmentType.BentHalf))
+        if (_m.Segments.Any(s => s.Type == SegmentType.BentHalf && !_interior.ContainsKey(s.Name)))
             Warn(UnresolvedFlag.Text("p.277", "pier diaphragm openings and the 3\" soffit step length", "the openings are drawn with partial dimensions and the step is drawn without its own length", "Diaphragm modeled solid; step over the 1'-6\" bulkhead zone (flagged on the element)."));
     }
 
@@ -494,14 +505,27 @@ public sealed partial class SegmentalGenerator
             {
                 var m = new Mesh();
                 var ol = p.FootingOutline.Select(v => v.ToVec2()).ToList();
-                if (MeshBuilder.SignedArea(ol) < 0) ol.Reverse();
-                MeshBuilder.AddExtrusion(m, ol, fr, p.FootingBottom, p.FootingTop);
+                var zone = p.FootingLevelZone?.Select(v => v.ToVec2()).ToList();
+                if (MeshBuilder.SignedArea(ol) < 0) { ol.Reverse(); zone?.Reverse(); }
+                if (zone != null && p.FootingTopEdge is double edge && zone.Count == ol.Count)
+                {
+                    // sloped top: outline walls up to the edge elevation, planes up to the level zone at the footing top
+                    Vec3[] Ring(List<Vec2> poly, double z) => poly.Select(v => fr.ToWorld(v.X, v.Y, z)).ToArray();
+                    MeshBuilder.AddLoft(m, ol, new[] { Ring(ol, p.FootingBottom), Ring(ol, edge), Ring(zone, p.FootingTop) }, false);
+                }
+                else
+                {
+                    if (zone != null) Warn($"Segmental pier {b.Name}: the footing level zone needs the footing outline's vertex count and FootingTopEdge - flat top built.");
+                    MeshBuilder.AddExtrusion(m, ol, fr, p.FootingBottom, p.FootingTop);
+                }
                 unit.Solids.Add(new SubSolid(SubElementKind.Footing, $"{b.Name} footing", $"CIP footing on {p.PileCount} 36\" sq PS piles" + (_d.Misc?.Foundation(b.Name)?.Piles.Count > 0 ? "" : " (piles not modeled)"), m));
                 var minS = ol.Min(v => v.X); var maxS = ol.Max(v => v.X); var minN = ol.Min(v => v.Y); var maxN = ol.Max(v => v.Y);
                 unit.Foundations.Add(new FoundationInfo { Type = FoundationType.PileCap, S = (minS + maxS) / 2, N = (minN + maxN) / 2, TopZ = p.FootingTop, BottomZ = p.FootingBottom, SizeS = maxS - minS, SizeN = maxN - minN });
             }
             double capBottom = p.CapTop - p.CapHeight;
-            if (!double.IsNaN(p.ColumnS) && !double.IsNaN(p.ColumnN) && !double.IsNaN(p.FootingTop) && !double.IsNaN(capBottom))
+            if (p.ColumnSegments is { Count: > 0 } && !double.IsNaN(p.ColumnS) && !double.IsNaN(p.ColumnN) && !double.IsNaN(p.FootingTop) && !double.IsNaN(p.ColumnBaseTop))
+                BuildColumnStack(b.Name, p, unit, fr, capBottom);
+            else if (!double.IsNaN(p.ColumnS) && !double.IsNaN(p.ColumnN) && !double.IsNaN(p.FootingTop) && !double.IsNaN(capBottom))
             {
                 var m = new Mesh();
                 double cs = ColumnOffsetS(b.Name);
@@ -514,15 +538,20 @@ public sealed partial class SegmentalGenerator
                 var m = new Mesh();
                 var ol = p.CapOutline.Select(v => v.ToVec2()).ToList();
                 if (MeshBuilder.SignedArea(ol) < 0) ol.Reverse();
-                if (p.CapTaperHeight > 0 && p.CapTaperInset > 0)
+                var holes = (p.CapOpenings ?? new()).Where(h => h.Count >= 3).Select(h => h.Select(v => v.ToVec2()).ToList()).ToList();
+                var c = new Vec2(ol.Average(v => v.X), ol.Average(v => v.Y));
+                var inset = ol.Select(v => new Vec2(v.X - Math.Sign(v.X - c.X) * p.CapTaperInset, v.Y - Math.Sign(v.Y - c.Y) * p.CapTaperInset)).ToList();
+                bool taper = p.CapTaperHeight > 0 && p.CapTaperInset > 0;
+                if (holes.Count > 0)
+                    HollowPrism(m, fr, taper ? new[] { (inset, capBottom), (ol, capBottom + p.CapTaperHeight), (ol, p.CapTop) } : new[] { (ol, capBottom), (ol, p.CapTop) }, holes);
+                else if (taper)
                 {
-                    var c = new Vec2(ol.Average(v => v.X), ol.Average(v => v.Y));
-                    var inset = ol.Select(v => new Vec2(v.X - Math.Sign(v.X - c.X) * p.CapTaperInset, v.Y - Math.Sign(v.Y - c.Y) * p.CapTaperInset)).ToList();
                     Vec3[] Ring(List<Vec2> poly, double z) => poly.Select(v => fr.ToWorld(v.X, v.Y, z)).ToArray();
                     MeshBuilder.AddLoft(m, ol, new[] { Ring(inset, capBottom), Ring(ol, capBottom + p.CapTaperHeight), Ring(ol, p.CapTop) });
                 }
                 else MeshBuilder.AddExtrusion(m, ol, fr, capBottom, p.CapTop);
-                unit.Solids.Add(new SubSolid(SubElementKind.Cap, $"{b.Name} cap", $"Precast bent cap, top EL {p.CapTop / Ft(1):0.00}", m));
+                unit.Solids.Add(new SubSolid(SubElementKind.Cap, $"{b.Name} cap", $"Precast bent cap, top EL {p.CapTop / Ft(1):0.00}" + (holes.Count > 0 ? $", {holes.Count} full-depth access opening(s)" : "")
+                    + (p.Source.Length > 0 ? $" ({p.Source})" : ""), m));
                 double s0 = ol.Min(v => v.X), s1 = ol.Max(v => v.X);
                 unit.CapS0 = s0; unit.CapS1 = s1; unit.CapN0 = ol.Min(v => v.Y); unit.CapN1 = ol.Max(v => v.Y);
                 unit.CapTop.Add(new Vec2(s0, p.CapTop)); unit.CapTop.Add(new Vec2(s1, p.CapTop));
@@ -533,14 +562,199 @@ public sealed partial class SegmentalGenerator
             foreach (var br in b.Bearings.Where(x => !double.IsNaN(x.PedestalTop) && !double.IsNaN(x.PedestalAcross) && !double.IsNaN(x.PedestalAlong) && !double.IsNaN(p.CapTop)))
             {
                 var m = new Mesh();
-                var q = fr with { Origin = (o + dd * br.Offset + nn * br.Along).WithZ(0) };
+                double ps = br.Offset + (br.PedestalShift ?? 0);
+                var q = fr with { Origin = (o + dd * ps + nn * br.Along).WithZ(0) };
                 MeshBuilder.AddBox(m, q, -br.PedestalAcross / 2, br.PedestalAcross / 2, -br.PedestalAlong / 2, br.PedestalAlong / 2, p.CapTop, br.PedestalTop);
                 unit.Solids.Add(new SubSolid(SubElementKind.Pedestal, $"{b.Name} {br.Name} pedestal", $"CIP bearing pedestal, top EL {br.PedestalTop / Ft(1):0.00}", m));
-                unit.Pedestals.Add(new PedestalInfo(-1, br.Offset, br.Along, br.PedestalAcross, br.PedestalAlong, p.CapTop, br.PedestalTop) { Label = br.Name });
+                unit.Pedestals.Add(new PedestalInfo(-1, ps, br.Along, br.PedestalAcross, br.PedestalAlong, p.CapTop, br.PedestalTop) { Label = br.Name, SeatS = br.PedestalShift is null ? double.NaN : br.Offset });
             }
+            if (p.PtBars is { Count: > 0 }) BuildPierPtBars(b.Name, p, unit, fr);
+            if (p.BarList is { Count: > 0 }) PierBarList(b.Name, p, sub);
             if (unit.Solids.Count > 0) sub.Units.Add(unit);
         }
         _m.Substructure = sub.Units.Count > 0 ? sub : null;
+    }
+
+    /// <summary>Closed prism through polygon levels (same vertex count, CCW, bottom to top) with vertical holes through its full height.</summary>
+    private static void HollowPrism(Mesh m, Frame3 fr, IReadOnlyList<(List<Vec2> poly, double z)> levels, List<List<Vec2>> holes)
+    {
+        Vec3 W(Vec2 v, double z) => fr.ToWorld(v.X, v.Y, z);
+        double z0 = levels[0].z, z1 = levels[^1].z;
+        // the cap triangulation bridges each hole along +x to the outer outline: put that bridge point into every level's outline first (same edge in
+        // every level), so the walls and the caps share it (no T-junction); holes must not shadow each other along +x
+        var lv = levels.Select(l => l.poly.ToList()).ToList();
+        foreach (var h in holes)
+        {
+            // the same vertex PlateBuilder.TriangulateWithHoles bridges from: the hole made clockwise, its first vertex of largest x
+            var hc = h.ToList(); if (MeshBuilder.SignedArea(hc) > 0) hc.Reverse();
+            int mi = 0; for (int i = 1; i < hc.Count; i++) if (hc[i].X > hc[mi].X) mi = i;
+            var mpt = hc[mi];
+            int edge = -1; double best = double.MaxValue;
+            var p0 = lv[0];
+            for (int i = 0; i < p0.Count; i++)
+            {
+                var a = p0[i]; var c = p0[(i + 1) % p0.Count];
+                if ((a.Y > mpt.Y) == (c.Y > mpt.Y)) continue;
+                double x = a.X + (mpt.Y - a.Y) * (c.X - a.X) / (c.Y - a.Y);
+                if (x >= mpt.X && x < best) { best = x; edge = i; }
+            }
+            if (edge < 0) continue;
+            foreach (var poly in lv)
+            {
+                var a = poly[edge]; var c = poly[(edge + 1) % poly.Count];
+                if (Math.Abs(a.Y - mpt.Y) < 1e-9 || Math.Abs(c.Y - mpt.Y) < 1e-9) continue;
+                double x = a.X + (mpt.Y - a.Y) * (c.X - a.X) / (c.Y - a.Y);
+                poly.Insert(edge + 1, new Vec2(x, mpt.Y));
+            }
+        }
+        levels = levels.Select((l, i) => (lv[i], l.z)).ToList();
+        for (int k = 0; k + 1 < levels.Count; k++)
+        {
+            var (a, za) = levels[k]; var (b, zb) = levels[k + 1];
+            for (int i = 0; i < a.Count; i++)
+            {
+                int j = (i + 1) % a.Count;
+                int i0 = m.Add(W(a[i], za)), i1 = m.Add(W(a[j], za)), i2 = m.Add(W(b[j], zb)), i3 = m.Add(W(b[i], zb));
+                m.Tri(i0, i1, i2); m.Tri(i0, i2, i3);
+            }
+        }
+        foreach (var h0 in holes)
+        {
+            var h = h0.ToList();
+            if (MeshBuilder.SignedArea(h) < 0) h.Reverse();                     // CCW; hole walls face inward (into the hole)
+            for (int i = 0; i < h.Count; i++)
+            {
+                int j = (i + 1) % h.Count;
+                int i0 = m.Add(W(h[i], z0)), i1 = m.Add(W(h[j], z0)), i2 = m.Add(W(h[j], z1)), i3 = m.Add(W(h[i], z1));
+                m.Tri(i0, i2, i1); m.Tri(i0, i3, i2);
+            }
+        }
+        foreach (var (poly, z, up) in new[] { (levels[0].poly, z0, false), (levels[^1].poly, z1, true) })
+        {
+            var (verts, tris0) = PlateBuilder.TriangulateWithHoles(poly, holes.Select(h => h.ToArray()).ToList());
+            // ear clipping across collinear outline vertices (e.g. a T with both stem corners on one line) leaves a triangle edge through a vertex:
+            // split such triangles at that vertex so the cap conforms to the walls
+            var tris = new List<(int, int, int)>(tris0);
+            for (int pass = 0; pass < 64; pass++)
+            {
+                bool split = false;
+                for (int t = 0; t < tris.Count && !split; t++)
+                {
+                    var (a, b2, c2) = tris[t];
+                    foreach (var (u, w, o) in new[] { (a, b2, c2), (b2, c2, a), (c2, a, b2) })
+                    {
+                        var e = verts[w] - verts[u]; double l2 = Vec2.Dot(e, e);
+                        if (l2 < 1e-18) continue;
+                        int hit = -1;
+                        for (int q = 0; q < verts.Count && hit < 0; q++)
+                        {
+                            if (q == u || q == w || q == o || (verts[q] - verts[u]).Length < 1e-9 || (verts[q] - verts[w]).Length < 1e-9) continue;
+                            double tt = Vec2.Dot(verts[q] - verts[u], e) / l2;
+                            if (tt <= 1e-9 || tt >= 1 - 1e-9) continue;
+                            if ((verts[u] + e * tt - verts[q]).Length < 1e-7) hit = q;
+                        }
+                        if (hit < 0) continue;
+                        tris[t] = (u, hit, o); tris.Add((hit, w, o)); split = true; break;
+                    }
+                }
+                if (!split) break;
+            }
+            int baseIdx = m.Positions.Count;
+            foreach (var v in verts) m.Add(W(v, z));
+            foreach (var (a, b2, c2) in tris) { if (up) m.Tri(baseIdx + a, baseIdx + b2, baseIdx + c2); else m.Tri(baseIdx + a, baseIdx + c2, baseIdx + b2); }
+        }
+        if (m.Volume() < 0) for (int i = 0; i < m.Indices.Count; i += 3) (m.Indices[i + 1], m.Indices[i + 2]) = (m.Indices[i + 2], m.Indices[i + 1]);
+    }
+
+    /// <summary>CIP column base (solid, footing top to <see cref="SegmentalPier.ColumnBaseTop"/>), grout bed, hollow precast segments; the stack top vs the cap
+    /// soffit is a check row (never adjusted).</summary>
+    private void BuildColumnStack(string bent, SegmentalPier p, SubstructureUnit unit, Frame3 fr, double capBottom)
+    {
+        double cs = ColumnOffsetS(bent);
+        var outer = new List<Vec2> { new(cs - p.ColumnS / 2, -p.ColumnN / 2), new(cs + p.ColumnS / 2, -p.ColumnN / 2), new(cs + p.ColumnS / 2, p.ColumnN / 2), new(cs - p.ColumnS / 2, p.ColumnN / 2) };
+        var core = p.ColumnCore?.Select(v => new Vec2(cs + v.S, v.N)).ToList();
+        string src = p.Source.Length > 0 ? $" ({p.Source})" : "";
+        var mb = new Mesh();
+        MeshBuilder.AddExtrusion(mb, outer, fr, p.FootingTop, p.ColumnBaseTop);
+        unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{bent} column base", $"CIP column base, solid {p.ColumnS / Ft(1):0.##} x {p.ColumnN / Ft(1):0.##} ft, footing top to EL {p.ColumnBaseTop / Ft(1):0.00}{src}", mb));
+        double z = p.ColumnBaseTop;
+        if (p.GroutBed is double g && g > 0)
+        {
+            var mg = new Mesh();
+            MeshBuilder.AddExtrusion(mg, outer, fr, z, z + g);
+            unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{bent} column grout bed", $"grout bed {g / In(1):0.##} in under the first precast column segment{src}", mg));
+            z += g;
+        }
+        int k = 0;
+        foreach (double hseg in p.ColumnSegments!)
+        {
+            k++;
+            var ms = new Mesh();
+            if (core is { Count: >= 3 }) HollowPrism(ms, fr, new[] { (outer, z), (outer, z + hseg) }, new() { core });
+            else MeshBuilder.AddExtrusion(ms, outer, fr, z, z + hseg);
+            unit.Solids.Add(new SubSolid(SubElementKind.Column, $"{bent} column segment {k}",
+                $"precast {(core != null ? "hollow " : "")}column segment {k}, {hseg / Ft(1):0.###} ft, EL {z / Ft(1):0.00} - {(z + hseg) / Ft(1):0.00}{src}", ms));
+            z += hseg;
+        }
+        unit.Columns.Add(new ColumnInfo(0, cs, 0, z, p.FootingTop, ColumnShape.Rectangular, p.ColumnS, p.ColumnN));
+        if (!double.IsNaN(capBottom))
+            _m.Checks.Add(new SegmentalCheck($"{bent}: top of the precast column stack vs the cap soffit (ft)", z / Ft(1), capBottom / Ft(1), (z - capBottom) / Ft(1),
+                "segments stacked on the grout bed over the CIP base; the cap is match cast on the top segment"));
+    }
+
+    /// <summary>Schedule-only marks of a pier bar bill (unit = the bent); per-row and total weight check rows.</summary>
+    private void PierBarList(string bent, SegmentalPier p, SubstructureModel sub)
+    {
+        if (p.BarListUnresolved.Length > 0) Warn(p.BarListUnresolved);
+        double model = 0, plan = 0; int bad = 0;
+        foreach (var row in p.BarList!)
+        {
+            RebarSize size;
+            try { size = RebarCatalog.Size(row.Size); } catch { Warn($"Segmental pier {bent}: bar {row.Mark} size '{row.Size}' unknown - not scheduled."); continue; }
+            if (double.IsNaN(row.Length) || row.Count <= 0) continue;
+            var mk = new BarMark
+            {
+                Mark = row.Mark, Size = size, Shape = BarShape.Straight(row.Length), Unit = bent, Count = row.Count, Coating = row.Coating,
+                Location = $"{row.Element}{(row.Shape.Length > 0 ? $", {row.Shape}" : "")} (schedule only, not placed - UNRESOLVED){(row.Source.Length > 0 ? $" ({row.Source})" : "")}",
+            };
+            sub.Marks.Add(mk);
+            double lb = mk.TotalMass / 0.45359237;
+            model += lb;
+            if (!double.IsNaN(row.PlanWeightLb)) { plan += row.PlanWeightLb; if (Math.Abs(lb - row.PlanWeightLb) > Math.Max(2, 0.01 * row.PlanWeightLb)) bad++; }
+        }
+        if (plan > 0)
+            _m.Checks.Add(new SegmentalCheck($"{bent}: pier bar bill weight, count x length x unit weight vs the printed weights (lb)", model, plan, model - plan,
+                $"{p.BarList!.Count} rows, {bad} rows differ by more than 1 %; schedule only (no 3D bars)"));
+    }
+
+    /// <summary>Vertical pier PT bars: bar, dead-end plate (optional) and stressing anchor plate as sub-solids (PtBar / PtAnchor).</summary>
+    private void BuildPierPtBars(string bent, SegmentalPier p, SubstructureUnit unit, Frame3 fr)
+    {
+        int n = 0;
+        foreach (var pb in p.PtBars!)
+        {
+            if (pb.Unresolved.Length > 0) Warn(pb.Unresolved);
+            if (double.IsNaN(pb.Bottom) || double.IsNaN(pb.Top) || double.IsNaN(pb.Diameter)) { Warn($"Segmental pier {bent}: PT bar '{pb.Name}' needs Bottom / Top / Diameter - not built."); continue; }
+            var flag = pb.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(pb.Unresolved, "PT bar / plates as listed") : null;
+            double pt = double.IsNaN(pb.PlateThickness) ? 0 : pb.PlateThickness;
+            Vec3 P(double z) => fr.ToWorld(pb.S, pb.N, z);
+            var mbar = SBM.Core.Misc.MiscMesh.Cylinder(P(pb.Bottom), P(pb.Top + pb.Protrusion), pb.Diameter / 2, 16);
+            string src = pb.Source.Length > 0 ? $" ({pb.Source})" : "";
+            unit.Solids.Add(new SubSolid(SubElementKind.PtBar, $"{bent} {pb.Name}", $"{pb.Diameter / In(1):0.###}\" PT bar{(double.IsNaN(pb.DuctDiameter) ? "" : $" in a {pb.DuctDiameter / In(1):0.###}\" duct")}, " +
+                $"EL {pb.Bottom / Ft(1):0.00} - {pb.Top / Ft(1):0.00}{src}", mbar, false) { Material = pb.Material.Length > 0 ? pb.Material : "PT bar", Density = 7850, Assumption = flag });
+            void Plate(string what, double w, double t, double zTop)
+            {
+                if (double.IsNaN(w) || double.IsNaN(t)) return;
+                var mp = new Mesh();
+                MeshBuilder.AddBox(mp, fr, pb.S - w / 2, pb.S + w / 2, pb.N - w / 2, pb.N + w / 2, zTop - t, zTop);
+                unit.Solids.Add(new SubSolid(SubElementKind.PtAnchor, $"{bent} {pb.Name} {what} anchor plate", $"{what} anchor plate {w / In(1):0.##}\" x {w / In(1):0.##}\" x {t / In(1):0.##}\" of {pb.Name}{src}", mp, false)
+                    { Material = "Steel anchor plate (PT supplier)", Density = 7850, Assumption = flag });
+            }
+            Plate("stressing", pb.PlateWidth, pt, pb.Top);
+            Plate("dead-end", pb.DeadPlateWidth, double.IsNaN(pb.DeadPlateThickness) ? 0 : pb.DeadPlateThickness, pb.Bottom + (double.IsNaN(pb.DeadPlateThickness) ? 0 : pb.DeadPlateThickness));
+            n++;
+        }
+        if (n > 0) Info($"Segmental pier {bent}: {n} PT bars.");
     }
 
     // ------------------------------------------------------------------ report

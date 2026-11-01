@@ -62,6 +62,9 @@ double D(string s) => double.Parse(s, inv);
 // N 45 04'44.5" W to PC 3 102+46.84 (curve 3 R 6,050.00 RT). Back tangent N 80 29'29.1" W. No spirals, no station equations.
 U("p.35 / p.36 (S0-34 / S0-35 location sketches)", "-L- state plane coordinates of the PIs / PCs", "the structure plans print no N / E for the -L- PI / PC / PT; only the GPS monument B2500-2 (N 751499.622, E 3031964.117 US ft, -L- STA 26+47.55, 23.82' RT) is given", "The alignment is placed by that monument (curve 1 PI 27+27.13 R 2,347 LT, printed tangent bearings, p.21-34 curve data; check: long chord 794.52 ft vs 794'-6 1/4\" printed); the direction of increasing stations (towards N 0 44' E) rests on the printed bearings + the location sketch. PC / PT N / E in docs/plan-data/bonner-b2500/L-coordinates.csv.");
 const string AlName = "-L- (NC 12)";
+// Fixed project name: the IFC / database GlobalIds are keyed on it (`sbm new <file>` names the project after the file, so a build into a temp file
+// would change every GlobalId and stale every element agent review).
+Doc.Project.Name = "Bonner Unit 5 segmental";
 Doc.Project.Alignments.RemoveAll(a => a.Name == AlName);
 double Brg(int d, int m, double s, bool west) { double a = (d + m / 60.0 + s / 3600.0) * Math.PI / 180; return west ? Math.PI / 2 + a : Math.PI / 2 - a; }   // N ... W/E -> math angle
 double Dms(int d, int m, double s) => (d + m / 60.0 + s / 3600.0) * Math.PI / 180;
@@ -183,6 +186,28 @@ var pedTop = new Dictionary<string, (double L, double R)>   // CIP bearing pedes
     ["29"] = (71.20, 70.79),
 };
 var pierRows = Csv("piers.csv").ToDictionary(r => r[0]);
+// agent review readings (qc/bonner-unit5/substructure, copied as sub-*.csv): column stacks / footing tops, cap PT pockets, soffit corner ducts
+var colRows = Csv("sub-columns-footings.csv").ToDictionary(r => r[0]);
+var pocketRows = Csv("sub-cap-pt-pockets.csv");
+var cornerRows = Csv("sub-cap-corner-ducts.csv");
+var pierBarRows = Csv("sub-substructure-bars.csv");
+// bents a row applies to: "18,29", "20,21,22", "23-24" style lists
+bool RowFor(string bents, int n) => bents.Split(',').Any(t => t.Contains('-') && !t.StartsWith("-")
+    ? int.TryParse(t.Split('-')[0], out int a) && int.TryParse(t.Split('-')[1], out int b2) && n >= a && n <= b2
+    : int.TryParse(t.Trim(), out int v) && v == n);
+double FtInText(string t)   // 37'-4", 11'-5 1/2", 2'-0"
+{
+    var m = System.Text.RegularExpressions.Regex.Match(t, @"(\d+)'-(\d+)(?: (\d+)/(\d+))?");
+    if (!m.Success) return double.NaN;
+    double inch = D(m.Groups[2].Value) + (m.Groups[3].Success ? D(m.Groups[3].Value) / D(m.Groups[4].Value) : 0);
+    return Ft(D(m.Groups[1].Value)) + In(inch);
+}
+// rectangle S0..S1 x N0..N1 (ft) with 3" x 3" corner fillets (chamfered 45 deg)
+List<PlanPoint> Filleted(double s0, double s1, double n0, double n1)
+{
+    const double f = 0.25;
+    return new[] { (s0 + f, n0), (s1 - f, n0), (s1, n0 + f), (s1, n1 - f), (s1 - f, n1), (s0 + f, n1), (s0, n1 - f), (s0, n0 + f) }.Select(q => new PlanPoint(Ft(q.Item1), Ft(q.Item2))).ToList();
+}
 foreach (var (n, _) in bentSta)
 {
     string k = n.ToString();
@@ -201,12 +226,12 @@ foreach (var (n, _) in bentSta)
             Along = n == 18 ? F(5, 6) : n == 29 ? -F(5, 6) : 0,
             PedestalTop = Ft(left ? pedTop[k].L : pedTop[k].R),
             PedestalAcross = end ? F(6, 2) : F(6), PedestalAlong = end ? F(4, 2) : F(6),
+            // end bents: the 6'-2" pedestal runs 3'-10" inboard / 2'-4" outboard of the CL bearing (p.354 / 355 / 371): centre 9" inboard
+            PedestalShift = end ? (left ? 1 : -1) * In(9) : null,
         };
         // Bearing body = masonry plate plan maxima (p318 PLAN DIMENSION SUMMARY TABLE C x D): 18: 3'-10" x 3'-6"; 19-22, 25-28: 5'-6" x 5'-6"; 29: 3'-8" x 3'-6".
-        if (n is 23 or 24)
-            bb.Unresolved = UnresolvedFlag.Text("p.318", $"bearing size at bent {n}", "the plan dimension summary table covers bents 18-22 and 25-29 only; bents 23 & 24 have their own masonry plate plan without a size table", "Bearing recorded (type, height, position), no solid.");
-        else
         {
+            // bents 23 / 24: masonry plate 5'-6" max x 5'-6" max with 6 anchor rods on their own masonry plate plan (p.318; agent review substructure/columns-footings.md)
             (bb.SizeAcross, bb.SizeAlong) = n == 18 ? (F(3, 10), F(3, 6)) : n == 29 ? (F(3, 8), F(3, 6)) : (F(5, 6), F(5, 6));
             bb.Unresolved = UnresolvedFlag.Text("p.318", "disc bearing body", "the plans give the masonry plate MAX plan size (C x D, orientation of C not stated) and an assumed bearing height, not the vendor bearing",
                 "Generic block: C across the bent line x D along -L- x assumed height, top on the pedestal top + height.");
@@ -215,36 +240,38 @@ foreach (var (n, _) in bentSta)
     }
     // Pier (piers.csv; cap sheets p354-375; column sheets p376-381; foundation layout p251-253).
     var pr = pierRows[k];
+    var cf = colRows[k];
     var pier = new SegmentalPier
     {
         CapTop = Ft(D(pr[2])), CapHeight = end ? F(5) : F(5, 6), ColumnBaseTop = Ft(17.00),
         FootingTop = Ft(D(pr[3].Split(' ')[0])), FootingBottom = Ft(D(pr[4])), PileCount = int.Parse(pr[8]),
+        Source = "p.334-384 (agent review qc/bonner-unit5/substructure/caps.md, columns-footings.md)",
     };
     if (end)
     {
-        // T-shaped cap (p354 bent 18; p371 bent 29 opposite hand): 23'-0" x 9'-6" toward the unit-5 span + 43'-6" x 6'-6" toward the adjoining unit.
+        // T-shaped cap (p.354 bent 18; p.371 bent 29 = N mirrored), 5'-0" deep: 43'-6" wide part 8'-0" deep (N -6'-6" .. +1'-6" from the bent control line,
+        // toward the adjoining unit), stem 23'-0" from N +2'-6" to +9'-6" with 1'-0" x 1'-0" re-entrant chamfers (all dimensioned; caps.md section 1).
         double sgn = n == 18 ? 1 : -1;
-        var stem = new[] { (-11.5, 0.0), (11.5, 0.0), (11.5, 9.5), (-11.5, 9.5) };
-        pier.CapOutline = new List<PlanPoint> { new PlanPoint(-Ft(21.75), -sgn * Ft(6.5)), new PlanPoint(Ft(21.75), -sgn * Ft(6.5)), new PlanPoint(Ft(21.75), 0), new PlanPoint(Ft(11.5), 0), new PlanPoint(Ft(11.5), sgn * Ft(9.5)),
-            new PlanPoint(-Ft(11.5), sgn * Ft(9.5)), new PlanPoint(-Ft(11.5), 0), new PlanPoint(-Ft(21.75), 0) };
-        _ = stem;
-        pier.Unresolved.Add(UnresolvedFlag.Text(n == 18 ? "p.354" : "p.371", $"bent {n} cap re-entrant corners", "the 1'-0\" chamfers at the T junction are drawn, the outline is simplified", "Square T outline."));
+        pier.CapOutline = new[] { (-21.75, -6.5), (21.75, -6.5), (21.75, 1.5), (12.5, 1.5), (11.5, 2.5), (11.5, 9.5), (-11.5, 9.5), (-11.5, 2.5), (-12.5, 1.5), (-21.75, 1.5) }
+            .Select(q => new PlanPoint(Ft(q.Item1), sgn * Ft(q.Item2))).ToList();
+        // access opening 3'-0" x 3'-0" into the hollow column, full depth, 3" fillets (N -1'-9" .. +1'-3" at bent 18)
+        pier.CapOpenings = new() { Filleted(-1.5, 1.5, sgn > 0 ? -1.75 : -1.25, sgn > 0 ? 1.25 : 1.75) };
     }
     else
     {
         // p359 / p363 / p367: 18'-0" x 13'-0", 5'-6" high, lower 3'-0" tapered to 17'-4" x 12'-4" (4" per side).
         pier.CapOutline = new List<PlanPoint> { new PlanPoint(-Ft(9), -Ft(6.5)), new PlanPoint(Ft(9), -Ft(6.5)), new PlanPoint(Ft(9), Ft(6.5)), new PlanPoint(-Ft(9), Ft(6.5)) };
         pier.CapTaperInset = In(4); pier.CapTaperHeight = F(3);
+        // access opening 3'-0" x 5'-6" centred, full depth, 3" fillets
+        pier.CapOpenings = new() { Filleted(-1.5, 1.5, -2.75, 2.75) };
     }
-    if (n is 23 or 24)
-        pier.Unresolved.Add(UnresolvedFlag.Text("p.380", $"bent {n} precast column size", "the column segment sheet for bents 23 & 24 was not resolved to an outside size", "No column solid."));
-    else
-    {
-        // p376-381: precast hollow column 16'-0" x 11'-0" (16'-0" = 1'-6" + 6'-6" + 6'-6" + 1'-6" walls along the bent line), match cast.
-        pier.ColumnS = F(16); pier.ColumnN = F(11);
-        pier.Unresolved.Add(UnresolvedFlag.Text("p.376-381", $"bent {n} column", "the hollow core (wall in the 11'-0\" direction), the CIP base outline and the 16'-0\" orientation are not resolved",
-            "Solid 16'-0\" (along the bent line) x 11'-0\" envelope from the footing top to the cap bottom (incl. the 3\" grout bed)."));
-    }
+    // p.376-381 (all bents incl. 23 / 24): precast hollow column segments 16'-0" (along the bent line) x 11'-0", core 13'-0" x 8'-0" with 1'-0" x 1'-0" chamfers
+    // (1'-6" walls), match cast, on a 3" grout bed (EL 17.00 - 17.25) over the solid CIP base 16'-0" x 11'-0" (footing top to EL 17.00); segment stack per
+    // columns-footings.csv (every stack + cap reproduces the printed top of bent).
+    pier.ColumnS = F(16); pier.ColumnN = F(11); pier.GroutBed = In(3);
+    pier.ColumnCore = new[] { (-5.5, -4.0), (5.5, -4.0), (6.5, -3.0), (6.5, 3.0), (5.5, 4.0), (-5.5, 4.0), (-6.5, 3.0), (-6.5, -3.0) }.Select(q => new PlanPoint(Ft(q.Item1), Ft(q.Item2))).ToList();
+    pier.ColumnSegments = cf[18].Split(';').Select(t => t.Trim()).Where(t => t.Length > 0).Select(t => { var e = t.Substring(t.IndexOf(':') + 1).Split('-'); return Ft(D(e[1]) - D(e[0])); }).ToList();
+    pier.Unresolved.Add(UnresolvedFlag.Text("p.376-381", $"bent {n} column segment corner chamfers", "the ~3/4\" outer corner chamfers of the precast segments are drawn, not dimensioned", "Square outer corners."));
     // Footings: p252 (bents 22-25) read on the raster: 51'-0" across -L- x 36'-0" along -L-; 23, 24 octagon 51'-0" x 58'-6" with 15'-0" x 21'-3" corner cuts;
     // lateral split of the 51'-0" about -L-: bent 22 26'-4 3/8" left / 24'-7 5/8" right, 23-25 25'-11 3/4" / 25'-0 1/4".
     string plan = pr[9];
@@ -262,7 +289,42 @@ foreach (var (n, _) in bentSta)
     if (n is not (22 or 23 or 24 or 25))
         pier.Unresolved.Add(UnresolvedFlag.Text(n <= 21 ? "p.251" : "p.253", $"bent {n} footing orientation / position", "only foundation layout sheet 2 (p252, bents 22-25) was read on the raster",
             $"{plan} footing with the larger size across -L-, centred on the bent WP."));
-    pier.Unresolved.Add(UnresolvedFlag.Text("p.251-253, 334-353", $"bent {n} footing top", $"the top is sloped to the edges ({pr[3]})", "Flat footing at the CL elevation."));
+    // footing top (p.334-353): level over the CIP base footprint (S +-8'-0" x N +-5'-6") at the CL elevation, planes falling straight to the edge elevation
+    // (octagon 23 / 24: each level-zone corner to both ends of its diagonal edge).
+    pier.FootingTopEdge = Ft(D(cf[8]));
+    var fo = pier.FootingOutline.Select(v => (v.S - sOff, v.N)).ToList();
+    const double eps = 1e-4;
+    pier.FootingLevelZone = fo.Select((v, i) =>
+    {
+        double zs = Math.Sign(v.Item1) * Ft(8), zn = Math.Sign(v.Item2) * F(5, 6);
+        if (fo.Count == 4) return new PlanPoint(zs, zn);
+        // octagon: the vertex on the S end (|S| = half width) keeps the corner, the one on the N end moves eps along S toward the CL
+        bool nEnd = Math.Abs(Math.Abs(v.Item2) - pier.FootingOutline.Max(q => Math.Abs(q.N))) < 1e-6;
+        return new PlanPoint(zs - (nEnd ? Math.Sign(zs) * eps : 0), zn - (nEnd ? 0 : Math.Sign(zn) * eps));
+    }).ToList();
+    // PT bars that reach the cap (p.383-384, cap sheets; caps.md section 6): 2 1/2" high-strength bars in 4" ducts, plumb at the cap pocket centres, dead end
+    // 5'-0" below the footing top, stressing anchor plate 12" x 12" x 3 1/2" cast into the cap at the bottom of the 1'-6" pocket (pocket concreted after
+    // stressing). Bents 23-28: + 4 corner bars anchored at the column top (nut in a 6" x 2'-0" soffit duct).
+    string capType = n is 18 or 29 ? k : n <= 22 ? "19-22" : n <= 24 ? "23-24" : "25-28";
+    string ptFlag = UnresolvedFlag.Text("p.383-384, 334-353, 376-381", $"bent {n} pier PT bars", "the coupler positions (\"PT DUCT GROUP PRESENT\" tables), the groups ending at lower segments, the dead-end plate and the bar protrusion are not read / given (final details by the PT supplier, p.383 note 9)",
+        "Bars that reach the cap modeled plumb from the dead end (5'-0\" below the footing top) to the anchor plate at the pocket bottom (1'-6\" below the cap top); no couplers.");
+    pier.PtBars = new();
+    int pbn = 0;
+    foreach (var row in pocketRows.Where(r => r[0] == capType))
+        pier.PtBars.Add(new SegmentalPierPtBar { Name = $"PT bar {++pbn}", S = Ft(D(row[1])), N = Ft(D(row[2])), Bottom = pier.FootingTop - F(5), Top = pier.CapTop - F(1, 6),
+            Diameter = In(2.5), DuctDiameter = In(4), PlateWidth = In(12), PlateThickness = In(3.5), Material = "2 1/2\" HS PT bar (A722 above the first coupler, stainless below)", Source = $"p.383, {row[10]}", Unresolved = ptFlag });
+    foreach (var row in cornerRows.Where(r => r[0] == capType))
+        pier.PtBars.Add(new SegmentalPierPtBar { Name = $"PT bar {++pbn} (corner, column top)", S = Ft(D(row[1])), N = Ft(D(row[2])), Bottom = pier.FootingTop - F(5), Top = pier.CapTop - pier.CapHeight,
+            Diameter = In(2.5), DuctDiameter = In(4), PlateWidth = In(12), PlateThickness = In(3.5), Material = "2 1/2\" HS PT bar", Source = $"p.383, {row[6]}", Unresolved = ptFlag });
+    // CIP reinforcing bill (footing, column base; all stainless; p.336 / 339 / 342 / 347 / 350 / 353 bills of material, agent review columns-footings.md):
+    // schedule-only marks - the positions between the callouts are drawn only, and the precast segment bars (p.382) have no counts.
+    pier.BarList = pierBarRows.Where(r => RowFor(r[0], n) && int.TryParse(r[4], out _)).Select(r => new SegmentalPierBarRow
+    {
+        Mark = r[3], Size = r[5], Count = int.Parse(r[4]), Length = FtInText(r[8]), Coating = r[7].StartsWith("S") ? "stainless" : r[7], Element = r[12], Shape = r[13],
+        PlanWeightLb = double.TryParse(r[10], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var w) ? w : double.NaN, Source = $"p.{r[1]} ({r[2]})",
+    }).ToList();
+    pier.BarListUnresolved = UnresolvedFlag.Text("p.334-353, 382", $"bent {n} CIP footing / column base reinforcing placement", "the bills give every mark, count, size and shape, but the positions between the callouts (mats, bundles, stirrup grid exceptions) are drawn only; the precast segment / cap bars have no counts (shop drawings)",
+        "Scheduled from the bill (counts, lengths, weights), not placed in 3D." + (n is 20 or 21 or 22 or 25 ? " PLAN CONFLICT (p.342 / p.350): mark T17 prints 15 #8 x 28'-10\" but 385 lb = 5 bars (the sheet totals use 385 lb); scheduled as printed (15)." : ""));
     b.Pier = pier;
     sg.Bents.Add(b);
 }
@@ -334,7 +396,7 @@ U("p.278", "number of bent segments with transverse tendons F1 & F2", "the S3-30
   "Each of the 20 bent halves gets F1 & F2 (difference reported by the check).");
 
 // Plan items not modeled (GAP) and remaining open items.
-G("Permanent bent PT bar pockets, temporary bar couplers (p278, 299) - not modeled; bent / end segment vertical and bent longitudinal PT bars built by details-bonner-unit5.csx (FixedBars) (erection bars joint to joint and D1-U1 + Type A / B / C blocks: details-bonner-unit5.csx).");
+G("PT bar hardware (p278, 299-300) - built by details-bonner-unit5.csx: vertical / longitudinal bars (FixedBars) with nominal anchor plates, nuts + stressing pockets, temporary bars with nominal anchor plates + spherical nuts and the D1 - U1 couplers (vendor determined, flagged); only the final D1 - U1 erection bar arrangement (erection bars joint to joint and D1-U1 + Type A / B / C blocks: details-bonner-unit5.csx).");
 G("Tendon lanes / deviations of every cantilever, continuity, closure and end-span tendon (p272, 285-298, 303-304) by details-bonner-unit5.csx; deviation blocks + pipes (p302), future PT pipes F1-F4 (p308), cantilever / continuity tendon lanes + anchor deviations (p285-297, 303) built by details-bonner-unit5.csx.");
 G("Shear keys, alignment keys, epoxy joints (p283) - joints are plain planes; mild reinforcing in every segment by rebar-bonner-unit5.csx (bars without counts / bill: UNRESOLVED list).");
 G("Navigational lights (channel station not given), box lighting conduit runs (shop drawings), hoist receptacles, platform clips / bolts, door hardware - not modeled (parapet, A.O. / T.A.O. / A.O.B. / bent diaphragm + utility openings by details-bonner-unit5.csx; piles, deck drains, modular joint envelopes / blockouts / end posts / cover plates, 2-bar metal rail, solar array platforms, nav light conduit sleeves, box girder luminaires / boxes / panels, access doors, vermin screens, vent holes, survey blockouts by misc-bonner-unit5.csx; inventory segmental-unit5/MISC-DATA.md).");

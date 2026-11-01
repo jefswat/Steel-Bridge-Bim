@@ -69,7 +69,53 @@ public sealed class SegmentalBlockPlacement
     public SegmentalBlockPlacement Clone() => (SegmentalBlockPlacement)MemberwiseClone();
 }
 
-public enum SegmentalOpeningKind { BottomSlab, TopSlab, BentDiaphragm }
+public enum SegmentalOpeningKind { BottomSlab, TopSlab, BentDiaphragm, StressingPocket }
+
+/// <summary>
+/// OPTIONAL interior of the segments of one type (bent halves / end segments; null list = the standard rule: hollow box, a bent half solid over
+/// <see cref="SegmentalDefinition.BentDiaphragm"/>, an end segment a solid envelope). The segment is built as consecutive PIECES along it, each a closed solid
+/// between two distances from the segment's SUPPORT-SIDE face (bent half: the CL split face; end segment: the free face at the support), with the
+/// standard outer outline (depth / soffit step of the segment type) and its own void: <see cref="SegmentalInteriorPiece.Void0"/> at From, lerped to
+/// <see cref="SegmentalInteriorPiece.Void1"/> at To (same point count), none = solid. A void outline is in the section frame (S = x from CL girder, right +;
+/// N = y DOWN from the deck top), symmetric or not, and must contain a top point and a bottom point on x = 0 (the loft closes the section in two halves there).
+/// </summary>
+public sealed class SegmentalInteriorDefinition
+{
+    public string Name { get; set; } = "";
+    public SegmentType SegmentType { get; set; }
+    /// <summary>Regex on the segment names (default all of the type).</summary>
+    public string Segments { get; set; } = ".*";
+    public List<SegmentalInteriorPiece> Pieces { get; set; } = new();
+    public string Source { get; set; } = "";
+    /// <summary>Open / scaled items (UnresolvedFlag text): raised once and set on every segment built with this interior (dimension-only).</summary>
+    public string Unresolved { get; set; } = "";
+    public SegmentalInteriorDefinition Clone() { var c = (SegmentalInteriorDefinition)MemberwiseClone(); c.Pieces = Pieces.Select(p => p.Clone()).ToList(); return c; }
+}
+
+public sealed class SegmentalInteriorPiece
+{
+    public double From { get; set; }
+    public double To { get; set; }
+    /// <summary>Void outline at From (empty = solid piece).</summary>
+    public List<PlanPoint> Void0 { get; set; } = new();
+    /// <summary>OPTIONAL void outline at To (null = <see cref="Void0"/>).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PlanPoint>? Void1 { get; set; }
+    /// <summary>OPTIONAL outer outline at From / To (same frame and rules as the void; null = the standard box outline at that station), e.g. an end
+    /// segment's top slab nose or thickened wings.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PlanPoint>? Outer0 { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PlanPoint>? Outer1 { get; set; }
+    public string Note { get; set; } = "";
+    public SegmentalInteriorPiece Clone()
+    {
+        var c = (SegmentalInteriorPiece)MemberwiseClone();
+        c.Void0 = Void0.Select(p => new PlanPoint(p.S, p.N)).ToList(); c.Void1 = Void1?.Select(p => new PlanPoint(p.S, p.N)).ToList();
+        c.Outer0 = Outer0?.Select(p => new PlanPoint(p.S, p.N)).ToList(); c.Outer1 = Outer1?.Select(p => new PlanPoint(p.S, p.N)).ToList();
+        return c;
+    }
+}
 
 /// <summary>Opening through the box: slab openings (rectangle Width across x Length along, or round Diameter) centred on the segment (or, with
 /// <see cref="Bents"/>, on the bent CL split into the two bent halves); diaphragm openings = <see cref="Outline"/> through the solid bent diaphragm.</summary>
@@ -98,6 +144,15 @@ public sealed class SegmentalOpeningDefinition
     /// <see cref="OutlineFromTop"/>).</summary>
     public List<PlanPoint> Outline { get; set; } = new();
     public bool OutlineFromTop { get; set; }
+    /// <summary>OPTIONAL diaphragm openings: the opening runs from <see cref="AlongFrom"/> to <see cref="AlongTo"/> measured from the bent CL (bent halves) or from
+    /// the support-side face (segments listed in <see cref="Segments"/>, e.g. end segments); NaN = from the bent CL over <see cref="SegmentalDefinition.BentDiaphragm"/>.
+    /// Slab openings at <see cref="Bents"/>: <see cref="AlongFrom"/> = centre of a whole opening this far from the bent CL in EACH half (NaN = centred on the CL, split).</summary>
+    public double AlongFrom { get; set; } = double.NaN;
+    public double AlongTo { get; set; } = double.NaN;
+    /// <summary>OPTIONAL slab opening outline in plan (S = x from CL girder, N = distance from the support-side face of each segment in <see cref="Segments"/>);
+    /// replaces Width / Length / Diameter and the centring.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PlanPoint>? PlanOutline { get; set; }
     /// <summary>Temporary opening (repaired after erection): recorded and drawn, no concrete deducted.</summary>
     public bool Temporary { get; set; }
     public string Source { get; set; } = "";
@@ -105,7 +160,7 @@ public sealed class SegmentalOpeningDefinition
     public SegmentalOpeningDefinition Clone()
     {
         var c = (SegmentalOpeningDefinition)MemberwiseClone();
-        c.Segments = Segments.ToList(); c.Stations = Stations.ToList(); c.Bents = Bents.ToList(); c.Outline = Outline.Select(p => new PlanPoint(p.S, p.N)).ToList();
+        c.Segments = Segments.ToList(); c.Stations = Stations.ToList(); c.Bents = Bents.ToList(); c.Outline = Outline.Select(p => new PlanPoint(p.S, p.N)).ToList(); c.PlanOutline = PlanOutline?.Select(p => new PlanPoint(p.S, p.N)).ToList();
         return c;
     }
 }
@@ -271,7 +326,95 @@ public sealed class SegmentalPtBarDefinition
     public string Source { get; set; } = "";
     /// <summary>Open items (UnresolvedFlag text): bars are built and flagged dimension-only.</summary>
     public string Unresolved { get; set; } = "";
-    public SegmentalPtBarDefinition Clone() { var c = (SegmentalPtBarDefinition)MemberwiseClone(); c.Positions = Positions.Select(p => p.Clone()).ToList(); return c; }
+    /// <summary>OPTIONAL anchor plate + nut at both bar ends (on the far block faces); null = bar only.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SegmentalBarHardwareDefinition? Anchor { get; set; }
+    /// <summary>OPTIONAL couplers along the bar (bars in pieces through the bent segment); null = none.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalBarCouplerDefinition>? Couplers { get; set; }
+    /// <summary>OPTIONAL: each bar line (far block face to far block face) is built as these separate PIECES (erection stages), each with its own anchors,
+    /// tails and couplers, instead of one bar (+ <see cref="Anchor"/> at both ends and <see cref="Couplers"/>, which are then not used).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalBarPiece>? Pieces { get; set; }
+    /// <summary>OPTIONAL final state of temporary bars (e.g. "destressed and removed at completion of the cantilever, ducts grouted (p.299 notes 3 / 4)"):
+    /// added to the bar / hardware descriptions.</summary>
+    public string FinalState { get; set; } = "";
+    public SegmentalPtBarDefinition Clone()
+    {
+        var c = (SegmentalPtBarDefinition)MemberwiseClone();
+        c.Positions = Positions.Select(p => p.Clone()).ToList(); c.Anchor = Anchor?.Clone(); c.Couplers = Couplers?.Select(x => x.Clone()).ToList();
+        c.Pieces = Pieces?.Select(x => x.Clone()).ToList();
+        return c;
+    }
+}
+
+/// <summary>
+/// OPTIONAL PT bar anchorage hardware (usually the PT supplier's: give the plan's nominal / scaled values and say so in <see cref="Unresolved"/>): square plate
+/// <see cref="PlateWidth"/> x <see cref="PlateThickness"/> normal to the bar with its bearing face at the anchor point, then a nut (cylinder <see cref="NutDiameter"/>
+/// x <see cref="NutLength"/>) outward of the plate.
+/// </summary>
+public sealed class SegmentalBarHardwareDefinition
+{
+    public double PlateWidth { get; set; } = double.NaN;
+    public double PlateThickness { get; set; } = double.NaN;
+    public double NutDiameter { get; set; } = double.NaN;
+    public double NutLength { get; set; } = double.NaN;
+    public string Source { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public SegmentalBarHardwareDefinition Clone() => (SegmentalBarHardwareDefinition)MemberwiseClone();
+}
+
+/// <summary>
+/// One piece of a bar line (<see cref="SegmentalPtBarDefinition.Pieces"/>): from <see cref="Start"/> (down-station end) to <see cref="End"/> (up-station end).
+/// </summary>
+public sealed class SegmentalBarPiece
+{
+    public string Name { get; set; } = "";
+    public SegmentalBarPieceEnd Start { get; set; } = new();
+    public SegmentalBarPieceEnd End { get; set; } = new();
+    /// <summary>Erection stage / step that installs and stresses it (text, e.g. "steps 2-5").</summary>
+    public string Stage { get; set; } = "";
+    /// <summary>Printed minimum bar length (check row vs the modeled bar end to bar end).</summary>
+    public double PrintedMinLength { get; set; } = double.NaN;
+    public SegmentalBarPiece Clone() { var c = (SegmentalBarPiece)MemberwiseClone(); c.Start = Start.Clone(); c.End = End.Clone(); return c; }
+}
+
+/// <summary>
+/// One end of a <see cref="SegmentalBarPiece"/>: the point is the far block face on that side (<see cref="FromBentCl"/> NaN) or the bar line at that signed
+/// distance from the bent CL (+ up-station). <see cref="Anchor"/>: the bar set's plate + nut bear there, facing away from the piece, and the bar runs
+/// <see cref="Tail"/> past the nut (stressing tail / protrusion); otherwise the bar ends at the point. <see cref="Coupler"/>: a coupler (Diameter x Length)
+/// centred on the bar end.
+/// </summary>
+public sealed class SegmentalBarPieceEnd
+{
+    public double FromBentCl { get; set; } = double.NaN;
+    public bool Anchor { get; set; }
+    public bool Stressing { get; set; }
+    public double Tail { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SegmentalBarCouplerDefinition? Coupler { get; set; }
+    public SegmentalBarPieceEnd Clone() { var c = (SegmentalBarPieceEnd)MemberwiseClone(); c.Coupler = Coupler?.Clone(); return c; }
+}
+
+/// <summary>
+/// OPTIONAL bar coupler where a bar piece anchored inside the bent segment is extended (plan "COUPLER DETAIL"): the anchor plate bearing face lies where the
+/// bar crosses the station <see cref="FromBentCl"/> from the bent CL (down- and / or up-station side), the plate + nut (<see cref="Anchor"/>, else the bar set's
+/// <see cref="SegmentalPtBarDefinition.Anchor"/>) face away from the bent CL, and the coupler (<see cref="Diameter"/> x <see cref="Length"/>) starts
+/// <see cref="GapAfterNut"/> past the nut.
+/// </summary>
+public sealed class SegmentalBarCouplerDefinition
+{
+    public double FromBentCl { get; set; } = double.NaN;
+    public bool DownStation { get; set; } = true;
+    public bool UpStation { get; set; } = true;
+    public double Diameter { get; set; } = double.NaN;
+    public double Length { get; set; } = double.NaN;
+    public double GapAfterNut { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public SegmentalBarHardwareDefinition? Anchor { get; set; }
+    public string Source { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public SegmentalBarCouplerDefinition Clone() { var c = (SegmentalBarCouplerDefinition)MemberwiseClone(); c.Anchor = Anchor?.Clone(); return c; }
 }
 
 /// <summary>Which face of a segment <see cref="SegmentalFixedBarDefinition"/> positions are measured from: the face nearer the segment's own bent / support
@@ -319,7 +462,45 @@ public sealed class SegmentalFixedBarDefinition
     public string Source { get; set; } = "";
     /// <summary>Open items (UnresolvedFlag text): bars are built and flagged dimension-only.</summary>
     public string Unresolved { get; set; } = "";
-    public SegmentalFixedBarDefinition Clone() { var c = (SegmentalFixedBarDefinition)MemberwiseClone(); c.Positions = Positions.Select(p => p.Clone()).ToList(); return c; }
+    /// <summary>OPTIONAL anchorages at the bar ends (anchor plate + stressing pocket); null = bar only.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalBarAnchorDefinition>? Anchors { get; set; }
+    public SegmentalFixedBarDefinition Clone()
+    {
+        var c = (SegmentalFixedBarDefinition)MemberwiseClone();
+        c.Positions = Positions.Select(p => p.Clone()).ToList(); c.Anchors = Anchors?.Select(a => a.Clone()).ToList();
+        return c;
+    }
+}
+
+/// <summary>Bar end of a fixed PT bar: <see cref="Start"/> = its first point (vertical: the top end; longitudinal: <see cref="SegmentalFixedBarPosition.Along"/>),
+/// <see cref="End"/> = the second (vertical: the bottom end; longitudinal: AlongEnd).</summary>
+public enum SegmentalBarEnd { Start, End }
+
+/// <summary>
+/// OPTIONAL anchorage at one end of every bar of a <see cref="SegmentalFixedBarDefinition"/>: square anchor plate <see cref="PlateWidth"/> x <see cref="PlateThickness"/>
+/// normal to the bar, its bearing face at the bar end, outward of it; optional stressing pocket = square frustum void from the plate bearing face to the concrete
+/// surface the bar points to (deck top / soffit / segment face), <see cref="PocketDepth"/> measured normal to that surface, <see cref="PocketInnerWidth"/> at the
+/// plate, <see cref="PocketOuterWidth"/> at the surface (NaN depth = no pocket: plate cast in). Plate / pocket sizes are usually the PT supplier's: give the
+/// plan's nominal (drawn / scaled) values and say so in <see cref="Unresolved"/> (parts flagged dimension-only). The pocket is grouted after stressing, so it
+/// removes no concrete from the quantities.
+/// </summary>
+public sealed class SegmentalBarAnchorDefinition
+{
+    public SegmentalBarEnd End { get; set; }
+    /// <summary>Stressing (live) end; false = dead end (IFC TENSIONING_END / FIXED_END).</summary>
+    public bool Stressing { get; set; }
+    public double PlateWidth { get; set; } = double.NaN;
+    public double PlateThickness { get; set; } = double.NaN;
+    public double PocketDepth { get; set; } = double.NaN;
+    public double PocketInnerWidth { get; set; } = double.NaN;
+    public double PocketOuterWidth { get; set; } = double.NaN;
+    /// <summary>OPTIONAL nut outward of the plate (cylinder; NaN = none). Its shape is the PT supplier's (spherical / hex): give a nominal envelope.</summary>
+    public double NutDiameter { get; set; } = double.NaN;
+    public double NutLength { get; set; } = double.NaN;
+    public string Source { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public SegmentalBarAnchorDefinition Clone() => (SegmentalBarAnchorDefinition)MemberwiseClone();
 }
 
 public enum SegmentalPipeKind { DeviationPipe, FuturePtPipe }
@@ -472,6 +653,10 @@ public sealed class SegmentalEndFaceAnchor
     /// Null = the bend at the span face (pipe straight from the anchor to the span face).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public double? BendPiFromAnchor { get; set; }
+    /// <summary>OPTIONAL distance along the box from the end segment's anchor face to the anchorage (an anchor on a bearing face inside a recess, e.g. the
+    /// p.271 wedges); null = on the anchor face. <see cref="BendPiFromAnchor"/> is measured from the anchorage.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? AnchorFromFace { get; set; }
     public string Source { get; set; } = "";
     public string Unresolved { get; set; } = "";
     public SegmentalEndFaceAnchor Clone() => (SegmentalEndFaceAnchor)MemberwiseClone();

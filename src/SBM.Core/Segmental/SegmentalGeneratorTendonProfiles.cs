@@ -477,7 +477,8 @@ public sealed partial class SegmentalGenerator
             var es = _m.Segments.FirstOrDefault(sg => sg.Name.Equals(esName, StringComparison.OrdinalIgnoreCase));
             var lEnd = L(maxRead);
             if (es == null || lEnd == null) { why = $"end segment {esName} / lane at the closure joint not found"; return null; }
-            double sAnc = down ? es.Station0 : es.Station1, sFace = down ? es.Station1 : es.Station0;
+            double sFace0 = down ? es.Station0 : es.Station1, sFace = down ? es.Station1 : es.Station0;
+            double sAnc = sFace0 + Math.Sign(sFace - sFace0) * (ea.AnchorFromFace ?? 0);
             var (h, _, _) = SectionAt(sAnc);
             double yA = double.IsNaN(ea.AboveSoffit) ? YOf(lEnd, sAnc) : h - ea.AboveSoffit;
             ctrl.Add(new Ctrl(sAnc, side * ea.FromCl, yA, 0));

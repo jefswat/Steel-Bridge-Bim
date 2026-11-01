@@ -13,7 +13,7 @@ using SBM.IO.Database;
 namespace SBM.Api;
 
 /// <summary>What an agent review flag is about.</summary>
-public enum ReviewFlagKind { PlanPdf, SheetLinks, ProgramDefault, GeneratorFlag }
+public enum ReviewFlagKind { PlanPdf, SheetLinks, ProgramDefault, GeneratorFlag, ElementReview }
 
 /// <summary>Open = must be resolved (or recorded as the user's decision) before the model is finished; Minor = listed with <c>--all</c>
 /// (zero / off / empty starting values, generator warnings); Note = information (first record of a PDF, confirmed defaults).</summary>
@@ -23,7 +23,7 @@ public sealed record ReviewFlag(ReviewFlagKind Kind, ReviewLevel Level, string B
 {
     public string KindText => Kind switch
     {
-        ReviewFlagKind.PlanPdf => "plan PDF", ReviewFlagKind.SheetLinks => "sheet links", ReviewFlagKind.ProgramDefault => "program default", _ => "generator flag",
+        ReviewFlagKind.PlanPdf => "plan PDF", ReviewFlagKind.SheetLinks => "sheet links", ReviewFlagKind.ProgramDefault => "program default", ReviewFlagKind.ElementReview => "element review", _ => "generator flag",
     };
 }
 
@@ -44,6 +44,8 @@ public sealed class AgentReviewRecord
 {
     public List<ReviewPdfRecord> Pdfs { get; set; } = new();
     public List<ReviewConfirmation> Confirmed { get; set; } = new();
+    /// <summary>Element agent reviews (an agent compared the element with its plan sheets): one per element, the latest wins.</summary>
+    public List<ElementReviewRecord> Elements { get; set; } = new();
 
     public static string PathFor(string modelFile) => System.IO.Path.ChangeExtension(modelFile, ".agent-review.json");
 
@@ -70,6 +72,53 @@ public sealed class ReviewConfirmation
     public string Value { get; set; } = "";
     public string Note { get; set; } = "";
     public string At { get; set; } = "";
+}
+
+/// <summary>
+/// The result of an agent comparing ONE element (or a container and everything in it) with the plan sheets it was modeled from. It holds while the
+/// element's <see cref="Fingerprint"/> and the fingerprints of its <see cref="Neighbours"/> (elements in contact, from the database boxes) are unchanged:
+/// a change of the element makes it stale, a change of a neighbour flags the interface for a new review. AI-only: there is no human sign-off state.
+/// </summary>
+public sealed class ElementReviewRecord
+{
+    public string GlobalId { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Level { get; set; } = "";
+    public string Category { get; set; } = "";
+    public string Bridge { get; set; } = "";
+    /// <summary>"agrees" = the element matches its sheets (flagged items aside, they stay generator flags); "differs" = a difference was found and
+    /// reported (<see cref="Note"/>).</summary>
+    public string Result { get; set; } = "agrees";
+    public List<string> Sheets { get; set; } = new();
+    public string Note { get; set; } = "";
+    /// <summary>Path of the agent's write-up (repo-relative), e.g. qc/bonner-unit5/segments/end-segment.md.</summary>
+    public string Report { get; set; } = "";
+    public string By { get; set; } = "agent";
+    public string At { get; set; } = "";
+    public string Fingerprint { get; set; } = "";
+    /// <summary>Hash of the neighbours' GlobalIds + fingerprints (<see cref="ModelDb.NeighbourHash"/>) and their count per category when recorded.</summary>
+    public string NeighbourHash { get; set; } = "";
+    public Dictionary<string, int> Neighbours { get; set; } = new();
+}
+
+/// <summary>A request to record element agent reviews (<c>sbm review --record-elements FILE</c>): which elements, the result, sheets and write-up.</summary>
+public sealed class ElementReviewRequest
+{
+    public List<ElementReviewRequestItem> Reviews { get; set; } = new();
+}
+
+public sealed class ElementReviewRequestItem
+{
+    /// <summary>Explicit GlobalIds; or a selector (all given parts must match): Bridge (exact), Level (exact), Category (exact), Name (regex).</summary>
+    public List<string> Ids { get; set; } = new();
+    public string? Bridge { get; set; }
+    public string? Level { get; set; }
+    public string? Category { get; set; }
+    public string? Name { get; set; }
+    public string Result { get; set; } = "agrees";
+    public List<string> Sheets { get; set; } = new();
+    public string Note { get; set; } = "";
+    public string Report { get; set; } = "";
 }
 
 public sealed class AgentReviewReport
@@ -150,6 +199,7 @@ public static class AgentReview
             SheetLinks(doc, model, db, mdb, rep);
             Defaults(doc, record, mdb, rep);
             if (o.Regenerate) Generator(doc, rep);
+            if (mdb != null) ElementReviews(record, mdb, rep, o.Record);
             if (o.Record && mdb != null)
                 mdb.WriteAgentReview(rep.Flags.Select(f => new AgentReviewRow(f.KindText, f.Level.ToString().ToLowerInvariant(), f.Bridge, f.Subject, f.Path, f.Value, f.Reason, f.Next)),
                     DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
@@ -158,6 +208,130 @@ public static class AgentReview
 
         if (o.Record && recordChanged && recordPath != null) record.Save(recordPath);
         return rep;
+    }
+
+    // ------------------------------------------------------------------ (4) element agent reviews
+
+    /// <summary>Levels counted for the coverage flags (an element is covered when it or a container above it, below the bridge, has a review).</summary>
+    private static readonly HashSet<string> CoveredLevels = new(StringComparer.Ordinal) { "element", "part", "bar" };
+    private static readonly HashSet<string> AboveReview = new(StringComparer.Ordinal) { "project", "site", "alignment", "bridge group", "unit" };
+
+    /// <summary>State of every recorded element review vs the database (current / changed / interface / missing), rows of
+    /// <c>element_agent_review</c>, and one coverage flag per bridge / level / category with elements no review covers.</summary>
+    private static void ElementReviews(AgentReviewRecord record, ModelDb mdb, AgentReviewReport rep, bool write)
+    {
+        var all = mdb.ReviewElements();
+        var rows = new List<ElementReviewRow>();
+        var neighboursNow = ModelDb.Neighbours(all, record.Elements.Select(r => r.GlobalId));
+        int current = 0;
+        foreach (var r in record.Elements)
+        {
+            string state, changed = "";
+            if (!all.TryGetValue(r.GlobalId, out var e)) { state = "missing"; }
+            else if (e.Fingerprint != r.Fingerprint) state = "changed";
+            else
+            {
+                var now = neighboursNow.GetValueOrDefault(r.GlobalId) ?? new List<string>();
+                state = ModelDb.NeighbourHash(all, now) == r.NeighbourHash ? "current" : "interface";
+                if (state == "interface")
+                {
+                    var cats = ModelDb.NeighbourCounts(all, now);
+                    changed = string.Join("; ", cats.Keys.Union(r.Neighbours.Keys).OrderBy(k => k)
+                        .Select(k => (k, a: r.Neighbours.GetValueOrDefault(k), b: cats.GetValueOrDefault(k))).Select(x => x.a == x.b ? $"{x.k} {x.b}" : $"{x.k} {x.a} -> {x.b}"));
+                    changed = "a neighbour changed; neighbours by category (recorded -> now): " + changed;
+                }
+            }
+            if (state == "current") current++;
+            rows.Add(new ElementReviewRow(r.GlobalId, r.Name, r.Level, r.Category, r.Bridge, r.Result, state, r.At, string.Join(", ", r.Sheets), r.Note, r.Report, changed));
+        }
+        foreach (var g in rows.Where(x => x.State != "current").GroupBy(x => (x.Bridge, x.Category, x.State)))
+        {
+            string why = g.Key.State switch
+            {
+                "changed" => "The element changed since its agent review (its fingerprint differs): review it again against its sheets.",
+                "interface" => "An element in contact with it changed since the review: review the interface again.",
+                _ => "The reviewed element is no longer in the model.",
+            };
+            rep.Flags.Add(new(ReviewFlagKind.ElementReview, ReviewLevel.Open, g.Key.Bridge, $"{g.Count()} {g.Key.Category} review(s) {g.Key.State}", "",
+                string.Join(", ", g.Take(3).Select(x => x.Name)) + (g.Count() > 3 ? ", ..." : ""), why, "re-review and record with `sbm review <model> --record-elements FILE`"));
+        }
+        foreach (var g in rows.Where(x => x.State == "current" && x.Result == "differs").GroupBy(x => (x.Bridge, x.Category)))
+            rep.Flags.Add(new(ReviewFlagKind.ElementReview, ReviewLevel.Minor, g.Key.Bridge, $"{g.Count()} {g.Key.Category} reviewed with a reported difference", "",
+                string.Join(", ", g.Take(3).Select(x => x.Name)), "The agent found a difference and reported it (note / write-up); it is a generator flag or a user decision."));
+
+        // coverage: an element is covered by a current or stale review of itself or of a container above it (below the bridge level)
+        var byId = all.Values.ToDictionary(x => x.Id);
+        var reviewed = new HashSet<long>(record.Elements.Where(r => all.ContainsKey(r.GlobalId)).Select(r => all[r.GlobalId].Id));
+        var memo = new Dictionary<long, bool>();
+        bool Covered(long id)
+        {
+            var chain = new List<long>();
+            bool res = false;
+            for (long? cur = id; cur is long k && byId.TryGetValue(k, out var x); cur = x.ParentId)
+            {
+                if (memo.TryGetValue(k, out var m)) { res = m; break; }
+                chain.Add(k);
+                if (AboveReview.Contains(x.Level)) break;
+                if (reviewed.Contains(k)) { res = true; break; }
+            }
+            foreach (var k in chain) memo[k] = res;
+            return res;
+        }
+        int total = 0, covered = 0;
+        foreach (var g in all.Values.Where(x => CoveredLevels.Contains(x.Level)).GroupBy(x => (x.Bridge, x.Level, x.Category)).OrderBy(g => g.Key))
+        {
+            int n = g.Count(), c = g.Count(x => Covered(x.Id));
+            total += n; covered += c;
+            if (c < n)
+                rep.Flags.Add(new(ReviewFlagKind.ElementReview, ReviewLevel.Open, g.Key.Bridge, $"{n - c:N0} of {n:N0} {g.Key.Level}s '{g.Key.Category}' without an agent review", "",
+                    string.Join(", ", g.Where(x => !Covered(x.Id)).Take(3).Select(x => x.Name)),
+                    "No agent has compared these elements with their plan sheets yet.", "agent review against `sbm db <model> --sheets-for <name>`, then `sbm review <model> --record-elements FILE`"));
+        }
+        rep.Notes.Add($"element agent reviews: {record.Elements.Count:N0} recorded, {current:N0} current; {covered:N0} of {total:N0} elements / parts / bars covered");
+        if (write) mdb.WriteElementReview(rows, DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>Records element agent reviews from a request file: resolves the selectors in the companion database (it must be newer than the
+    /// model: run <c>sbm pipeline</c> first), stores each element's fingerprint and its neighbours' fingerprints. Returns the number recorded.</summary>
+    public static int RecordElements(SbmDocument doc, string requestFile, out string message)
+    {
+        string model = doc.FilePath ?? throw new InvalidOperationException("The model has no file.");
+        string db = CompanionDatabase.DefaultPath(model);
+        if (!File.Exists(db) || (ModelDatabase.BuiltAt(db) ?? File.GetLastWriteTimeUtc(db)) < File.GetLastWriteTimeUtc(model))
+        { message = "The companion database is missing or older than the model: run `sbm pipeline <model.sbm>` first."; return 0; }
+        var req = JsonSerializer.Deserialize<ElementReviewRequest>(File.ReadAllText(requestFile), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? new ElementReviewRequest();
+        string recordPath = AgentReviewRecord.PathFor(model);
+        var record = AgentReviewRecord.Load(recordPath);
+        using var mdb = new ModelDb(db);
+        var all = mdb.ReviewElements();
+        var at = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+        var picked = new List<(string gid, ElementReviewRequestItem it)>();
+        var empty = new List<string>();
+        foreach (var it in req.Reviews)
+        {
+            var ids = it.Ids.Count > 0 ? it.Ids.Where(all.ContainsKey).ToList() : ModelDb.Select(all, it.Bridge, it.Level, it.Category, it.Name);
+            if (ids.Count == 0) empty.Add(it.Ids.Count > 0 ? string.Join(",", it.Ids.Take(3)) : $"{it.Bridge}/{it.Level}/{it.Category}/{it.Name}");
+            picked.AddRange(ids.Select(g => (g, it)));
+        }
+        var nb = ModelDb.Neighbours(all, picked.Select(p => p.gid));
+        var byGid = record.Elements.ToDictionary(r => r.GlobalId, StringComparer.Ordinal);
+        foreach (var (gid, it) in picked)
+        {
+            var e = all[gid];
+            byGid[gid] = new ElementReviewRecord
+            {
+                GlobalId = gid, Name = e.Name, Level = e.Level, Category = e.Category, Bridge = e.Bridge, Result = it.Result, Sheets = it.Sheets, Note = it.Note,
+                Report = it.Report, At = at, Fingerprint = e.Fingerprint,
+                NeighbourHash = ModelDb.NeighbourHash(all, nb.GetValueOrDefault(gid) ?? new List<string>()),
+                Neighbours = ModelDb.NeighbourCounts(all, nb.GetValueOrDefault(gid) ?? new List<string>()),
+            };
+        }
+        record.Elements = byGid.Values.OrderBy(r => r.Bridge).ThenBy(r => all.TryGetValue(r.GlobalId, out var x) ? x.Id : long.MaxValue).ToList();
+        record.Save(recordPath);
+        message = $"{picked.Select(p => p.gid).Distinct().Count():N0} element review(s) recorded in {System.IO.Path.GetFileName(recordPath)}"
+            + (empty.Count > 0 ? $"; no element matched: {string.Join(" | ", empty)}" : "") + ".";
+        return picked.Count;
     }
 
     // ------------------------------------------------------------------ (1) plan PDFs
@@ -250,7 +424,7 @@ public static class AgentReview
                 "Sheets per element, unused sheets and elements without a sheet cannot be reviewed.", "run `sbm pipeline <model.sbm>`"));
             return;
         }
-        if (File.GetLastWriteTimeUtc(db) < File.GetLastWriteTimeUtc(model))
+        if ((ModelDatabase.BuiltAt(db) ?? File.GetLastWriteTimeUtc(db)) < File.GetLastWriteTimeUtc(model))
             rep.Flags.Add(new(ReviewFlagKind.SheetLinks, ReviewLevel.Open, "", "Companion database is older than the model", "", "",
                 "The sheet findings below come from the previous build and may be out of date.", "run `sbm pipeline <model.sbm>`"));
         if (mdb == null) return;
@@ -571,6 +745,9 @@ public static class AgentReview
                         or nameof(SegmentalBarDefinition.Cover) or nameof(SegmentalBarDefinition.CoverTop) or nameof(SegmentalBarDefinition.CoverBottom)
                     : name is nameof(SegmentalBarDefinition.CountPerSegment) or nameof(SegmentalBarDefinition.PrintedDims) or nameof(SegmentalBarDefinition.ShapeCode)
                         || (name is nameof(SegmentalBarDefinition.CoverTop) or nameof(SegmentalBarDefinition.CoverBottom) && double.IsNaN(name == nameof(SegmentalBarDefinition.CoverTop) ? sb.CoverTop : sb.CoverBottom));
+            // segment interiors: the segment regex is a selector (default = every segment of the type), not a plan value
+            case SegmentalInteriorDefinition:
+                return name == nameof(SegmentalInteriorDefinition.Segments);
             case SegmentalOpeningDefinition so:
                 if (so.Kind == SegmentalOpeningKind.BentDiaphragm) return name is nameof(SegmentalOpeningDefinition.Width) or nameof(SegmentalOpeningDefinition.Length)
                     or nameof(SegmentalOpeningDefinition.Diameter) or nameof(SegmentalOpeningDefinition.Segments) or nameof(SegmentalOpeningDefinition.CenterOffset);

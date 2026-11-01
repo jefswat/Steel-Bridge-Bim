@@ -96,6 +96,7 @@ public static class ModelLayers
         SubElementKind.DeckDrain or SubElementKind.DrainPipe => "3D-DRAINAGE",
         SubElementKind.SplashBasin => "3D-SPLASH-BASIN",
         SubElementKind.Fender => "3D-SUB-FENDER",
+        SubElementKind.PtBar or SubElementKind.PtAnchor => "3D-SUB-PT",
         _ => "3D-SUB-OTHER",
     };
 
@@ -247,7 +248,7 @@ public static class ModelProjectionSource
                 foreach (var s in sm.Segments) Add(s.Mesh, s.Assumption != null ? "3D-UNRESOLVED-SEGMENTS" : "3D-SEGMENTS", "segment/" + s.Name, "Segment", s.Name, s);
                 foreach (var b in sm.Bearings) Add(b.Mesh, "3D-SEGMENTAL-BEARINGS", "bearing/" + b.Name, "Bearing", b.Name, b);
                 foreach (var bl in sm.Blocks) Add(bl.Mesh, "3D-SEGMENT-BLOCKS", "block/" + bl.Name, "Block", bl.Name, bl);
-                foreach (var hw in sm.PtHardware) Add(hw.Mesh, "3D-SEGMENT-PT-HARDWARE", "pt/" + hw.Name, hw.IsPipe ? "Pipe" : "PtBar", hw.Name, hw);
+                foreach (var hw in sm.PtHardware) Add(hw.Mesh, hw.ErectionOnly ? "3D-SEGMENT-ERECTION-PT" : "3D-SEGMENT-PT-HARDWARE", "pt/" + hw.Name, hw.IsPipe ? "Pipe" : "PtBar", hw.Name, hw);
                 if (o.Rebar) foreach (var t in sm.Tendons) Add(null, "3D-PT-TENDONS", "tendon/" + t.Name, "Tendon", t.Name, t, -1, false, new[] { t.Points.ToArray() });
             }
             if (o.Rebar)

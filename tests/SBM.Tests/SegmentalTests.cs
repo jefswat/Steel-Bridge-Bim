@@ -263,7 +263,8 @@ public class SegmentalTests
         Assert.Equal(11, sm.Segments.Count(s => s.Type == SegmentType.Closure));
         Assert.Equal(20, sm.Segments.Count(s => s.Type == SegmentType.BentHalf));
         Assert.Equal(2, sm.Segments.Count(s => s.Type == SegmentType.End));
-        Assert.All(sm.Segments, s => Assert.True(Closed(s.Mesh), s.Name));
+        // segments built from interior pieces: every piece is a closed solid (the merged mesh shares their end faces)
+        Assert.All(sm.Segments, s => Assert.True(s.Pieces.Count > 1 ? s.Pieces.All(Closed) : Closed(s.Mesh), s.Name));
         // tendon schedule (S3-57/58): plan weights T 774,968 / B 267,524 / C 25,716 lb
         Assert.Equal(774968, sm.Tendons.Where(t => t.Group == TendonGroup.Cantilever).Sum(t => t.PlanWeightLb), 0);
         Assert.Equal(267524, sm.Tendons.Where(t => t.Group == TendonGroup.Bottom).Sum(t => t.PlanWeightLb), 0);

@@ -157,12 +157,16 @@ public static class ModelPipeline
         catch (Exception) { return false; }
     }
 
-    /// <summary>True when the database is newer than the model file and every input of its sheet links (rules file, automatic index files).</summary>
+    /// <summary>True when the database is newer than the model file and every input of its sheet links (rules file, automatic index files). The model
+    /// is compared with the time the elements were BUILT (meta <c>built_at</c>): later writes (agent review tables, relinks) touch the file but do not
+    /// bring its elements up to date.</summary>
     public static bool DatabaseUpToDate(string dbPath, string modelFile, IEnumerable<string> inputs, Func<string, DateTime?>? mtime = null)
     {
+        bool real = mtime == null;
         mtime ??= f => File.Exists(f) ? File.GetLastWriteTimeUtc(f) : null;
         if (mtime(dbPath) is not { } db) return false;
-        if (mtime(modelFile) is { } m && m > db) return false;
+        var built = real ? SBM.IO.Database.ModelDatabase.BuiltAt(dbPath) ?? db : db;
+        if (mtime(modelFile) is { } m && m > built) return false;
         return inputs.All(f => mtime(f) is not { } t || t <= db);
     }
 

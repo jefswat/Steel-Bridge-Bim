@@ -301,6 +301,27 @@ public sealed partial class SegmentalGenerator
             if (od.Kind is SegmentalOpeningKind.BottomSlab or SegmentalOpeningKind.TopSlab)
             {
                 bool bottom = od.Kind == SegmentalOpeningKind.BottomSlab;
+                if (od.PlanOutline is { Count: >= 3 } po)
+                {
+                    foreach (var name in od.Segments)
+                    {
+                        if (SegByName(name) is not { } sd) { missing.Add($"{od.Name}: segment {name} not found"); continue; }
+                        if (SupportFace(sd.r, sd.d) is not { } sf) { missing.Add($"{od.Name}: {name} has no support-side face"); continue; }
+                        double dir = Math.Sign(sf.sO - sf.sF);
+                        var ol = po.Select(p => new Vec2(p.S, dir * p.N)).ToList();
+                        if (MeshBuilder.SignedArea(ol) < 0) ol.Reverse();
+                        double cAlong = sf.sF + ol.Average(q => q.Y);
+                        var (h, t, _) = SectionIn(sd.d, sd.r, cAlong);
+                        double y0 = bottom ? h + m : -m, y1 = bottom ? h - t - m : _d.Box.TopSlab + m;
+                        _m.Openings.Add(new SegmentalOpeningResult
+                        {
+                            Name = $"{sd.r.Name} {od.Name}", Kind = od.Kind, Segment = sd.r.Name, Mesh = SlabVoid(sd.r, sf.sF, ol, y0, y1, 1), Temporary = od.Temporary,
+                            RemovedVolume = od.Temporary ? 0 : Math.Abs(MeshBuilder.SignedArea(ol)) * (bottom ? t : _d.Box.TopSlab), Assumption = flag,
+                            Description = $"{od.Name} through the {(bottom ? "bottom" : "top")} slab of {sd.r.Name} (plan outline from the support-side face)" + (od.Source.Length > 0 ? $" ({od.Source})" : ""),
+                        });
+                    }
+                    continue;
+                }
                 var outline = SlabOutline(od);
                 if (outline == null) { missing.Add($"{od.Name}: no size"); continue; }
                 double area = Math.Abs(MeshBuilder.SignedArea(outline));
@@ -352,43 +373,59 @@ public sealed partial class SegmentalGenerator
                     foreach (var (r, d, _) in _segs.Where(x => x.d.Type == SegmentType.BentHalf && x.d.Bent.Equals(bent, StringComparison.OrdinalIgnoreCase)))
                     {
                         int sgn = r.Station0 < bs - 1e-9 ? -1 : 1;                      // half on this side of the bent CL
-                        double sIn = bs + sgn * 1e-4;
+                        bool whole = !double.IsNaN(od.AlongFrom);
+                        double cen = whole ? bs + sgn * od.AlongFrom : bs;
+                        double sIn = whole ? cen : bs + sgn * 1e-4;
                         var (h, t, _) = SectionIn(d, r, sIn);
-                        var half = Clip(outline, p => sgn * p.Y);                      // (x, along) - keep this half
+                        var half = whole ? outline : Clip(outline, p => sgn * p.Y);    // (x, along) - keep this half
                         if (half.Count < 3) continue;
                         double y0 = bottom ? h + m : -m, y1 = bottom ? h - t - m : _d.Box.TopSlab + m;
-                        var mesh = SlabVoid(r, bs, half, y0, y1, 1);
+                        var mesh = SlabVoid(r, cen, half, y0, y1, 1);
                         double thk = bottom ? t : _d.Box.TopSlab;
                         _m.Openings.Add(new SegmentalOpeningResult
                         {
                             Name = $"{r.Name} {od.Name}", Kind = od.Kind, Segment = r.Name, Mesh = mesh, Temporary = od.Temporary,
                             RemovedVolume = od.Temporary ? 0 : Math.Abs(MeshBuilder.SignedArea(half)) * thk, Assumption = flag,
-                            Description = $"{od.Name} at the {bent} CL, {(sgn < 0 ? "down" : "up")}station half" + (od.Source.Length > 0 ? $" ({od.Source})" : ""),
+                            Description = $"{od.Name} {(whole ? $"{od.AlongFrom / Ft(1):0.###} ft from" : "at")} the {bent} CL, {(sgn < 0 ? "down" : "up")}station half" + (od.Source.Length > 0 ? $" ({od.Source})" : ""),
                         });
                     }
                 }
             }
             else
             {
-                if (od.Outline.Count < 3 || double.IsNaN(_d.BentDiaphragm)) { missing.Add($"{od.Name}: outline / diaphragm length missing"); continue; }
+                bool range = !double.IsNaN(od.AlongFrom) && !double.IsNaN(od.AlongTo);
+                if (od.Outline.Count < 3 || !range && double.IsNaN(_d.BentDiaphragm)) { missing.Add($"{od.Name}: outline / diaphragm length missing"); continue; }
+                var hosts = new List<(SegmentResult r, SegmentDefinition d, double sF, int sgn, string where)>();
                 foreach (var bent in od.Bents)
                 {
                     if (!_bentSta.TryGetValue(bent, out double bs)) { missing.Add($"{od.Name}: bent {bent} not found"); continue; }
                     foreach (var (r, d, _) in _segs.Where(x => x.d.Type == SegmentType.BentHalf && x.d.Bent.Equals(bent, StringComparison.OrdinalIgnoreCase)))
+                        hosts.Add((r, d, bs, r.Station0 < bs - 1e-9 ? -1 : 1, $"the {bent} diaphragm"));
+                }
+                foreach (var name in od.Segments)
+                {
+                    if (SegByName(name) is not { } sd) { missing.Add($"{od.Name}: segment {name} not found"); continue; }
+                    if (SupportFace(sd.r, sd.d) is not { } sf) { missing.Add($"{od.Name}: {name} has no support-side face"); continue; }
+                    hosts.Add((sd.r, sd.d, sf.sF, Math.Sign(sf.sO - sf.sF), $"the {name} diaphragm"));
+                }
+                if (od.Segments.Count > 0 && !range) { missing.Add($"{od.Name}: segment diaphragm openings need AlongFrom / AlongTo"); continue; }
+                foreach (var (r, d, bs, sgn, where) in hosts)
+                {
                     {
-                        int sgn = r.Station0 < bs - 1e-9 ? -1 : 1;
-                        var (h, t, _) = SectionIn(d, r, bs + sgn * 1e-4);
+                        double mid = range ? (od.AlongFrom + od.AlongTo) / 2 : 1e-4;
+                        var (h, t, _) = SectionIn(d, r, bs + sgn * mid);
                         var sec = od.Outline.Select(p => new Vec2(p.S, od.OutlineFromTop ? p.N : h - t - p.N)).ToList();
                         if (MeshBuilder.SignedArea(sec) < 0) sec.Reverse();
-                        double a0 = bs, a1 = bs + sgn * (_d.BentDiaphragm + m);
+                        double len = range ? od.AlongTo - od.AlongFrom : _d.BentDiaphragm;
+                        double a0 = range ? bs + sgn * (od.AlongFrom - m) : bs, a1 = bs + sgn * ((range ? od.AlongTo : _d.BentDiaphragm) + m);
                         var stas = new[] { a0, a1 };
                         var rings = stas.Select(s => { var f = ChordFrame(r, s); return sec.Select(f.At).ToArray(); }).ToList();
                         var mesh = Loft(rings, new[] { sec, sec });
                         _m.Openings.Add(new SegmentalOpeningResult
                         {
                             Name = $"{r.Name} {od.Name}", Kind = od.Kind, Segment = r.Name, Mesh = mesh, Temporary = od.Temporary,
-                            RemovedVolume = od.Temporary ? 0 : Math.Abs(MeshBuilder.SignedArea(sec)) * _d.BentDiaphragm, Assumption = flag,
-                            Description = $"{od.Name} through the {bent} diaphragm, {(sgn < 0 ? "down" : "up")}station half" + (od.Source.Length > 0 ? $" ({od.Source})" : ""),
+                            RemovedVolume = od.Temporary ? 0 : Math.Abs(MeshBuilder.SignedArea(sec)) * len, Assumption = flag,
+                            Description = $"{od.Name} through {where}" + (od.Bents.Count > 0 && d.Type == SegmentType.BentHalf ? $", {(sgn < 0 ? "down" : "up")}station half" : "") + (od.Source.Length > 0 ? $" ({od.Source})" : ""),
                         });
                     }
                 }

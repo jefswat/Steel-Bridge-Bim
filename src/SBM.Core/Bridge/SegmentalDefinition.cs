@@ -168,6 +168,9 @@ public sealed class SegmentalBearing
     public double PedestalTop { get; set; } = double.NaN;
     public double PedestalAcross { get; set; } = double.NaN;
     public double PedestalAlong { get; set; } = double.NaN;
+    /// <summary>OPTIONAL pedestal centre shift along the bent line from the CL bearing (+ right); null = centred on the bearing.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? PedestalShift { get; set; }
     public string Unresolved { get; set; } = "";
     public SegmentalBearing Clone() => (SegmentalBearing)MemberwiseClone();
 }
@@ -194,12 +197,84 @@ public sealed class SegmentalPier
     public int PileCount { get; set; }
     /// <summary>Items modeled as an envelope / not modeled (one UNRESOLVED warning each, also on the element).</summary>
     public List<string> Unresolved { get; set; } = new();
+
+    // ---- OPTIONAL as-designed pier details (null = the envelopes above; omitted from the .sbm when null)
+    /// <summary>Hollow precast column: core outline (S, N about the column centre); null = solid column.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PlanPoint>? ColumnCore { get; set; }
+    /// <summary>Precast column segment heights, bottom to top, stacked on <see cref="GroutBed"/> over the CIP base top <see cref="ColumnBaseTop"/>; the
+    /// base (footing top to <see cref="ColumnBaseTop"/>) is then a solid of its own. null = one column solid footing top to cap soffit.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<double>? ColumnSegments { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? GroutBed { get; set; }
+    /// <summary>Sloped footing top: level over <see cref="FootingLevelZone"/> (same vertex count / order as <see cref="FootingOutline"/>, vertex i of the
+    /// zone joins vertex i of the outline) at <see cref="FootingTop"/>, planes down to <see cref="FootingTopEdge"/> at the outline. null = flat top.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<PlanPoint>? FootingLevelZone { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public double? FootingTopEdge { get; set; }
+    /// <summary>Full-depth openings through the cap (plan polygons S, N).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<List<PlanPoint>>? CapOpenings { get; set; }
+    /// <summary>Vertical PT bars through the pier (dead end at <see cref="SegmentalPierPtBar.Bottom"/>, anchor plate under <see cref="SegmentalPierPtBar.Top"/>).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalPierPtBar>? PtBars { get; set; }
+    /// <summary>Plan bill of the pier's CIP reinforcing (footing, column base): schedule-only marks of the substructure unit (no 3D bars; the
+    /// placement is raised once with <see cref="BarListUnresolved"/>). Each row's printed weight is compared with count x length x unit weight.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalPierBarRow>? BarList { get; set; }
+    public string BarListUnresolved { get; set; } = "";
+    public string Source { get; set; } = "";
+
     public SegmentalPier Clone() => new()
     {
         CapTop = CapTop, CapHeight = CapHeight, CapOutline = CapOutline.Select(p => new PlanPoint(p.S, p.N)).ToList(), CapTaperInset = CapTaperInset, CapTaperHeight = CapTaperHeight,
         ColumnS = ColumnS, ColumnN = ColumnN, ColumnBaseTop = ColumnBaseTop, FootingOutline = FootingOutline.Select(p => new PlanPoint(p.S, p.N)).ToList(), FootingTop = FootingTop,
         FootingBottom = FootingBottom, PileCount = PileCount, Unresolved = Unresolved.ToList(),
+        ColumnCore = ColumnCore?.Select(p => new PlanPoint(p.S, p.N)).ToList(), ColumnSegments = ColumnSegments?.ToList(), GroutBed = GroutBed,
+        FootingLevelZone = FootingLevelZone?.Select(p => new PlanPoint(p.S, p.N)).ToList(), FootingTopEdge = FootingTopEdge,
+        CapOpenings = CapOpenings?.Select(o => o.Select(p => new PlanPoint(p.S, p.N)).ToList()).ToList(), PtBars = PtBars?.Select(b => b.Clone()).ToList(), Source = Source,
+        BarList = BarList?.Select(b => b.Clone()).ToList(), BarListUnresolved = BarListUnresolved,
     };
+}
+
+/// <summary>One row of a pier bar bill (<see cref="SegmentalPier.BarList"/>): mark, size, count, length (scheduled, out to out), coating, element, shape text.</summary>
+public sealed class SegmentalPierBarRow
+{
+    public string Mark { get; set; } = "";
+    public string Size { get; set; } = "";
+    public int Count { get; set; }
+    public double Length { get; set; } = double.NaN;
+    public string Coating { get; set; } = "";
+    public string Element { get; set; } = "";
+    public string Shape { get; set; } = "";
+    public double PlanWeightLb { get; set; } = double.NaN;
+    public string Source { get; set; } = "";
+    public SegmentalPierBarRow Clone() => (SegmentalPierBarRow)MemberwiseClone();
+}
+
+/// <summary>Vertical PT bar of a segmental pier (column / cap post-tensioning): plumb at (S, N) of the bent frame from the dead end at elevation
+/// <see cref="Bottom"/> (plate <see cref="DeadPlateWidth"/> x <see cref="DeadPlateThickness"/> above it, optional) to the stressing anchor plate whose top
+/// is at <see cref="Top"/> (<see cref="PlateWidth"/> x <see cref="PlateThickness"/> below it; the bar ends <see cref="Protrusion"/> above it).</summary>
+public sealed class SegmentalPierPtBar
+{
+    public string Name { get; set; } = "";
+    public double S { get; set; }
+    public double N { get; set; }
+    public double Bottom { get; set; } = double.NaN;
+    public double Top { get; set; } = double.NaN;
+    public double Diameter { get; set; } = double.NaN;
+    public double DuctDiameter { get; set; } = double.NaN;
+    public double PlateWidth { get; set; } = double.NaN;
+    public double PlateThickness { get; set; } = double.NaN;
+    public double DeadPlateWidth { get; set; } = double.NaN;
+    public double DeadPlateThickness { get; set; } = double.NaN;
+    public double Protrusion { get; set; }
+    public string Material { get; set; } = "";
+    public string Source { get; set; } = "";
+    public string Unresolved { get; set; } = "";
+    public SegmentalPierPtBar Clone() => (SegmentalPierPtBar)MemberwiseClone();
 }
 
 /// <summary>Plan point in a bent frame (S along the bent line right +, N along the alignment up-station +).</summary>
@@ -281,6 +356,9 @@ public sealed class SegmentalDefinition
     /// <summary>OPTIONAL PT bars fixed inside one segment (vertical PT bars of bent / end segments); null = none (SegmentalDetails.cs).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<SegmentalFixedBarDefinition>? FixedBars { get; set; }
+    /// <summary>OPTIONAL interiors of bent halves / end segments as pieces along the segment (SegmentalDetails.cs); null = the standard rule.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SegmentalInteriorDefinition>? Interiors { get; set; }
     /// <summary>OPTIONAL bent steel pipes for future PT (deviation block pipes, diaphragm pipes); null = none (SegmentalDetails.cs).</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public List<SegmentalPipeDefinition>? Pipes { get; set; }
@@ -304,7 +382,7 @@ public sealed class SegmentalDefinition
         Unresolved = Unresolved.ToList(), Reported = Reported.ToList(),
         BlockTypes = BlockTypes?.Select(x => x.Clone()).ToList(), Blocks = Blocks?.Select(x => x.Clone()).ToList(),
         Openings = Openings?.Select(x => x.Clone()).ToList(), Parapet = Parapet?.Clone(), Bars = Bars?.Select(x => x.Clone()).ToList(), Keys = Keys?.Select(x => x.Clone()).ToList(), SectionBars = SectionBars?.Select(x => x.Clone()).ToList(),
-        PtBars = PtBars?.Select(x => x.Clone()).ToList(), FixedBars = FixedBars?.Select(x => x.Clone()).ToList(), Pipes = Pipes?.Select(x => x.Clone()).ToList(), DuctLanes = DuctLanes?.Select(x => x.Clone()).ToList(), Misc = Misc?.Clone(),
+        PtBars = PtBars?.Select(x => x.Clone()).ToList(), FixedBars = FixedBars?.Select(x => x.Clone()).ToList(), Interiors = Interiors?.Select(x => x.Clone()).ToList(), Pipes = Pipes?.Select(x => x.Clone()).ToList(), DuctLanes = DuctLanes?.Select(x => x.Clone()).ToList(), Misc = Misc?.Clone(),
     };
 
     public List<string> Validate(int spanCount)

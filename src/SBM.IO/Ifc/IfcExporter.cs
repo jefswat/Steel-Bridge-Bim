@@ -408,6 +408,7 @@ public static class IfcExporter
         var miscPlaceholders = new List<(int id, string location, string basis)>();
         // Elements modeled on an assumption the plans do not fix: Pset SBM_Status (Status, Reason, Basis).
         var miscStatus = new List<(int id, SBM.Core.Assumption a)>();
+        var erectionOnly = new List<(int id, string finalState)>();   // temporary erection hardware (SBM_ConstructionPhase)
         // approach slabs owned by a road (ApproachSlabDefinition.Owner = Road): contained in that IfcRoad, written with the roads
         var roadContained = new Dictionary<string, List<int>>();
         var fabAttrs = new List<(int id, SBM.Core.Bridge.FabricationAttributes f)>();
@@ -757,6 +758,9 @@ public static class IfcExporter
                         SBM.Core.Substructure.SubElementKind.PavementStrip => w.Add("IFCPAVEMENT", $"{common},$,{Ref(pl)},{Ref(pds)},$,.RIGID."),
                         // pier fender system (timber sheeting / wales / posts / spreaders, plan-drawn): IFC 4.3 impact protection device FENDER
                         SBM.Core.Substructure.SubElementKind.Fender => w.Add("IFCIMPACTPROTECTIONDEVICE", $"{common},$,{Ref(pl)},{Ref(pds)},$,.FENDER."),
+                        // vertical pier post-tensioning bars and their anchor plates (segmental piers)
+                        SBM.Core.Substructure.SubElementKind.PtBar => w.Add("IFCTENDON", $"{common},'PIER_PT_BAR',{Ref(pl)},{Ref(pds)},$,$,.BAR.,$,$,$,$,$,$,$"),
+                        SBM.Core.Substructure.SubElementKind.PtAnchor => w.Add("IFCTENDONANCHOR", $"{common},'ANCHOR_PLATE',{Ref(pl)},{Ref(pds)},$,$,.NOTDEFINED."),
                         _ => w.Add("IFCFOOTING", $"{common},$,{Ref(pl)},{Ref(pds)},$,{footingType}"),
                     };
                     contained.Add(id);
@@ -1180,10 +1184,27 @@ public static class IfcExporter
                 foreach (var hw in sm.PtHardware)
                 {
                     if (hw.Points.Count < 2 || !segIds.TryGetValue(hw.Segment, out int hhost)) continue;
-                    var (hc, _) = Directrix(hw.Points);
+                    var (hc, _) = hw.IsPlate || hw.IsFastener ? (0, 0.0) : Directrix(hw.Points);
                     string hk = IfcKeys.SegHardware(bk, hw.Name);
                     int hid;
-                    if (hw.IsPipe)
+                    if (hw.IsPlate)
+                    {
+                        // anchor plate: IfcTendonAnchor contained like the bars (not aggregated into the segment: viewers apply the host's openings - the
+                        // stressing pocket around the plate - to its parts and the plate vanished)
+                        if (barStyle == 0) barStyle = RgbStyle("PT bar", 0.30, 0.30, 0.34);
+                        hid = w.Add("IFCTENDONANCHOR", $"{Guid(hk)},$,{S(hw.Name)},{S(hw.Description)},'ANCHOR_PLATE',{Ref(pl)},{Ref(Body(hw.Mesh, barStyle))},$,$,"
+                            + (hw.TensioningEnd switch { true => ".TENSIONING_END.", false => ".FIXED_END.", _ => ".NOTDEFINED." }));
+                        contained.Add(hid);
+                    }
+                    else if (hw.IsFastener)
+                    {
+                        if (barStyle == 0) barStyle = RgbStyle("PT bar", 0.30, 0.30, 0.34);
+                        bool coupler = hw.Kind == SBM.Core.Segmental.SegmentalHardwareKind.BarCoupler;
+                        hid = w.Add("IFCMECHANICALFASTENER", $"{Guid(hk)},$,{S(hw.Name)},{S(hw.Description)},{(coupler ? "'PT_BAR_COUPLER'" : "'SPHERICAL_NUT'")},{Ref(pl)},{Ref(Body(hw.Mesh, barStyle))},$,"
+                            + $"{R(hw.OuterDiameter * scale)},{R(hw.Length * scale)},{(coupler ? ".COUPLER." : ".USERDEFINED.")}");
+                        contained.Add(hid);
+                    }
+                    else if (hw.IsPipe)
                     {
                         if (pipeStyle == 0) pipeStyle = RgbStyle("Galvanized steel pipe", 0.70, 0.72, 0.74);
                         int hd = w.Add("IFCSWEPTDISKSOLID", $"{Ref(hc)},{R(hw.OuterDiameter / 2 * scale)},{(hw.InnerDiameter > 0 ? R(hw.InnerDiameter / 2 * scale) : "$")},$,$");
@@ -1214,6 +1235,7 @@ public static class IfcExporter
                     }
                     if (hw.Material.Length > 0) AddMaterial(hw.Material, hid);
                     if (hw.Assumption != null) miscStatus.Add((hid, hw.Assumption));
+                    if (hw.ErectionOnly) erectionOnly.Add((hid, hw.FinalState));
                     result.ElementCount++;
                 }
                 foreach (var bl in sm.Blocks)
@@ -1237,7 +1259,7 @@ public static class IfcExporter
             {
                 if (!segIds.TryGetValue(op.Segment, out int host)) continue;
                 string ok = IfcKeys.SegOpening(bk, op.Name);
-                int open = w.Add("IFCOPENINGELEMENT", $"{Guid(ok)},$,{S(op.Name)},{S(op.Description)},{(op.Temporary ? "'TEMPORARY_ACCESS_OPENING'" : "$")},{Ref(pl)},{Ref(Body(op.Mesh, null))},$,.OPENING.");
+                int open = w.Add("IFCOPENINGELEMENT", $"{Guid(ok)},$,{S(op.Name)},{S(op.Description)},{(op.Temporary ? "'TEMPORARY_ACCESS_OPENING'" : op.Kind == SBM.Core.Bridge.SegmentalOpeningKind.StressingPocket ? "'STRESSING_POCKET'" : "$")},{Ref(pl)},{Ref(Body(op.Mesh, null))},$,.OPENING.");
                 w.Add("IFCRELVOIDSELEMENT", $"{Guid(ok + "/void")},$,$,$,{Ref(host)},{Ref(open)}");
                 if (op.Assumption != null) miscStatus.Add((open, op.Assumption));
             }
@@ -2160,6 +2182,18 @@ public static class IfcExporter
             int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/fitcond/" + first)},$,'SBM_FitConditions',$,{Refs(props)}");
             w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relfitcond/" + first)},$,$,$,{Refs(grp.Select(t => t.id))},{Ref(ps)}");
         }
+        // ERECTION ONLY elements (segmental temporary PT bar sets): one property set per distinct final-state text
+        foreach (var grp in erectionOnly.GroupBy(e => e.finalState))
+        {
+            int q1 = w.Add("IFCPROPERTYSINGLEVALUE", "'Phase',$,IFCLABEL('ERECTION ONLY'),$");
+            int q2 = w.Add("IFCPROPERTYSINGLEVALUE", "'IsTemporary',$,IFCBOOLEAN(.T.),$");
+            var qs = new List<int> { q1, q2 };
+            if (grp.Key.Length > 0) qs.Add(w.Add("IFCPROPERTYSINGLEVALUE", $"'FinalState',$,IFCTEXT({S(grp.Key)}),$"));
+            int first = grp.First().id;
+            int ps = w.Add("IFCPROPERTYSET", $"{Guid(key + "/erection/" + first)},$,'SBM_ConstructionPhase',$,({string.Join(",", qs.Select(Ref))})");
+            w.Add("IFCRELDEFINESBYPROPERTIES", $"{Guid(key + "/relerection/" + first)},$,$,$,({string.Join(",", grp.Select(e => Ref(e.id)))}),{Ref(ps)}");
+        }
+
         foreach (var (id, a) in miscStatus)
         {
             int q1 = w.Add("IFCPROPERTYSINGLEVALUE", $"'Status',$,IFCLABEL({S(a.Status)}),$");

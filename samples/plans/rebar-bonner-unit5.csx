@@ -250,7 +250,7 @@ string noBillBent = U("p.279-280", "bent segment reinforcing", "the set has no b
 // ---------------------------------------------------------------- 4. end segments 18-ES / 29-ES (p.273-276; no bill in the set)
 {
     const string unit = "end segments", rx = @"^\d+-ES$";
-    string noBillEnd = U("p.273-276", "end segment reinforcing", "the set has no bill of materials for the end segments (48 marks drawn with counts / spacings, shapes drawn only) and the end segment interior is modeled as the solid envelope", "Marks with printed counts placed at the printed spacings (positions scaled, flagged); lengths from the model; the other marks are not scheduled.");
+    string noBillEnd = U("p.273-276", "end segment reinforcing", "the set has no bill of materials for the end segments (48 marks drawn with counts / spacings, shapes drawn only)", "Marks with printed counts placed at the printed spacings (positions scaled, flagged); lengths from the model; the other marks are not scheduled.");
     var e45 = new SegmentalSectionBarSet { Mark = "E45", Size = "#4", Unit = unit, Segments = rx, Kind = SegmentalSectionBarKind.Longitudinal, Mirror = true, Count = 21, EndClear = I(2), Cover = I(2), CoverTop = I(3),
         Path = new() { AtX("TOP", 3.25, 6), C("TIP", 2.25, "TOP", 3.25) }, Source = "p.273 (S3-25)", Location = "top slab TOP longitudinal (21 @ 1'-0\" per half width), each side (end segments; no bill: length from the model)", Unresolved = noBillEnd };
     sets.Add(e45);
@@ -264,7 +264,7 @@ string noBillBent = U("p.279-280", "bent segment reinforcing", "the set has no b
             Location = $"end diaphragm horizontal across the webs (#7E9 TO #7E15 @ 10\", 3 each) (end segments; no bill: length from the model)",
             Unresolved = noBillEnd + " " + U("p.273", "E9-E15 positions", "the elevation dimensions '#7E9 TO #7E15 @ 10\"' from the bottom chain (1'-0\", 11 1/2\") and the sections give '3' per mark without positions along the segment", "E9 1'-11 1/2\" above the soffit, @ 10\"; 3 per mark at equal spaces 2\" clear of the segment faces (SCALED / DERIVED).") });
     }
-    sg.Unresolved.Add("[rebar] " + U("p.273-276", "end segment marks E1-E8, E16-E44, E46-E48, S1 / S2 / A9", "they are drawn with counts in elevation / section views of the anchor zone but without a bill of materials or bend dimensions, and the end segment interior (diaphragm, blockout) is not modeled", "Not scheduled or placed."));
+    sg.Unresolved.Add("[rebar] " + U("p.273-276", "end segment marks E1-E8, E16-E44, E46-E48, S1 / S2 / A9", "they are drawn with counts in elevation / section views of the anchor zone but without a bill of materials or bend dimensions", "Not scheduled or placed."));
 }
 
 // ---------------------------------------------------------------- 5. block bars (J, T, P, D, H): no bill, no bend dims

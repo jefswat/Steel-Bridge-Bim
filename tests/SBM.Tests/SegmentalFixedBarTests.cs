@@ -51,5 +51,55 @@ public class SegmentalFixedBarTests
         Assert.Contains("'VERTICAL_PT_BAR'", sw.ToString());
         Assert.Single(BridgeProject.FromJson(p.ToJson()).Bridges[0].Segmental!.FixedBars!);
         Assert.DoesNotContain("FixedBars", SegmentalTests.Model().p.ToJson());
+        Assert.DoesNotContain("Anchors", p.ToJson());
+    }
+
+    [Fact]
+    public void Anchors_PlateAtEachEnd_PocketOpensThroughTheDeckTop()
+    {
+        var (p, b) = SegmentalTests.Model();
+        b.Segmental!.FixedBars = new()
+        {
+            new() { Name = "vertical PT bar", Kind = SegmentalFixedBarKind.Vertical, SegmentType = SegmentType.BentHalf, From = SegmentalFaceRef.SupportSide,
+                Positions = { new() { Along = Ft(1), X = Ft(3) } }, TopDepth = In(10.5), BottomHeight = In(6.5), Diameter = In(1.75), Source = "test",
+                Anchors = new()
+                {
+                    new() { End = SegmentalBarEnd.Start, Stressing = true, PlateWidth = In(5), PlateThickness = In(1.75), NutDiameter = In(3), NutLength = In(2.875), PocketDepth = In(10.5), PocketInnerWidth = In(5.5), PocketOuterWidth = In(8.25),
+                        Unresolved = "UNRESOLVED (p.1): nominal - vendor determined." },
+                    new() { End = SegmentalBarEnd.End, PlateWidth = In(5), PlateThickness = In(1.75) },
+                } },
+        };
+        var m = new RegenerationCache().Regenerate(p).Single()!;
+        var sm = m.Concrete!.Segmental!;
+        var bars = sm.PtHardware.Where(h => h.Kind == SegmentalHardwareKind.VerticalPtBar).ToList();
+        var plates = sm.PtHardware.Where(h => h.IsPlate).ToList();
+        var pockets = sm.Openings.Where(o => o.Kind == SegmentalOpeningKind.StressingPocket).ToList();
+        Assert.Equal(2 * bars.Count, plates.Count);
+        Assert.Equal(bars.Count, pockets.Count);
+        Assert.Equal(bars.Count, plates.Count(x => x.TensioningEnd == true));
+        Assert.All(plates, x => Assert.Equal(Math.Pow(In(5), 2) * In(1.75), x.Mesh.Volume(), 9));
+        Assert.All(plates, x => Assert.Equal(x.TensioningEnd == true, x.Assumption != null));
+        Assert.All(pockets, x => Assert.NotNull(x.Assumption));
+        Assert.All(pockets, x => Assert.Equal(0, x.RemovedVolume));
+        foreach (var bar in bars)
+        {
+            // top plate outward (above) the bar top, bottom plate below the bar bottom; the pocket reaches past the deck top (bar top + 10 1/2")
+            var top = plates.Single(x => x.Name == bar.Name + " top anchor plate");
+            Assert.True(top.Points[1].Z > bar.Points[0].Z && (top.Points[0] - bar.Points[0]).Length < 1e-9);
+            var bot = plates.Single(x => x.Name == bar.Name + " bottom anchor plate");
+            Assert.True(bot.Points[1].Z < bar.Points[1].Z);
+            var nut = sm.PtHardware.Single(x => x.Kind == SegmentalHardwareKind.BarNut && x.Name == bar.Name + " top nut");
+            Assert.True((nut.Points[0] - top.Points[1]).Length < 1e-9 && Math.Abs((nut.Points[1] - nut.Points[0]).Length - In(2.875)) < 1e-9, "nut on the outer plate face");
+            Assert.DoesNotContain(sm.PtHardware, x => x.Name == bar.Name + " bottom nut");
+            var pk = pockets.Single(x => x.Name == bar.Name + " top stressing pocket");
+            Assert.True(pk.Mesh.Bounds().Max.Z > bar.Points[0].Z + In(10.5) * 0.98);
+        }
+        var sw = new StringWriter();
+        IfcExporter.Export(sw, "seg.ifc", p, new[] { new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed) });
+        string ifc = sw.ToString();
+        Assert.Contains(".TENSIONING_END.", ifc);
+        Assert.Contains(".FIXED_END.", ifc);
+        Assert.Contains("'STRESSING_POCKET'", ifc);
+        Assert.Equal(2, BridgeProject.FromJson(p.ToJson()).Bridges[0].Segmental!.FixedBars![0].Anchors!.Count);
     }
 }

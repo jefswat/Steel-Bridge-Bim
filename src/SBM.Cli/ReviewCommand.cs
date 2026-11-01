@@ -9,6 +9,10 @@ public static class ReviewCommand
     public const string Help = """
         sbm review <model.sbm> [--all] [--no-regen] [--no-db] [--no-record] [--accept-pdf FILE]... [--json flags.json]
         sbm review <model.sbm> --confirm PATH [--confirm PATH]... [--note TEXT]
+        sbm review <model.sbm> --record-elements FILE.json
+          Records element agent reviews: {"reviews": [{"ids": [GlobalId...] | "bridge"/"level"/"category"/"name" (regex) selector,
+          "result": "agrees"|"differs", "sheets": ["p.271", ...], "note": "...", "report": "qc/.../x.md"}]}. Each element keeps its fingerprint
+          and its neighbours' (elements in contact); a later change of the element or a neighbour makes the review stale (flag "element review").
           Agent review of a model built from plan PDFs. Flags:
             plan PDF        no PDF attached, PDF missing, PDF changed since its fingerprint was recorded (first review records it)
             sheet links     no / wrong sheet-links file, plan sets not attached, attached PDFs not indexed, sheets no element uses,
@@ -16,6 +20,8 @@ public static class ReviewCommand
             program default every input still at the program's starting value (non-zero = OPEN, zero / off / empty = minor),
                             with the sheets linked to that support / item ("read on")
             generator flag  UNRESOLVED / CONFLICT warnings and errors of the regeneration (other warnings = minor)
+            element review  elements / parts / bars no agent review covers (per bridge / category), reviews whose element changed
+                            or whose neighbour (interface) changed, reviews of elements no longer in the model
           Writes <model>.agent-review.json (PDF fingerprints, confirmed values; commit it) and the table agent_review in the
           companion database (view v_agent_review_open). --confirm records the current starting values at or under PATH
           (e.g. "Bridges[Ramp B].Supports[Pier 1].DeckEndOffset" or a whole object "Bridges[Ramp B].Studs") as confirmed;
@@ -30,6 +36,12 @@ public static class ReviewCommand
         string? Opt(string name) => Many(name).LastOrDefault();
         bool Has(string name) => args.Contains(name);
 
+        if (Opt("--record-elements") is { } req)
+        {
+            int k = AgentReview.RecordElements(doc, req, out var msg);
+            Console.WriteLine(msg);
+            return k == 0 ? 1 : 0;
+        }
         var confirm = Many("--confirm");
         if (confirm.Count > 0)
         {

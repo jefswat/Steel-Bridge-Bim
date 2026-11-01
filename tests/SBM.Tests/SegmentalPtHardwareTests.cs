@@ -117,6 +117,87 @@ public class SegmentalPtHardwareTests
     }
 
     [Fact]
+    public void PtBars_Pieces_AnchorsTailsCouplersAndPrintedMinimum()
+    {
+        var (p, b) = Model();
+        var hw = new SegmentalBarHardwareDefinition { PlateWidth = In(9), PlateThickness = In(2.25), NutDiameter = In(3), NutLength = In(2.875) };
+        var bd = b.Segmental!.PtBars![1];                              // bottom bars D1-U1 (AcrossBent, both webs)
+        bd.Anchor = hw;
+        bd.FinalState = "TEMPORARY: removed";
+        double dead = Ft(3.5) + In(2.25) + In(2.875) + In(3.625);
+        bd.Pieces = new()
+        {
+            new() { Name = "B-D1", PrintedMinLength = Ft(15), Start = new() { Anchor = true, Stressing = true, Tail = Ft(3) }, End = new() { FromBentCl = -dead } },
+            new() { Name = "B-U1", Start = new() { FromBentCl = -Ft(3.5), Anchor = true, Tail = In(3.625), Coupler = new() { Diameter = In(3.125), Length = In(6.75) } },
+                End = new() { Anchor = true, Stressing = true, Tail = Ft(3) } },
+        };
+        var m = Generate(p);
+        var sm = m.Concrete!.Segmental!;
+        var pieces = sm.PtHardware.Where(h => h.Kind == SegmentalHardwareKind.TemporaryPtBar && h.Name.Contains("bottom bars D1-U1")).ToList();
+        Assert.Equal(4, pieces.Count);                                  // 2 pieces x 2 webs
+        var cpl = sm.PtHardware.Where(h => h.Kind == SegmentalHardwareKind.BarCoupler).ToList();
+        Assert.Equal(2, cpl.Count);
+        foreach (int side in new[] { -1, 1 })
+        {
+            var bu = pieces.Single(h => h.Side == side && h.Name.EndsWith(" B-U1"));
+            var bdp = pieces.Single(h => h.Side == side && h.Name.EndsWith(" B-D1"));
+            var c = cpl.Single(h => h.Side == side);
+            var mid = (c.Points[0] + c.Points[1]) * 0.5;
+            Assert.True((mid - bu.Points[0]).Length < 1e-6, "coupler centred on the B-U1 dead end");
+            Assert.True((bdp.Points[1] - bu.Points[0]).Length < 1e-6, "B-D1 ends in the coupler centre");
+            Assert.Equal(In(6.75), (c.Points[1] - c.Points[0]).Length, 9);
+            Assert.Contains("TEMPORARY: removed", bu.Description);
+        }
+        // plates: B-D1 start + B-U1 both ends, per web; the stressing ends are TENSIONING_END
+        var plates = sm.PtHardware.Where(h => h.IsPlate && h.Name.Contains("bottom bars D1-U1")).ToList();
+        Assert.Equal(6, plates.Count);
+        Assert.Equal(4, plates.Count(x => x.TensioningEnd == true));
+        // the whole temporary set (bars, plates, nuts, couplers) is ERECTION ONLY; permanent hardware is not
+        Assert.All(sm.PtHardware.Where(h => h.Name.Contains("bottom bars D1-U1")), h => Assert.True(h.ErectionOnly, h.Name));
+        Assert.All(sm.PtHardware.Where(h => h.Kind != SegmentalHardwareKind.TemporaryPtBar && !h.Name.Contains("D1-U1")), h => Assert.False(h.ErectionOnly, h.Name));
+        Assert.Contains(sm.Checks, c => c.Item.Contains("piece B-D1") && c.Item.Contains("printed minimum"));
+        Assert.Single(BridgeProject.FromJson(p.ToJson()).Bridges[0].Segmental!.PtBars![1].Pieces!.Where(x => x.Name == "B-U1"));
+        Assert.DoesNotContain("\"Pieces\"", Model().p.ToJson());
+    }
+
+    [Fact]
+    public void PtBars_AnchorPlatesNuts_AndCouplerOnTheBentDiaphragmFace()
+    {
+        var (p, b) = Model();
+        var hw = new SegmentalBarHardwareDefinition { PlateWidth = In(9), PlateThickness = In(2.25), NutDiameter = In(3), NutLength = In(2.875), Unresolved = "UNRESOLVED (p.1): nominal." };
+        foreach (var bd in b.Segmental!.PtBars!) bd.Anchor = hw;
+        b.Segmental.PtBars![1].Couplers = new() { new() { FromBentCl = Ft(3.5), UpStation = false, Diameter = In(3.125), Length = In(6.75), GapAfterNut = In(0.25) } };
+        var m = Generate(p);
+        var sm = m.Concrete!.Segmental!;
+        var bars = sm.PtHardware.Where(h => h.Kind == SegmentalHardwareKind.TemporaryPtBar).ToList();
+        var cpl = sm.PtHardware.Where(h => h.Kind == SegmentalHardwareKind.BarCoupler).ToList();
+        Assert.Equal(2 * bars.Count + cpl.Count, sm.PtHardware.Count(h => h.IsPlate));
+        Assert.Equal(sm.PtHardware.Count(h => h.IsPlate), sm.PtHardware.Count(h => h.Kind == SegmentalHardwareKind.BarNut));
+        Assert.Equal(2, cpl.Count);                                     // D1-U1 bottom bar, both webs, down-station only
+        foreach (var c in cpl)
+        {
+            var bar = bars.Single(x => c.Name.StartsWith(x.Name + " "));
+            var plate = sm.PtHardware.Single(h => h.IsPlate && h.Name == bar.Name + " down-station coupler anchor plate");
+            // plate bearing face on the bar, 3'-6" down-station of the bent CL; nut, 1/4" gap, coupler, all toward D1 (down-station)
+            var dir = (bar.Points[0] - bar.Points[1]).Normalized();         // toward D1
+            Assert.True(Vec3.Dot(plate.Points[1] - plate.Points[0], dir) > 0);
+            double along = Vec3.Dot(c.Points[0] - plate.Points[0], dir);
+            Assert.Equal(In(2.25) + In(2.875) + In(0.25), along, 6);
+            Assert.Equal(In(6.75), c.Length, 6);
+            Assert.True(Closed(c.Mesh) && Closed(plate.Mesh));
+            Assert.NotNull(plate.Assumption);
+        }
+        var sw = new StringWriter();
+        IfcExporter.Export(sw, "seg.ifc", p, new[] { new IfcBridgeData(m.Framing, m.Steel, m.Concrete, m.Substructure, m.Prestressed) });
+        string ifc = sw.ToString();
+        Assert.Contains("'PT_BAR_COUPLER'", ifc); Assert.Contains("'SPHERICAL_NUT'", ifc); Assert.Contains(".NOTDEFINED.", ifc);
+        var back = BridgeProject.FromJson(p.ToJson()).Bridges[0].Segmental!.PtBars!;
+        Assert.Single(back[1].Couplers!);
+        Assert.Null(back[0].Couplers);
+        Assert.DoesNotContain("Couplers", Model().p.ToJson());
+    }
+
+    [Fact]
     public void Tendon_PassesEveryJointInItsLane_ChangesLaneInsideTheSegment()
     {
         var (p, _) = Model();

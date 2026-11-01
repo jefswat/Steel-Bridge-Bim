@@ -70,6 +70,10 @@ foreach (var b in sg.Bents)
     }
     Centre(pier.FootingOutline);
     Centre(pier.CapOutline);
+    // column-centred inputs (given about CL column = CL cap): level zone, cap openings, PT bars
+    if (pier.FootingLevelZone != null) foreach (var v in pier.FootingLevelZone) v.S += c;
+    if (pier.CapOpenings != null) foreach (var o in pier.CapOpenings) foreach (var v in o) v.S += c;
+    if (pier.PtBars != null) foreach (var pb in pier.PtBars) pb.S += c;
     if (b.Bearings.Count == 2)
     {
         double cur = (b.Bearings[0].Offset + b.Bearings[1].Offset) / 2;
@@ -119,7 +123,7 @@ md.Unresolved.Add(U("p.322", "deck drains in the bent segments, end segments and
 // CL modular expansion joint assembly @ 60 F: 1'-0 1/2" +- down-station of the bent 18 control line (S2-19 p.161 Section N-N) and 1'-2 1/2" +- up-station of the
 // bent 29 control line (S4-15 p.407 Section K-K), i.e. on the side of the adjoining FIB unit. The opening (DIM "A") is in the "MODULAR JOINT MOVEMENT AND SETTINGS"
 // table (p.333 legend: bound with the north and south transition plans) - not found in the 633 pages (text search). End segment blockout p.271 Section C-C:
-// 2'-2" from the anchor face x 1'-4" deep, ends 9" from the deck edges (scaled on the vector half plan, 3/8" = 1'-0"). Parapet end posts p.327 / p.333:
+// 2'-2" from the anchor face x 1'-4" deep, ends 9" from the deck edges (dimensioned on the elevation; agent review end-segment.md section 5). Parapet end posts p.327 / p.333:
 // 3'-9" long, 1'-2" wide, 2'-2" above the 2'-6" parapet (end view 4'-8"). Cover plates p.333 (revision 1, 08/30/16): 3/4" plate recessed flush in the parapet
 // traffic face, 4'-5" high from 3" above the deck, 6'-1" (left) / 6'-3" (right) long, 3'-4 1/2" on one side of the CL joint.
 string jointFlag(string bent, string page) => U($"p.333, {page}", $"modular expansion joint at {bent}", "the joint system is by the manufacturer (special provisions) and its setting table (DIM \"A\") is bound with the transition plans, not in this set",
@@ -137,9 +141,7 @@ foreach (var (bent, from, page) in new[] { ("Bent 18", -F(1, 0.5), "p.161 (S2-19
             Material = "AASHTO M270 Gr. 50, metallized (p.333 notes)" },
         Source = $"p.271, 327, 333; {page}",
         Unresolved = new() { jointFlag(bent, page), plateFlag,
-            U("p.271", $"end segment blockout ends at {bent}", "the 9\" from the deck edges is scaled on the half plan (not dimensioned)", "Blockout built to 9\" from the edges."),
-            U("p.271", $"end segment top slab thickening at {bent}", "Section C-C shows a 2'-2\" thick top slab at the anchor face; the end segment is modeled with the typical outline (solid envelope)",
-              "The blockout's removed concrete is clipped to the modeled wing / top slab.") },
+        },
     };
     md.Joints.Add(jd);
 }
@@ -411,7 +413,7 @@ md.Unresolved.Add(U("p.161, 407 vs p.271", "end segment face vs the CL joint", "
             A0 = 0, A1 = 0, N0 = 0, N1 = 0, Z0 = 0, Z1 = In(3.0 / 16) } },
     });
     // Vermin screens on the end segment anchor faces (p.314 'ANCHOR FACE SECTION', p.271 note 8).
-    string screenFlag = U("p.314, 271", "vermin screen position", "the end segment is a solid envelope in the model (its diaphragm opening is not built) and the screen bottom is read at the top of the 10\" bottom slab of p.271 Section A-A",
+    string screenFlag = U("p.314, 271", "vermin screen position", "the screen is drawn on the anchor face over the 11\" deep recess below the top slab nose (p.271 interior modeled since 2026-11-01) and its bottom is read at the top of the 10\" bottom slab of p.271 Section A-A",
         "Envelope 10'-2\" wide to 3'-2\", stepped to the 3'-6\" door at 6'-0\" (sloped sides enveloped), 3\" deep (L3x3 frames), on the anchor face; wire cloth, door, hinges and anchors not modeled separately.");
     var segAll = sg.Spans.SelectMany(s => s.Segments).ToList();
     foreach (var (bent, first) in new[] { ("Bent 18", true), ("Bent 29", false) })

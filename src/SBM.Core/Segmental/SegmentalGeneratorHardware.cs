@@ -34,6 +34,14 @@ public sealed partial class SegmentalGenerator
             var lengths = new List<double>();
             int missing = 0;
             var assumption = bd.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(bd.Unresolved, "bar between the far faces of the two blocks at the listed positions") : null;
+            var hwCount = new int[3];   // plates, nuts, couplers
+            string fin = bd.FinalState.Length > 0 ? $"; {bd.FinalState}" : "";
+            var pieceLen = new Dictionary<string, List<double>>();
+            int firstHw = _m.PtHardware.Count;
+            foreach (var t in new[] { bd.Anchor?.Unresolved ?? "" }.Concat(bd.Couplers?.SelectMany(c => new[] { c.Unresolved, c.Anchor?.Unresolved ?? "" }) ?? Array.Empty<string>())
+                         .Concat(bd.Pieces?.SelectMany(p => new[] { p.Start.Coupler?.Unresolved ?? "", p.End.Coupler?.Unresolved ?? "" }) ?? Array.Empty<string>())
+                         .Where(t => t.Length > 0).Distinct())
+                Warn(t);
             foreach (var (r, d, _) in _segs.Where(x => x.d.Type == SegmentType.Typical && rx.IsMatch(x.r.Name)))
             {
                 if (!_bentSta.TryGetValue(d.Bent, out double bs)) continue;
@@ -77,20 +85,68 @@ public sealed partial class SegmentalGenerator
                         lengths.Add(len);
                         string sideName = side < 0 ? "left" : "right";
                         string name = $"{r.Name}-{pt.r.Name} {bd.Name} {sideName}" + (positions.Length > 1 ? $" {pn}" : "");
+                        if (bd.Pieces is { Count: > 0 })
+                        {
+                            BuildBarPieces(bd, name, side, a, b, sa, sb, bs, r.Name, kind, assumption, fin, hwCount, pieceLen);
+                            continue;
+                        }
+                        if (bd.Anchor is { } ah)
+                        {
+                            AddBarAnchor(ah, r.Name, $"{name} {r.Name} end", a, a - b, side, null, hwCount);
+                            AddBarAnchor(ah, pt.r.Name, $"{name} {pt.r.Name} end", b, b - a, side, null, hwCount);
+                        }
+                        if (bd.Couplers != null)
+                            foreach (var cd in bd.Couplers)
+                            {
+                                if (double.IsNaN(cd.FromBentCl) || double.IsNaN(cd.Diameter) || double.IsNaN(cd.Length)) continue;
+                                foreach (int sgn in new[] { -1, 1 })
+                                {
+                                    if (sgn < 0 && !cd.DownStation || sgn > 0 && !cd.UpStation) continue;
+                                    double s = bs + sgn * cd.FromBentCl, u = (s - sa) / (sb - sa);
+                                    if (u <= 0 || u >= 1) continue;
+                                    var at = Vec3.Lerp(a, b, u);
+                                    var outward = (b - a) * (sgn * (sb - sa) > 0 ? 1 : -1);
+                                    var hw = cd.Anchor ?? bd.Anchor;
+                                    var seg = SegAtStation(s) ?? r.Name;
+                                    string where = sgn < 0 ? "down-station" : "up-station";
+                                    var nutEnd = hw != null ? AddBarAnchor(hw, seg, $"{name} {where} coupler", at, outward, side, null, hwCount) : at;
+                                    var o = outward.Normalized();
+                                    var c0 = nutEnd + o * cd.GapAfterNut; var c1 = c0 + o * cd.Length;
+                                    var flag = cd.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(cd.Unresolved, "coupler at the drawn position, size per the coupler detail") : null;
+                                    _m.PtHardware.Add(new SegmentalHardwareResult
+                                    {
+                                        Name = $"{name} {where} coupler", Kind = SegmentalHardwareKind.BarCoupler, Segment = seg, Points = new List<Vec3> { c0, c1 }, OuterDiameter = cd.Diameter, Side = side,
+                                        Mesh = MiscMesh.Cylinder(c0, c1, cd.Diameter / 2, 24), Material = "PT bar coupler (PT supplier)", Assumption = flag,
+                                        Description = $"threaded bar coupler {cd.Diameter / In(1):0.###}\" dia. x {cd.Length / In(1):0.###}\" on {name}, {cd.FromBentCl / Ft(1):0.###} ft {where} of the bent CL"
+                                            + (cd.Source.Length > 0 ? $" ({cd.Source})" : ""),
+                                    });
+                                    hwCount[2]++;
+                                }
+                            }
                         _m.PtHardware.Add(new SegmentalHardwareResult
                         {
                             Name = name, Kind = kind, Segment = r.Name, Points = pts, OuterDiameter = bd.Diameter, Side = side,
                             Mesh = MiscMesh.Cylinder(a, b, bd.Diameter / 2, 16), Material = bd.Material, Assumption = assumption,
                             Description = $"{bd.Name} ({bd.Diameter / In(1):0.###}\" bar{(double.IsNaN(bd.DuctDiameter) ? "" : $" in a {bd.DuctDiameter / In(1):0.###}\" duct")}) from {r.Name} to {pt.r.Name}, {sideName} web, " +
-                                $"{len / Ft(1):0.00} ft between the far block faces" + (bd.Source.Length > 0 ? $" ({bd.Source})" : ""),
+                                $"{len / Ft(1):0.00} ft between the far block faces" + (bd.Source.Length > 0 ? $" ({bd.Source})" : "") + fin,
                         });
                     }
                 }
             }
+            // temporary bars: the bar and every plate / nut / coupler built for it are ERECTION ONLY (removed at completion; kept as the erection set)
+            if (kind == SegmentalHardwareKind.TemporaryPtBar)
+                for (int i = firstHw; i < _m.PtHardware.Count; i++) { _m.PtHardware[i].ErectionOnly = true; _m.PtHardware[i].FinalState = bd.FinalState; }
+            if (kind == SegmentalHardwareKind.TemporaryPtBar && _m.PtHardware.Count > firstHw)
+                Info($"Segmental PT bars '{bd.Name}': {_m.PtHardware.Count - firstHw} elements marked ERECTION ONLY (layer 3D-SEGMENT-ERECTION-PT, IFC SBM_ConstructionPhase).");
             if (missing > 0) Warn($"Segmental PT bars '{bd.Name}': {missing} bar ends without a '{bd.BlockType}' block placement in the segment - not built.");
             if (lengths.Count == 0) continue;
-            Info($"Segmental PT bars '{bd.Name}': {lengths.Count} built, {lengths.Min() / Ft(1):0.00} - {lengths.Max() / Ft(1):0.00} ft between the far block faces.");
-            if (!double.IsNaN(bd.PrintedMinLength))
+            Info($"Segmental PT bars '{bd.Name}': {lengths.Count} built, {lengths.Min() / Ft(1):0.00} - {lengths.Max() / Ft(1):0.00} ft between the far block faces"
+                + (hwCount.Sum() > 0 ? $"; {hwCount[0]} anchor plates, {hwCount[1]} nuts, {hwCount[2]} couplers." : "."));
+            foreach (var pc in bd.Pieces ?? new List<SegmentalBarPiece>())
+                if (!double.IsNaN(pc.PrintedMinLength) && pieceLen.TryGetValue(pc.Name, out var pl) && pl.Count > 0)
+                    _m.Checks.Add(new SegmentalCheck($"PT bars {bd.Name} piece {pc.Name}: shortest bar (end to end, incl. tails) vs the printed minimum bar length ({bd.Source})",
+                        pl.Min(), pc.PrintedMinLength, pl.Min() - pc.PrintedMinLength, $"{pl.Count} pieces, {pl.Min() / Ft(1):0.00} - {pl.Max() / Ft(1):0.00} ft; anchors / tails / couplers as listed"));
+            if (!double.IsNaN(bd.PrintedMinLength) && bd.Pieces is not { Count: > 0 })
                 _m.Checks.Add(new SegmentalCheck($"PT bars {bd.Name}: shortest length between the far block faces vs the printed minimum bar length ({bd.Source})",
                     lengths.Min(), bd.PrintedMinLength, lengths.Min() - bd.PrintedMinLength, "the bar extends beyond the anchor plates (nut + protrusion, coupler); model = block face to block face"));
         }
@@ -115,6 +171,9 @@ public sealed partial class SegmentalGenerator
             var assumption = bd.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(bd.Unresolved, "bars at the listed positions") : null;
             var lengths = new List<double>();
             int noSupport = 0;
+            var anchorCount = new int[3];
+            if (bd.Anchors != null)
+                foreach (var an in bd.Anchors.Where(x => x.Unresolved.Length > 0).Select(x => x.Unresolved).Distinct()) Warn(an);
             foreach (var (r, d, _) in _segs.Where(x => x.d.Type == bd.SegmentType && rx.IsMatch(x.r.Name)))
             {
                 // support-side face: the face nearer the segment's own bent / support control line
@@ -158,9 +217,13 @@ public sealed partial class SegmentalGenerator
                         double len = (b - a).Length;
                         lengths.Add(len);
                         string sideName = side < 0 ? "left" : "right";
+                        string barName = $"{r.Name} {bd.Name} {sideName}" + (bd.Positions.Count > 1 ? $" {pn}" : "");
+                        if (bd.Anchors != null)
+                            foreach (var an in bd.Anchors) BuildBarAnchor(bd, an, r, barName, an.End == SegmentalBarEnd.Start ? a : b, an.End == SegmentalBarEnd.Start ? a - b : b - a,
+                                sF + dir * (an.End == SegmentalBarEnd.Start ? pos.Along : vertical ? pos.Along : pos.AlongEnd), side, anchorCount);
                         _m.PtHardware.Add(new SegmentalHardwareResult
                         {
-                            Name = $"{r.Name} {bd.Name} {sideName}" + (bd.Positions.Count > 1 ? $" {pn}" : ""), Kind = kind, Segment = r.Name, Points = new List<Vec3> { a, b },
+                            Name = barName, Kind = kind, Segment = r.Name, Points = new List<Vec3> { a, b },
                             OuterDiameter = bd.Diameter, Side = side, Mesh = MiscMesh.Cylinder(a, b, bd.Diameter / 2, 16), Material = bd.Material, Assumption = assumption,
                             Description = $"{bd.Name} ({bd.Diameter / In(1):0.###}\" bar{(double.IsNaN(bd.DuctDiameter) ? "" : $" in a {bd.DuctDiameter / In(1):0.###}\" duct")}) in {r.Name}, {sideName}, " +
                                 $"{len / Ft(1):0.00} ft between its anchor ends" + (bd.Source.Length > 0 ? $" ({bd.Source})" : ""),
@@ -170,7 +233,8 @@ public sealed partial class SegmentalGenerator
             }
             if (noSupport > 0) Warn($"Segmental PT bars '{bd.Name}': {noSupport} segments without a bent / support station - not built.");
             if (lengths.Count == 0) { Warn($"Segmental PT bars '{bd.Name}': no {bd.SegmentType} segment matches '{bd.Segments}' - none built."); continue; }
-            Info($"Segmental PT bars '{bd.Name}': {lengths.Count} built, {lengths.Min() / Ft(1):0.00} - {lengths.Max() / Ft(1):0.00} ft between the anchor ends.");
+            Info($"Segmental PT bars '{bd.Name}': {lengths.Count} built, {lengths.Min() / Ft(1):0.00} - {lengths.Max() / Ft(1):0.00} ft between the anchor ends"
+                + (bd.Anchors != null ? $"; {anchorCount[0]} anchor plates, {anchorCount[2]} nuts, {anchorCount[1]} stressing pockets." : "."));
             if (!double.IsNaN(bd.ListedLength))
                 _m.Checks.Add(new SegmentalCheck($"PT bars {bd.Name}: length between the modeled anchor ends vs the printed bar length (ft) ({bd.Source})",
                     lengths.Average() / Ft(1), bd.ListedLength / Ft(1), (lengths.Average() - bd.ListedLength) / Ft(1),
@@ -181,6 +245,171 @@ public sealed partial class SegmentalGenerator
     }
 
     private string Src(string s) => s.Length > 0 ? s : Pages;
+
+    /// <summary>Builds the pieces of one bar line a (down-station far block face, station sa) .. b (up-station, sb): per piece the bar from end to end
+    /// (anchored ends carry plate + nut facing away from the piece and the tail past the nut), anchors and couplers.</summary>
+    private void BuildBarPieces(SegmentalPtBarDefinition bd, string name, int side, Vec3 a, Vec3 b, double sa, double sb, double bs, string seg0,
+        SegmentalHardwareKind kind, Assumption? assumption, string fin, int[] hwCount, Dictionary<string, List<double>> pieceLen)
+    {
+        var dir = (b - a).Normalized();
+        Vec3 At(SegmentalBarPieceEnd e, bool start) => double.IsNaN(e.FromBentCl) ? (start ? a : b) : Vec3.Lerp(a, b, (bs + e.FromBentCl - sa) / (sb - sa));
+        string SegOf(Vec3 p) => SegAtStation(sa + (sb - sa) * Vec3.Dot(p - a, dir) / Math.Max((b - a).Length, 1e-9)) ?? seg0;
+        // pass 1: anchors and bar ends; pass 2: an un-anchored end at a coupler of another piece ends exactly at that coupler's centre (the bar end it
+        // couples), then couplers and bars
+        var ends = new List<(SegmentalBarPiece pc, string pname, Vec3 e0, Vec3 e1)>();
+        foreach (var pc in bd.Pieces!)
+        {
+            string pname = $"{name} {pc.Name}";
+            Vec3 p0 = At(pc.Start, true), p1 = At(pc.End, false);
+            Vec3 BarEnd(SegmentalBarPieceEnd e, Vec3 p, Vec3 outward, string where)
+            {
+                if (!e.Anchor) return p;
+                var hw = bd.Anchor ?? new SegmentalBarHardwareDefinition();
+                var nutEnd = AddBarAnchor(hw, SegOf(p), $"{pname} {where}", p, outward, side, e.Stressing ? true : null, hwCount);
+                return nutEnd + outward.Normalized() * e.Tail;
+            }
+            ends.Add((pc, pname, BarEnd(pc.Start, p0, -dir, "start"), BarEnd(pc.End, p1, dir, "end")));
+        }
+        var couplerAt = ends.SelectMany(x => new[] { (x.pc.Start, x.e0), (x.pc.End, x.e1) }).Where(x => x.Item1.Coupler != null).Select(x => x.Item2).ToList();
+        Vec3 Snap(SegmentalBarPieceEnd e, Vec3 p)
+        {
+            if (e.Anchor || e.Coupler != null) return p;
+            foreach (var c in couplerAt) if ((c - p).Length < In(3)) return c;
+            return p;
+        }
+        foreach (var (pc, pname, s0, s1) in ends)
+        {
+            var e0 = Snap(pc.Start, s0); var e1 = Snap(pc.End, s1);
+            foreach (var (e, pe, where) in new[] { (pc.Start, e0, "start"), (pc.End, e1, "end") })
+            {
+                if (e.Coupler is not { } cd || double.IsNaN(cd.Diameter) || double.IsNaN(cd.Length)) continue;
+                var c0 = pe - dir * (cd.Length / 2); var c1 = pe + dir * (cd.Length / 2);
+                var flag = cd.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(cd.Unresolved, "coupler centred on the bar end, size per the coupler detail") : null;
+                _m.PtHardware.Add(new SegmentalHardwareResult
+                {
+                    Name = $"{pname} {where} coupler", Kind = SegmentalHardwareKind.BarCoupler, Segment = SegOf(pe), Points = new List<Vec3> { c0, c1 }, OuterDiameter = cd.Diameter, Side = side,
+                    Mesh = MiscMesh.Cylinder(c0, c1, cd.Diameter / 2, 24), Material = "PT bar coupler (PT supplier)", Assumption = flag,
+                    Description = $"threaded bar coupler {cd.Diameter / In(1):0.###}\" dia. x {cd.Length / In(1):0.###}\" centred on the {where} of {pname}" + (cd.Source.Length > 0 ? $" ({cd.Source})" : "") + fin,
+                });
+                hwCount[2]++;
+            }
+            double len = (e1 - e0).Length;
+            if (!pieceLen.TryGetValue(pc.Name, out var l)) pieceLen[pc.Name] = l = new List<double>();
+            l.Add(len);
+            _m.PtHardware.Add(new SegmentalHardwareResult
+            {
+                Name = pname, Kind = kind, Segment = SegOf((e0 + e1) * 0.5), Points = new List<Vec3> { e0, e1 }, OuterDiameter = bd.Diameter, Side = side,
+                Mesh = MiscMesh.Cylinder(e0, e1, bd.Diameter / 2, 16), Material = bd.Material, Assumption = assumption,
+                Description = $"{bd.Name} piece {pc.Name} ({bd.Diameter / In(1):0.###}\" bar), {len / Ft(1):0.00} ft end to end" + (pc.Stage.Length > 0 ? $", {pc.Stage}" : "")
+                    + (bd.Source.Length > 0 ? $" ({bd.Source})" : "") + fin,
+            });
+        }
+    }
+
+    /// <summary>Segment whose stations contain <paramref name="s"/> (first match).</summary>
+    private string? SegAtStation(double s)
+    {
+        foreach (var (r, _, _) in _segs) if (s >= Math.Min(r.Station0, r.Station1) - 1e-6 && s <= Math.Max(r.Station0, r.Station1) + 1e-6) return r.Name;
+        return null;
+    }
+
+    /// <summary>Anchor plate (bearing face at <paramref name="at"/>) + nut outward of it along <paramref name="outward"/>; returns the outer end of the nut (or plate).</summary>
+    private Vec3 AddBarAnchor(SegmentalBarHardwareDefinition h, string seg, string name, Vec3 at, Vec3 outward, int side, bool? tensioning, int[] count)
+    {
+        if (double.IsNaN(h.PlateWidth) || double.IsNaN(h.PlateThickness)) return at;
+        var o = outward.Normalized();
+        var flag = h.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(h.Unresolved, "nominal plate / nut size as listed (PT supplier's detail governs)") : null;
+        var refDir = Math.Abs(o.Z) < 0.9 ? new Vec3(0, 0, 1) : new Vec3(1, 0, 0);
+        var u = (refDir - o * Vec3.Dot(o, refDir)).Normalized();
+        var v = Vec3.Cross(o, u);
+        var sec = new[] { new Vec2(-0.5, -0.5), new Vec2(0.5, -0.5), new Vec2(0.5, 0.5), new Vec2(-0.5, 0.5) };
+        Vec3[] Ring(Vec3 c) => sec.Select(q => c + u * (q.X * h.PlateWidth) + v * (q.Y * h.PlateWidth)).ToArray();
+        var p1 = at + o * h.PlateThickness;
+        var mesh = new Mesh();
+        MeshBuilder.AddLoft(mesh, sec.Select(q => q * h.PlateWidth).ToList(), new[] { Ring(at), Ring(p1) });
+        string src = h.Source.Length > 0 ? $" ({h.Source})" : "";
+        _m.PtHardware.Add(new SegmentalHardwareResult
+        {
+            Name = name + " anchor plate", Kind = SegmentalHardwareKind.AnchorPlate, Segment = seg, Points = new List<Vec3> { at, p1 }, OuterDiameter = h.PlateWidth, Side = side,
+            TensioningEnd = tensioning, Mesh = mesh, Material = "Steel anchor plate (PT supplier)", Assumption = flag,
+            Description = $"anchor plate {h.PlateWidth / In(1):0.###}\" x {h.PlateWidth / In(1):0.###}\" x {h.PlateThickness / In(1):0.###}\" (nominal) of {name}{src}",
+        });
+        count[0]++;
+        if (double.IsNaN(h.NutDiameter) || double.IsNaN(h.NutLength)) return p1;
+        var n1 = p1 + o * h.NutLength;
+        _m.PtHardware.Add(new SegmentalHardwareResult
+        {
+            Name = name + " nut", Kind = SegmentalHardwareKind.BarNut, Segment = seg, Points = new List<Vec3> { p1, n1 }, OuterDiameter = h.NutDiameter, Side = side,
+            Mesh = MiscMesh.Cylinder(p1, n1, h.NutDiameter / 2, 24), Material = "PT bar nut (PT supplier)", Assumption = flag,
+            Description = $"spherical nut {h.NutDiameter / In(1):0.###}\" dia. x {h.NutLength / In(1):0.###}\" (nominal) of {name}{src}",
+        });
+        count[1]++;
+        return n1;
+    }
+
+    /// <summary>Anchor plate (+ stressing pocket) at one end of a fixed PT bar: <paramref name="end"/> = the bar end (plate bearing face), <paramref name="outward"/> =
+    /// direction away from the bar. The pocket opens to the surface the bar points to (deck top / soffit when it runs mostly across the section's depth, else the
+    /// segment face), its depth measured normal to that surface; the void runs 1" past the surface so it opens cleanly.</summary>
+    private void BuildBarAnchor(SegmentalFixedBarDefinition bd, SegmentalBarAnchorDefinition an, SegmentResult r, string barName, Vec3 end, Vec3 outward, double sta, int side, int[] count)
+    {
+        if (double.IsNaN(an.PlateWidth) || double.IsNaN(an.PlateThickness)) return;
+        var o = outward.Normalized();
+        var f = ChordFrame(r, sta);
+        var refDir = Math.Abs(Vec3.Dot(o, f.Lat)) < 0.9 ? f.Lat : f.Tangent;
+        var u = (refDir - o * Vec3.Dot(o, refDir)).Normalized();
+        var v = Vec3.Cross(o, u);
+        string endName = an.End == SegmentalBarEnd.Start ? (bd.Kind == SegmentalFixedBarKind.Vertical ? "top" : "start") : (bd.Kind == SegmentalFixedBarKind.Vertical ? "bottom" : "end");
+        var flag = an.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(an.Unresolved, "nominal plate / pocket size as listed (PT supplier's detail governs)") : null;
+        string src = an.Source.Length > 0 ? an.Source : bd.Source;
+        Mesh Prism(Vec3 c0, double w0, Vec3 c1, double w1, bool exact)
+        {
+            var sec = new[] { new Vec2(-0.5, -0.5), new Vec2(0.5, -0.5), new Vec2(0.5, 0.5), new Vec2(-0.5, 0.5) };
+            Vec3[] Ring(Vec3 c, double w) => sec.Select(q => c + u * (q.X * w) + v * (q.Y * w)).ToArray();
+            var m = new Mesh();
+            MeshBuilder.AddLoft(m, sec.Select(q => q * w0).ToList(), new[] { Ring(c0, w0), Ring(c1, w1) }, exact);
+            return m;
+        }
+        var outer = end + o * an.PlateThickness;
+        _m.PtHardware.Add(new SegmentalHardwareResult
+        {
+            Name = $"{barName} {endName} anchor plate", Kind = SegmentalHardwareKind.AnchorPlate, Segment = r.Name, Points = new List<Vec3> { end, outer },
+            OuterDiameter = an.PlateWidth, Side = side, TensioningEnd = an.Stressing, Mesh = Prism(end, an.PlateWidth, outer, an.PlateWidth, true), Material = "Steel anchor plate (PT supplier)",
+            Assumption = flag,
+            Description = $"{(an.Stressing ? "stressing" : "dead")} end anchor plate {an.PlateWidth / In(1):0.###}\" x {an.PlateWidth / In(1):0.###}\" x {an.PlateThickness / In(1):0.###}\" (nominal) of {barName}"
+                + (src.Length > 0 ? $" ({src})" : ""),
+        });
+        count[0]++;
+        double nutEnd = an.PlateThickness;
+        if (!double.IsNaN(an.NutDiameter) && !double.IsNaN(an.NutLength))
+        {
+            var n1 = outer + o * an.NutLength;
+            nutEnd += an.NutLength;
+            _m.PtHardware.Add(new SegmentalHardwareResult
+            {
+                Name = $"{barName} {endName} nut", Kind = SegmentalHardwareKind.BarNut, Segment = r.Name, Points = new List<Vec3> { outer, n1 }, OuterDiameter = an.NutDiameter, Side = side,
+                Mesh = MiscMesh.Cylinder(outer, n1, an.NutDiameter / 2, 24), Material = "PT bar nut (PT supplier)", Assumption = flag,
+                Description = $"nut {an.NutDiameter / In(1):0.###}\" dia. x {an.NutLength / In(1):0.###}\" (nominal envelope; shape by the PT supplier) at the {endName} of {barName}"
+                    + (src.Length > 0 ? $" ({src})" : ""),
+            });
+            count[2]++;
+        }
+        if (double.IsNaN(an.PocketDepth) || double.IsNaN(an.PocketInnerWidth) || double.IsNaN(an.PocketOuterWidth)) return;
+        // surface the pocket opens to: deck top / soffit (section up) or the segment face (chord tangent)
+        var n = Math.Abs(Vec3.Dot(o, f.Up)) >= Math.Abs(Vec3.Dot(o, f.Tangent)) ? f.Up : f.Tangent;
+        double cos = Math.Abs(Vec3.Dot(o, n));
+        if (cos < 0.3) { Warn($"Segmental PT bars '{bd.Name}': {barName} {endName} pocket not built - the bar meets the surface at {Math.Acos(cos) * 180 / Math.PI:0} deg from its normal."); return; }
+        double len = an.PocketDepth / cos, over = In(1) / cos;
+        if (nutEnd > len + 1e-9) Warn($"Segmental PT bars '{bd.Name}': {barName} {endName} plate + nut ({nutEnd / In(1):0.##}\") stick out of the {an.PocketDepth / In(1):0.##}\" pocket.");
+        double wOver = an.PocketOuterWidth + (an.PocketOuterWidth - an.PocketInnerWidth) * over / len;
+        _m.Openings.Add(new SegmentalOpeningResult
+        {
+            Name = $"{barName} {endName} stressing pocket", Kind = SegmentalOpeningKind.StressingPocket, Segment = r.Name,
+            Mesh = Prism(end, an.PocketInnerWidth, end + o * (len + over), wOver, false), RemovedVolume = 0, Assumption = flag,
+            Description = $"stressing pocket {an.PocketOuterWidth / In(1):0.###}\" at the surface to {an.PocketInnerWidth / In(1):0.###}\" at the plate, {an.PocketDepth / In(1):0.###}\" deep (nominal) "
+                + $"at the {endName} of {barName}; grouted after stressing (no concrete deducted)" + (src.Length > 0 ? $" ({src})" : ""),
+        });
+        count[1]++;
+    }
 
     // ------------------------------------------------------------------ future PT pipes
 

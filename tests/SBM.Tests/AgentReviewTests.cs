@@ -20,6 +20,42 @@ public class AgentReviewTests
     private static readonly AgentReviewOptions Fast = new() { Regenerate = false };
 
     [Fact]
+    public void ElementReview_RecordedCurrent_StaleOnNeighbourOrOwnChange()
+    {
+        string path = TempModel(out var doc);
+        doc.ExportDatabase();
+        File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddMinutes(-5));
+        string db = SBM.IO.Database.CompanionDatabase.DefaultPath(path);
+        string deckId;
+        using (var mdb = new SBM.IO.Database.ModelDb(db))
+            deckId = mdb.ReviewElements().Values.First(e => e.Category.Contains("deck") && e.Box != null && !e.HasChildren).GlobalId;
+        string req = Path.Combine(Path.GetDirectoryName(path)!, "req.json");
+        File.WriteAllText(req, "{\"reviews\": [{\"ids\": [\"" + deckId + "\"], \"result\": \"agrees\", \"sheets\": [\"p.1\"], \"report\": \"x.md\"}]}");
+        Assert.Equal(1, AgentReview.RecordElements(doc, req, out _));
+        var rec = AgentReviewRecord.Load(AgentReviewRecord.PathFor(path));
+        var r = Assert.Single(rec.Elements);
+        Assert.False(string.IsNullOrEmpty(r.Fingerprint));
+        Assert.NotEmpty(r.Neighbours);
+        var rep = AgentReview.Run(doc, Fast);
+        Assert.Contains(rep.Notes, n => n.Contains("1 recorded, 1 current"));
+        Assert.DoesNotContain(rep.Flags, f => f.Kind == ReviewFlagKind.ElementReview && f.Subject.Contains("review(s)"));
+        Assert.Contains(rep.Flags, f => f.Kind == ReviewFlagKind.ElementReview && f.Subject.Contains("without an agent review"));
+
+        // a neighbour changed -> interface
+        r.NeighbourHash = "changed";
+        rec.Save(AgentReviewRecord.PathFor(path));
+        rep = AgentReview.Run(doc, Fast);
+        Assert.Contains(rep.Flags, f => f.Kind == ReviewFlagKind.ElementReview && f.Subject.Contains("review(s) interface"));
+
+        // the element itself changed -> changed
+        doc.Project.Bridges[0].Deck.Thickness += 0.01;
+        doc.Save(path);
+        doc.ExportDatabase();
+        rep = AgentReview.Run(doc, Fast);
+        Assert.Contains(rep.Flags, f => f.Kind == ReviewFlagKind.ElementReview && f.Subject.Contains("review(s) changed"));
+    }
+
+    [Fact]
     public void Defaults_FlaggedUntilSet_RelevanceRules_AndConfirm()
     {
         string path = TempModel(out var doc);

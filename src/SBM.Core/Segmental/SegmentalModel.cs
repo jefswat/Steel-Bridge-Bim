@@ -107,7 +107,7 @@ public sealed class SegmentalOpeningResult
     public string Description { get; init; } = "";
 }
 
-public enum SegmentalHardwareKind { TemporaryPtBar, PermanentPtBar, DeviationPipe, FuturePtPipe, VerticalPtBar }
+public enum SegmentalHardwareKind { TemporaryPtBar, PermanentPtBar, DeviationPipe, FuturePtPipe, VerticalPtBar, AnchorPlate, BarNut, BarCoupler }
 
 /// <summary>PT hardware of the box (OPTIONAL SegmentalDefinition.PtBars / Pipes): bar or bent steel pipe along <see cref="Points"/>; <see cref="Mesh"/> =
 /// closed solid (bar = round solid, pipe = hollow tube); <see cref="Segment"/> = host segment (the pipe's segment, the bar's first block).</summary>
@@ -127,6 +127,16 @@ public sealed class SegmentalHardwareResult
     public Assumption? Assumption { get; set; }
     public double Length { get { double l = 0; for (int i = 1; i < Points.Count; i++) l += (Points[i] - Points[i - 1]).Length; return l; } }
     public bool IsPipe => Kind is SegmentalHardwareKind.DeviationPipe or SegmentalHardwareKind.FuturePtPipe;
+    /// <summary>Anchor plate of a fixed PT bar (OPTIONAL anchorages): <see cref="Mesh"/> = the plate, <see cref="Points"/> = bearing face centre -> outer face
+    /// centre, <see cref="OuterDiameter"/> = plate width; <see cref="TensioningEnd"/> = stressing end (null = not stated).</summary>
+    public bool IsPlate => Kind == SegmentalHardwareKind.AnchorPlate;
+    /// <summary>Nut / coupler of a PT bar: round solid along <see cref="Points"/> (IFC IfcMechanicalFastener).</summary>
+    public bool IsFastener => Kind is SegmentalHardwareKind.BarNut or SegmentalHardwareKind.BarCoupler;
+    public bool? TensioningEnd { get; init; }
+    /// <summary>ERECTION ONLY: part of a temporary PT bar set (the bar and its plates, nuts, couplers) that is removed when erection is complete;
+    /// kept in the model as the erection set. <see cref="FinalState"/> = the plan's text on what happens to it.</summary>
+    public bool ErectionOnly { get; set; }
+    public string FinalState { get; set; } = "";
 }
 
 public sealed class SegmentalModel

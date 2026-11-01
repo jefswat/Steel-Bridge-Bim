@@ -329,7 +329,8 @@ public static class SceneBuilder
             () => SegmentLayer(models, o, flagged: true),
             () => SegmentDetailLayer(models, o, openings: false),
             () => SegmentDetailLayer(models, o, openings: true),
-            () => SegmentHardwareLayer(models, o),
+            () => SegmentHardwareLayer(models, o, erection: false),
+            () => SegmentHardwareLayer(models, o, erection: true),
             () =>
             {
                 // Segmental box tendons (straight duct runs, equal-area bundle tubes).
@@ -386,21 +387,25 @@ public static class SceneBuilder
             : new SolidLayer { Name = "3D-SEGMENTS", R = 205, G = 200, B = 186, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3, Opacity = 0.55f };
     }
 
-    /// <summary>Segmental box PT hardware (OPTIONAL): PT bars and future-PT pipes (3D-SEGMENT-PT-HARDWARE).</summary>
-    private static SolidLayer? SegmentHardwareLayer(IReadOnlyList<SBM.Core.Concrete.ConcreteModel> models, Vec3 o)
+    /// <summary>Segmental box PT hardware (OPTIONAL): PT bars and future-PT pipes (3D-SEGMENT-PT-HARDWARE); the ERECTION ONLY temporary bar sets on
+    /// their own layer 3D-SEGMENT-ERECTION-PT (switch off = the completed bridge).</summary>
+    private static SolidLayer? SegmentHardwareLayer(IReadOnlyList<SBM.Core.Concrete.ConcreteModel> models, Vec3 o, bool erection)
     {
         var items = new List<(Mesh mesh, object tag)>();
         foreach (var sm in models.Select(m => m.Segmental).OfType<SBM.Core.Segmental.SegmentalModel>())
-            foreach (var h in sm.PtHardware.Where(h => !h.Mesh.IsEmpty))
+            foreach (var h in sm.PtHardware.Where(h => !h.Mesh.IsEmpty && h.ErectionOnly == erection))
             {
                 var props = new List<(string, string)> { ("Kind", h.Kind.ToString()), ("Segment", h.Segment), ("Length", $"{h.Length / 0.3048:N2} ft"),
                     ("Diameter", $"{h.OuterDiameter / 0.0254:0.###} in"), ("Info", h.Description) };
+                if (h.ErectionOnly) { props.Insert(0, ("Phase", "ERECTION ONLY")); if (h.FinalState.Length > 0) props.Add(("Final state", h.FinalState)); }
                 if (h.Assumption != null) { props.Add(("Status", h.Assumption.Status)); props.Add(("Reason", h.Assumption.Reason)); }
-                items.Add((h.Mesh, new NamedPick(h.IsPipe ? "Pipe" : "PT bar", h.Name, props)));
+                items.Add((h.Mesh, new NamedPick(h.IsPipe ? "Pipe" : h.IsPlate ? "Anchor plate" : h.Kind == SBM.Core.Segmental.SegmentalHardwareKind.BarNut ? "Nut" : h.Kind == SBM.Core.Segmental.SegmentalHardwareKind.BarCoupler ? "Coupler" : "PT bar", h.Name, props)));
             }
         if (items.Count == 0) return null;
         var geo = FlatShaded(items.Select(x => x.mesh), o, items.Select(x => x.tag).ToList());
-        return new SolidLayer { Name = "3D-SEGMENT-PT-HARDWARE", R = 120, G = 125, B = 140, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3 };
+        return erection
+            ? new SolidLayer { Name = "3D-SEGMENT-ERECTION-PT", R = 215, G = 140, B = 40, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3 }
+            : new SolidLayer { Name = "3D-SEGMENT-PT-HARDWARE", R = 120, G = 125, B = 140, Parts = new() { (geo, null) }, Triangles = geo.Indices!.Count / 3 };
     }
 
     /// <summary>Segmental box details (OPTIONAL): blocks (anchor / erection bar blocks, 3D-SEGMENT-BLOCKS) and opening voids (3D-SEGMENT-OPENINGS, see-through).</summary>
@@ -568,6 +573,7 @@ public static class SceneBuilder
             () => Layer("3D-DRAINAGE", 90, 170, 200, x => x.Kind is SBM.Core.Substructure.SubElementKind.DeckDrain or SBM.Core.Substructure.SubElementKind.DrainPipe),
             () => Layer("3D-SPLASH-BASIN", 140, 120, 90, x => x.Kind == SBM.Core.Substructure.SubElementKind.SplashBasin),
             () => Layer("3D-SUB-FENDER", 150, 115, 75, x => x.Kind == SBM.Core.Substructure.SubElementKind.Fender),
+            () => Layer("3D-SUB-PT", 120, 200, 220, x => x.Kind is SBM.Core.Substructure.SubElementKind.PtBar or SBM.Core.Substructure.SubElementKind.PtAnchor),
             // Optional misc items: Ramp G drainage, sign supports, end posts, lighting (items by others as translucent placeholders).
             () => MiscLayer(models, o, "3D-DRAIN-PIPES", 90, 170, 200, e => (e.Assumption == null || e.Assumption.DimensionOnly) && e.Group == SBM.Core.Misc.MiscGroup.Drainage && e.Kind is SBM.Core.Misc.MiscKind.DrainTube or SBM.Core.Misc.MiscKind.DrainPipe or SBM.Core.Misc.MiscKind.PipeFitting or SBM.Core.Misc.MiscKind.PipeHanger or SBM.Core.Misc.MiscKind.PipeSupport),
             () => MiscLayer(models, o, "3D-DRAIN-INLETS", 60, 140, 190, e => (e.Assumption == null || e.Assumption.DimensionOnly) && e.Kind is SBM.Core.Misc.MiscKind.DrainTrench or SBM.Core.Misc.MiscKind.DrainGrate or SBM.Core.Misc.MiscKind.DrainBox or SBM.Core.Misc.MiscKind.DrainTrough),

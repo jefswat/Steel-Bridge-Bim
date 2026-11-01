@@ -39,8 +39,11 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
    `SBM.IO/Database/ModelDb.Review.cs`, `SBM.Cli/ReviewCommand.cs`, docs/AGENT-REVIEW.md) flags plan PDFs (attached / present / SHA-256 unchanged), sheet links
    (unused sheets, elements without a sheet), every input still at the program's starting value (reflection against a fresh object; inputs the generators do
    not read are skipped by `Unused` / `NotRead` - keep those rules in step when adding inputs; repeats once per pattern `[*]`) and generator UNRESOLVED /
-   CONFLICT. Record `<model>.agent-review.json` (PDF fingerprints, `--confirm`ed values; commit it), db table `agent_review`. Not built yet: the per-element
-   PDF-vs-geometry comparison by an agent and its staleness rule. Every plan-set build script now adds its plan PDF to `Doc.Project.PlanPdfs` (idempotent, just before `Doc.Save()`; 2026-10-27):
+   CONFLICT. Record `<model>.agent-review.json` (PDF fingerprints, `--confirm`ed values, ELEMENT AGENT REVIEWS; commit it), db table `agent_review`.
+   Element agent reviews (2026-11-01, docs/AGENT-REVIEW.md): `sbm review <model> --record-elements FILE.json` (selector / GlobalIds, result agrees | differs, sheets,
+   note, report) stores each element's fingerprint (`ModelDb.ReviewElements`: db row + children) + a hash of its neighbours (boxes touching within 2 mm,
+   `ModelDb.Neighbours`); `sbm review` flags (kind "element review") uncovered elements per category, changed elements and changed interfaces; table
+   `element_agent_review`. Database freshness = model vs meta `built_at` (`ModelDatabase.BuiltAt`), not the file time. Not in the app yet. Every plan-set build script now adds its plan PDF to `Doc.Project.PlanPdfs` (idempotent, just before `Doc.Save()`; 2026-10-27):
    build-i80-wb (Design 116) + build-ramp-g (Design 316) - both from `dist\SteelBridgeModeler`, not C:\SBMData - build-woodbury, build-br02069, build-nebraska-st,
    build-nht, build-odot-o-tub, build-bonner-unit5 / -unit6, build-ptc-delaware-river (its copies "PTC main truss 18-20" / "PTC approach trusses" inherit it). The
    committed .sbm files get it on their next build (until then they still flag it). Concept models without a plan set (build-richmond-*, build-blatnik-*) keep the flag.
@@ -1111,7 +1114,45 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   the deck top, BottomHeight above the soffit, ListedLength / PlanCount check rows) -> `SegmentalModel.PtHardware` (new appended `SegmentalHardwareKind.VerticalPtBar`, IFC IfcTendon
   .BAR. 'VERTICAL_PT_BAR', DB "vertical PT bar"; longitudinal = PermanentPtBar). Bonner (agent read qc/bonner-unit5/vertical-pt): 80 bent vertical bars (17'-10" = table), 8 end
   segment bars inclined with the webs (7'-9 7/8" vs 7'-10"), longitudinal bent bars as two pieces per bar; PLAN CONFLICT counts 18 / 9 segments vs 20 halves / 10 bents, 8'-3" vs 8'-7".
+  Anchorages (2026-10-31, user: "nominal stressing pockets and anchor plates, vendor determined"): OPTIONAL `SegmentalFixedBarDefinition.Anchors` (`SegmentalBarAnchorDefinition`: End Start | End,
+  Stressing, square plate PlateWidth x PlateThickness normal to the bar outward of the bearing face, optional pocket = square frustum PocketInnerWidth (plate) -> PocketOuterWidth (surface),
+  PocketDepth normal to the surface the bar points to (deck top / soffit or segment face), void 1" past the surface) -> `SegmentalHardwareKind.AnchorPlate` (appended; `IsPlate`,
+  `TensioningEnd`; IFC IfcTendonAnchor 'ANCHOR_PLATE' .TENSIONING_END. / .FIXED_END. CONTAINED, not aggregated into the segment - IfcOpenShell applies the host's openings to its parts and
+  the plate inside the pocket vanished; DB "PT bar anchor plate") + `SegmentalOpeningKind.StressingPocket` (appended; RemovedVolume 0 = grouted, p.278 note 6; IFC 'STRESSING_POCKET',
+  DB "stressing pocket"). Bonner: vertical bars plate 5" x 5" x 1 3/4" + top pocket 8 1/4" -> 5 1/2" x 10 1/2" (scaled, flagged vendor determined), bottom plate cast in;
+  longitudinal 10" x 10" plate (thickness 1 3/4" nominal) in a 10 1/2" x 10 1/2" x 8 1/2" pocket (p.278 details) -> 256 plates, 168 pockets; OPTIONAL `NutDiameter` / `NutLength` = nut envelope outward of the plate (BarNut; shape is the supplier's) - Bonner 3" x 2 7/8" on all 256 plates (2026-11-01).
+  Erection bar hardware (2026-10-31, user "model them"): OPTIONAL `SegmentalPtBarDefinition.Anchor` (`SegmentalBarHardwareDefinition`: square plate + nut cylinder at both bar ends on the
+  far block faces) and `Couplers` (`SegmentalBarCouplerDefinition`: plate bearing face where the bar crosses `FromBentCl` down- / up-station, plate + nut facing away from the bent CL, coupler
+  `GapAfterNut` past the nut) -> `SegmentalHardwareKind.BarNut` / `BarCoupler` (appended; `IsFastener`; IFC IfcMechanicalFastener 'SPHERICAL_NUT' .USERDEFINED. / 'PT_BAR_COUPLER' .COUPLER.,
+  contained; plates IfcTendonAnchor .NOTDEFINED. when the end is not stated: `TensioningEnd` is now `bool?`). Bonner (p.299-300 COUPLER DETAIL): coupler 3 1/8" x 6 3/4" 1/4" past the nut
+  (dimensioned); plate 9" x 9" x 2 1/4" and spherical nut 3" x 2 7/8" scaled (vendor determined, flagged); top D1-U1 couplers on both bent segment end faces (5'-0"), bottom D1-U1 coupler
+  on the DB bent diaphragm face (3'-6"). 3,140 plates, 2,884 nuts, 100 couplers. check-bonner-unit5 counts bars by Kind (375 / 31 unchanged).
   Tests `SegmentalFixedBarTests`.
+  SEGMENT INTERIORS / ERECTION PIECES / PIERS (2026-11-01; agent reviews qc/bonner-unit5/segments/{bent-segment,end-segment,erection-bars}.md and
+  qc/bonner-unit5/substructure/{caps,columns-footings}.md; all OPTIONAL, omitted when unset; tests `SegmentalInteriorTests`, `SegmentalPtHardwareTests.PtBars_Pieces_*`):
+  `SegmentalDefinition.Interiors` (`SegmentalInteriorDefinition` per SegmentType + segment regex: `Pieces` = closed solids between distances From / To from the
+  segment's SUPPORT-SIDE face (`SupportFace`: bent half = split face, end segment = free face), each with its own void `Void0` -> `Void1` (lerped, same point
+  count; empty = solid) and optional outer `Outer0` / `Outer1`; outlines in the section frame (x right, y DOWN from the deck top) with a top and a bottom point
+  on x = 0; `Segmental/SegmentalGeneratorInterior.cs`; `SectionIn` takes hollow / bottom slab t from the piece; pieces = `SegmentResult.Pieces` = one IFC
+  item each - the merged mesh has shared end faces). Openings: `AlongFrom` / `AlongTo` (diaphragm openings over a range from the bent CL or, with `Segments`,
+  from the support-side face; slab openings at `Bents` = whole opening at AlongFrom in each half), `PlanOutline` (slab opening outline from the support-side
+  face). `SegmentalEndFaceAnchor.AnchorFromFace` (anchor on a recess bearing face; `BendPiFromAnchor` measured from the anchor). PT bar PIECES
+  `SegmentalPtBarDefinition.Pieces` (`SegmentalBarPiece` Start / End = far block face or FromBentCl, `Anchor` (plate + nut facing away) + `Tail` past the nut,
+  `Coupler` centred on the bar end; an un-anchored end snaps to a coupler of another piece within 3"; per-piece PrintedMinLength check rows) + `FinalState`
+  text (temporary bars removed at completion, p.299 notes 3 / 4). ERECTION ONLY (user decision 2026-11-01: keep them, mark them): every element of a Temporary bar set (bar,
+  plates, nuts, couplers) has `SegmentalHardwareResult.ErectionOnly` + `FinalState` -> viewport / projection / Rhino layer 3D-SEGMENT-ERECTION-PT (switch off = completed
+  bridge), pick "Phase: ERECTION ONLY", IFC Pset `SBM_ConstructionPhase` (Phase, IsTemporary, FinalState), DB props phase / final_state. Fixed bar anchors `NutDiameter` / `NutLength`. PIERS: `SegmentalPier.ColumnCore` (hollow
+  precast segments) + `ColumnSegments` + `GroutBed` (CIP base solid to ColumnBaseTop; stack top vs cap soffit check row), `FootingLevelZone` + `FootingTopEdge`
+  (sloped footing top, vertex i of the zone joins vertex i of the outline), `CapOpenings` (full depth; `HollowPrism` inserts the triangulation's bridge point
+  into every level so the walls and caps share it), `PtBars` (`SegmentalPierPtBar` -> new appended `SubElementKind.PtBar` / `PtAnchor`: IFC IfcTendon .BAR.
+  'PIER_PT_BAR' / IfcTendonAnchor 'ANCHOR_PLATE', DB "pier PT bar" / "pier PT anchor plate", layer 3D-SUB-PT), `BarList` (`SegmentalPierBarRow`: schedule-only
+  BarMarks of the unit + weight check row), `SegmentalBearing.PedestalShift`. Bonner: bent halves = cells / 2'-0" diaphragm 1'-6" .. 3'-6" / top blocks /
+  2'-9" bottom slab (99.5 ton vs note 6 100 ton), end segments = nose / recess with the B / C wedges / 5'-0" diaphragm with the access passage (94.5 ton vs
+  note 9 110 ton: reported), D1-U1 pieces T-D1 / T-B / T-U1 and B-D1 / B-U1 with couplers C-D / C-U / C-B, end-span B / C anchors on the wedges (bends 18.4 / 26.3 /
+  16.6 deg vs 18 / 26 / 16), pintle blockouts, conduit holes, end bent caps corrected (8'-0" wide part, chamfered T), cap access openings, hollow columns on
+  every bent incl. 23 / 24, sloped footing tops (bill concrete within 1 % less the embedded pile heads; bent 19 bill = PLAN CONFLICT), 8 + 4 pier PT bars,
+  footing / base bills scheduled (T17 PLAN CONFLICT bents 20-22 / 25). Data `docs/plan-data/bonner-b2500/segmental-unit5/sub-*.csv`.
+  check-bonner-unit5 389 PASS / 20 DIFF (16 end-span tendons now poke ~1" out of the hollow end segment at the span face = the reported p.272 offset conflict).
   REBAR IN EVERY SEGMENT (2026-10-30, design note section 8): OPTIONAL `SegmentalDefinition.SectionBars` (`Bridge/SegmentalSectionBars.cs`, generator `Segmental/SegmentalGeneratorBars.cs`,
   run after BuildDetails): one set = mark / unit / segment regex + a path of `SegmentalBarPoint`s on named section FACES (TOP, TIP, WINGFLAT, WING, WEBOUT, SOFFIT; void TOPIN, HAUNCH, WEBIN,
   BHAUNCH, BOTIN; "L:" = mirror; offsets normal into the concrete): corner (Face @ off x Face2 @ off2), point on a face at X / Y, free leg (Length along a face / H / V with a direction hint;

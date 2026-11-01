@@ -11,6 +11,7 @@ using System.IO;
 using System.Globalization;
 using SBM.Core;
 using SBM.Core.Bridge;
+using SBM.Core.Segmental;
 
 const string BridgeName = "Bonner Unit 5";
 bool noRegen = Args.Contains("--no-regen");
@@ -198,30 +199,70 @@ sg.Blocks = blocks;
 sg.Unresolved.RemoveAll(u => u.Contains("[details]"));
 // ================================================================ 2b. PT bars (p.299-300) and future-PT pipes (p.302, p.308)
 // Erection bars between the blocks: top 2 per web at every joint (Type A, both ducts), bottom 1 per web per joint alternating between the two ducts (p.299
-// STAGGERED pattern, 8" stagger), D1 - U1 through the bent segment (Type A top / Type C bottom; the drawn couplers are not modeled). Temporary bars are
-// removed and reused after erection: every joint's bars are drawn.
+// STAGGERED pattern, 8" stagger), D1 - U1 through the bent segment as their erection PIECES (top T-D1 / T-B / T-U1, bottom B-D1 / B-U1, couplers C-D / C-U / C-B).
+// Temporary bars are removed after erection (FinalState); every joint's bars are modeled (the set the erection uses).
 const string TypicalRx = @"^\d+-[DU]\d+$";
-string barFlag(string item, string why) => U("p.299-300", item, why, "Bars straight between the far faces of the two blocks; anchor plates, nuts, couplers not modeled.");
+string barFlag(string item, string why) => U("p.299-300", item, why, "Bars straight between the far faces of the two blocks; anchor plates / spherical nuts nominal (own flag).");
+// Anchor plate + spherical nut at every temporary bar end (p.299 / p.300 COUPLER DETAIL): drawn, not dimensioned -> nominal, scaled from the detail (1:4, calibrated on its
+// dimensioned 6 3/4" coupler: plate 2.27" x 9.0", nut 3.08" dia. x 2.85"). Coupler 3 1/8" dia. x 6 3/4" (dimensioned), starting 1/4" past the nut (3 5/8" min. protrusion
+// - 3 3/8" to the coupler centre).
+var tempHw = new SegmentalBarHardwareDefinition { PlateWidth = In(9), PlateThickness = In(2.25), NutDiameter = In(3), NutLength = In(2.875), Source = "p.299-300 COUPLER DETAIL (scaled)",
+    Unresolved = U("p.299-300", "temporary PT bar anchor plates and spherical nuts", "they are vendor determined (PT supplier); the coupler detail draws them without dimensions",
+        "Nominal sizes scaled from the coupler detail: plate 9\" x 9\" x 2 1/4\" (width across the bar assumed square), spherical nut 3\" dia. x 2 7/8\" (envelope; the nut shape varies by supplier).") };
+// Final state (p.299 notes 3 / 4, p.313 step 32): every temporary bar is destressed and removed at completion of the cantilever, the empty ducts grouted.
+const string tempFinal = "TEMPORARY: destressed and removed at completion of the cantilever, empty ducts grouted (p.299 notes 3 / 4, p.313 step 32)";
+// D1 - U1 pieces (agent review qc/bonner-unit5/segments/erection-bars.md): 3'-0" (MIN.) stressing tails past the nut (p.299 / 300 "MINIMUM REQUIRED LENGTH FOR
+// STRESSING"), 3 5/8" (MIN.) bar past the dead-end nut = coupler centre (coupler detail), coupler 3 1/8" x 6 3/4".
+double tail = F(3), protrusion = In(3.625);
+double tbTailEnd = F(4, 6) + tempHw.PlateThickness + tempHw.NutLength + tail;          // T-B stressing tail end (C-D centre), down-station
+double tbDeadEnd = F(4, 6) + tempHw.PlateThickness + tempHw.NutLength + protrusion;    // T-B dead end (C-U centre), up-station
+double bbDeadEnd = F(3, 6) + tempHw.PlateThickness + tempHw.NutLength + protrusion;    // B-U1 dead end (C-B centre), down-station
+SegmentalBarCouplerDefinition coupler(string name, string page, string where) => new() { Diameter = In(3.125), Length = In(6.75), Source = $"{page} COUPLER DETAIL ({name})",
+    Unresolved = U(page, $"temporary PT bar coupler {name}", $"the coupler is drawn {where}, centred on the bar end 3 5/8\" (MIN.) past the nut, without its own dimension", "Coupler centred on the bar end.") };
 sg.PtBars = new List<SegmentalPtBarDefinition>
 {
     new() { Name = "top temporary PT bars", Kind = SegmentalPtBarKind.Temporary, Segments = TypicalRx, Pairing = SegmentalBarPairing.NextTowardTip, BlockType = "erection PT bar block Type A",
         Positions = new() { new() { X = F(7, 9), Depth = F(2, 0.5) }, new() { X = F(9, 8), Depth = F(2, 8.5) } }, Diameter = In(1.75), DuctDiameter = In(2.75), PrintedMinLength = F(14),
-        Material = "1 3/4\" dia. PT bar (temporary)", Source = "p.300 (S3-52)",
+        Material = "1 3/4\" dia. PT bar (temporary)", Anchor = tempHw, Source = "p.300 (S3-52)", FinalState = tempFinal,
         Unresolved = barFlag("top temporary PT bar ends and second bar depth", "the anchor plates / nuts are drawn on the block faces without dimensions, and the 8\" under the first bar is read as the drop to the second bar") },
     new() { Name = "bottom temporary PT bars", Kind = SegmentalPtBarKind.Temporary, Segments = TypicalRx, Pairing = SegmentalBarPairing.NextTowardTip, BlockType = "erection PT bar block Type B",
         Positions = new() { new() { X = F(2, 6), Height = In(6.5) }, new() { X = F(3, 2), Height = In(6.5) } }, Alternate = true, Diameter = In(1.75), DuctDiameter = In(2.75), PrintedMinLength = F(20, 3),
-        Material = "1 3/4\" dia. PT bar (temporary)", Source = "p.299 (S3-51)",
+        Material = "1 3/4\" dia. PT bar (temporary)", Anchor = tempHw, Source = "p.299 (S3-51)", FinalState = tempFinal,
         Unresolved = barFlag("bottom temporary PT bar ends and stagger", "the staggered pattern is drawn (8\" stagger) without saying which duct the first joint of an arm takes; the bars alternate from the 2'-6\" duct at the first joint") },
     new() { Name = "top temporary PT bars D1-U1", Kind = SegmentalPtBarKind.Temporary, Segments = @"^\d+-D1$", Pairing = SegmentalBarPairing.AcrossBent, BlockType = "erection PT bar block Type A",
         Positions = new() { new() { X = F(7, 9), Depth = F(2, 0.5) }, new() { X = F(9, 8), Depth = F(2, 8.5) } }, Diameter = In(1.75), DuctDiameter = In(2.75),
-        Material = "1 3/4\" dia. PT bar (temporary)", Source = "p.300 (S3-52)",
-        Unresolved = barFlag("top temporary PT bars D1 - U1", "they run through the bent segment in coupled pieces (min. 11'-7\" / 14'-6\"); the coupler positions are not dimensioned") },
+        Material = "1 3/4\" dia. PT bar (temporary)", Anchor = tempHw, Source = "p.300 (S3-52)", FinalState = tempFinal,
+        Pieces = new()
+        {
+            // T-D1: D1 Type A tip face (stressing, 3'-0" tail) -> end of the T-B stressing tail (C-D)
+            new() { Name = "T-D1", Stage = "erection steps 8-9 (D1 on its shoring tower, DB-D1 joint epoxied, stressed 75 ksi)", PrintedMinLength = F(11, 7),
+                Start = new() { Anchor = true, Stressing = true, Tail = tail }, End = new() { FromBentCl = -tbTailEnd } },
+            // T-B: DB top end block face -4'-6" (stressing, 3'-0" tail + C-D) .. UB top end block face +4'-6" (dead end, 3 5/8" past the nut + C-U)
+            new() { Name = "T-B", Stage = "erection steps 2-5 (bent halves epoxied, squeezed with the permanent bottom bars)", PrintedMinLength = F(13, 3),
+                Start = new() { FromBentCl = -F(4, 6), Anchor = true, Stressing = true, Tail = tail, Coupler = coupler("C-D", "p.300", "on the end of the T-B stressing tail, inside D1") },
+                End = new() { FromBentCl = F(4, 6), Anchor = true, Tail = protrusion, Coupler = coupler("C-U", "p.300", "on the T-B dead end; it reaches about 6\" into U1 where the plans show only the 2 3/4\" duct (PLAN CONFLICT: no recess / enlarged duct given)") } },
+            // T-U1: C-U -> U1 Type A tip face (stressing, 3'-0" tail)
+            new() { Name = "T-U1", Stage = "erection steps 6-7 (U1 on its shoring tower, UB-U1 joint epoxied, stressed 75 ksi)", PrintedMinLength = F(14, 6),
+                Start = new() { FromBentCl = tbDeadEnd }, End = new() { Anchor = true, Stressing = true, Tail = tail } },
+        },
+        Unresolved = U("p.300, 313", "top temporary PT bars D1 - U1 (pieces T-D1, T-B, T-U1)", "the anchor faces inside the bent segment are dimensioned (6\" inside the bulkhead faces), the plates / nuts / tails are vendor or minimum values and the C-D / C-U couplers sit inside the 2 3/4\" duct where no recess is shown",
+            "Three pieces per duct line with the dimensioned anchors, 3'-0\" tails at the stressing ends, 3 5/8\" past the dead-end nut, couplers centred on the bar ends.") },
     new() { Name = "bottom temporary PT bars D1-U1", Kind = SegmentalPtBarKind.Temporary, Segments = @"^\d+-D1$", Pairing = SegmentalBarPairing.AcrossBent, BlockType = "erection PT bar block Type C",
         Positions = new() { new() { X = F(6, 6), Depth = F(14, 6) } }, Diameter = In(1.75), DuctDiameter = In(2.75),
-        Material = "1 3/4\" dia. PT bar (temporary)", Source = "p.299 (S3-51)",
-        Unresolved = barFlag("bottom temporary PT bars D1 - U1", "they run through the bent segment with a coupler (min. 15'-0\" pieces); the coupler position is not dimensioned") },
+        Material = "1 3/4\" dia. PT bar (temporary)", Anchor = tempHw, Source = "p.299 (S3-51)", FinalState = tempFinal,
+        Pieces = new()
+        {
+            // B-D1: D1 Type C tip face (stressing, 3'-0" tail) -> C-B on the B-U1 dead end
+            new() { Name = "B-D1", Stage = "erection steps 8-9 (stressed 75 ksi)", PrintedMinLength = F(15),
+                Start = new() { Anchor = true, Stressing = true, Tail = tail }, End = new() { FromBentCl = -bbDeadEnd } },
+            // B-U1: DB diaphragm outer face -3'-6" (dead end, 3 5/8" past the nut + C-B) -> U1 Type C tip face (stressing, 3'-0" tail)
+            new() { Name = "B-U1", Stage = "erection steps 6-7 (stressed 75 ksi)", PrintedMinLength = F(23, 7),
+                Start = new() { FromBentCl = -F(3, 6), Anchor = true, Tail = protrusion, Coupler = coupler("C-B", "p.299", "BAR COUPLER on the B-U1 dead end, in the open 1'-6\" end zone of DB") },
+                End = new() { Anchor = true, Stressing = true, Tail = tail } },
+        },
+        Unresolved = U("p.299, 313", "bottom temporary PT bars D1 - U1 (pieces B-D1, B-U1)", "the dead end on the DB diaphragm outer face (3'-6\" from the bent CL) is scaled, the plates / nuts / tails are vendor or minimum values",
+            "Two pieces per bar with the coupler C-B centred on the B-U1 dead end; the pieces need 1.9\" / 3.4\" more than the printed minimum lengths with the scaled hardware (check rows).") },
 };
-sg.Unresolved.Add("[details] " + U("p.299-300", "temporary PT bars between the bent segment and U1, and the permanent 1 3/4\" bent PT bars with their pockets", "their anchor plates sit in the bent segment at positions that are drawn only ('3'-0\" MIN.'), and the pocket outline of the permanent bars (Section C-C) is not dimensioned", "Not built."));
 
 // 4" Sch. 40 galvanized steel pipe (p.302 note 1): ASME B36.10M OD 4.500", wall 0.237".
 double pipeOd = In(4.5), pipeWall = In(0.237);
@@ -271,23 +312,40 @@ sg.Pipes = pipes;
 // 6'-4" from CL, 1'-5" above the bent soffit, through the split, plate faces 8 1/2" inside each bulkhead face (+-5'-0"). p.272 (S3-24) end segment: 4 per segment
 // in the webs, inclined with the web (8'-11" / 10'-3 3/4" from CL at the top, 7'-0" / 8'-4 3/4" at the bottom), 2'-0" from the closure-joint face, anchors per the
 // p.278 details (note 7); 7'-10" (table).
+
+// Vertical bar anchorages (p.278 VERTICAL PT BAR DETAILS, also p.272 note 7): plate and pocket sizes are the PT supplier's; the plan draws them without dimensions ->
+// nominal values SCALED from the drawing (agent review qc/bonner-unit5/vertical-pt: plate about 5" x 1 3/4", top pocket about 8 1/4" at the deck top to 5 1/2" at the plate).
+var vAnchorFlag = U("p.278", "vertical PT bar anchor plates and stressing pockets", "sizes are vendor determined (PT supplier); the plan draws the plate and the top pocket but does not dimension them",
+    "Nominal sizes scaled from the drawing: plate 5\" x 5\" x 1 3/4\", top pocket 8 1/4\" at the deck top to 5 1/2\" at the plate, 10 1/2\" deep (dimensioned); bottom plate cast in, no pocket. Nut drawn outward of each plate: nominal 3\" dia. x 2 7/8\" envelope (the 1 3/4\" bar nut scaled on the p.299 coupler detail); its shape varies by supplier.");
+List<SegmentalBarAnchorDefinition> VertAnchors() => new()
+{
+    new() { End = SegmentalBarEnd.Start, Stressing = true, PlateWidth = In(5), PlateThickness = In(1.75), NutDiameter = In(3), NutLength = In(2.875), PocketDepth = In(10.5), PocketInnerWidth = In(5.5), PocketOuterWidth = In(8.25),
+        Source = "p.278 (S3-30) TOP detail", Unresolved = vAnchorFlag },
+    new() { End = SegmentalBarEnd.End, Stressing = false, PlateWidth = In(5), PlateThickness = In(1.75), NutDiameter = In(3), NutLength = In(2.875), Source = "p.278 (S3-30) BOTTOM detail", Unresolved = vAnchorFlag },
+};
+var lAnchorFlag = U("p.278, 299", "longitudinal PT bar anchor plates and pockets", "the plate is 10\" x 10\" and the pocket 10 1/2\" x 10 1/2\" x 8 1/2\" (LONGITUDINAL PT BAR DETAILS), but the plate thickness is vendor determined (PT supplier) and the plan does not say which end is jacked",
+    "Nominal plate thickness 1 3/4\" (as the drawn vertical bar plates), nut 3\" dia. x 2 7/8\" envelope (shape varies by supplier); a pocket at both bulkhead faces, both modeled as stressing ends.");
 sg.FixedBars = new()
 {
     new() { Name = "vertical PT bar", Kind = SegmentalFixedBarKind.Vertical, SegmentType = SegmentType.BentHalf, From = SegmentalFaceRef.SupportSide,
         Positions = { new() { Along = F(2, 6), X = F(3, 8) }, new() { Along = F(2, 6), X = F(6) } }, TopDepth = In(10.5), BottomHeight = In(6.5),
         Diameter = In(1.75), DuctDiameter = In(2.75), ListedLength = F(17, 10), PlanCount = 18 * 4, Material = "1 3/4\" PT bar, Grade 150", Source = "p.278 (S3-30)",
+        Anchors = VertAnchors(),
         Unresolved = U("p.278", "bent segment vertical PT bars", "PLAN CONFLICT: the stressing table lists 18 segments (72 bars) while the 10 cantilever bents have 20 bent halves with 4 bars each (Section A-A half plans); anchor plate / pocket sizes are drawn, not dimensioned",
             "4 bars in every bent half (80), plate face to plate face as dimensioned (count check row)."),
     },
     new() { Name = "vertical PT bar", Kind = SegmentalFixedBarKind.Vertical, SegmentType = SegmentType.End, From = SegmentalFaceRef.FarSide,
         Positions = { new() { Along = F(2), X = F(8, 11), XBottom = F(7) }, new() { Along = F(2), X = F(10, 3.75), XBottom = F(8, 4.75) } }, TopDepth = In(10.5), BottomHeight = In(6.5),
         Diameter = In(1.75), DuctDiameter = In(2.75), ListedLength = F(7, 10), PlanCount = 2 * 4, Material = "1 3/4\" PT bar, Grade 150", Source = "p.272 (S3-24), p.278",
+        Anchors = VertAnchors(),
         Unresolved = U("p.272, 278", "end segment vertical PT bars", "p.272 does not dimension the anchor levels (note 7 refers to the p.278 bar details: 10 1/2\" / 6 1/2\") and draws only one end segment (29-ES taken as the opposite hand from its own closure-joint face)",
             "2 bars per web, parallel to the web, 2'-0\" from the closure-joint face, anchor levels of p.278."),
     },
     new() { Name = "longitudinal PT bar", Kind = SegmentalFixedBarKind.Longitudinal, SegmentType = SegmentType.BentHalf, From = SegmentalFaceRef.SupportSide,
         Positions = { new() { Along = 0, AlongEnd = F(5) - In(8.5), X = F(3, 4) }, new() { Along = 0, AlongEnd = F(5) - In(8.5), X = F(6, 4) } }, BottomHeight = F(1, 5),
         Diameter = In(1.75), PlanCount = 9 * 4 * 2, Material = "1 3/4\" PT bar, Grade 150", Source = "p.278 (S3-30), p.299 (S3-51)",
+        Anchors = new() { new() { End = SegmentalBarEnd.End, Stressing = true, PlateWidth = In(10), PlateThickness = In(1.75), NutDiameter = In(3), NutLength = In(2.875), PocketDepth = In(8.5), PocketInnerWidth = In(10.5),
+            PocketOuterWidth = In(10.5), Source = "p.278 (S3-30) LONGITUDINAL PT BAR DETAILS", Unresolved = lAnchorFlag } },
         Unresolved = U("p.278, 299", "bent segment longitudinal PT bars", "PLAN CONFLICT: the table lists 8'-3\" and 9 bent segments, but the plates 8 1/2\" inside the +-5'-0\" bulkhead faces give 8'-7\" (p.299 minimum bar 9'-11 1/2\" = 8'-7\" + 2 x 8 1/4\" agrees) and there are 10 bents; one bar runs through both halves",
             "Each bar is built as two pieces, split face to plate face in each half (8'-7\" plate to plate); 4 bars per bent (count check row counts pieces against 2 x 36)."),
     },
@@ -378,10 +436,12 @@ sg.FixedBars = new()
     // row B) R = 12'-0" 16 deg. p.304 TOP SLAB TENDON - PLAN (C1 - SPAN 19 AND 29): lane 10 -> 8 in XX-12, P.I.s 3'-0" from the bent-side face and 4'-0" from the bulkhead
     // face ('TOWARD BENT 18 OR BENT 29' side), R = 22'-0"; the row change in XX-11 as in spans 20-28
     var ecProfile = cProfile.Clone();
+    // anchors on the p.271 recess wedges (agent review end-segment.md): top wedge bearing face (s 17", y 26") .. (26", 45"), bottom (20", 98") .. (26", 80"),
+    // at the p.272 anchor heights (C 6'-6", B 1'-7" above the 9'-0" soffit); the printed bends (26 / 18 deg) are the wedge face slopes
     ecProfile.EndFaceAnchors = new()
     {
-        new() { Tendons = "C1", FromCl = F(7, 7.5), AboveSoffit = F(6, 6), SpanFaceFromCl = F(7, 7.5), BendRadius = F(10), BendDeg = 26, BendPiFromAnchor = F(3, 10), Source = "p.272 (C1)" },
-        new() { Tendons = "C2", FromCl = F(9, 1.5), AboveSoffit = F(6, 6), SpanFaceFromCl = F(9, 1.5), BendRadius = F(12), BendDeg = 16, BendPiFromAnchor = F(3, 10), Source = "p.272 (C2)" },
+        new() { Tendons = "C1", FromCl = F(7, 7.5), AboveSoffit = F(6, 6), SpanFaceFromCl = F(7, 7.5), BendRadius = F(10), BendDeg = 26, BendPiFromAnchor = F(3, 10), AnchorFromFace = In(17 + 9 * (108 - 78 - 26) / 19.0), Source = "p.272 (C1), p.271 top wedge" },
+        new() { Tendons = "C2", FromCl = F(9, 1.5), AboveSoffit = F(6, 6), SpanFaceFromCl = F(9, 1.5), BendRadius = F(12), BendDeg = 16, BendPiFromAnchor = F(3, 10), AnchorFromFace = In(17 + 9 * (108 - 78 - 26) / 19.0), Source = "p.272 (C2), p.271 top wedge" },
     };
     ecProfile.LaneChangePis = new() { new() { Tendons = "C1", Segment = 12, FirstPiFromBentFace = F(3), SecondPiFromBulkheadFace = F(4), Radius = F(22), Source = "p.304 TOP SLAB TENDON - PLAN (C1 - SPAN 19 AND 29)" } };
     ecProfile.Source = "p.272, p.285 / p.296 (lanes), p.298, p.304";
@@ -395,8 +455,8 @@ sg.FixedBars = new()
     eProfile.EndFaceAnchors = new()
     {
         // p.272 Section A-A: the pipe falls from the anchor (1'-7" above the soffit) to its bend P.I. 3'-6" from the anchor at the row C level, 18 deg, R = 10'-0"
-        new() { Tendons = "B1", FromCl = F(8), AboveSoffit = F(1, 7), SpanFaceFromCl = F(8, 4.75), BendRadius = F(10), BendDeg = 18, BendPiFromAnchor = F(3, 6), Source = "p.272 (B1)" },
-        new() { Tendons = "B2", FromCl = F(6, 6), AboveSoffit = F(1, 7), SpanFaceFromCl = F(7), BendRadius = F(10), BendDeg = 18, BendPiFromAnchor = F(3, 6), Source = "p.272 (B2)" },
+        new() { Tendons = "B1", FromCl = F(8), AboveSoffit = F(1, 7), SpanFaceFromCl = F(8, 4.75), BendRadius = F(10), BendDeg = 18, BendPiFromAnchor = F(3, 6), AnchorFromFace = In(20 + 6 * (98 - (108 - 19)) / 18.0), Source = "p.272 (B1), p.271 bottom wedge" },
+        new() { Tendons = "B2", FromCl = F(6, 6), AboveSoffit = F(1, 7), SpanFaceFromCl = F(7), BendRadius = F(10), BendDeg = 18, BendPiFromAnchor = F(3, 6), AnchorFromFace = In(20 + 6 * (98 - (108 - 19)) / 18.0), Source = "p.272 (B2), p.271 bottom wedge" },
     };
     // p.304 CONTINUITY TENDON - PLAN (TENDON B1, span 19 to span 29): its lane changes have the P.I.s 2'-6" / 7'-0" from the bent-side face in every span
     eProfile.LaneChangePis!.Add(new() { Tendons = "B1", Segment = 0, FirstPiFromBentFace = F(2, 6), SecondPiFromBentFace = F(7), Source = "p.304 CONTINUITY TENDON - PLAN (TENDON B1)" });
@@ -426,6 +486,14 @@ sg.FixedBars = new()
 }
 sg.Unresolved.Add("[details] " + U("p.285-296", "anchor block pattern at bents 21, 23, 25 and 27", "the layout sheets show bents 19, 20, 22, 24, 26 and 28 only (the key elevations that name the other bents were not read)", "The identical pattern of every sheet is used (B_k in segment k+4, end spans k+6; C1 / C2 in 10 / 11)."));
 
+List<PlanPoint> Circle(double x, double y, double d)
+{
+    const int n = 16;
+    double r = d / 2 * Math.Sqrt(2 * Math.PI / (n * Math.Sin(2 * Math.PI / n)));   // equal area
+    return Enumerable.Range(0, n).Select(i => new PlanPoint(x + r * Math.Cos(2 * Math.PI * i / n), y + r * Math.Sin(2 * Math.PI * i / n))).ToList();
+}
+string conduitFlag = U("p.277", "bent diaphragm electrical conduit holes", "the two 3 1/2\" holes are drawn right of CL in the section of both halves; their run through the 2'-0\" diaphragm is read from the section, not dimensioned",
+    "Holes through the diaphragm (1'-6\" .. 3'-6\" from the bent CL) at the drawn positions.");
 // ================================================================ 3. openings (openings.csv: p.263-266, 271, 277, 315, 316, 321)
 sg.Openings = new List<SegmentalOpeningDefinition>
 {
@@ -436,14 +504,94 @@ sg.Openings = new List<SegmentalOpeningDefinition>
         Segments = new() { "19-D2", "20-D2", "21-D2", "22-D2", "23-D2", "23-U2", "24-U2", "25-U2", "26-U2", "27-U2", "28-U2" } },
     new() { Name = "A.O.B. access opening at the bent", Kind = SegmentalOpeningKind.BottomSlab, Diameter = F(3), Source = "p.277 / 315",
         Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList() },
-    new() { Name = "bent diaphragm opening", Kind = SegmentalOpeningKind.BentDiaphragm, Source = "p.277 (S3-29)",
-        Outline = new() { new(-In(30), 0), new(In(30), 0), new(In(30), In(96)), new(In(15), In(120)), new(-In(15), In(120)), new(-In(30), In(96)) },
+    // through the 2'-0" diaphragm of each bent half (1'-6" .. 3'-6" from the bent CL; agent review qc/bonner-unit5/segments/bent-segment.md)
+    new() { Name = "bent diaphragm opening", Kind = SegmentalOpeningKind.BentDiaphragm, OutlineFromTop = true, AlongFrom = F(1, 6), AlongTo = F(3, 6), Source = "p.277 (S3-29), p.278 B-B",
+        Outline = new() { new(-In(30), In(198)), new(In(30), In(198)), new(In(30), In(102)), new(In(15), In(78)), new(-In(15), In(78)), new(-In(30), In(102)) },
         Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList() },
-    new() { Name = "utility diaphragm opening", Kind = SegmentalOpeningKind.BentDiaphragm, OutlineFromTop = true, Source = "p.277 (S3-29)",
+    new() { Name = "utility diaphragm opening", Kind = SegmentalOpeningKind.BentDiaphragm, OutlineFromTop = true, AlongFrom = F(1, 6), AlongTo = F(3, 6), Source = "p.277 (S3-29)",
         Outline = new() { new(-In(4), In(25)), new(In(4), In(25)), new(In(8), In(29)), new(In(8), In(46)), new(In(4), In(50)), new(-In(4), In(50)), new(-In(8), In(46)), new(-In(8), In(29)) },
         Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList() },
+    new() { Name = "electrical conduit hole 1", Kind = SegmentalOpeningKind.BentDiaphragm, OutlineFromTop = true, AlongFrom = F(1, 6), AlongTo = F(3, 6), Source = "p.277 (S3-29)",
+        Outline = Circle(In(83.5), In(165.5), In(3.5)), Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList(), Unresolved = conduitFlag },
+    new() { Name = "electrical conduit hole 2", Kind = SegmentalOpeningKind.BentDiaphragm, OutlineFromTop = true, AlongFrom = F(1, 6), AlongTo = F(3, 6), Source = "p.277 (S3-29)",
+        Outline = Circle(In(91), In(153.5), In(3.5)), Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList(), Unresolved = conduitFlag },
+    // bearing pintle blockouts: 8" dia. through the bottom slab, 1'-1" from the bent CL in each half, 4'-3" / 5'-9" each side of CL girder (p.277)
+    new() { Name = "pintle blockout left outer", Kind = SegmentalOpeningKind.BottomSlab, Diameter = In(8), CenterOffset = -In(69), AlongFrom = In(13), Source = "p.277 (S3-29)", Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList() },
+    new() { Name = "pintle blockout left inner", Kind = SegmentalOpeningKind.BottomSlab, Diameter = In(8), CenterOffset = -In(51), AlongFrom = In(13), Source = "p.277 (S3-29)", Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList() },
+    new() { Name = "pintle blockout right inner", Kind = SegmentalOpeningKind.BottomSlab, Diameter = In(8), CenterOffset = In(51), AlongFrom = In(13), Source = "p.277 (S3-29)", Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList() },
+    new() { Name = "pintle blockout right outer", Kind = SegmentalOpeningKind.BottomSlab, Diameter = In(8), CenterOffset = In(69), AlongFrom = In(13), Source = "p.277 (S3-29)", Bents = Enumerable.Range(19, 10).Select(n => $"Bent {n}").ToList() },
+    // end segment bottom slab notch at the anchor end (p.271 half plan: 1'-9" at s 2'-2", 1'-3" + 1'-9" ... at s 11"; purpose not labelled)
+    new() { Name = "bottom slab notch", Kind = SegmentalOpeningKind.BottomSlab, Segments = new() { "18-ES", "29-ES" }, Source = "p.271 (S3-23) half plan bottom slab",
+        PlanOutline = new() { new(-In(36), In(11)), new(-In(21), In(26)), new(In(21), In(26)), new(In(36), In(11)) } },
 };
-sg.Unresolved.Add("[details] " + U("p.271, 277", "end segment diaphragm opening, bearing pintle blockouts", "the end segment is modeled as a solid envelope (its opening width 10'-2\" is scaled) and the pintles go through the bent soffit with the bearing details", "Not built. (Vent holes, survey blockouts, deck drains, access doors, vermin screens, solar platforms and box lighting are built by misc-bonner-unit5.csx.)"));
+sg.Unresolved.Add("[details] " + U("p.271, 317, 319", "end segment small items: pintle blockouts (5 1/2\" x 11\"), conduit holes, 2 1/2\" vent hole, fall protection inserts, CIP plinth",
+    "the pintle blockouts are not located along the segment, the conduit hole run / side and the vent hole's low side are not stated, the plinth is the bearing supplier's (scaled only)", "Not built (the end segment interior itself is modeled, Interiors)."));
+
+// ================================================================ 3c. segment interiors (agent reviews qc/bonner-unit5/segments/bent-segment.md / end-segment.md)
+// Pieces along each segment from its support-side face (bent half: the CL split face; end segment: the anchor face at the expansion joint), each with its
+// own void in the section frame (x right of CL girder, y down from the deck top; inches).
+List<PlanPoint> Mir(params (double x, double y)[] half)   // half outline from the top point on x = 0 down the right side to the bottom point on x = 0, mirrored
+{
+    var l = half.Select(p => new PlanPoint(In(p.x), In(p.y))).ToList();
+    l.AddRange(half.Skip(1).Take(half.Length - 2).Reverse().Select(p => new PlanPoint(-In(p.x), In(p.y))));
+    return l;
+}
+List<PlanPoint> Pts(IEnumerable<SBM.Core.Geometry.Vec2> v) => v.Select(q => new PlanPoint(q.X, q.Y)).ToList();
+// --- bent halves (p.277 / 278 / 280): hollow cell 0..1'-6" (one 3'-0" cell across the split), 2'-0" diaphragm 1'-6" .. 3'-6", hollow 3'-6" .. 5'-0".
+// Top blocks 3'-6" under the top slab outside |x| 38.76" (6'-10" TYP.) from 0 to 1'-6" and 3'-6" to 4'-6" (6" short of the bulkhead face); bottom slab 2'-9"
+// flat to 3'-6", its top then drops 6" at CL to the bulkhead section (p.268 section 1: 2'-0" slab + 6" x 2'-5 1/2" haunch) as the soffit rises 3".
+var bulk = SegmentalSection.Void(sg.Box, F(19), F(2)).ToList();                       // p.268 section 1 at the bulkhead face (h 19'-0", slab 2'-0")
+var bulk54 = bulk.Select(q => Math.Abs(q.Y - F(19) + F(2)) < 1e-9 ? new SBM.Core.Geometry.Vec2(q.X, q.Y - In(2)) : q).ToList();   // bottom slab top 2" higher at 4'-6"
+(double, double)[] cell(double yb) => new[] { (0.0, 9.0), (38.76, 9.0), (38.76, 51.0), (120.75, 51.0), (84.0, 198.0), (54.5, yb), (0.0, yb) };
+var bentInterior = new SegmentalInteriorDefinition
+{
+    Name = "bent segment half", SegmentType = SegmentType.BentHalf, Source = "p.277 (S3-29), p.278 B-B, p.280 D-D / E-E",
+    Unresolved = U("p.277", "bent segment interior", "every face is dimensioned; the top blocks' web fillet and the bottom slab between 3'-6\" and the bulkhead are drawn as straight lines between dimensioned sections",
+        "Cells, 2'-0\" diaphragm, top blocks and bottom slab as read (agent review bent-segment.md); faces between dimensioned sections are straight."),
+    Pieces = new()
+    {
+        new() { From = 0, To = In(18), Void0 = Mir(cell(198)), Note = "hollow cell + top blocks" },
+        new() { From = In(18), To = In(42), Note = "2'-0\" diaphragm (openings: bent diaphragm / utility / conduit openings)" },
+        new() { From = In(42), To = In(54), Void0 = Mir(cell(198)), Void1 = Mir(cell(202)), Note = "hollow + top blocks, bottom slab top dropping 6\" over 1'-6\"" },
+        new() { From = In(54), To = In(60), Void0 = Pts(bulk54), Void1 = Pts(bulk), Note = "typical top haunch, bottom slab to the bulkhead section" },
+    },
+};
+// --- end segments 18-ES / 29-ES (p.271): top slab nose 0..11", anchor recess 11 .. 26" with the C1 / C2 (top) and B1 / B2 (bottom) wedges, 5'-0" diaphragm 26 .. 86"
+// pierced by the access passage (diaphragm opening shape to 66", rectangle to 86"), typical box 86 .. 104"; wings 2'-2" thick to 51", tip taper to 66".
+const double eps = 0.004;                                    // in.: a vanishing wedge / taper keeps a sliver so the outline has no repeated point
+double rt = sg.Box.TopWidth / In(1) / 2;                     // 255.5
+double xw(double y) => 109.09 + 0.25 * (98 - y);              // web inner face of the 9'-0" box
+double xc(double y) => 119 + (y - 26) * 6.125 / 7.875;        // recess top chamfer 6 1/8" x 7 7/8"
+(double, double)[] outerThk(double yt) => new[] { (0.0, 0.0), (rt, 0.0), (rt, yt), (206.5 + (yt - 10) / 16 * (143.5 - 206.5), yt), (143.5, 26.0), (123.0, 108.0), (0.0, 108.0) };
+(double, double)[] recessTop(double yw) => new[] { (0.0, 26.0), (79.0, 26.0), (79.0, yw), (xc(yw), yw), (125.125, 33.875), (109.09, 98.0), (0.0, 98.0) };
+(double, double)[] recessBoth(double yw, double yb, bool chamfer) => chamfer
+    ? new[] { (0.0, 26.0), (79.0, 26.0), (79.0, yw), (xc(yw), yw), (125.125, 33.875), (xw(yb), yb), (61.0, yb), (61.0, 98.0), (0.0, 98.0) }
+    : new[] { (0.0, 26.0), (79.0, 26.0), (79.0, yw), (xw(yw), yw), (xw(yb), yb), (61.0, yb), (61.0, 98.0), (0.0, 98.0) };
+double sTop(double y) => 17 + 9 * (y - 26) / 19;              // top wedge bearing face: (s 17, y 26) .. (s 26, y 45)
+double yBot(double s) => 98 - 18 * (s - 20) / 6;               // bottom wedge bearing face: (s 20, y 98) .. (s 26, y 80)
+double sCh = sTop(33.875 - eps);
+var thick = Mir((0, 0), (rt, 0), (rt, 26), (143.5, 26), (123, 108), (0, 108));
+var passage = Mir((0, 26), (21, 26), (61, 57.5), (61, 98), (0, 98));
+var tunnel = Mir((0, 9), (61, 9), (61, 98), (0, 98));
+var endInterior = new SegmentalInteriorDefinition
+{
+    Name = "end segment", SegmentType = SegmentType.End, Source = "p.271 (S3-23) elevation, sections A-A / B-B / C-C, half plans",
+    Unresolved = U("p.271", "end segment interior", "every face is dimensioned on p.271, but the segment weight that results (about 85 ton) differs from note 9 (110 ton) and the anchor face to bent control line distance is not dimensioned",
+        "Interior as dimensioned (agent review end-segment.md); the note 9 weight is reported, not used."),
+    Pieces = new()
+    {
+        new() { From = 0, To = In(11), Outer0 = Mir((0, 0), (rt, 0), (rt, 26), (0, 26)), Note = "top slab nose 2'-2\" (expansion joint blockout: misc joints)" },
+        new() { From = In(11), To = In(17), Outer0 = thick, Void0 = Mir(recessTop(26 + eps)), Note = "anchor recess" },
+        new() { From = In(17), To = In(20), Outer0 = thick, Void0 = Mir(recessTop(26 + eps)), Void1 = Mir(recessTop(26 + 19 * 3 / 9.0)), Note = "recess, C1 / C2 wedge" },
+        new() { From = In(20), To = In(sCh), Outer0 = thick, Void0 = Mir(recessBoth(26 + 19 * 3 / 9.0, 98 - eps, true)), Void1 = Mir(recessBoth(33.875 - eps, yBot(sCh), true)), Note = "recess, both wedges" },
+        new() { From = In(sCh), To = In(26), Outer0 = thick, Void0 = Mir(recessBoth(33.875 - eps, yBot(sCh), false)), Void1 = Mir(recessBoth(45, 80, false)), Note = "recess, both wedges" },
+        new() { From = In(26), To = In(51), Outer0 = thick, Void0 = passage, Note = "diaphragm, access passage" },
+        new() { From = In(51), To = In(66), Outer0 = Mir(outerThk(26 - eps)), Outer1 = Mir(outerThk(10)), Void0 = passage, Note = "diaphragm, wing tip taper" },
+        new() { From = In(66), To = In(86), Void0 = tunnel, Note = "diaphragm, rectangular passage" },
+        new() { From = In(86), To = In(104), Void0 = Pts(SegmentalSection.Void(sg.Box, F(9), In(10))), Note = "typical box" },
+    },
+};
+sg.Interiors = new() { bentInterior, endInterior };
 sg.Unresolved.Add("[details] " + U("p.392, 263-266", "navigational lights and their conduit runs", "the lights, junction boxes and cable are by others and located only relative to the navigation channel, whose CL station is not given; only the cast-in conduit sleeves are dimensioned", "Not built (sleeves only, in misc-bonner-unit5.csx)."));
 
 // ================================================================ 4. parapet (parapet.csv: p.323-327)

@@ -958,10 +958,11 @@ public static partial class Rhino3dmExporter
                     Solid(bl.Mesh, L("3D-SEGMENT-BLOCKS"), Base(bl.Name, "SegmentBlock").Add("Description", bl.Description).Add("Segment", bl.Segment)
                         .Add("Volume_m3", bl.Volume).Add("GlobalId", Gid(IfcKeys.SegBlock(bk, bl.Name))).Flag(bl.Assumption));
                 foreach (var hw in sm.PtHardware)
-                    Solid(hw.Mesh, L("3D-SEGMENT-PT-HARDWARE"), Base(hw.Name, hw.IsPipe ? "SegmentPipe" : "SegmentPtBar").Add("Description", hw.Description).Add("Segment", hw.Segment)
+                    Solid(hw.Mesh, L(hw.ErectionOnly ? "3D-SEGMENT-ERECTION-PT" : "3D-SEGMENT-PT-HARDWARE"), Base(hw.Name, hw.IsPipe ? "SegmentPipe" : hw.IsPlate ? "SegmentAnchorPlate" : hw.IsFastener ? "SegmentBarFastener" : "SegmentPtBar")
+                        .Add("Phase", hw.ErectionOnly ? "ERECTION ONLY" : "").Add("Description", hw.Description).Add("Segment", hw.Segment)
                         .Add("Material", hw.Material).Add("GlobalId", Gid(IfcKeys.SegHardware(bk, hw.Name))).Flag(hw.Assumption),
                         // exact B-rep along the centerline: hollow pipe (bore = inside diameter) for deviation / future PT pipes, solid pipe for bars
-                        hw.Points.Count >= 2 && hw.OuterDiameter > 0 ? () => RhinoBarPipe.Faces(hw.Points, hw.OuterDiameter / 2, out var why, hw.IsPipe ? hw.InnerDiameter / 2 : 0)
+                        !hw.IsPlate && hw.Points.Count >= 2 && hw.OuterDiameter > 0 ? () => RhinoBarPipe.Faces(hw.Points, hw.OuterDiameter / 2, out var why, hw.IsPipe ? hw.InnerDiameter / 2 : 0)
                             ?? throw new InvalidOperationException("pipe: " + why) : null);
                 foreach (var op in sm.Openings)
                     Solid(op.Mesh, L("3D-SEGMENT-OPENINGS"), Base(op.Name, "SegmentOpening").Add("Description", op.Description).Add("Segment", op.Segment)

@@ -1,0 +1,13 @@
+{"reviews": [
+ {"bridge": "Bonner Unit 5", "level": "element", "category": "cantilever tendon", "result": "agrees", "sheets": ["p.272","p.283","p.285-298","p.303","p.304"],
+  "note": "Agent review 2026-10-31 of the tendon bend profiles (anchors, exit angles, radii, lane changes); its DIFF items were fixed in the generator / data; the remaining plan conflicts are generator flags.",
+  "report": "qc/bonner-unit5/pt-profiles/findings.md"},
+ {"bridge": "Bonner Unit 5", "level": "element", "category": "bottom continuity tendon", "result": "agrees", "sheets": ["p.283","p.285-297","p.304"],
+  "note": "Agent review 2026-10-31 of the tendon bend profiles; fixes applied; remaining plan conflicts are generator flags.", "report": "qc/bonner-unit5/pt-profiles/findings.md"},
+ {"bridge": "Bonner Unit 5", "level": "element", "category": "closure tendon", "result": "differs", "sheets": ["p.272","p.285","p.290","p.296","p.304"],
+  "note": "Agent review 2026-10-31: C1 / C2 row change and end-span B1 / B2 span-face offsets are PLAN CONFLICTS (generator flags).", "report": "qc/bonner-unit5/pt-profiles/findings.md"},
+ {"bridge": "Bonner Unit 5", "level": "element", "category": "vertical PT bar", "result": "differs", "sheets": ["p.272","p.278"],
+  "note": "Agent review 2026-10-31 (positions, anchor levels, lengths): matches; the stressing table count (18 segments) is a PLAN CONFLICT with the 20 bent halves.", "report": "qc/bonner-unit5/vertical-pt/vertical-pt.md"},
+ {"bridge": "Bonner Unit 5", "level": "element", "category": "permanent PT bar", "result": "differs", "sheets": ["p.278","p.299"],
+  "note": "Agent review 2026-10-31: plate to plate 8'-7\" vs the table 8'-3\" and 9 vs 10 bents = PLAN CONFLICT (generator flag).", "report": "qc/bonner-unit5/vertical-pt/vertical-pt.md"}
+]}

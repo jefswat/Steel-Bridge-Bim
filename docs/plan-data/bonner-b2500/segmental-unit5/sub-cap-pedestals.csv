@@ -1,0 +1,35 @@
+bent,pedestal,centre_S_ft,centre_N_ft,size_S_ft,size_N_ft,top_EL_ft,tag
+18,"18G1 (span 18, other unit)",-18.3490,-3.1667,5.3333,2.1667,70.43,VECTOR (dims p.354/355; EL p.354)
+18,"18G2 (span 18, other unit)",-11.0938,-3.1667,5.3333,2.1667,70.1,VECTOR (dims p.354/355; EL p.354)
+18,"18G3 (span 18, other unit)",-3.8385,-3.1667,5.3333,2.1667,69.78,VECTOR (dims p.354/355; EL p.354)
+18,"18G4 (span 18, other unit)",3.4167,-3.1667,5.3333,2.1667,69.45,VECTOR (dims p.354/355; EL p.354)
+18,"18G5 (span 18, other unit)",10.6719,-3.1667,5.3333,2.1667,69.12,VECTOR (dims p.354/355; EL p.354)
+18,"18G6 (span 18, other unit)",17.9271,-3.1667,5.3333,2.1667,68.8,VECTOR (dims p.354/355; EL p.354)
+18,span 19 left brg (CL brg S -8.25),-7.5000,5.5000,6.1667,4.1667,69.93,"VECTOR (3'-10"" inboard / 2'-4"" outboard of CL brg, 4'-2"" centred, p.354/355)"
+18,span 19 right brg (CL brg S +8.25),7.5000,5.5000,6.1667,4.1667,69.19,VECTOR
+29,"30G1 (span 30, other unit)",-17.0260,3.1667,5.3333,2.1667,71.42,VECTOR (dims p.371; EL p.371)
+29,"30G2 (span 30, other unit)",-5.5260,3.1667,5.3333,2.1667,71.13,VECTOR (dims p.371; EL p.371)
+29,"30G3 (span 30, other unit)",5.9740,3.1667,5.3333,2.1667,70.84,VECTOR (dims p.371; EL p.371)
+29,"30G4 (span 30, other unit)",17.4740,3.1667,5.3333,2.1667,70.55,VECTOR (dims p.371; EL p.371)
+29,span 29 left brg (CL brg S -8.25),-7.5000,-5.5000,6.1667,4.1667,71.2,VECTOR (p.371)
+29,span 29 right brg (CL brg S +8.25),7.5000,-5.5000,6.1667,4.1667,70.79,VECTOR (p.371)
+19,left brg,-5.2500,0.0000,6.0,6.0,65.24,VECTOR (elevation table p.359/363/367)
+19,right brg,5.2500,0.0000,6.0,6.0,64.71,VECTOR
+20,left brg,-5.2500,0.0000,6.0,6.0,69.74,VECTOR (elevation table p.359/363/367)
+20,right brg,5.2500,0.0000,6.0,6.0,69.27,VECTOR
+21,left brg,-5.2500,0.0000,6.0,6.0,69.74,VECTOR (elevation table p.359/363/367)
+21,right brg,5.2500,0.0000,6.0,6.0,69.27,VECTOR
+22,left brg,-5.2500,0.0000,6.0,6.0,69.74,VECTOR (elevation table p.359/363/367)
+22,right brg,5.2500,0.0000,6.0,6.0,69.27,VECTOR
+23,left brg,-5.2500,0.0000,6.0,6.0,69.62,VECTOR (elevation table p.359/363/367)
+23,right brg,5.2500,0.0000,6.0,6.0,69.36,VECTOR
+24,left brg,-5.2500,0.0000,6.0,6.0,69.62,VECTOR (elevation table p.359/363/367)
+24,right brg,5.2500,0.0000,6.0,6.0,69.36,VECTOR
+25,left brg,-5.2500,0.0000,6.0,6.0,69.62,VECTOR (elevation table p.359/363/367)
+25,right brg,5.2500,0.0000,6.0,6.0,69.36,VECTOR
+26,left brg,-5.2500,0.0000,6.0,6.0,69.62,VECTOR (elevation table p.359/363/367)
+26,right brg,5.2500,0.0000,6.0,6.0,69.36,VECTOR
+27,left brg,-5.2500,0.0000,6.0,6.0,69.62,VECTOR (elevation table p.359/363/367)
+27,right brg,5.2500,0.0000,6.0,6.0,69.36,VECTOR
+28,left brg,-5.2500,0.0000,6.0,6.0,66.04,VECTOR (elevation table p.359/363/367)
+28,right brg,5.2500,0.0000,6.0,6.0,65.78,VECTOR

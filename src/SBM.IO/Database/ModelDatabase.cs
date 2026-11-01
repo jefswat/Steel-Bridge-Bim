@@ -201,6 +201,18 @@ public static class ModelDatabase
         return total > noteMb ? $"Note: the database is {total:F1} MB (> {noteMb:F0} MB). Largest tables: {tables}" : $"Database size {total:F1} MB. Largest tables: {tables}";
     }
 
+    /// <summary>UTC time the element registry was last written (meta <c>built_at</c>), null when unknown.</summary>
+    public static DateTime? BuiltAt(string path)
+    {
+        try
+        {
+            using var cn = Open(path);
+            var s = Scalar<string>(cn, "SELECT value FROM meta WHERE key='built_at'");
+            return DateTime.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var t) ? t : null;
+        }
+        catch (Exception) { return null; }
+    }
+
     /// <summary>Informational size threshold (MB) above which the CLI / app mention the database size prominently. Not a limit.</summary>
     public const double SizeNoteMb = 100;
 
@@ -1444,6 +1456,8 @@ public static class ModelDatabase
                         SubElementKind.TrafficBarrier => ("traffic barrier", "IFCRAILING"),
                         SubElementKind.PavementStrip => ("replacement pavement", "IFCPAVEMENT"),
                         SubElementKind.Fender => ("fender", "IFCIMPACTPROTECTIONDEVICE"),
+                        SubElementKind.PtBar => ("pier PT bar", "IFCTENDON"),
+                        SubElementKind.PtAnchor => ("pier PT anchor plate", "IFCTENDONANCHOR"),
                         _ => ("footing", "IFCFOOTING"),
                     };
                     var r = New(Id(IfcKeys.SubSolid(uk, k++)), ParentOfSolid(so), "element", cat, cls, so.Name);
@@ -1665,24 +1679,26 @@ public static class ModelDatabase
                 {
                     SBM.Core.Segmental.SegmentalHardwareKind.TemporaryPtBar => "temporary PT bar", SBM.Core.Segmental.SegmentalHardwareKind.PermanentPtBar => "permanent PT bar",
                     SBM.Core.Segmental.SegmentalHardwareKind.DeviationPipe => "deviation pipe", SBM.Core.Segmental.SegmentalHardwareKind.VerticalPtBar => "vertical PT bar",
-                    _ => "future PT pipe",
+                    SBM.Core.Segmental.SegmentalHardwareKind.AnchorPlate => "PT bar anchor plate", SBM.Core.Segmental.SegmentalHardwareKind.BarNut => "PT bar nut",
+                    SBM.Core.Segmental.SegmentalHardwareKind.BarCoupler => "PT bar coupler", _ => "future PT pipe",
                 };
-                var r = New(Id(IfcKeys.SegHardware(bk, hw.Name)), Id(IfcKeys.Segment(bk, hw.Segment)), "element", cat, hw.IsPipe ? "IFCTENDONCONDUIT" : "IFCTENDON", hw.Name);
+                var r = New(Id(IfcKeys.SegHardware(bk, hw.Name)), Id(IfcKeys.Segment(bk, hw.Segment)), "element", cat, hw.IsPipe ? "IFCTENDONCONDUIT" : hw.IsPlate ? "IFCTENDONANCHOR" : hw.IsFastener ? "IFCMECHANICALFASTENER" : "IFCTENDON", hw.Name);
                 r.Tag = hw; r.Subtype = hw.Kind.ToString();
                 if (_keysOnly) { _w.Add(r); continue; }
                 r.Material = hw.Material; r.Length = hw.Length;
                 double area = Math.PI / 4 * (hw.OuterDiameter * hw.OuterDiameter - hw.InnerDiameter * hw.InnerDiameter);
-                r.Volume = area * hw.Length; r.Mass = r.Volume * 7850;
+                r.Volume = hw.IsPlate ? hw.Mesh.Volume() : area * hw.Length; r.Mass = r.Volume * 7850;
                 r.Box = hw.Mesh.Bounds(); StationOf(r, r.Box);
                 var pj = new Json().Add("segment", hw.Segment).Add("side", hw.Side < 0 ? "left" : "right").Add("outside_diameter_in", Math.Round(hw.OuterDiameter / 0.0254, 3))
                     .Add("length_ft", Math.Round(hw.Length / 0.3048, 3)).Add("description", hw.Description);
+                if (hw.ErectionOnly) pj.Add("phase", "erection only").Add("final_state", hw.FinalState);
                 if (hw.Assumption is { } asu) pj.Add("status", asu.Status).Add("reason", asu.Reason).Add("assumed", asu.Basis);
                 r.Props = pj.ToString();
                 _w.Add(r);
             }
             foreach (var op in sm.Openings)
             {
-                var r = New(Id(IfcKeys.SegOpening(bk, op.Name)), Id(IfcKeys.Segment(bk, op.Segment)), "element", op.Temporary ? "temporary opening" : "opening", "IFCOPENINGELEMENT", op.Name);
+                var r = New(Id(IfcKeys.SegOpening(bk, op.Name)), Id(IfcKeys.Segment(bk, op.Segment)), "element", op.Temporary ? "temporary opening" : op.Kind == SBM.Core.Bridge.SegmentalOpeningKind.StressingPocket ? "stressing pocket" : "opening", "IFCOPENINGELEMENT", op.Name);
                 r.Tag = op; r.Subtype = op.Kind.ToString();
                 if (_keysOnly) { _w.Add(r); continue; }
                 r.Volume = op.RemovedVolume; r.Box = op.Mesh.Bounds(); StationOf(r, r.Box);

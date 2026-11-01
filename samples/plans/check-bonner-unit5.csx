@@ -158,8 +158,8 @@ foreach (var g in sm.Segments.GroupBy(s => s.Type))
 }
 var es = sm.Segments.First(s => s.Type == SegmentType.End);
 var bh = sm.Segments.First(s => s.Type == SegmentType.BentHalf);
-Row("end segment weight at 150 pcf (plan: 110 ton to be lifted, p271 note 9)", es.Volume / Math.Pow(ft, 3) * 0.150 / 2, 110, 5, "ton", "solid envelope - interior UNRESOLVED");
-Row("bent segment half weight at 150 pcf (plan: 100 ton, p277 note 6)", bh.Volume / Math.Pow(ft, 3) * 0.150 / 2, 100, 5, "ton", "diaphragm solid, openings not modeled");
+Row("end segment weight at 150 pcf (plan: 110 ton to be lifted, p271 note 9)", es.Volume / Math.Pow(ft, 3) * 0.150 / 2, 110, 5, "ton", "interior as dimensioned on p.271 (agent review end-segment.md); expansion joint blockout and notch not deducted here");
+Row("bent segment half weight at 150 pcf (plan: 100 ton, p277 note 6)", bh.Volume / Math.Pow(ft, 3) * 0.150 / 2, 100, 5, "ton", "cells / 2'-0\" diaphragm / top blocks as dimensioned (bent-segment.md); openings not deducted here");
 Print($"INFO  total box concrete {sm.ConcreteVolume / Math.Pow(ft, 3) / 27:0} CY (no plan quantity)");
 
 // ---------------------------------------------------------------- 7. bearings and pedestals
@@ -180,7 +180,11 @@ foreach (var u in sm.Substructure!.Units)
     if (ftg != null)
     {
         Row($"{u.Name} footing bottom", ftg.Mesh.Bounds().Min.Z / ft, D(piers[u.Name][4]), 0.005, "ft");
-        Row($"{u.Name} footing concrete (BOM, CIP)", Math.Abs(ftg.Mesh.Volume()) / Math.Pow(ft, 3) / 27, D(piers[u.Name][13]), 0.5, "CY", "sloped top modeled flat");
+        // the bill deducts the embedded pile heads (36" square, Embedment above the footing bottom; the footing solid is not cut by the piles)
+        double embed = sm.Substructure.Units.Where(x => x.Name == u.Name).SelectMany(x => x.Foundations).SelectMany(f => f.Piles).Sum(pp => Math.Max(0, Math.Min(pp.TopZ, ftg.Mesh.Bounds().Max.Z) - ftg.Mesh.Bounds().Min.Z)) * Math.Pow(3 * ft, 2);
+        Row($"{u.Name} footing concrete (BOM, CIP) less the embedded pile heads", (Math.Abs(ftg.Mesh.Volume()) - embed) / Math.Pow(ft, 3) / 27, D(piers[u.Name][13]), 0.01 * D(piers[u.Name][13]), "CY",
+            "1 % tolerance; sloped top modeled (level over the base footprint, planes to the edges); pile heads 36\" sq x embedment deducted as the bill does"
+            + (u.Name == "Bent 19" ? "; PLAN CONFLICT: the bent 19 bill repeats the bents 26-28 value (its footing is the same size but sits 0.02 ft higher at the edges)" : ""));
     }
 }
 
@@ -365,8 +369,10 @@ if (def.Misc is { } md)
         int armJoints = typ.GroupBy(x => x.Bent + (x.Name.Contains("-D") ? "D" : "U")).Sum(g => g.Count() - 1);
         int bents = typ.Select(x => x.Bent).Distinct().Count();
         Row("top temporary PT bars between consecutive typical segments (2 per web, p.300)", hw.Count(h => h.Kind == SBM.Core.Segmental.SegmentalHardwareKind.TemporaryPtBar && h.Name.Contains("top temporary PT bars ") && !h.Name.Contains("D1-U1")), 4 * armJoints, 0, "");
-        Row("bottom temporary PT bars between consecutive typical segments (1 per web, staggered, p.299)", hw.Count(h => h.Name.Contains("bottom temporary PT bars ") && !h.Name.Contains("D1-U1")), 2 * armJoints, 0, "");
-        Row("D1 - U1 temporary PT bars through the bent (2 top + 1 bottom per web)", hw.Count(h => h.Name.Contains("D1-U1")), 6 * bents, 0, "");
+        Row("bottom temporary PT bars between consecutive typical segments (1 per web, staggered, p.299)", hw.Count(h => h.Kind == SBM.Core.Segmental.SegmentalHardwareKind.TemporaryPtBar && h.Name.Contains("bottom temporary PT bars ") && !h.Name.Contains("D1-U1")), 2 * armJoints, 0, "");
+        // bar lines = one T-B (top) / B-U1 (bottom) piece each; pieces T-D1 / T-B / T-U1 and B-D1 / B-U1 (erection-bars.md)
+        Row("D1 - U1 temporary PT bar lines through the bent (2 top + 1 bottom per web)", hw.Count(h => h.Kind == SBM.Core.Segmental.SegmentalHardwareKind.TemporaryPtBar && h.Name.Contains("D1-U1") && (h.Name.EndsWith(" T-B") || h.Name.EndsWith(" B-U1"))), 6 * bents, 0, "");
+        Row("D1 - U1 temporary PT bar pieces (3 per top line, 2 per bottom line)", hw.Count(h => h.Kind == SBM.Core.Segmental.SegmentalHardwareKind.TemporaryPtBar && h.Name.Contains("D1-U1")), (4 * 3 + 2 * 2) * bents, 0, "");
         foreach (var c in sm.Checks.Where(c => c.Item.StartsWith("PT bars ")))
             Print($"{(c.Model >= c.Plan - 1e-6 ? "INFO" : "INFO (shorter than the printed minimum bar)")}  {c.Item}: {c.Model / ft:0.00} ft vs {c.Plan / ft:0.00} ft - {c.Note}");
         Row("deviation blocks at the closure joints of spans 20-28 (2 webs, p.302)", sm.Blocks.Count(b => b.Kind == SegmentalBlockKind.DeviationBlock), 18, 0, "");
