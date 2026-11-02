@@ -798,6 +798,11 @@ public sealed class TrussBracingGussetDefinition
     /// are not placed (counted in a CHECK warning).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool ProbeFaces { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted): a second point (name on the same plane) where connected members may END instead of <see cref="Point"/> - the
+    /// plans' lateral work point "W.P." on the gusset plate line (p.97 / p.98: 1'-2 1/2 inside the CL truss) while the plate outline / stack / edge angle stay
+    /// referred to the panel point. Members ending there are connected like members ending at the point (laps / fills / rivets from their own cut end).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? WorkPoint { get; set; }
 }
 
 /// <summary>

@@ -1401,6 +1401,11 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   gusset fills clipped clear of the edge angle on the same plate face (N07), data: web member fills U6 / L7 / U8 / L9 / U10 / U21 / L21 / U22 (connections-ptc.csx BATCH 8b, scaled,
   flagged), L21 O.S. splice 34 x 1 1/8, L11 layer step 44 in., portal knee top on the lowest p.71 box bottom, sway apex edge angles on the lateral plate (CrossingFaceOffset),
   CL walkway rail L 3x2 1/2x5/16, nav walk posts. Concrete truss line items carry their material + UNRESOLVED flag to IFC (SBM_Status) / DB (`ConcreteModel.BarrierInfo`).
+  MAIN SPAN LATERAL PLATES AS DRAWN (2026-11-02, TRUSS-DESIGN.md 33; test `TrussTests.BracingGussets_WorkPoint_*`): OPTIONAL `TrussBracingGussetDefinition.WorkPoint` (members ending at
+  that point - the p.97 / p.98 lateral W.P. 1'-2 1/2 inside the CL truss - belong to the plate of `Point`; laps / fills / rivets from their own end, stack clearance of the panel
+  point); drawn outlines keep their shape when carried to the stack; a MemberPlane plate for ONE named member lies in its plane also with an edge angle. PTC data
+  `truss/lateral-plates.csv` (traced outlines per detail + 'similar' mapping, mirrored for S / primed) read by bracing-ptc.csx (W.P. points LW / UW, 108 lateral ends moved);
+  L11 strut `OffsetZ` 7 1/8 in. (p.80 / p.104 Section A). Apex / L0 / L13 / L22 / U22 / U11 plates stay envelopes (flagged).
   GUSSET / RIVET AGENT REVIEWS applied (2026-10-30; qc/ptc/main-span/{gussets,rivets}-review, qc/ptc/approach/review, qc/ptc/girders/review, outcome columns there; tests
   `TrussRivetReviewTests`): generic OPTIONAL `TrussDefinition.JointRivetsShareHoles` (`RivetHoles.MergeShared`: a joint rivet whose shank overlaps a parallel rivet with the axes
   closer than 0.5 (d1 + d2) becomes one rivet through both stacks; set by rivets-ptc.csx), `TrussEndConnection.OutBoltMaterial` (outstanding-leg fasteners = high-strength

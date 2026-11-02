@@ -251,7 +251,7 @@ Print("--- 8b. gusset layers (plates per face, total thickness)");
 // 8b. bracing rivet counts per member END vs the p.71 diagrams (batch 5b; Note A: the detail sheets govern only where the diagram gives no number)
 {
     var tdef = bdef.Truss!;
-    var defs = (tdef.BracingGussets ?? new()).Where(g => g.Label == "2-1/2 Pls." && g.Side == TrussBracingPlateSide.Both && g.Rivets != null).ToList();
+    var defs = (tdef.BracingGussets ?? new()).Where(g => g.Label.StartsWith("2-") && g.Label.EndsWith(" Pls.") && /* 2-1/2, 2-5/8 (L11), 2-3/4 (L15) */ g.Side == TrussBracingPlateSide.Both && g.Rivets != null).ToList();
     var latM = tdef.Members.Where(m => m.System is "Upper laterals" or "Lower laterals" && m.Role != TrussMemberRole.Strut).ToList();
     var strM = tdef.Members.Where(m => m.System is "Upper laterals" or "Lower laterals" && m.Role == TrussMemberRole.Strut && !m.Section.StartsWith("STRUT L")).ToList();
     int Num(string sp) { var mm = System.Text.RegularExpressions.Regex.Match(sp, @"\d+"); return mm.Success ? int.Parse(mm.Value) : -1; }
@@ -285,7 +285,10 @@ Print("--- 8b. gusset layers (plates per face, total thickness)");
         foreach (var (m, sp) in ends)
         {
             string key = sp.Contains(":LM") || sp.Contains(":UM") ? "N:" + P(sp) : sp;
-            var d = defs.FirstOrDefault(x => x.Point == key && (x.Members.Count == 0 || x.Members.Contains(m.Name)));
+            // (a lateral ending at the plate's drawn W.P. (bracing-ptc 2026-11-02): the plate of the panel point with that WorkPoint)
+            string wpl = sp.Contains(':') ? sp[..sp.IndexOf(':')] : "";
+            var d = defs.FirstOrDefault(x => (x.Point == key || x.WorkPoint != null && x.Point.StartsWith(wpl + ":") && $"{wpl}:{x.WorkPoint}" == sp)
+                && (x.Members.Count == 0 || x.Members.Contains(m.Name)));
             if (d != null && d.Rivets!.TryGetValue(m.Name, out var c)) vals.Add(2 * c);
         }
         string model = vals.Count == 0 ? "no plate" : string.Join(" / ", vals.Distinct().OrderBy(v => v)) + $" per end ({vals.Count} ends)";

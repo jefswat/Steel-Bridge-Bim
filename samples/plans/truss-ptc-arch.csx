@@ -474,6 +474,9 @@ foreach (bool pr in halves)
     // lower laterals: L0-L10 K apex at the lower-numbered strut, L10-L12 diamond about L11, L12-L13 K apex at L13, L15-L22 K apex at L(n+1)
     Strut("L" + P(0, pr), "STRUT L0", "Lower laterals");
     Strut("L" + P(11, pr), "STRUT L11", "Lower laterals");
+    // p.80 Section A / p.104 Section A (2026-11-02 agent review): the 3'-4 1/2 b.b. Ls strut stands 2'-3 3/8 above / 1'-1 1/8 below its work line (CL of
+    // strut 7 1/8 above it; p.80 also prints '6 7/8' CL of strut to the line - 1/4 in. plan conflict, the chain that closes on 3'-4 1/2 used); it was centred
+    t.Members[^1].OffsetZ = In(7.125);
     foreach (int n in Enumerable.Range(1, 10).Concat(new[] { 12, 13 }).Concat(Enumerable.Range(16, 7))) if (!(pr && n == 22)) Strut("L" + P(n, pr), "STRUT", "Lower laterals");
     for (int n = 0; n < 10; n++) KDiag("L" + P(n + 1, pr), "LM" + P(n, pr), "LAT31", "Lower laterals", TrussMemberRole.LowerLateral);
     KDiag("L" + P(11, pr), "LM" + P(10, pr), "LAT50", "Lower laterals", TrussMemberRole.LowerLateral);

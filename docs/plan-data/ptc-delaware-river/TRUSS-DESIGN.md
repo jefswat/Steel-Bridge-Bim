@@ -1051,3 +1051,28 @@ station zone along the member). `SteelModel.RivetMesh`: button heads inscribed i
 PTC data: see the outcome sections of the four findings files. R01 (centring the drawn chord fields on the model web) was tried and reverted: it moved the rivets off their
 drawn gusset outlines; the offset has to be corrected in the work point / drawn chord reading. Results: check-truss-ptc 616 PASS / 19 DIFF, location 389 / 37, approach
 1792 / 16, girders 128 / 9; Bolt x Bolt main 650 -> 184, 3-span 36 -> 22, 4-span 86 -> 20.
+
+## 33. Main span lateral plates as drawn, lateral W.P., L11 strut height (2026-11-02 agent review; user: N-BGL15-T, S-BGL11-b-T "the lateral bracing gussets aren't correct ... there are issues elsewhere"; tests `TrussTests.BracingGussets_WorkPoint_LateralEndsOnTheGussetLine`)
+Found: every main span lateral / strut plate pair was the generic envelope of the member laps (p.97 default "2-1/2 Pls." applied everywhere), although p.97 / p.98 DRAW
+them (scale 3/4" = 1'-0 reduced, 2.166 pt / in. checked on 1'-2 1/2, 2'-10 Min., 1'-0 and the 18 in. strut); the details also run the strut AND lateral working lines through the
+W.P. on the gusset plate line 1'-2 1/2 inside the CL truss, while the model ran the laterals to the panel point (8-10 in. off the drawn position normal to the member at the
+plate). L15 was 1/2 in. with 7 x 4 x 1/2 (p.98: 2-3/4 Pls., 2-Ls 7 x 4 x 3/4 bent, curved edges, plate about 67 in. along the chord). L11 (p.80 View K / Section B): 5/8 lateral
+plates with 1-L 8 x 7 1/2 x 1/2 on the chord inner web; the model plate pair was a 17 x 25 in. piece in the mean chord plane at the chord kink, short of the chord.
+Generic (OPTIONAL, omitted when unset): `TrussBracingGussetDefinition.WorkPoint` (members ending at that point are connected to the plate of `Point`; laps / fills / rivets
+from each member's own end point; a member ending there clears the joint stack of the plate's panel point, `CornerClearSetback` rule (a)); a GIVEN (drawn) outline keeps its
+shape when carried to the stack (`CarryToLine`: only its stack-side edge moves; envelopes still take the hull); a Fitted plate defined for ONE named member with `MemberPlane`
+lies in that member's plane also when it has an edge angle (was the mean chord plane).
+PTC data `truss/lateral-plates.csv` (page, applies_to incl. the 'similar' mapping, thickness, edge angle, W.P., outline in inches in the drawn frame = N truss / unprimed,
+u up-station, v toward the truss; S = v mirrored, primed = u mirrored): L1 (L1-L8), L10 (L9, L10), L12, L15, L16, L17 (L17-L21 and U12-U21 per the p.98 notes), L11 (no outline:
+envelope carried to the chord under the 8 x 7 1/2 angle, flagged). bracing-ptc.csx: W.P. points LW / UW (offset 14.5 in. inward, station / elevation of the panel point) and the
+108 lateral ends moved to them; plates with the drawn outline (dimension-only flag per point: page, traced +-1 in., mirrored); L15 pair in the lateral's plane (the angle is
+bent, not the plate); L11 plates stop 5 in. beyond the strut box side (the 24 WF 94 end connection tees overlapped them 7/16 in.).
+L11 bottom strut (coordinator, walkway agent review): p.80 Section A / p.104 Section A put the 3'-4 1/2 b.b. Ls strut 2'-3 3/8 above / 1'-1 1/8 below its work line; it was
+centred: `OffsetZ` = 7 1/8 in. (truss-ptc-arch.csx + bracing-ptc.csx), top of angles El. 100.48 (cover plate top 100.53, was 99.94). p.80 also prints '6 7/8' CL of strut to the
+same line: CONFLICT row (1/4 in.), reported.
+Results (main span only copy, chain bracing -> details -> girder-details -> rivets): bracing plates 584 (unchanged count), edge angles 524 -> 540 (L11), fills (bracing plates) 708 -> 700,
+bracing rivets placed 22,744 -> 23,432, positions passing one part only 3,504 -> 2,744, steel C + S 14,240,179 -> 14,245,858 lb (89.4 % of p.42); check-truss-ptc 616 PASS /
+19 DIFF / 73 INFO / 2 CONFLICT before and after (bracing rivets per end all PASS; check reads the W.P. ends and the 5/8 / 3/4 labels); clash (main span, no bolts) 1,124 -> 1,122:
+the lateral / plate rows that changed are all 'walkway on strut L11' x the raised strut (walkways follow the strut top in the walkway agent's branch).
+Open (flagged): apex plates LM / UM (half views on p.97 / p.98 not traced: envelopes kept), L0 (p.73), L13 / L13 1/2 (p.95 / p.98), L22 / U22 (p.90), U11 (portal) plates; L11 outline;
+rivet gages / pitch (not dimensioned); L15 has 40 rivet positions with a 1/4 - 9/16 in. gap behind (counted by the generator CHECK warning).

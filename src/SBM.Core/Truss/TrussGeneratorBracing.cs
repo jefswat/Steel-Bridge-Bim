@@ -77,15 +77,26 @@ public static partial class TrussGenerator
             var d1 = Away(m, start);
             var offs = Corners(m).Select(c => m.X * c.x + m.Y * c.y).ToList();
             double T = 0;
-            // (a) the truss-plane joint(s) at the point
-            var inPlane = InPlaneAt(pl, pt, P).Where(o => o != m).ToList();
+            // (a) the truss-plane joint(s) at the point; a member ending at a bracing plate's WorkPoint clears the joint of that plate's panel point
+            string jpt = pt; var JP = P;
+            if (_d.BracingGussets != null && At(pl, pt).All(o => IsCrossPlane(o.Def.Role)))
+                foreach (var bg in _d.BracingGussets)
+                {
+                    if (bg.WorkPoint is not { Length: > 0 } wn || !wn.Trim().Equals(pt, StringComparison.OrdinalIgnoreCase)) continue;
+                    string spec = bg.Point.Trim();
+                    if (spec.Contains(':') && !spec[..spec.IndexOf(':')].Trim().Equals(pl, StringComparison.OrdinalIgnoreCase)) continue;
+                    string bpt = spec.Contains(':') ? spec[(spec.IndexOf(':') + 1)..].Trim() : spec;
+                    if (_pts.TryGetValue((pl.ToUpperInvariant(), bpt.ToUpperInvariant()), out var bp)) { jpt = bpt; JP = bp; break; }
+                }
+            var inPlane = InPlaneAt(pl, jpt, JP).Where(o => o != m).ToList();
             foreach (var g in inPlane.GroupBy(o => o.Plane.Length > 0 ? o.Plane : pl, StringComparer.OrdinalIgnoreCase))
             {
-                var n = Normal(g.Key, StationOf(P));
+                var n = Normal(g.Key, StationOf(JP));
                 double k = Vec3.Dot(d1, n);
                 if (Math.Abs(k) < 0.2) continue;
-                double s = Math.Sign(k), H = StackHalf(g.Key, pt, g), cs = _d.JointDefaults.BracingStackClearance > 0 ? _d.JointDefaults.BracingStackClearance : clr;
-                foreach (var o in offs) T = Math.Max(T, (H + cs - s * Vec3.Dot(o, n)) / Math.Abs(k));
+                double s = Math.Sign(k), H = StackHalf(g.Key, jpt, g), cs = _d.JointDefaults.BracingStackClearance > 0 ? _d.JointDefaults.BracingStackClearance : clr;
+                double w0 = s * Vec3.Dot(P - JP, n);
+                foreach (var o in offs) T = Math.Max(T, (H + cs - w0 - s * Vec3.Dot(o, n)) / Math.Abs(k));
             }
             // (b) members passing near the point (any member: a strut through the apex of a K, a floor beam over a sway frame, a girder beside a lateral
             // node), (c) bracing members of equal / higher rank ending at the same point; a member steep to a bracing plate
@@ -204,7 +215,13 @@ public static partial class TrussGenerator
                     else { n = Up; u = tan; }
                     var v = Vec3.Cross(n, u).Normalized();
                     Vec2 UV(Vec3 w) => new(Vec3.Dot(w - P, u), Vec3.Dot(w - P, v));
-                    // connected members: ending at the point / passing it
+                    // connected members: ending at the point (or at the plate's work point) / passing it
+                    Vec3? W = null;
+                    if (bg.WorkPoint is { Length: > 0 } wpn)
+                    {
+                        if (_pts.TryGetValue((pl.ToUpperInvariant(), wpn.Trim().ToUpperInvariant()), out var wv)) W = wv;
+                        else Warn($"Truss: bracing plate at {where} - work point '{wpn}' is not defined on plane {pl}; members are taken at the point only{Src}.");
+                    }
                     var conn = new List<(Inst m, bool ends, bool start)>();
                     foreach (var o in _inst)
                     {
@@ -213,6 +230,7 @@ public static partial class TrussGenerator
                         if (bg.Members.Count > 0 && !named) continue;
                         if (bg.Members.Count == 0 && (!IsBracing(o.Def.Role) || (o.Def.Role == TrussMemberRole.Sway) != (bg.Orientation == TrussBracingPlateOrientation.Transverse) || Math.Abs(Vec3.Dot(o.Axis, n)) > 0.5)) continue;
                         bool atA = (o.A - P).Length < 0.005, atB = (o.B - P).Length < 0.005;
+                        if (!atA && !atB && W is { } wp) { atA = (o.A - wp).Length < 0.005; atB = (o.B - wp).Length < 0.005; }
                         if (atA || atB) { conn.Add((o, true, atA)); continue; }
                         double len = (o.B - o.A).Length, ta = Vec3.Dot(P - o.A, o.Axis);
                         if (ta > 0.01 && ta < len - 0.01 && (o.A + o.Axis * ta - P).Length < 0.005) conn.Add((o, false, false));
@@ -225,7 +243,8 @@ public static partial class TrussGenerator
                         // apart), one member = its own flange plane; normal up; u = the tangent projected into it
                         Vec3 best = default; double bl = 0;
                         var chords = InPlaneAt(pl, ptName, P).Where(o => IsChord(o.Def.Role) && o.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)).ToList();
-                        if (chords.Count > 0 && (conn.Count > 1 || bg.EdgeAngle.Length > 0) && !(bg.MemberPlane && conn.Count > 1))
+                        // (MemberPlane with ONE named member - a plate pair of its own per lateral, e.g. at a chord kink: the member's plane, also with an edge angle)
+                        if (chords.Count > 0 && (conn.Count > 1 || bg.EdgeAngle.Length > 0) && !(bg.MemberPlane && (conn.Count > 1 || bg.Members.Count == 1)))
                         {
                             var cd = chords.Select(o => Vec3.Dot(o.Axis, tan) >= 0 ? o.Axis : -o.Axis).Aggregate(Vec3.Zero, (a, b) => a + b).Normalized();
                             best = Vec3.Cross(cd, Normal(pl, st)); bl = best.Length;
@@ -254,13 +273,16 @@ public static partial class TrussGenerator
                     int CountOf(Inst m) => bg.RivetDiameter <= 0 ? 0 : bg.Rivets != null && (bg.Rivets.TryGetValue(m.Def.Name, out var c1) || bg.Rivets.TryGetValue(m.Mark, out c1)) ? c1 : bg.RivetsPerMember;
                     // lap of each member: the given lap, longer when its rivet lines need it (1 1/2 d end distances)
                     double LapOf(Inst m) { int c = CountOf(m); return c <= 0 ? lap : Math.Max(lap, 3 * bg.RivetDiameter + (Math.Ceiling(c / (double)nLines) - 1) * pitch); }
+                    // base of a connected member's lap: its own end point (the panel point, or the work point W) / the point for a member passing it
+                    Vec3 Base(Inst m, bool ends, bool start) => ends ? (start ? m.A : m.B) : P;
                     // face of a member along n over the part of it the plate laps (an inclined member: the lowest / highest point of the lap)
                     double Face(Inst m, bool max)
                     {
                         var c = conn.First(x => x.m == m);
                         var d = c.ends ? Away(m, c.start) : m.Axis;
                         double s0 = c.ends ? (c.start ? m.SA : m.SB) : -LapOf(m) / 2;
-                        var vals = new[] { s0, s0 + LapOf(m) }.SelectMany(sa => Corners(m).Select(k => Vec3.Dot(d * sa + m.X * k.x + m.Y * k.y, n)));
+                        double b0 = Vec3.Dot(Base(m, c.ends, c.start) - P, n);
+                        var vals = new[] { s0, s0 + LapOf(m) }.SelectMany(sa => Corners(m).Select(k => b0 + Vec3.Dot(d * sa + m.X * k.x + m.Y * k.y, n)));
                         return max ? vals.Max() : vals.Min();
                     }
                     (Vec3 dir, Vec3 across, double half) InPlane(Inst m, Vec3 d)
@@ -281,7 +303,7 @@ public static partial class TrussGenerator
                             var (dp, ac, h) = InPlane(m, Away(m, start));
                             double s0 = start ? m.SA : m.SB;
                             foreach (double s in new[] { s0, s0 + LapOf(m) })
-                                foreach (int sx in new[] { -1, 1 }) pts.Add(UV(P + Away(m, start) * s + ac * (sx * (h + margin))));
+                                foreach (int sx in new[] { -1, 1 }) pts.Add(UV(Base(m, true, start) + Away(m, start) * s + ac * (sx * (h + margin))));
                         }
                         if (pts.Count == 0) pts.Add(new Vec2(0, 0));
                         foreach (var (m, _, _) in conn.Where(c => !c.ends))
@@ -314,8 +336,7 @@ public static partial class TrussGenerator
                                 double dmin = outline.Min(q => q.X * nu.X + q.Y * nu.Y);
                                 if (dmin > lim + 1e-4)
                                 {
-                                    var ext = outline.Concat(outline.Where(q => q.X * nu.X + q.Y * nu.Y < dmin + 0.15).Select(q => q - nu * (q.X * nu.X + q.Y * nu.Y - lim))).ToList();
-                                    outline = MeshBuilder.ConvexHull(ext);
+                                    outline = CarryToLine(outline, nu, lim, dmin, bg.Outline is { Count: >= 3 });
                                     nToStack++;
                                 }
                             }
@@ -335,7 +356,7 @@ public static partial class TrussGenerator
                     Vec2 crossN2 = default;
                     if (ending.Count > 0 && bg.Outline is not { Count: >= 3 })
                     {
-                        var cen = ending.Select(c => { var (dp, _, _) = InPlane(c.m, Away(c.m, c.start)); return UV(P + dp * ((c.start ? c.m.SA : c.m.SB) + LapOf(c.m) / 2)); })
+                        var cen = ending.Select(c => { var (dp, _, _) = InPlane(c.m, Away(c.m, c.start)); return UV(Base(c.m, true, c.start) + dp * ((c.start ? c.m.SA : c.m.SB) + LapOf(c.m) / 2)); })
                             .Aggregate(new Vec2(0, 0), (a, b) => a + b) / ending.Count;
                         foreach (var o in _inst)
                         {
@@ -424,8 +445,7 @@ public static partial class TrussGenerator
                                 if (bg.PlateToStack && outline.Count >= 3)
                                 {
                                     double dmin = outline.Min(q => q.X * nu.X + q.Y * nu.Y);
-                                    if (dmin > lim + 1e-4)
-                                        outline = MeshBuilder.ConvexHull(outline.Concat(outline.Where(q => q.X * nu.X + q.Y * nu.Y < dmin + 0.15).Select(q => q - nu * (q.X * nu.X + q.Y * nu.Y - lim))).ToList());
+                                    if (dmin > lim + 1e-4) outline = CarryToLine(outline, nu, lim, dmin, bg.Outline is { Count: >= 3 });
                                 }
                             }
                         }
@@ -542,7 +562,8 @@ public static partial class TrussGenerator
                                 var dd = ends ? Away(m, start) : m.Axis;
                                 var (dp, ac, h) = InPlane(m, dd);
                                 double a0 = ends ? (start ? m.SA : m.SB) : -LapOf(m) / 2, a1 = a0 + LapOf(m);
-                                var rect = new List<Vec2> { UV(P + dp * a0 - ac * h), UV(P + dp * a1 - ac * h), UV(P + dp * a1 + ac * h), UV(P + dp * a0 + ac * h) };
+                                var B0 = Base(m, ends, start);
+                                var rect = new List<Vec2> { UV(B0 + dp * a0 - ac * h), UV(B0 + dp * a1 - ac * h), UV(B0 + dp * a1 + ac * h), UV(B0 + dp * a0 + ac * h) };
                                 if (MeshBuilder.SignedArea(rect) < 0) rect.Reverse();
                                 for (int k = 0; k < outline.Count && rect.Count >= 3; k++)
                                 {
@@ -591,7 +612,7 @@ public static partial class TrussGenerator
                                 foreach (double gg in gages)
                                 {
                                     if (placed >= cnt) break;
-                                    var q = P + (ends ? Away(m, start) : m.Axis) * (s0 + k * pitch) + ac * gg;
+                                    var q = Base(m, ends, start) + (ends ? Away(m, start) : m.Axis) * (s0 + k * pitch) + ac * gg;
                                     q -= n * Vec3.Dot(q - P, n);   // onto the plate plane through the point
                                     var q2 = UV(q);
                                     if (EdgeDistance(outline, q2) < 1.25 * bg.RivetDiameter) { nOut++; placed++; continue; }
@@ -683,6 +704,16 @@ public static partial class TrussGenerator
                     break;
                 }
             return best;
+        }
+
+        /// <summary>PlateToStack: the outline part next to the stack carried to the line q . nu = lim (dmin = its current nearest distance). An envelope
+        /// (convex) takes the hull with the vertices within 0.15 m projected onto the line; a GIVEN (drawn, possibly concave) outline keeps its shape - only the
+        /// vertices of its stack-side edge (within 1 in. of dmin) move onto the line.</summary>
+        private static List<Vec2> CarryToLine(List<Vec2> outline, Vec2 nu, double lim, double dmin, bool given)
+        {
+            if (!given)
+                return MeshBuilder.ConvexHull(outline.Concat(outline.Where(q => q.X * nu.X + q.Y * nu.Y < dmin + 0.15).Select(q => q - nu * (q.X * nu.X + q.Y * nu.Y - lim))).ToList());
+            return outline.Select(q => { double d = q.X * nu.X + q.Y * nu.Y; return d < dmin + In(1) ? q - nu * (d - lim) : q; }).ToList();
         }
 
         /// <summary>Keeps the part of a convex polygon with p . nrm >= c.</summary>

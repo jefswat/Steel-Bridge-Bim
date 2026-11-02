@@ -9,6 +9,7 @@
 // Every scaled value is a dimension-only flag (page + reason); values the sheets do not give are UNRESOLVED flags; nothing is adjusted.
 // Dev options (not for the committed model): env BRACING_ONLY=<bridge name part> keeps only those bridges in memory (nothing saved), BRACING_CLASH=1 prints
 // the clash summary of the kept bridges.
+using System.IO;
 using SBM.Core;
 using SBM.Core.Bridge;
 using SBM.Core.Steel;
@@ -120,8 +121,92 @@ if (T(Main) is { } tm0)
         "the wind chord CL elevations (p.69 table) and the suspended floor beam depth / bottom (p.94) leave less than the 14 BP 73 half depth between them; the wind chord to floor beam connection (p.99) was not read",
         "both kept as printed; the overlap (and the floor beam end plates / edge angles over the wind chord) is reported, not adjusted."));
     report.Add($"{Main}: L13 struts removed {removedL13}");
+    // ---- 2026-11-02 agent review (user: N-BGL15-T, S-BGL11-b-T and "the lateral bracing gussets aren't correct ... there are issues elsewhere"):
+    // the plates were envelopes of the member laps everywhere; the details draw them (docs/plan-data/ptc-delaware-river/truss/lateral-plates.csv, traced
+    // at 300 dpi, 2.166 pt / in. checked on 1'-2 1/2, 2'-10 Min. and the 18 in. strut). Drawn = N truss, unprimed half, plan view (u up-station, v toward
+    // the truss): S truss = mirror about the CL bridge (v -> -v), primed (NJ) half = mirror about L22 (u -> -u). The details also put the strut and LATERAL
+    // working lines through the W.P. on the gusset plate line 1'-2 1/2 inside the CL truss (L1-L10, L12, L16-L21, U12-U21; at L15 the lateral runs to L15
+    // on the CL truss): the laterals ran to the panel point, 8-10 in. (normal to the member) off the drawn position at the plate.
+    var lpRows = new List<Dictionary<string, string>>();
+    {
+        string lpPath = null;
+        for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir != null && lpPath == null; dir = dir.Parent)
+        {
+            var p = Path.Combine(dir.FullName, "docs", "plan-data", "ptc-delaware-river", "truss", "lateral-plates.csv");
+            if (File.Exists(p)) lpPath = p;
+        }
+        if (lpPath == null) report.Add($"{Main}: lateral-plates.csv not found above the current directory - plates stay the lap envelopes");
+        else
+        {
+            List<string> Split(string line)
+            {
+                var cells = new List<string>(); var cur = new System.Text.StringBuilder(); bool q = false;
+                for (int i = 0; i < line.Length; i++)
+                {
+                    char c = line[i];
+                    if (q) { if (c == '"') { if (i + 1 < line.Length && line[i + 1] == '"') { cur.Append('"'); i++; } else q = false; } else cur.Append(c); }
+                    else if (c == '"') q = true;
+                    else if (c == ',') { cells.Add(cur.ToString()); cur.Clear(); }
+                    else cur.Append(c);
+                }
+                cells.Add(cur.ToString());
+                return cells;
+            }
+            var lines = File.ReadAllLines(lpPath).Where(l => l.Trim() != "").ToList();
+            var hdr = Split(lines[0]);
+            lpRows = lines.Skip(1).Select(l => { var f = Split(l); return hdr.Select((h, i) => (h, v: i < f.Count ? f[i].Trim() : "")).ToDictionary(x => x.h, x => x.v); }).ToList();
+        }
+    }
+    var lpFor = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+    foreach (var r in lpRows) foreach (var a in r["applies_to"].Split(';', StringSplitOptions.RemoveEmptyEntries)) lpFor[a.Trim()] = r;
+    var inv = System.Globalization.CultureInfo.InvariantCulture;
+    string AngleOf(string s)
+    {
+        // "2-Ls 7 x 4 x 1/2 (bent)" / "1-L 8 x 7 1/2 x 1/2" -> "L7x4x1/2" / "L8x7-1/2x1/2" (one angle per plate of the pair)
+        var core = System.Text.RegularExpressions.Regex.Replace(s, @"\(.*?\)", "").Trim();
+        core = System.Text.RegularExpressions.Regex.Replace(core, @"^\d+-Ls?\s*", "");
+        var dims = core.Split('x').Select(x => x.Trim().Replace(' ', '-')).ToArray();
+        return "L" + string.Join("x", dims);
+    }
+    // W.P. points (1'-2 1/2 inside the CL truss, at the panel point's station and elevation = on the strut working line) and the laterals re-pointed to them
+    int wpMoved = 0;
+    foreach (var (bn, r) in lpFor)
+    {
+        if (r["work_point"] != "1'-2 1/2") continue;
+        foreach (bool pr in new[] { false, true })
+        {
+            string pn = bn + (pr ? "'" : "");
+            var pd = t.Points.FirstOrDefault(p => p.Name == pn && p.Planes == null);
+            if (pd == null) continue;
+            string wn = (bn.StartsWith("U") ? "UW" : "LW") + bn[1..] + (pr ? "'" : "");
+            t.Points.RemoveAll(p => p.Name == wn);
+            string src = $"p.{r["page"]} detail {r["detail"]}: W.P. on the gusset plate line 1'-2 1/2 inside the CL truss (strut and lateral working lines)";
+            t.Points.Add(new TrussPointDefinition(wn, pd.Station, pd.Elevation, src) { Offset = In(14.5), Planes = new() { "N" } });
+            t.Points.Add(new TrussPointDefinition(wn, pd.Station, pd.Elevation, src) { Offset = -In(14.5), Planes = new() { "S" } });
+            foreach (var m in t.Members.Where(m => m.Role is TrussMemberRole.UpperLateral or TrussMemberRole.LowerLateral && m.System is "Upper laterals" or "Lower laterals"))
+                foreach (var plq in new[] { "N", "S" })
+                {
+                    if (m.From == $"{plq}:{pn}") { m.From = $"{plq}:{wn}"; wpMoved++; }
+                    if (m.To == $"{plq}:{pn}") { m.To = $"{plq}:{wn}"; wpMoved++; }
+                }
+        }
+    }
+    report.Add($"{Main}: lateral ends moved to the drawn W.P. {wpMoved} (lateral-plates.csv rows {lpRows.Count})");
+    // L11 box strut height (p.80 Section A / p.104 Section A): 2'-3 3/8 above and 1'-1 1/8 below its work line = CL of strut 7 1/8 above it (also set in
+    // truss-ptc-arch.csx; here for models built before). p.80 also prints '6 7/8' from the CL of strut to that line: 1/4 in. plan conflict, reported.
+    foreach (var m in t.Members.Where(m => m.Name is "LS-L11" or "LS-L11'")) m.OffsetZ = In(7.125);
+    t.Unresolved.RemoveAll(s => s.Contains("L11 bottom strut above its work line"));
+    t.Unresolved.Add(U("p.80, p.104", "CONFLICT (p.80 Section A dimension strings): L11 bottom strut above its work line",
+        "Section A prints 2'-3 3/8 above / 1'-1 1/8 below the work line (= 3'-4 1/2 b. to b. Ls, CL of strut 7 1/8 above; p.104 Section A agrees: top 12'-9 3/8 above the pier) and '6 7/8' from the CL of strut to the same line",
+        "CL of strut 7 1/8 in. above the work line (the chain that closes on the 3'-4 1/2 depth); the 1/4 in. difference is reported, not adjusted."));
+    // W.P. specs map back to their panel point (one plate pair per point)
+    string ToPanel(string spec)
+    {
+        string pl0 = spec[..spec.IndexOf(':')], p0 = spec[(spec.IndexOf(':') + 1)..];
+        return p0.StartsWith("LW") || p0.StartsWith("UW") ? $"{pl0}:{p0[0]}{p0[2..]}" : spec;
+    }
     var pts = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-    string Norm(string spec) => spec.Contains(":UM") || spec.Contains(":LM") ? "N:" + spec[(spec.IndexOf(':') + 1)..] : spec;
+    string Norm(string spec) => spec.Contains(":UM") || spec.Contains(":LM") ? "N:" + spec[(spec.IndexOf(':') + 1)..] : ToPanel(spec);
     var lat = t.Members.Where(m => m.Role is TrussMemberRole.UpperLateral or TrussMemberRole.LowerLateral && m.System is "Upper laterals" or "Lower laterals").ToList();
     var struts = t.Members.Where(m => m.Role == TrussMemberRole.Strut && m.System is "Upper laterals" or "Lower laterals").ToList();
     foreach (var m in lat) { pts.Add(Norm(m.From)); pts.Add(Norm(m.To)); }
@@ -169,20 +254,49 @@ if (T(Main) is { } tm0)
         // L0 / L11: the box struts (30 / 40 in. deep, p.71) are deeper than the laterals: one plate pair per lateral, lying on the lateral and stopping
         // clear of the strut
         var deep = struts.Where(m => m.Section.StartsWith("STRUT L") && (m.From == spec || m.To == spec)).ToList();
-        var groups = deep.Count > 0
+        // L15 (p.98): one lateral, no strut, '2-Ls 7 x 4 x 3/4 (bent)' along the chord kink = a FLAT plate pair in the lateral's plane (the angle bends,
+        // not the plate): the plate is defined for that lateral alone so it lies in the lateral's plane (the mean chord plane left it 0.09 in. into the lateral)
+        bool ownLateral = deep.Count > 0 || pt.TrimEnd('\'') == "L15";
+        var groups = ownLateral
             ? lat.Where(m => Norm(m.From) == spec || Norm(m.To) == spec).Select(m => new List<string> { m.Name }).ToList()
             : new List<List<string>> { new() };
         int gi = 0;
+        // 2026-11-02: the drawn plate of this point (lateral-plates.csv; 'similar' points mapped there), mirrored for the S truss / primed half
+        string pl = spec[..spec.IndexOf(':')], bn = pt.TrimEnd('\'');
+        bool primed = pt.EndsWith("'");
+        lpFor.TryGetValue(bn, out var lr);
+        if (apex || quarter) lr = null;
+        List<TrussUV>? drawn = null;
+        if (lr != null && lr["outline_in"].Length > 0)
+            drawn = lr["outline_in"].Split(';').Select(q => q.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                .Select(q => new TrussUV { U = In(double.Parse(q[0], inv)) * (primed ? -1 : 1), V = In(double.Parse(q[1], inv)) * (pl == "S" ? -1 : 1) }).ToList();
+        double thk = lr != null ? In(double.Parse(lr["thickness_in"], inv)) : In(0.5);
+        string ang = lr != null ? AngleOf(lr["edge_angle"]) : apex || quarter || deep.Count > 0 ? "" : pt.StartsWith("L13H") ? "L7-1/2x4x1/2" : "L7x4x1/2";
+        string flag = mainPlateFlag;
+        if (lr != null && drawn != null)
+            flag = U($"p.{lr["page"]}", $"main span lateral / strut gusset plate outline at {pt} (as drawn for {lr["detail"]}{(lr["detail"] != bn ? ", 'similar'" : "")})",
+                $"the plate is drawn, not dimensioned: outline traced from a 300 dpi render ({lr["confidence"]} confidence, about +-1 in.){(primed || pl == "S" ? ", mirrored for this truss / half" : "")}; rivet gages / pitch not dimensioned",
+                $"plate {lr["thickness_in"]} in. pair as traced (clipped 1/4 in. clear of the joint stack under the {lr["edge_angle"]}); rivets at the p.71 counts, 4 lines 2 1/2 in. from the member sides, 3 in. pitch.");
+        else if (lr != null)
+            flag = U($"p.{lr["page"]}", $"main span lateral plates at {pt} ({lr["edge_angle"]}, {lr["thickness_in"]} in.)",
+                "View K / Section B show the plate pair on the chord inner web at the lateral's top / bottom faces in an oblique view without dimensions; its outline and position along the chord, and the angle's rivets, are not given",
+                "plate = envelope of the lateral lap carried to the stack (1/4 in. clear) under the angle, lying on the lateral's top / bottom face (flat in the bracing plane); angle rivets not placed.");
         foreach (var members in groups)
             t.BracingGussets.Add(new TrussBracingGussetDefinition
             {
                 Members = members, Suffix = groups.Count > 1 ? "-" + "abcd"[gi++] : "",
-                Point = spec, Label = "2-1/2 Pls.", Orientation = TrussBracingPlateOrientation.Fitted, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
-                EdgeAngle = apex || quarter || deep.Count > 0 ? "" : pt.StartsWith("L13H") ? "L7-1/2x4x1/2" : "L7x4x1/2", EdgeRivets = apex || quarter || deep.Count > 0 ? 0 : 13, Rivets = rv, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
-                RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet", Material = "C", Unresolved = mainPlateFlag, Source = "p.97 / p.98",
+                Point = spec, Label = lr != null ? $"2-{(lr["thickness_in"] == "0.5" ? "1/2" : lr["thickness_in"] == "0.75" ? "3/4" : lr["thickness_in"] == "0.625" ? "5/8" : lr["thickness_in"])} Pls." : "2-1/2 Pls.",
+                Orientation = TrussBracingPlateOrientation.Fitted, Side = TrussBracingPlateSide.Both, Thickness = thk,
+                Outline = drawn, WorkPoint = lr?["work_point"] == "1'-2 1/2" ? (bn.StartsWith("U") ? "UW" : "LW") + bn[1..] + (primed ? "'" : "") : null,
+                EdgeAngle = ang, EdgeRivets = apex || quarter || ang.Length == 0 || lr?["detail"] == "L11" ? 0 : 13, Rivets = rv, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
+                RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet", Material = "C", Unresolved = flag, Source = lr != null ? $"p.{lr["page"]}" : "p.97 / p.98",
                 // batch 5a: since batch 1b the members are 14 / 19 in. wide (channels top and bottom): plate in the plane of the members it connects, fills
                 // where a member face stands off it, plate carried to the stack under the edge angle, 4 rivet lines across each member's own width
-                MemberPlane = true, MemberFills = true, PlateToStack = !apex && deep.Count == 0, RivetGageEdge = In(2.5), RivetGapTolerance = In(3.0 / 16), ProbeFaces = true,
+                // (L11, p.80 View K / Section B: the plate pair of each lateral reaches the chord inner web under the 1-L 8 x 7 1/2 x 1/2: carried to the stack)
+                MemberPlane = true, MemberFills = true, PlateToStack = !apex && (deep.Count == 0 || lr != null), RivetGageEdge = In(2.5), RivetGapTolerance = In(3.0 / 16), ProbeFaces = true,
+                // L11: the strut end connection tees ('Cut from 24 WF 94', p.80 Section A) stand 4 3/4 in. beyond the box sides at the post: the lateral plates
+                // and their angles stop clear of them (they overlapped the tees by 7/16 in.)
+                CrossingFaceOffset = deep.Count > 0 && lr != null ? In(5) : 0,
             });
     }
     report.Add($"{Main}: {t.BracingGussets.Count} bracing plate definitions");

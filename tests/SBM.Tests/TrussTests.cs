@@ -999,6 +999,60 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void BracingGussets_WorkPoint_LateralEndsOnTheGussetLine()
+    {
+        // PTC p.97 / p.98: the lateral working line runs to a W.P. on the gusset plate line 1'-2 1/2 inside the CL truss, the plate stays referred to the
+        // panel point (stack clip, edge angle); the lateral ending at the W.P. is connected to the plate of the panel point and clears the joint stack
+        (BridgeModel bm, BridgeDefinition b) Build(bool wp)
+        {
+            var (p, b) = Model();
+            var t = b.Truss!;
+            t.Members.RemoveAll(m => m.Name.StartsWith("FB"));
+            t.Points.Add(new TrussPointDefinition("LM3", Ft(100) + 3 * Panel, Ft(60)) { Offset = Half, Planes = new() { "N" } });
+            t.Points.Add(new TrussPointDefinition("LW2", Ft(100) + 2 * Panel, Ft(60)) { Offset = In(14.5), Planes = new() { "N" } });
+            t.Members.Add(new TrussMemberDefinition { Name = "STRUT2", From = "N:L2", To = "S:L2", Section = "PL", Role = TrussMemberRole.Strut });
+            t.Members.Add(new TrussMemberDefinition { Name = "KA", From = wp ? "N:LW2" : "N:L2", To = "N:LM3", Section = "PL", Role = TrussMemberRole.LowerLateral });
+            t.JointDefaults.BracingCornerClearance = In(0.5);
+            t.JointDefaults.BracingStackClearance = In(4);
+            t.BracingGussets = new()
+            {
+                new TrussBracingGussetDefinition { Point = "N:L2", WorkPoint = wp ? "LW2" : null, Thickness = In(0.5), Side = TrussBracingPlateSide.Below,
+                    RivetsPerMember = 6, RivetPitch = In(3), RivetGage = In(4), RivetDiameter = In(0.875) },
+            };
+            return (Regen(p), b);
+        }
+        var (bm, bd) = Build(true);
+        var st = bm.Steel!;
+        var diag = string.Join(" | ", st.Diagnostics.Where(d => d.Message.Contains("bracing")).Select(d => d.Message));
+        // the lateral ending at the work point is connected: plate under its end, rivets through it
+        var plate = st.Parts.SingleOrDefault(x => x.Mark == "N-BGL2");
+        Assert.True(plate != null, diag);
+        var ka = st.Parts.Single(x => x.Mark == "KA");
+        var kaM = st.Truss!.Member("KA")!;
+        Assert.True(kaM.WorkLength - kaM.CutLength > In(1), $"KA setbacks {(kaM.WorkLength - kaM.CutLength) / 0.0254:0.0} in.");
+        var pb = plate!.Mesh.Bounds(); var kb = ka.Mesh.Bounds();
+        Assert.True(pb.Max.X > kb.Min.X && pb.Min.X < kb.Max.X && pb.Max.Y > kb.Min.Y && pb.Min.Y < kb.Max.Y, "plate does not reach KA");
+        Assert.InRange(pb.Max.Z - kb.Min.Z, -1e-4, 1e-4);                                  // plate top on the lateral's bottom face
+        int kaRivets = st.Bolts.Count(r => r.Kind == BoltKind.Rivet && r.Diameter == In(0.875) && r.Assembly.StartsWith("BR-")
+            && r.Frame.Origin.X > pb.Min.X - 0.01 && r.Frame.Origin.X < pb.Max.X + 0.01 && r.Frame.Origin.Y > kb.Min.Y && r.Frame.Origin.Y < kb.Max.Y);
+        Assert.True(kaRivets >= 3, $"{kaRivets} rivets on KA");
+        var o = new SBM.Core.Checks.ClashOptions();
+        var cl = SBM.Core.Checks.SteelClashCheck.Run(bm, o).Clashes;
+        Assert.DoesNotContain(cl, c => (c.A.Mark == "KA" || c.B.Mark == "KA") && (c.A.Kind is "TrussChord" or "TrussGusset" || c.B.Kind is "TrussChord" or "TrussGusset" || c.A.Mark == "STRUT2" || c.B.Mark == "STRUT2"));
+        // the same lateral ending at the panel point instead (old layout): no work point needed, plate still built
+        var (bm0, _) = Build(false);
+        Assert.Contains(bm0.Steel!.Parts, x => x.Mark == "N-BGL2");
+        // the work point moves the lateral's working line (and its end) toward the bridge CL
+        var ka0 = bm0.Steel!.Truss!.Member("KA")!;
+        Assert.InRange(kaM.A.Y - ka0.A.Y, -In(14.5) - 1e-6, -In(14.5) + 1e-6);
+        // the input is OPTIONAL: omitted from the .sbm when unset, kept by a round trip
+        var json = System.Text.Json.JsonSerializer.Serialize(new TrussBracingGussetDefinition());
+        Assert.DoesNotContain("WorkPoint", json);
+        var p2 = BridgeProject.FromJson(new BridgeProject { Alignments = { new Alignment { Name = "A" } }, Bridges = { bd } }.ToJson());
+        Assert.Equal("LW2", p2.Bridges[0].Truss!.BracingGussets![0].WorkPoint);
+    }
+
+    [Fact]
     public void SwayPlates_EdgeAngleOnCrossingMember_RotatedEndConnection_NoStackClip()
     {
         // inverted V sway frame from U3 (both planes) down to the CL point LM3 of strut 3 (the strut passes it); the diagonals are rolled shapes turned 90 deg
