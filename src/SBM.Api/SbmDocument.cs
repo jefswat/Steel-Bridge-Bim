@@ -620,6 +620,15 @@ public sealed class SbmDocument
     /// <param name="centerlines">Also write every element's geometric centerline and section centroid line (layers CL-GEOMETRIC / CL-CENTROID).</param>
     /// <param name="exactCurved">Regenerate with exact NURBS for the curved parts (deck, haunches, barriers, curved girder plates) for this export when
     /// the project setting is off (the setting is restored afterwards and the model is not saved). False = the model as it is set.</param>
+    /// <summary>Writes a LOW RESOLUTION Google Earth KMZ (doc.kml + one COLLADA model per bridge, alignments as lines): solids only (no bars, strands,
+    /// fasteners, welds), meshes simplified by vertex clustering until the file fits the triangle budget. Needs a georeference whose CRS is in
+    /// <see cref="SBM.Core.Geometry.MapProjections"/>. See docs/API.md "Google Earth export".</summary>
+    public SBM.IO.Kml.KmzResult ExportKmz(string path, SBM.IO.Kml.KmzOptions? options = null)
+    {
+        Regenerate();
+        return SBM.IO.Kml.KmzExporter.Export(path, Project, _models.OfType<BridgeModel>().ToList(), options);
+    }
+
     public SBM.IO.Rhino3dm.Rhino3dmResult Export3dm(string path, IReadOnlyList<string>? bridges = null, bool detail = true, bool meshOnly = false,
         bool terrain = false, bool barSolids = false, int fileVersion = 8, bool centerlines = false, bool exactCurved = true, string? layers = null)
     {

@@ -30,6 +30,7 @@ public static partial class Program
           sbm regen <file.sbm>                              Regenerate; print counts, warnings, timing
           sbm export <file.sbm> [--ifc a.ifc|a.ifczip] [--geometry parametric|abv] [--chord-tol mm] [--dxf b.dxf] [--landxml c.xml]
                                                             [--for-check [--keep-designations]]  IFC for an independent checker: originator notes stripped
+                                                            [--kmz a.kmz [--bridges A,B] [--kmz-tris N (150000)] [--kmz-cell mm (100)] [--no-alignments]]  Google Earth, low resolution
                                                             [--3dm a.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids] [--3dm-version 7|8] [--3dm-layers REGEX]]
                                                             Rhino 3DM: exact extrusions / B-reps, fastener blocks, bar and alignment
                                                             curves, layers per bridge, IFC GlobalIds as user text (IFC base point)
@@ -367,6 +368,15 @@ public static partial class Program
                         int nUn = res.Unclassified.Values.Sum();
                         Console.WriteLine($"  US Bridge Dictionary classes: {res.Classified.Sum(c => c.Count):N0} elements in {res.Classified.Count} classes; no fitting class: {nUn:N0}" +
                                           (nUn > 0 ? " (" + string.Join(", ", res.Unclassified.OrderByDescending(kv => kv.Value).Take(args.Contains("--classes") ? 1000 : 8).Select(kv => $"{kv.Key} {kv.Value:N0}")) + ")" : ""));
+                    }
+                    if (Opt("--kmz") is { } kz)
+                    {
+                        var ko = new SBM.IO.Kml.KmzOptions { Bridges = Opt("--bridges")?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), Alignments = !args.Contains("--no-alignments") };
+                        if (Opt("--kmz-tris") is { } kt) ko.MaxTriangles = int.Parse(kt, System.Globalization.CultureInfo.InvariantCulture);
+                        if (Opt("--kmz-cell") is { } kc) ko.CellSize = double.Parse(kc, System.Globalization.CultureInfo.InvariantCulture) / 1000;
+                        var kr = doc.ExportKmz(kz, ko);
+                        Console.WriteLine($"  Google Earth KMZ → {kz}  ({kr.Bytes / 1048576.0:0.0} MB, {kr.Bridges} bridge models, {kr.Triangles:N0} triangles from {kr.SourceTriangles:N0}, vertex grid {kr.CellSize * 1000:0} mm, {kr.Alignments} alignments)");
+                        foreach (var n in kr.Notes) Console.WriteLine("  " + n);
                     }
                     if (Opt("--3dm") is { } r3)
                     {

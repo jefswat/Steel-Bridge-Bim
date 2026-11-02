@@ -304,6 +304,9 @@
                             <Button Style="{StaticResource RibbonButton}" Command="{Binding ExportRhinoCommand}" ToolTip="Rhino 3DM (.3dm): exact plates / shapes as extrusions, curved solids as B-reps, bolts and rivets as blocks, bars and alignments as curves; layers per bridge as in the 3D view; IFC GlobalIds as user text; same base point as the IFC">
                                 <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xF158;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Export Rhino (.3dm)"/></StackPanel>
                             </Button>
+                            <Button Style="{StaticResource RibbonButton}" Command="{Binding ExportKmzCommand}" ToolTip="Google Earth (.kmz), low resolution: bridge solids without bars, fasteners or welds, simplified to keep the file small; alignments as lines. Needs a georeference.">
+                                <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xE909;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Google Earth (.kmz)"/></StackPanel>
+                            </Button>
                             <Button Style="{StaticResource RibbonButton}" Command="{Binding ExportDxfCommand}" ToolTip="Framing plan as layered 3D DXF (opens in MicroStation / Civil 3D)">
                                 <StackPanel><TextBlock Style="{StaticResource RibbonIcon}" Text="&#xEDE1;"/><TextBlock Style="{StaticResource RibbonLabel}" Text="Framing Plan DXF"/></StackPanel>
                             </Button>

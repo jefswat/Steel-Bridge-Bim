@@ -1151,6 +1151,35 @@ public sealed partial class MainViewModel : ObservableObject
         finally { IsBusy = false; StatusText = "Rhino 3DM export done"; }
     }
 
+    /// <summary>Low resolution Google Earth KMZ (SBM.IO.Kml.KmzExporter): solids without bars / fasteners / welds, simplified to the triangle budget,
+    /// alignments as lines. Needs a georeference with a CRS from the projection table. Runs off the UI thread.</summary>
+    [RelayCommand]
+    private async Task ExportKmz()
+    {
+        if (Framings.Count == 0) { Warn("There is no model to export. Create a bridge first."); return; }
+        if (SBM.Core.Geometry.GeoTransform.For(_project.Georeference) == null)
+        {
+            Warn(_project.Georeference == null ? "Google Earth export needs a georeference: this model is on a local grid."
+                : $"Google Earth export: the CRS '{_project.Georeference.CrsName}' is not in the projection table.");
+            return;
+        }
+        var dlg = new SaveFileDialog { Filter = "Google Earth (*.kmz)|*.kmz", FileName = _project.Name + ".kmz" };
+        if (dlg.ShowDialog() != true) return;
+        var models = Framings.Keys.Select(b => new BridgeModel(b, Framings[b], SteelModels.GetValueOrDefault(b), true, ConcreteModels.GetValueOrDefault(b),
+            SubstructureModels.GetValueOrDefault(b), PrestressedModels.GetValueOrDefault(b))).ToList();
+        var project = _project;
+        string path = dlg.FileName;
+        IsBusy = true;
+        StatusText = "Exporting Google Earth KMZ…";
+        try
+        {
+            var r = await Task.Run(() => SBM.IO.Kml.KmzExporter.Export(path, project, models));
+            Info($"Exported Google Earth KMZ to {path}: {r.Bridges} bridge models, {r.Triangles:N0} triangles (vertex grid {r.CellSize * 1000:0} mm), {r.Alignments} alignments, {r.Bytes / 1048576.0:0.0} MB.");
+        }
+        catch (Exception ex) { Error($"Google Earth export failed: {ex.Message}"); }
+        finally { IsBusy = false; StatusText = "Google Earth export done"; }
+    }
+
     // ------------------------------------------------------------------ regeneration
 
     private PlanDrawing? _lastDrawing;

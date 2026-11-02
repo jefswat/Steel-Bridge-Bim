@@ -111,6 +111,22 @@ sbm blocking   "C:\Jobs\Br12\Br12.sbm"          # camber, deflections, girder-li
 **Python:** see `samples/scripts/skew_study.py`. It calls `sbm` through `subprocess`. Project files are plain JSON
 (SI units), so you can also read them directly.
 
+## Google Earth export (`--kmz`, low resolution)
+
+```
+sbm export model.sbm --kmz out.kmz [--bridges A,B] [--kmz-tris 150000] [--kmz-cell 100] [--no-alignments]
+```
+App: Output > CAD > Google Earth (.kmz). API: `doc.ExportKmz(path, new KmzOptions { MaxTriangles = ..., CellSize = ... })`.
+
+- One COLLADA model per bridge (colours as the 3D view's layers) + the bridges' alignments as lines at the profile heights; `doc.kml` + `models/*.dae` in a zip.
+- LOW RESOLUTION on purpose: solids only (no bars, strands, tendons, bolts, rivets, studs, welds); every mesh is simplified by vertex clustering (snap to a
+  grid, merge, drop collapsed / repeated triangles) and the grid is coarsened (x 1.5) until the whole file fits `--kmz-tris` (default 150,000).
+  Bonner Unit 5: 1.02 M -> 147 k triangles at a 338 mm grid, 1.1 MB; Br02069: 12 k triangles, 0.1 MB.
+- Needs `Project.Georeference` with a CRS in `SBM.Core/Geometry/MapProjection.cs` (the same table as the terrain pipeline, `tools/terrain/crs.py`: the sample
+  models' state plane zones, UTM NAD83 / WGS84, ESRI:103708); local-grid models are refused with that reason. Project metres -> map (GridScale about
+  ScaleCenterX/Y) -> NAD83 lon / lat (taken as WGS84) -> the local east-north-up frame of each model's origin (ECEF exact, so curvature is in).
+- Heights: the model elevations as KML absolute altitudes. Google Earth uses EGM96, so NAVD88 / NGVD29 models sit within about a metre of its ground.
+
 ## Rhino export (`--3dm`)
 
 `sbm export model.sbm --3dm out.3dm`, `SbmDocument.Export3dm(path, bridges, detail, meshOnly, terrain, barSolids)` or the app
