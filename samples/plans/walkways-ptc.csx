@@ -66,7 +66,8 @@ var counts = new Dictionary<string, (double walkLf, int ladders, int platforms)>
 // singleRail (main span CL walkway, p.106 MATERIAL BETWEEN FLOOR BEAMS, user decision 2026-10-28 BW-W12): one rail angle 3 x 2 1/2 x 5/16 per side, no posts / mid rail
 string singleRailFlag = U("p.106", "main span CL walkway hand railing", "MATERIAL BETWEEN FLOOR BEAMS lists 'Hand Railing 3 x 2 1/2 x 5/16 (grind all sheared edges smooth)' (re-read 2026-10-30, batch 8g; was read 3/8) with 'Hand Rail Conn. to Fl. Beams 6x4x3/8 Ls', 1 PL 14 x 3/8 x 2'-0 and 2 conn. Ls 4x4x3/8 - no posts or mid rail; the rail height and its connection positions are drawn only",
     "one rail angle L 3x2 1/2x5/16 per side (3 in. leg horizontal, outward), top 3'-0 above the grating like the other walkway rails, continuous between the floor beam webs; connection angles and plates not built.");
-void Walk(string bridge, string name, bool transverse, double reference, double from, double to, double vTopIn, bool fromGrade, string pages, string flag, bool singleRail = false)
+// railSide: 0 = rails / posts on both sides, -1 / +1 = only on that side (the other side abuts steel, e.g. the walkway beside the L11 strut, p.104 Sections E / F)
+void Walk(string bridge, string name, bool transverse, double reference, double from, double to, double vTopIn, bool fromGrade, string pages, string flag, bool singleRail = false, int railSide = 0)
 {
     var t = bridges[bridge].Truss!;
     string desc = $"{bridge} - service walkways ({pages})";
@@ -77,6 +78,7 @@ void Walk(string bridge, string name, bool transverse, double reference, double 
     {
         string s = sd < 0 ? "L" : "R";
         items.Add(Li($"{name} channel {s}", "WALKWAYS", desc, PartCategory.WalkwayStringer, transverse, reference, from, to, fromGrade, Channel(sd, top), pages, channelFlag, lbft: 15.3));
+        if (railSide != 0 && sd != railSide) continue;
         if (singleRail)
         {
             items.Add(Li($"{name} hand rail {s}", "WALKWAYS", desc, PartCategory.WalkwayRail, transverse, reference, from, to, fromGrade, RailAngle(sd, 15, top + 36, 3, 2.5, 0.3125), pages, singleRailFlag, lbft: 5.6));
@@ -201,12 +203,13 @@ int WalkCl(string bridge, string name, double from, double to, double aboveFbBot
 string ladderFlag = U("p.101, p.102", "safety ladder width, top extension and cage", "the ladder material is listed (Ls 3x2 1/2x3/8, 3/4 in. rungs 12 in. ctrs, cage bars 2 1/2 x 3/8, hoops @ 5'-0); the stile spacing and the extension above the walkway are drawn only",
     "stiles 1'-4 apart, rungs from 12 in. above the platform at 12 in., stiles 3'-6 above the walkway grating; cage bars / hoops, bent hand bars and the anchors not built.");
 // half = inner face of the stiles from the ladder CL (in.; p.101 / p.102 approach 8, main span p.103 / p.104 '9 | 9'); flag = the ladder's own flag text
-void Ladder(string bridge, string name, double sta, double off, double zBot, double zTop, string pages, double half = 8, string? flag = null)
+// stileTop (m, absolute; NaN = zTop + 3'-6): the printed stile top when the sheet gives the ladder length (p.104 south ladder 15'-0 1/2)
+void Ladder(string bridge, string name, double sta, double off, double zBot, double zTop, string pages, double half = 8, string? flag = null, double stileTop = double.NaN)
 {
     var t = bridges[bridge].Truss!;
     string desc = $"{bridge} - safety ladders ({pages})";
     string lf = flag ?? ladderFlag;
-    double zb = zBot / In(1), zt = (zTop + FI(3, 6)) / In(1);
+    double zb = zBot / In(1), zt = (double.IsNaN(stileTop) ? zTop + FI(3, 6) : stileTop) / In(1);
     foreach (int sd in new[] { -1, 1 })
     {
         // stile angle: 3 in. leg across (transverse range = offsets), 2 1/2 in. leg along the alignment (U)
@@ -239,8 +242,9 @@ void Platform(string bridge, string name, double sta, double off0, double off1, 
     {
         string s = sd < 0 ? "B" : "A";
         items.Add(Li($"{name} channel {s}", "PLATFORMS", desc, PartCategory.WalkwayStringer, true, sta, off0, off1, false, Channel(sd, top, 8, 2.343, 0.303, 0.39, h), pages, platformFlag(pages), lbft: 13.75));
-        items.Add(Li($"{name} top rail {s}", "PLATFORMS", desc, PartCategory.WalkwayRail, true, sta, off0, off1, false, RailAngle(sd, h, top + 35.5, 3, 3, 0.3125), pages, railFlag, lbft: 6.1));
-        items.Add(Li($"{name} mid rail {s}", "PLATFORMS", desc, PartCategory.WalkwayRail, true, sta, off0, off1, false, RailAngle(sd, h, top + 17, 2.5, 3, 0.3125), pages, railFlag, lbft: 5.6));
+        // rails on the outside face of the posts (posts h .. h + 3 outside the channel backs, as on the walkways); they ran through the posts (mid rail clash 1.4 in.)
+        items.Add(Li($"{name} top rail {s}", "PLATFORMS", desc, PartCategory.WalkwayRail, true, sta, off0, off1, false, RailAngle(sd, h + 3, top + 35.5, 3, 3, 0.3125), pages, railFlag, lbft: 6.1));
+        items.Add(Li($"{name} mid rail {s}", "PLATFORMS", desc, PartCategory.WalkwayRail, true, sta, off0, off1, false, RailAngle(sd, h + 3, top + 17, 2.5, 3, 0.3125), pages, railFlag, lbft: 5.6));
         double len = off1 - off0;
         items.Add(Li($"{name} posts {s}", "PLATFORMS", desc, PartCategory.WalkwayPost, true, sta, off0, off1, false, P(sd * h, top - 8, sd * (h + 3), top - 8, sd * (h + 3), top + 32.5, sd * h, top + 32.5), pages, railFlag,
             pitch: (len - In(3)) / 2, width: In(3), start: 0));
@@ -424,13 +428,17 @@ void Post(string bridge, string asm, string desc, string name, double sta, doubl
             var box = PartBox(bn, "FB" + j);
             if (box == null) continue;
             int side = j == "15'" ? -1 : 1;
-            double sta = box.Value.sta + side * (In(9.5) + FI(1, 3));
+            // 2026-11-02 agent review (work9w): PLAN OF WALKWAY AT W15 dimensions the walk 2'-0 + 2'-0 from the CL Fl. Bm. at W15 (channel backs 2'-0 and 4'-0 from it: centre
+            // 3'-0; was 2'-0 1/2 = the rails over the floor beam stiffeners) and ends it at the walk along the wind chord: 36'-9 1/2 from that walk's inner channel (3'-8 1/2
+            // inboard of the wind chord CL = 39'-9 1/2 from the CL bridge) to the longitudinal walk (3'-0 north); it ran 1'-0 into the wind chord walk (40'-9 1/2)
+            double sta = box.Value.sta + side * Ft(3);
             double zc = box.Value.zMin + In(1.75);
             crossTop[j] = (sta, zc);
-            string cwFlag = U("p.106", $"cross walk at W{j} to the navigation light supports", "the key plan shows cross walks at W15, W20 and W19' to the navigation light platforms on the wind chords, 40'-9 1/2 each side of the CL; the plan of walkway at W15 ends them at the longitudinal walkway (1'-0 / 3'-0 north of the CL); the cross walk's level and its station beside the floor beam are drawn, not dimensioned",
-                "2'-0 walkway beside the floor beam (light side) at its bottom flange level, from 40'-9 1/2 north / south of the CL to the longitudinal walkway's edges.");
-            Walk(bn, $"cross walk W{j} N", true, sta, -FI(40, 9.5), Ft(ClOffsetFt) - Ft(1), zc / In(1), false, "p.106", cwConflict + cwFlag);
-            Walk(bn, $"cross walk W{j} S", true, sta, Ft(ClOffsetFt) + Ft(1), FI(40, 9.5), zc / In(1), false, "p.106", cwConflict + cwFlag);
+            double cwEnd = FI(39, 9.5);
+            string cwFlag = U("p.106", $"cross walk at W{j} to the navigation light supports", "the plan of walkway at W15 (W20 / W19' similar) gives the walk 2'-0 + 2'-0 from the CL Fl. Bm. and 36'-9 1/2 from the walk along the wind chord (1'-8 1/2 + 2'-0 inboard of the wind chord CL) to the longitudinal walkway (1'-0 / 3'-0 north of the CL); the cross walk's level is drawn (Section D), not dimensioned; W15' has no light support and is read from the key plan only (taken like W15)",
+                "2'-0 walkway centred 3'-0 from the floor beam (light side) at its bottom flange level, from 39'-9 1/2 north / south of the CL (the wind chord walk's inner channel) to the longitudinal walkway's edges. At that (assumed) level the walk channels / grating / posts dip 1/4 - 5/16 in. into the floor laterals 14 BP 73 X (FL-X) and their plates (BGFX) where they pass under the walk near the floor beam: reported, not adjusted.");
+            Walk(bn, $"cross walk W{j} N", true, sta, -cwEnd, Ft(ClOffsetFt) - Ft(1), zc / In(1), false, "p.106", cwConflict + cwFlag);
+            Walk(bn, $"cross walk W{j} S", true, sta, Ft(ClOffsetFt) + Ft(1), cwEnd, zc / In(1), false, "p.106", cwConflict + cwFlag);
         }
     }
 
@@ -441,7 +449,7 @@ void Post(string bridge, string asm, string desc, string name, double sta, doubl
     string navFlag = U("p.106", "navigation light platform frame, level and hangers", "Section B gives the platform 6'-0 x 4'-6 1/2 (10 in. + 3'-8 1/2 about the wind chord CL), the light 6 in. inside its down-station end and 1'-9 outboard of the wind chord CL, '17'-0 horizontal' from the floor beam (key plan: 17'-0 / 12'-0 / 7'-0 at W15 / W20 / W19'), 'platform to be level' with 'fill as reqd'; the frame channels, the hangers Ls 4x4x3/8 (conn. to str. 8x4x7/16 Ls), the 12 [ 25 light post and the light are drawn without positions",
         "grating top level with the 8 [ 13.75 frame top, the frame seated (5/16 fill) on the highest wind chord top under the platform; channels along the two long edges; rails + toe plates on the outboard side and both ends (inboard side open to the walk); hangers, fills at the low end, light post and light not built.");
     string navWalkFlag = U("p.106", "walk along the wind chord to the navigation light platform", "the plan of walkway at W15 draws a 2'-0 walk (WALKWAY MATERIAL 8 [ 13.75, conn. Ls 6x6x3/8, grating 3/4 x 3/16, rails, posts @ 6'-0 +-) 1'-8 1/2 to 3'-8 1/2 inboard of the wind chord CL from the cross walk to the platform; its level is not given - the Navigation Light Support plan marks the walk 'Parallel to Wind Chord' and the platform 'to be Level' (re-read 2026-10-30, batch 8f / recheck N2: the walk climbs with the wind chord to the platform, no step is drawn)",
-        "2'-0 walk on two 8 [ 13.75 from the cross walk grating level at its edge, rising in a straight line to the platform grating at the platform's down-station end (the wind chord between is not followed point by point; posts L 3x3x5/16 @ 6'-0); connection angles not built.");
+        "2'-0 walk on two 8 [ 13.75 from the cross walk grating level at its edge, rising in a straight line to the platform grating at the platform's down-station end (the wind chord between is not followed point by point; posts L 3x3x5/16 @ 6'-0); connection angles not built. Since 2026-11-02 the walk starts at the cross walk's near edge (plan of walkway at W15: the cross walk channels end on its inner channel), its rail / posts on the cross walk side open over the 2'-0 junction; there its channels dip 1/4 in. into the floor laterals FL-X / the wind chord bracing plate (BGW) at the floor beam: level not dimensioned, reported.");
     var navSupport = new[] { ("15", 17.0), ("20", 12.0), ("19'", 7.0) };
     foreach (var (j, dFt) in navSupport)
     {
@@ -475,30 +483,38 @@ void Post(string bridge, string asm, string desc, string name, double sta, doubl
             Post(bn, "PLATFORMS", desc, $"nav platform W{j} {s} post {++k}", a1, oIn, -1, sd, zg, 36, "p.106", railMainFlag);
             // walk along the wind chord: cross walk edge (its station + 1'-0) -> platform end
             double ow = wc + inb * FI(2, 8.5);
-            double w0 = cw.sta + Ft(1), w1 = a0;
+            // 2026-11-02 (plan of walkway at W15): the walk along the wind chord runs from the floor beam side past the cross walk (whose channels end on its
+            // inner channel) to the platform: it starts at the cross walk's near edge (2'-0 from the CL Fl. Bm.; it started at the cross walk's far edge, so the cross walk
+            // ran 1'-0 into it) and its rail / posts on the cross walk side are open over the 2'-0 junction
+            double w0 = cw.sta - Ft(1), w1 = a0, wj = cw.sta + Ft(1);
             if (w1 - w0 > In(6))
             {
                 var t8 = tdef.LineItems!;
                 string wd = $"{bn} - service walkways (p.106)";
-                double top = cw.z / In(1);
+                double top = cw.z / In(1), rise = zg - cw.z;
                 t8.Add(Li($"nav walk W{j} {s} grating", "WALKWAYS", wd, PartCategory.Grating, false, ow, w0, w1, false, P(-12 + 2.343, top - 0.75, 12 - 2.343, top - 0.75, 12 - 2.343, top, -12 + 2.343, top), "p.106", navWalkFlag + " " + gratingFlag, gratingDensity));
                 foreach (int e in new[] { -1, 1 })
                 {
                     string es = e < 0 ? "L" : "R";
                     t8.Add(Li($"nav walk W{j} {s} channel {es}", "WALKWAYS", wd, PartCategory.WalkwayStringer, false, ow, w0, w1, false, Channel(e, top, 8, 2.343, 0.303, 0.39, 12), "p.106", navWalkFlag, lbft: 13.75));
-                    t8.Add(Li($"nav walk W{j} {s} top rail {es}", "WALKWAYS", wd, PartCategory.WalkwayRail, false, ow, w0, w1, false, RailAngle(e, 15, top + 36, 3, 3, 0.3125), "p.106", railFlag, lbft: 6.1));
-                    t8.Add(Li($"nav walk W{j} {s} mid rail {es}", "WALKWAYS", wd, PartCategory.WalkwayRail, false, ow, w0, w1, false, RailAngle(e, 15, top + 18, 2.5, 3, 0.3125), "p.106", railFlag, lbft: 5.6));
+                    // the cross walk side (toward the CL = inb) starts after the junction, at the walk's height there (the walk rises linearly from w0 to w1)
+                    bool open = e == inb;
+                    double r0 = open ? Math.Min(wj, w1) : w0, dz = (r0 - w0) / (w1 - w0) * rise / In(1), tr = top + dz;
+                    if (w1 - r0 < In(6)) continue;
+                    t8.Add(Li($"nav walk W{j} {s} top rail {es}", "WALKWAYS", wd, PartCategory.WalkwayRail, false, ow, r0, w1, false, RailAngle(e, 15, tr + 36, 3, 3, 0.3125), "p.106", railFlag, lbft: 6.1));
+                    t8.Add(Li($"nav walk W{j} {s} mid rail {es}", "WALKWAYS", wd, PartCategory.WalkwayRail, false, ow, r0, w1, false, RailAngle(e, 15, tr + 18, 2.5, 3, 0.3125), "p.106", railFlag, lbft: 5.6));
                     // batch 8f (recheck N1, 2026-10-30): posts L 3x3x5/16 @ 6'-0 +- (p.101 / p.102 rail material, as the cross walks) - the rails floated without them
-                    double nlen = w1 - w0, npitch = Ft(6);
+                    double nlen = w1 - r0, npitch = Ft(6);
                     int nn = Math.Max(1, (int)Math.Floor((nlen - In(12)) / npitch) + 1);
                     double nst = (nlen - (nn - 1) * npitch - In(3)) / 2;
-                    t8.Add(Li($"nav walk W{j} {s} posts {es} a", "WALKWAYS", wd, PartCategory.WalkwayPost, false, ow, w0, w1, false, P(e * 12, top - 10, e * 15, top - 10, e * 15, top + 33, e * 12, top + 33), "p.106", railFlag,
+                    t8.Add(Li($"nav walk W{j} {s} posts {es} a", "WALKWAYS", wd, PartCategory.WalkwayPost, false, ow, r0, w1, false, P(e * 12, tr - 10, e * 15, tr - 10, e * 15, tr + 33, e * 12, tr + 33), "p.106", railFlag,
                         pitch: npitch, width: In(0.3125), start: nst));
-                    t8.Add(Li($"nav walk W{j} {s} posts {es} b", "WALKWAYS", wd, PartCategory.WalkwayPost, false, ow, w0, w1, false, P(e * 12, top - 10, e * 12.3125, top - 10, e * 12.3125, top + 33, e * 12, top + 33), "p.106", railFlag,
+                    t8.Add(Li($"nav walk W{j} {s} posts {es} b", "WALKWAYS", wd, PartCategory.WalkwayPost, false, ow, r0, w1, false, P(e * 12, tr - 10, e * 12.3125, tr - 10, e * 12.3125, tr + 33, e * 12, tr + 33), "p.106", railFlag,
                         pitch: npitch, width: In(3 - 0.3125), start: nst + In(0.3125)));
                 }
-                // 'Parallel to Wind Chord' (Navigation Light Support plan): the walk climbs from the cross walk level at its start to the level platform grating at its end
-                foreach (var it in t8.Where(x => x.Name.StartsWith($"nav walk W{j} {s} "))) it.Rise = zg - cw.z;
+                // 'Parallel to Wind Chord' (Navigation Light Support plan): the walk climbs from the cross walk level at its start to the level platform grating at its end;
+                // each item rises over its own range (the open-side rails / posts start at the junction)
+                foreach (var it in t8.Where(x => x.Name.StartsWith($"nav walk W{j} {s} "))) it.Rise = rise * (it.To - it.From) / (w1 - w0);
                 var c0 = counts.GetValueOrDefault(bn);
                 counts[bn] = (c0.walkLf + (w1 - w0) / 0.3048, c0.ladders, c0.platforms);
             }
@@ -606,13 +622,33 @@ void Post(string bridge, string asm, string desc, string name, double sta, doubl
     }
 
     // walkway on the bottom strut, walkway at the floor beam at L11 / L11', pier platforms and ladders (p.103 / p.104)
-    foreach (var (j, east) in new[] { ("L11", 1), ("L11'", -1) })
+    // HAND (2026-11-02 agent review, work9w): the p.103 key plans (north arrow: north truss to the left, stations increasing UP the sheet) draw the walkway at the
+    // floor beam, the 22'-0 walkway at the bottom strut and both ladders on the DOWN-station side of the CL floor beam / strut at pier 18, and the p.104 plans
+    // (north truss at the top, looking down) on the west side; pier 19 'opp. hand' = up-station. The model had them up-station at L11 (main span side).
+    foreach (var (j, east) in new[] { ("L11", -1), ("L11'", 1) })
     {
         string fbj = "FB" + j.Substring(1);
         var strut = PartBox(bn, "LS-" + j);
         if (strut != null)
-            Walk(bn, $"walkway on strut {j}", true, strut.Value.sta, -Ft(11), Ft(11), strut.Value.zMax / In(1) + 0.75, false, "p.103, p.104",
-                U("p.103", $"walkway on the bottom strut {j}", "the key plan gives 22'-0 x 2'-0 on the strut; its fastening is drawn only", "2'-0 walkway centred on the strut top, 22'-0 long."));
+        {
+            // p.103 key plan '22'-0 walkway at top of Bott. Strut' (11'-0 each side of the CL bridge) drawn BESIDE the strut line; p.104 PLAN OF WALKWAY ON BOTT. STRUT:
+            // 2'-0 from 11 13/16 (strut face, 1'-11 5/8 o.o.) to 2'-11 13/16 off the CL strut, 1-L 4 x 3 1/2 x 3/8 hangers; Sections E / F: grating flush with the strut top,
+            // rails 1'-6 / 3'-0 on the outer edge and across the walk ends; p.104 walkway material 10 [ 15.3 (2'-0 b.b.: inner channel back on the strut face).
+            // It was centred ON the strut (grating on the top cover, channels 9 in. into the strut, posts through the strut / sway plates).
+            double sc = strut.Value.sta + east * (In(11.8125) + Ft(1)), zs = strut.Value.zMax;
+            string swFlag = U("p.103, p.104", $"walkway beside the bottom strut {j}", "the plan / Sections C, E, F dimension the walk 2'-0 beside the strut (11 13/16 to 2'-11 13/16 from the CL strut), 22'-0 centred on the CL bridge, grating at the strut top, rails on the outer edge and across the ends; the hangers 1-L 4 x 3 1/2 x 3/8 (and the rail / grating drawn on the strut top in Section E) are drawn without positions",
+                "2'-0 walk on two 10 [ 15.3 2'-0 b.b. (inner channel back on the strut face), grating top = the model strut top, rails + posts on the outer edge, end rails across both ends with corner posts; hangers and any rail on the strut itself not built.");
+            Walk(bn, $"walkway on strut {j}", true, sc, -Ft(11), Ft(11), zs / In(1), false, "p.103, p.104", swFlag, railSide: east);
+            string swd = $"{bn} - service walkways (p.103, p.104)";
+            double sIn = strut.Value.sta + east * In(11.8125), sOut = sc + east * Ft(1);   // inner / outer channel backs
+            foreach (int e in new[] { -1, 1 })
+            {
+                double endOff = e * Ft(11);
+                Edge(bn, "WALKWAYS", swd, $"walkway on strut {j} end {(e < 0 ? "N" : "S")}", true, endOff, e, Math.Min(sIn, sOut + east * In(3)), Math.Max(sIn, sOut + east * In(3)), zs, 36, 18, false, "p.104", swFlag + " " + railFlag);
+                Post(bn, "WALKWAYS", swd, $"walkway on strut {j} corner post {(e < 0 ? "N" : "S")}", sOut, endOff, east, -e, zs - In(10), 46, "p.104", swFlag + " " + railFlag);
+            }
+            Print($"{bn}: walkway beside strut {j}: centre {(sc - strut.Value.sta) / 0.3048:0.000} ft from the strut CL, grating top El {zs / 0.3048:0.000} ft (strut top)");
+        }
         var fb = PartBox(bn, fbj);
         if (fb == null) continue;
         // 6a (BW-W4, W5): p.103 Section A - walkway 3'-0 3/8 to 5'-0 3/8 from the CL floor beam (4'-0 3/8 / 5'-0 3/8, walk 2'-0), grating top El. 141.6035 at pier 18
@@ -630,7 +666,7 @@ void Post(string bridge, string asm, string desc, string name, double sta, doubl
         // floor beam walkway (cage), south = 15'-0 1/2 up to the bottom strut level (BW-W9)
         double lsta = fb.Value.sta + east * FI(2, 3);
         string mlFlag = U("p.103, p.104", "main span ladder top extension, cage end and fastening", "the ladders are dimensioned (CL 2'-3 from the floor beam / strut, 6'-6 3/8 inboard of the truss, '9 | 9' stiles, 53'-2 and 15'-0 1/2 long); the stile extension above the walkway, the ladder support angles and the safety cage's top end are drawn only",
-            "stiles 3'-6 above the top level, rungs from 12 in. above the platform at 12 in.; cage hoops (p.103: 2 1/2 x 3/8, R 1'-0 3/8, 'abt. 5'-0 ctrs.') from 6'-9 above the platform (p.104) up to the last one 10 in. under the walkway grating, 5 vertical bars 2 1/2 x 3/8 inside the hoops (rev. 1); ladder supports not built.");
+            "stiles 3'-6 above the top level (north) / 15'-0 1/2 above the platform (south), rungs from 12 in. above the platform at 12 in.; cage hoops (p.103: 2 1/2 x 3/8, R 1'-0 3/8, 'abt. 5'-0 ctrs.') from 6'-9 above the platform (p.104) up to the last one 10 in. under the walkway grating, 5 vertical bars 2 1/2 x 3/8 inside the hoops (rev. 1); ladder supports not built. The north ladder CL is 9 3/8 from the floor beam walkway's inner channel (p.103 plan): the stile on that side (9 in. + its 2 1/2 in. leg) and the top hoop reach 3/8 in. into the walk channel / grating edge - how the stile passes the walkway ('1-L 6x3 1/2x3/8 shop weld to grating') is drawn only, reported, not adjusted.");
         foreach (int north in new[] { -1, 1 })
         {
             double pierTop = PierTop(bn, fb.Value.sta, north) + In(8.8125);
@@ -643,7 +679,9 @@ void Post(string bridge, string asm, string desc, string name, double sta, doubl
                 Ladder(bn, $"ladder {j} N", lsta, lo, pierTop, zw, "p.103, p.104", 9, mlFlag);
                 Cage(bn, $"ladder {j} N cage", lsta, lo, (int)inb, pierTop, zw, mlFlag);
             }
-            else Ladder(bn, $"ladder {j} S", lsta, lo, pierTop, pierTop + FI(15, 0.5), "p.104", 9, mlFlag);
+            // south: 15'-0 1/2 (p.104, 'Ladder South Side only') = the stile length above the platform - 3'-0 above the plan strut top (12'-9 3/8 above the top of pier,
+            // Section A); it was the level reached + another 3'-6. Rungs up to the strut top.
+            else Ladder(bn, $"ladder {j} S", lsta, lo, pierTop, strut?.zMax ?? pierTop + FI(12, 0), "p.104", 9, mlFlag, stileTop: pierTop + FI(15, 0.5));
         }
     }
 }

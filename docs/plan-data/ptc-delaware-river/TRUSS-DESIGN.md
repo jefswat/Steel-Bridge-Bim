@@ -1051,3 +1051,25 @@ station zone along the member). `SteelModel.RivetMesh`: button heads inscribed i
 PTC data: see the outcome sections of the four findings files. R01 (centring the drawn chord fields on the model web) was tried and reverted: it moved the rivets off their
 drawn gusset outlines; the offset has to be corrected in the work point / drawn chord reading. Results: check-truss-ptc 616 PASS / 19 DIFF, location 389 / 37, approach
 1792 / 16, girders 128 / 9; Bolt x Bolt main 650 -> 184, 3-span 36 -> 22, 4-span 86 -> 20.
+
+## 33. Main span walkways / ladders at L11 and the cross walks, agent review (2026-11-02; user: "the walkway and ladders around strut L11 are incorrect"; work files qc/ptc/main-span/work9w, untracked)
+`samples/plans/walkways-ptc.csx` only (no generator change). Evidence p.103 key plans (north arrow: north truss left, stations increasing UP the sheet), p.104 PLAN OF WALKWAY ON
+BOTT. STRUT / Sections A, C, E, F / Inspection platform at pier 18, p.106 PLAN OF WALKWAY AT W15.
+- HAND at L11 / L11': the walkway at the floor beam, the strut walkway and both ladders are DOWN-station of the CL floor beam / strut at pier 18 (key plans; p.104 plan with the
+  north truss at the top), pier 19 opposite hand; they were built up-station at L11.
+- Walkway at the bottom strut: BESIDE the strut, 2'-0 from 11 13/16 (strut face, 1'-11 5/8 o.o.) to 2'-11 13/16 off the CL strut, 22'-0 centred on the CL bridge, 10 [ 15.3
+  2'-0 b.b. (inner channel back on the strut face), channel top = strut top (Sections E / F), rails + posts on the outer edge only, end rails across both ends with corner posts
+  (Section F). It was centred ON the strut (channels 9 in. into it, posts through the strut / sway plates). Hangers 1-L 4x3 1/2x3/8 not built (drawn only, flag).
+  `Walk(..., railSide)` = rails / posts on one side only.
+- South ladder: 15'-0 1/2 = the stile length above the platform (3'-0 above the plan strut top, p.104 Section A 12'-9 3/8 above the top of pier); rungs to the strut top
+  (`Ladder(..., stileTop)`); it was the level + another 3'-6.
+- Inspection platforms (all, approach too): rails moved to the outside face of the posts (they ran through the posts: 8 main span + 16 approach 3-span clash rows).
+- Cross walks W15 / W20 / W19' / W15': centred 3'-0 from the CL floor beam (p.106: 2'-0 + 2'-0 dimensioned; was 2'-0 1/2 = rails over the floor beam stiffeners) and ending at
+  the wind chord walk's inner channel, 39'-9 1/2 from the CL (36'-9 1/2 + 3'-0; was 40'-9 1/2 = 1'-0 into that walk). Walk along the wind chord: from the cross walk's near edge
+  (it runs past the junction), its rail / posts on the cross walk side open over the 2'-0 junction (own rise per item).
+- Clash (main span, tolerance 1/16): 1,124 -> 1,064; walkway rows 321 -> 261: left = 188 catwalk rope x post (rope through the post holes, p.105 - holes not cut, intended),
+  51 floor lateral 14 BP 73 X / BGFX / BGW x cross walk / wind chord walk (walk level at the floor beam bottom flange is drawn, not dimensioned: 1/4 - 5/16 in., reported), 16 rail
+  corner laps 5/32 (nav platform end A, U22 platform), 6 north ladder stile / top hoop x floor beam walkway (ladder CL 9 3/8 from the walk channel, p.103; the stile at the
+  walkway is drawn only: reported).
+- Found, NOT walkway (for the bracing / strut owner): p.104 Section A puts the L11 strut 2'-3 3/8 above / 1'-1 1/8 below its work line (3'-4 1/2 b.b. Ls, top 12'-9 3/8 above
+  the top of pier); the model strut is centred on the work line, its top 6.6 in. lower (El 99.935 vs 100.48 ft). The strut walkway follows the model strut top.
