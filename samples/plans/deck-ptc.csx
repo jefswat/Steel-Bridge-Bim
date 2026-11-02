@@ -237,9 +237,31 @@ void Dam(string bridge, string name, double sta, double rootHalfIn, double tooth
                 UV(w + 3.125, top), UV(w - 3.125, top), UV(w - 3.125, top - 0.691), UV(w - 0.3555, top - 0.691), UV(w - 0.3555, top - 17.309), UV(w - 3.125, top - 17.309) }
             : new List<TrussUV> { UV(w - 0.35, top - 18), UV(w + 3.85, top - 18), UV(w + 3.85, top - 17.375), UV(w + 0.35, top - 17.375), UV(w + 0.35, top - 0.625), UV(w + 3.85, top - 0.625),
                 UV(w + 3.85, top), UV(w - 0.35, top) };
-        t.LineItems.Add(Item(side < 0 ? "support 18 I 70" : "support 18 [ 58", prof,
+        // agent review 2026-11-02 (clash rows 'dam ... support' x stringers, 0.35 in.): the plan shows the supports IN PIECES between the stringer lines -> one piece per
+        // gap between the stringers present at the dam station, ending at the stringer flange edges (just clear; the framing angles are not built)
+        var gaps = new List<double>();
+        if (t.Floor is { } fl)
+        {
+            var bands = new List<(double lo, double hi)>();
+            foreach (var ln in fl.Stringers)
+            {
+                if (ln.FromStation is { } fs && sta < fs - 0.01 || ln.ToStation is { } ts && sta > ts + 0.01) continue;
+                var sdef = t.Sections.FirstOrDefault(x => x.Name == ln.Section);
+                double bf = sdef == null ? 0 : sdef.FlangeWidth > 0 ? sdef.FlangeWidth : SBM.Core.Steel.SteelCatalog.FindWideFlange(sdef.Designation)?.FlangeWidth ?? 0;
+                if (bf <= 0) continue;
+                bands.Add((ln.Offset - bf / 2, ln.Offset + bf / 2));
+            }
+            bands.Sort();
+            double a0 = -Ft(CurbOff);
+            foreach (var (lo, hi) in bands) { if (lo > a0 + 1e-3) { gaps.Add(a0); gaps.Add(lo); } a0 = Math.Max(a0, hi); }
+            if (Ft(CurbOff) > a0 + 1e-3) { gaps.Add(a0); gaps.Add(Ft(CurbOff)); }
+        }
+        var sup = Item(side < 0 ? "support 18 I 70" : "support 18 [ 58", prof,
             U(pages, $"dam support members at {name}", "Section A draws the 18 I 70 / 18 [ 58 under the plates with their connection angles to the floor beams / stringers but does not dimension their position; the plan shows them in pieces between the stringer lines",
-                "continuous curb to curb, top flange under the plate, web 6 in. behind the tooth root (scaled); connection angles, bulkheads and anchor bars not built.")));
+                gaps.Count > 0 ? "in pieces between the stringer lines, ending at the stringer flange edges (framed; the connection angles, bulkheads and anchor bars are not built), top flange under the plate, web 6 in. behind the tooth root (scaled)."
+                    : "continuous curb to curb, top flange under the plate, web 6 in. behind the tooth root (scaled); connection angles, bulkheads and anchor bars not built."));
+        if (gaps.Count > 0) sup.Ranges = gaps;
+        t.LineItems.Add(sup);
     }
 }
 string slidingWhy = "p.46 Section A gives the roots 8 1/4 in. apart (1 1/2 + 5 1/4 + 1 1/2) and each plate 1'-3 from the CL dam; the plate thickness is read 1 1/2 (low confidence, '1 3/4' possible) and the supports (bracket plates on the floor beams) are drawn, not dimensioned (no dam beams modeled)";

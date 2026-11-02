@@ -1411,6 +1411,10 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   approach 'similar to' rivet copies onto another section -> count grid (R03), girder fixed shoe heights by pier (G04), stiffener / splice / corner plate / lateral rivets
   (G10 / G11 / G21 / G22), long. stiffener 6 in. leg on the web (G17), 21 WF 62 splice web plate 16 1/2 x 6 rows (G24). Not done: chord field centring R01 (moving the drawn
   rivets off their drawn outlines broke the gusset-cover check: needs the work points re-read), cover splice plate lengths G45, stitch rivets R05, L11 shoe stagger R09, bracing fills R14.
+  JOINT FIT agent review (2026-11-02, TRUSS-DESIGN.md 33, tests `TrussJointFitTests`; all OPTIONAL, omitted when unset): `TrussJointDefinition.GussetSplitGap` (inner gusset = two
+  plates per face split along v at the point, marks `-LA/-LB/-RA/-RB`; main L22 1/8 in., p.90), `TrussMemberDefinition.WebsAbutAt` (the other web members are cut on this
+  member's side face, before setbacks / corner cuts), `SetBackClearAt` (square setback until clear), `ChordsAbutAt` (chords ending at the point cut on the post sides; main L11, p.80).
+  PTC: verticals U11-U17 / L6 / L8 / L15-L18 keep their ends, U7 / U9 / L10 verticals set back square (connections-ptc.csx batch 4c); dam supports in pieces between the stringers (deck-ptc.csx).
   PTC curbs agent review (qc/ptc/curbs/curbs-findings.md): curb top +1/2 in., 1 in. face batter, slab ends 1'-11 outboard of the gutter line (parapet overhangs 11 in.), flag texts;
   railing FixedStations: no rule post in an end stretch shorter than one spacing (wing-end rail overhang). 2026-10-30 later: OPTIONAL `TrussLineItemDefinition.Ranges` (explicit station
   pairs, wins over RepeatPitch) -> curb drainage openings (P10, p.107 Section A profile, 7 / 7 / 6 openings per 31'-0 / 30'-5 3/4 / 26'-11 1/4 panel, omitted in girder spans 1 / 10 (p.43)

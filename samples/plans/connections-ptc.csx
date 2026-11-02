@@ -647,6 +647,9 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
                 "1 1/8 gussets on the post webs (2'-2 3/4 in. to in.), inlaid in the chord outer 1 1/8 web layer; outline = envelope of the member laps; 3/4 plates stacked outside (second and outer 3/4 ending at the Section E steps, scaled).");
             report.Add($"gusset layers {bn} {mj}: 1 1/8 in. to in. {jd.GussetsInsideFaceDistance / 0.0254:0.###} in. (p.80 Section E), {rows.Count - 1} layers of 3/4 outside");
         }
+        // agent review 2026-11-02: main L22 = '2-1" Gus. Pls. | 1/8 | 2-1" Gus. Pls.' (p.90): each half truss brings its own 1 in. gusset, 1/8 in. apart at the CL
+        jd.GussetSplitGap = st == "main" && dj == "L22" ? In(1.0 / 8) : 0;
+        if (jd.GussetSplitGap > 0) report.Add($"gusset layers {bn} {mj}: inner 1 in. gussets split at the CL, 1/8 in. gap (p.90)");
         jd.GussetLayers = new();
         foreach (var r in rows.Where(r => !r["position"].StartsWith("inner")).OrderByDescending(r => int.Parse(r["layer_from_outside"])))
         {
@@ -686,9 +689,34 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
             nPar++;
         }
         tm4.JointDefaults.WebToWebClearance = 0;
+        // agent review 2026-11-02 (clash rows web member x web member, 0.3-0.55 in.; the bisector corner cut is not what the sheets draw):
+        // (a) the verticals run to the chord and the diagonals are cut along their sides: U11 (p.79), U12 (p.81), U13 / U14 / U15 (p.82), U16 / U17 (p.87) and at the
+        //     lower chord L6 (p.76), L8 (p.77), L15 / L16 (p.86), L17 (p.87), L18 (p.88; L19 similar) - WebsAbutAt on the vertical;
+        // (b) the short verticals U7-L7 / U9-L9 (p.76 / p.77) stop square below the diagonals at U7 / U9 and U10-L10 above the diagonals at L10 (p.78) - SetBackClearAt;
+        // (c) at L11 the chords L10-L11 / L11-L12 end against the post U11-L11 (p.80 elevation: both chords cut vertical at the post sides) - ChordsAbutAt.
+        int nAb = 0, nSb = 0, nCa = 0;
+        var abutTop = new[] { "U11", "U12", "U13", "U14", "U15", "U16", "U17" };
+        var abutBot = new[] { "L6", "L8", "L15", "L16", "L17", "L18" };
+        foreach (var m in tm4.Members.Where(m => m.Role == TrussMemberRole.Vertical && m.Plane.Length == 0))
+        {
+            string a = m.From.TrimEnd('\''), b = m.To.TrimEnd('\'');
+            m.WebsAbutAt = null; m.SetBackClearAt = null; m.ChordsAbutAt = null;
+            var ab = new List<string>();
+            if (abutTop.Contains(a)) ab.Add(m.From);
+            if (abutBot.Contains(b)) ab.Add(m.To);
+            if (ab.Count > 0) { m.WebsAbutAt = ab; nAb += ab.Count; }
+            if (a is "U7" or "U9") { m.SetBackClearAt = new() { m.From }; nSb++; }
+            if (b == "L10") { m.SetBackClearAt = new() { m.To }; nSb++; }
+            if (a == "U11" && b == "L11") { m.ChordsAbutAt = new() { m.To }; nCa++; }
+        }
+        report.Add($"web member ends (agent review 2026-11-02): {nAb} vertical ends the diagonals abut (p.76-p.88), {nSb} short vertical ends set back square clear of the diagonals (U7 / U9 / L10), {nCa} posts the L11 chords abut (p.80)");
+        tm4.Unresolved.RemoveAll(x => x.Contains("post U11-L11 below the L11 chords"));
+        tm4.Unresolved.Add(U("p.80", "post U11-L11 below the L11 chords",
+            "the elevation draws the post webs running down through the joint (round the bottom strut box) to the FIN. line over the shoe, with the chords cut against its sides; the post bottom and the cut of its cover plates round the strut are not dimensioned",
+            "the chords end at the post sides; the post keeps its end above the chords (its part through the joint is not built)."));
         tm4.Unresolved.RemoveAll(x => x.Contains("web member ends at the panel points"));
         tm4.Unresolved.Add(U("p.73-90", "web member ends at the panel points", "the joint sheets draw the diagonal / vertical ends with a gap between them and the verticals U12-L12 / U13-L13 / U14-L14 cut along the sloped lower chord, without dimensions",
-            "web members set back just clear of each other (0 in.); the three verticals end on a plane parallel to the lower chord face (WebMemberClearance off it)."));
+            "web members set back just clear of each other (0 in.); the diagonals cut along the verticals that run to the chord, the short verticals at U7 / U9 / L10 set back square; the three verticals end on a plane parallel to the lower chord face (WebMemberClearance off it)."));
         report.Add($"web member ends (batch 4c): {nPar} verticals / rigid hangers end parallel to the lower chord; web-to-web clearance 0 in. (just clear)");
     }
     // BATCH 3a (GL02): the chords L10-L11 / L11-L12 '2'-5 o. to o. 1 1/8 web plates' (Views G / K); the elevation prints 'End of 1 1/8 webs' on both chords at L11 -> the outer

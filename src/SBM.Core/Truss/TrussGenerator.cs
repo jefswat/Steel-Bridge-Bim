@@ -535,8 +535,27 @@ public static partial class TrussGenerator
         /// 6 in. is reported, not fixed. Setbacks only grow.</summary>
         private void WebToWebSetbacks(double clr)
         {
-            int changed = 0, corner = 0; double maxDt = 0;
+            int changed = 0, corner = 0, abut = 0; double maxDt = 0;
             var big = new List<string>();
+            var cornerPairs = new List<string>(); var abutPairs = new List<string>();
+            bool AbutsAt(Inst k, string pt) => k.Def.WebsAbutAt is { Count: > 0 } wl && wl.Any(x => x.Equals(pt, StringComparison.OrdinalIgnoreCase));
+            bool SetsBackAt(Inst k, string pt) => k.Def.SetBackClearAt is { Count: > 0 } wl && wl.Any(x => x.Equals(pt, StringComparison.OrdinalIgnoreCase));
+            // ChordsAbutAt: the chords ending at the point are cut on the post's side faces
+            int chordAbut = 0;
+            foreach (var k in _inst.Where(i => i.Def.ChordsAbutAt is { Count: > 0 } && i.Plane.Length > 0))
+                for (int end = 0; end < 2; end++)
+                {
+                    bool ks = end == 0;
+                    string pl = ks ? k.PlaneA : k.PlaneB, pt = ks ? k.PointA : k.PointB;
+                    if (!k.Def.ChordsAbutAt!.Any(x => x.Equals(pt, StringComparison.OrdinalIgnoreCase))) continue;
+                    foreach (var c in At(pl, pt).Where(c => c != k && IsChord(c.Def.Role) && !IsCrossPlane(c.Def.Role) && c.Plane == k.Plane))
+                    {
+                        bool cs = StartsAt(c, pl, pt);
+                        if (AbutCut(k, ks, c, cs, pl, pt, clr) is { } abc) { if (cs) c.MitreA = (abc.X, abc.N); else c.MitreB = (abc.X, -abc.N); chordAbut++; }
+                        else big.Add($"{c.Mark} against {k.Mark} at {pt} (no abut plane)");
+                    }
+                }
+            if (chordAbut > 0) Info($"Truss {_d.Name}: {chordAbut} chord ends cut on the side faces of the post they abut (ChordsAbutAt, clearance {L(clr)}).");
             // extra setback of end (m, start) so that none of its end corners lies inside o (o's end at so); 0 = clear; +inf = no solution
             double Need(Inst m, bool start, Inst o, bool os, string pl, string pt)
             {
@@ -563,7 +582,28 @@ public static partial class TrussGenerator
                     }
                 return need - t;
             }
-            for (int pass = 0; pass < 3; pass++)
+            // pass -1 = the WebsAbutAt cuts only (before any setback / corner cut); an abutting end is then left alone by the other rules
+            var abutted = new HashSet<(Inst, bool)>();
+            // extra square setback of m's end so that no end corner of o (at its current end) lies inside m (in-plane band of m beyond m's end face)
+            double NeedOther(Inst m, bool start, Inst o, bool os)
+            {
+                var d1 = Away(m, start); double t = start ? m.SA : m.SB;
+                var n = Normal(m.Plane, StationOf(m.A));
+                var wm = Vec3.Cross(n, m.Axis).Normalized();
+                double hwm = Math.Abs(Vec3.Dot(m.X, wm)) * Math.Max(Math.Abs(m.Sec.XMin), Math.Abs(m.Sec.XMax)) + Math.Abs(Vec3.Dot(m.Y, wm)) * Math.Max(Math.Abs(m.Sec.YMin), Math.Abs(m.Sec.YMax)) + clr;
+                var dO1 = Away(o, os); double to = os ? o.SA : o.SB;
+                var P0 = start ? m.A : m.B; var Q0 = os ? o.A : o.B;
+                double need = t;
+                foreach (double x in new[] { o.Sec.XMin, o.Sec.XMax })
+                    foreach (double y in new[] { o.Sec.YMin, o.Sec.YMax })
+                    {
+                        var q = Q0 - P0 + dO1 * to + o.X * x + o.Y * y;
+                        double a = Vec3.Dot(q, d1), b = Vec3.Dot(q, wm);
+                        if (Math.Abs(b) < hwm - 1e-9 && a + clr > need) need = a + clr;
+                    }
+                return need - t;
+            }
+            for (int pass = -1; pass < 3; pass++)
             {
                 var webs = _inst.Where(i => IsWeb(i.Def.Role) && i.Plane.Length > 0).ToList();
                 foreach (var m in webs)
@@ -574,10 +614,40 @@ public static partial class TrussGenerator
                         foreach (var o in At(pl, pt).Where(o => o != m && IsWeb(o.Def.Role) && o.Plane == m.Plane && string.CompareOrdinal(o.Mark, m.Mark) > 0))
                         {
                             bool os = StartsAt(o, pl, pt);
+                            // WebsAbutAt: the other member is cut on this member's side face (pass 0 only; overrides a corner cut)
+                            if (AbutsAt(m, pt) != AbutsAt(o, pt))
+                            {
+                                if (pass != -1) continue;
+                                var (keep, ks, cut, cs) = AbutsAt(m, pt) ? (m, start, o, os) : (o, os, m, start);
+                                if (AbutCut(keep, ks, cut, cs, pl, pt, clr) is { } ab0)
+                                {
+                                    if (cs) cut.MitreA = (ab0.X, ab0.N); else cut.MitreB = (ab0.X, -ab0.N);
+                                    abutted.Add((cut, cs));
+                                    abut++; abutPairs.Add($"{cut.Mark} on {keep.Mark} at {pt}");
+                                }
+                                else big.Add($"{cut.Mark} against {keep.Mark} at {pt} (no abut plane)");
+                                continue;
+                            }
+                            if (pass == -1 || abutted.Contains((m, start)) || abutted.Contains((o, os))) continue;
                             bool fixM = (start ? m.Def.StartSetback : m.Def.EndSetback) == null, fixO = (os ? o.Def.StartSetback : o.Def.EndSetback) == null;
                             double dm = fixM ? Need(m, start, o, os, pl, pt) : double.PositiveInfinity;
                             double dO = fixO ? Need(o, os, m, start, pl, pt) : double.PositiveInfinity;
-                            if (dm <= 1e-9 && dO <= 1e-9) continue;
+                            if (dm <= 1e-9 && dO <= 1e-9 && !(SetsBackAt(m, pt) || SetsBackAt(o, pt))) continue;
+                            // SetBackClearAt: that member is set back square (any distance), the other one keeps its end
+                            if (SetsBackAt(m, pt) != SetsBackAt(o, pt))
+                            {
+                                var (sbm, sbs, dd) = SetsBackAt(m, pt) ? (m, start, dm) : (o, os, dO);
+                                // also clear of the other member's end corners (they may lie inside this one: its end moves on until they are outside)
+                                var (oth, othS) = SetsBackAt(m, pt) ? (o, os) : (m, start);
+                                if (!double.IsInfinity(dd)) dd = Math.Max(dd, NeedOther(sbm, sbs, oth, othS));
+                                if (dd > 1e-9 && !double.IsInfinity(dd))
+                                {
+                                    if (sbs) { sbm.SA += dd; sbm.MitreA = null; } else { sbm.SB += dd; sbm.MitreB = null; }
+                                    changed++; maxDt = Math.Max(maxDt, dd);
+                                }
+                                else if (double.IsInfinity(dd)) big.Add($"{sbm.Mark} at {pt} (SetBackClearAt: no square setback clears it)");
+                                continue;
+                            }
                             // move the member that needs less (the other one may already be clear of it)
                             bool moveM = dm <= 1e-9 ? false : dO <= 1e-9 ? true : dm <= dO;
                             double dt = moveM ? dm : dO;
@@ -592,6 +662,7 @@ public static partial class TrussGenerator
                                     if (start) m.MitreA = (cc.X, cc.N); else m.MitreB = (cc.X, -cc.N);
                                     if (os) o.MitreA = (cc.X, -cc.N); else o.MitreB = (cc.X, cc.N);
                                     corner++;
+                                    cornerPairs.Add($"{m.Mark} / {o.Mark} at {pt}");
                                 }
                                 else if (pass == 0 && (freeM || freeO) && AbutCut(freeM ? o : m, freeM ? os : start, freeM ? m : o, freeM ? start : os, pl, pt, clr) is { } ab)
                                 {
@@ -610,7 +681,8 @@ public static partial class TrussGenerator
                     }
             }
             if (changed > 0) Info($"Truss {_d.Name}: {changed} web member ends set back clear of the other web members at their panel point (clearance {L(clr)}; largest {L(maxDt)}).");
-            if (corner > 0) Info($"Truss {_d.Name}: {corner} pairs of web member ends cut on the bisector plane where their facing sides meet (corner cut, clearance {L(clr)}).");
+            if (corner > 0) Info($"Truss {_d.Name}: {corner} pairs of web member ends cut on the bisector plane where their facing sides meet (corner cut, clearance {L(clr)}): {string.Join(", ", cornerPairs)}.");
+            if (abut > 0) Info($"Truss {_d.Name}: {abut} web member ends cut on the side face of the member they abut (WebsAbutAt, clearance {L(clr)}): {string.Join(", ", abutPairs)}.");
             if (big.Count > 0) Warn($"Truss CHECK {_d.Name}: web members overlapping at their panel point - not separated (an end already has a cut plane, or no corner cut found): {string.Join(", ", big.Distinct().Take(20))}.");
         }
 
@@ -1055,21 +1127,36 @@ public static partial class TrussGenerator
             if (flags.Count > 0) Warn(jd.Unresolved.Length > 0 && jdef is not { Outline.Count: >= 3 } ? jd.Unresolved + (tg == In(0.75) && !(jdef is { GussetThickness: > 0 } || jd.GussetThickness > 0) ? " Gusset thickness not given where no joint sheet was read: 3/4\" built." : "")
                 : $"Truss: gussets - {string.Join("; ", flags.Select(f => f.Replace($" of joint {pt}", "")))}{Src}.");
             double area = Math.Abs(MeshBuilder.SignedArea(outline));
-            foreach (int side in new[] { -1, 1 })
+            // split gusset (GussetSplitGap): two plates per face, cut along v through the point, gap between them
+            var pieces = new List<(List<Vec2> poly, string suffix)>();
+            if (jdef is { GussetSplitGap: > 0 } sj)
             {
-                var mesh = new Mesh();
-                var fr = new Frame3(P + n * (side * X), u, v, n);
-                if (side > 0) MeshBuilder.AddExtrusion(mesh, outline, fr, 0, tg); else MeshBuilder.AddExtrusion(mesh, outline, fr, -tg, 0);
-                string mark = $"{pl}-G{pt}-{(side < 0 ? "L" : "R")}";
-                Model.Steel.Parts.Add(new SteelPart
+                foreach (var (sg, sfx) in new[] { (-1, "A"), (1, "B") })
                 {
-                    Mark = mark, Category = PartCategory.TrussGusset, Assembly = asmMark, Description = $"gusset PL {TrussSections.FormatIn(tg)} at {pt} ({area / 0.09290304:0.0} SF)",
-                    Mesh = mesh, Material = Material(chords.FirstOrDefault()?.Sec.Definition.Material ?? ""), Length = outline.Max(q => q.X) - outline.Min(q => q.X), Assumption = asu,
-                    Member = _d.PartPerPiece ? JointStack(pl, pt) : null, Piece = _d.PartPerPiece ? "gusset" : null,
-                });
-                Model.PanelOf[mark] = $"Joint {pt}";
-                Model.Gussets++;
+                    var half = ClipHalf(outline, new Vec2(sg, 0), sj.GussetSplitGap / 2);
+                    if (half.Count >= 3 && Math.Abs(MeshBuilder.SignedArea(half)) > 1e-6) pieces.Add((half, sfx));
+                }
+                Info($"Truss: joint {pt} ({pl}): inner gusset split at the joint's v axis, {L(sj.GussetSplitGap)} gap ({pieces.Count} plates per face){Src}.");
             }
+            else pieces.Add((outline, ""));
+            foreach (int side in new[] { -1, 1 })
+                foreach (var (poly, sfx) in pieces)
+                {
+                    var mesh = new Mesh();
+                    var fr = new Frame3(P + n * (side * X), u, v, n);
+                    if (side > 0) MeshBuilder.AddExtrusion(mesh, poly, fr, 0, tg); else MeshBuilder.AddExtrusion(mesh, poly, fr, -tg, 0);
+                    string mark = $"{pl}-G{pt}-{(side < 0 ? "L" : "R")}{sfx}";
+                    double ap = Math.Abs(MeshBuilder.SignedArea(poly));
+                    Model.Steel.Parts.Add(new SteelPart
+                    {
+                        Mark = mark, Category = PartCategory.TrussGusset, Assembly = asmMark,
+                        Description = $"gusset PL {TrussSections.FormatIn(tg)} at {pt}{(sfx.Length > 0 ? $", {(sfx == "A" ? "lower" : "higher")} station half" : "")} ({ap / 0.09290304:0.0} SF)",
+                        Mesh = mesh, Material = Material(chords.FirstOrDefault()?.Sec.Definition.Material ?? ""), Length = poly.Max(q => q.X) - poly.Min(q => q.X), Assumption = asu,
+                        Member = _d.PartPerPiece ? JointStack(pl, pt) : null, Piece = _d.PartPerPiece ? "gusset" : null,
+                    });
+                    Model.PanelOf[mark] = $"Joint {pt}";
+                    Model.Gussets++;
+                }
             // half width of the member over its gusset lap at this point only: pieces present between the member end and the gusset edge (partial plates elsewhere on
             // the member - e.g. the U11-L11 o.s. 9/16 plates near the floor beam - do not meet the gussets; recheck GN08)
             double HalfAt(Inst i)

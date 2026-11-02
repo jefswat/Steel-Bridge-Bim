@@ -421,6 +421,19 @@ public sealed class TrussMemberDefinition
     /// <summary>OPTIONAL: how the END cut end is cut (see <see cref="StartCut"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public TrussEndCut EndCut { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): panel points at which the OTHER web members of this plane meeting this member are cut on
+    /// this member's side face (they abut it; this member keeps its own end): e.g. a post running up to the chord with the diagonals cut along its sides
+    /// (<see cref="TrussJointDefaults.WebToWebClearance"/> must be set; without this list overlapping web ends are set back / corner cut).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? WebsAbutAt { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): panel points at which the CHORD members of this plane ending there are cut on this member's side
+    /// faces (the chords abut a post that runs through the joint; e.g. a lower chord kinked at a pier post). Needs <see cref="TrussJointDefaults.WebToWebClearance"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? ChordsAbutAt { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): panel points at which this web member's end is set back SQUARE until it clears the other web
+    /// members there (any distance; no corner cut), e.g. a short vertical stopping below the diagonals that run to the chord.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? SetBackClearAt { get; set; }
     /// <summary>OPTIONAL (null = none, omitted from the .sbm): rectangular cut-outs of the member's section pieces (end copes around a chord, slots for
     /// socket lugs through a flange; <see cref="TrussMemberNotch"/>).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -950,6 +963,11 @@ public sealed class TrussJointDefinition
     /// <summary>OPTIONAL (null = none, omitted from the .sbm): angles along free gusset edges (<see cref="TrussGussetEdgeAngle"/>), on each gusset face.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussGussetEdgeAngle>? EdgeAngles { get; set; }
+    /// <summary>OPTIONAL (0 = one plate per face, omitted from the .sbm): the inner gusset is TWO plates per face, split along the joint's v axis
+    /// through the point (u = 0, e.g. the CL of a closure joint where each half truss brings its own gusset) with this gap between them (meters).
+    /// Marks get "A" (lower station side) / "B"; layers, rivets and edge angles still use the whole outline (a splice layer bridges the gap).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double GussetSplitGap { get; set; }
 }
 
 /// <summary>
