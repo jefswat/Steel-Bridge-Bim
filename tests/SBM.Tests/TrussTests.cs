@@ -1349,4 +1349,45 @@ public class TrussTests : IDisposable
         Assert.Equal((int)AssemblyKind.FlangeDeflector + 1, (int)AssemblyKind.TrussLine);
         Assert.Equal(1, (int)BoltKind.Anchor);
     }
+    [Fact]
+    public void BracingGussets_BearOn_PlateUnderTheFloorBeamFlange_FillsUnderTheLaterals()
+    {
+        // PTC p.99 floor lateral connection at the floor beams: the bottom plate runs under the floor beam and is riveted to its bottom flange; the
+        // laterals end at the crossing and stand off it (fills). Floor beam FB2 sits 1/4 in. below the lateral bottoms here.
+        (BridgeModel bm, BridgeDefinition b) Build(bool bear)
+        {
+            var (p, b) = Model();
+            var t = b.Truss!;
+            t.Members.RemoveAll(m => m.Role == TrussMemberRole.LowerLateral);
+            t.Members.First(m => m.Name == "FB2").OffsetZ = In(11.7);                      // W36x150 bottom 6.23 in. below the L points
+            t.Points.Add(new TrussPointDefinition("FX2", Ft(100) + 2 * Panel, Ft(60)) { Offset = Half, Planes = new() { "N" } });   // CL bridge on FB2
+            t.Members.Add(new TrussMemberDefinition { Name = "XA", From = "N:L1", To = "N:FX2", Section = "PL", Role = TrussMemberRole.LowerLateral });
+            t.Members.Add(new TrussMemberDefinition { Name = "XB", From = "N:FX2", To = "S:L3", Section = "PL", Role = TrussMemberRole.LowerLateral });
+            t.JointDefaults.BracingCornerClearance = In(0.5);
+            var g = new TrussBracingGussetDefinition { Point = "N:FX2", Orientation = TrussBracingPlateOrientation.Horizontal, Side = TrussBracingPlateSide.Below,
+                Thickness = In(7.0 / 16), Members = new() { "XA", "XB" }, RivetsPerMember = 4, RivetPitch = In(3), RivetGage = In(4), RivetDiameter = In(0.875) };
+            if (bear) { g.BearOn = new() { "FB2" }; g.MemberFills = true; }
+            t.BracingGussets = new() { g };
+            return (Regen(p), b);
+        }
+        var (bm, bd) = Build(true);
+        var st = bm.Steel!;
+        var plate = st.Parts.Single(x => x.Mark == "N-BGFX2");
+        var fb = st.Parts.Where(x => x.Mark.StartsWith("FB2")).ToList();
+        double fbBottom = fb.Min(x => x.Mesh.Bounds().Min.Z);
+        Assert.InRange(plate.Mesh.Bounds().Max.Z - fbBottom, -1e-4, 1e-4);                  // plate top on the floor beam bottom
+        var cl = SBM.Core.Checks.SteelClashCheck.Run(bm, new SBM.Core.Checks.ClashOptions()).Clashes;
+        Assert.DoesNotContain(cl, c => (c.A.Mark == "N-BGFX2" || c.B.Mark == "N-BGFX2") && (c.A.Mark.StartsWith("FB2") || c.B.Mark.StartsWith("FB2")));
+        var fills = st.Parts.Where(x => x.Mark.StartsWith("N-BGFX2-F")).ToList();
+        Assert.NotEmpty(fills);
+        foreach (var f in fills) { var fbx = f.Mesh.Bounds(); Assert.InRange(fbx.Max.Z - fbx.Min.Z, In(0.2), In(0.26)); }
+        // without it the plate lies on the lateral bottoms and overlaps the flange
+        var (bm0, _) = Build(false);
+        var plate0 = bm0.Steel!.Parts.SingleOrDefault(x => x.Mark == "N-BGFX2");
+        if (plate0 != null) Assert.True(plate0.Mesh.Bounds().Max.Z > fbBottom + In(0.2));
+        // OPTIONAL: omitted from the .sbm when unset, kept by a round trip
+        Assert.DoesNotContain("BearOn", System.Text.Json.JsonSerializer.Serialize(new TrussBracingGussetDefinition()));
+        var p2 = BridgeProject.FromJson(new BridgeProject { Alignments = { new Alignment { Name = "A" } }, Bridges = { bd } }.ToJson());
+        Assert.Equal("FB2", p2.Bridges[0].Truss!.BracingGussets![0].BearOn![0]);
+    }
 }

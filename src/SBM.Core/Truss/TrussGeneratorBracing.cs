@@ -342,10 +342,22 @@ public static partial class TrussGenerator
                             }
                         }
                     }
+                    // BearOn: crossing members the plate is riveted to (their section corners at the foot of the point, along n)
+                    bool IsBearOn(Inst o) => bg.BearOn is { Count: > 0 } bo && bo.Any(x => x.Equals(o.Def.Name, StringComparison.OrdinalIgnoreCase) || x.Equals(o.Mark, StringComparison.OrdinalIgnoreCase));
+                    var bearZ = new List<double>();
+                    if (bg.BearOn is { Count: > 0 })
+                        foreach (var o in _inst.Where(IsBearOn))
+                        {
+                            double len = (o.B - o.A).Length, ta = Vec3.Dot(P - o.A, o.Axis);
+                            if (ta < -0.3 || ta > len + 0.3) continue;
+                            var foot = o.A + o.Axis * Math.Clamp(ta, 0, len) + o.Y * o.Def.OffsetZ;
+                            bearZ.AddRange(Corners(o).Select(c => Vec3.Dot(foot - P + o.X * c.x + o.Y * (c.y - o.Def.OffsetZ), n)));
+                        }
                     (double z0, double z1) ZOf(TrussBracingPlateSide side)
                     {
                         bool below = side == TrussBracingPlateSide.Below;
                         double face = below ? conn.Min(c => Face(c.m, false)) : conn.Max(c => Face(c.m, true));
+                        if (bearZ.Count > 0) face = below ? Math.Min(face, bearZ.Min()) : Math.Max(face, bearZ.Max());
                         return below ? (face - bg.Thickness, face) : (face, face + bg.Thickness);
                     }
                     var sides = bg.Side == TrussBracingPlateSide.Both ? new[] { TrussBracingPlateSide.Below, TrussBracingPlateSide.Above } : new[] { bg.Side };
@@ -360,7 +372,7 @@ public static partial class TrussGenerator
                             .Aggregate(new Vec2(0, 0), (a, b) => a + b) / ending.Count;
                         foreach (var o in _inst)
                         {
-                            if (conn.Any(c => c.m == o) || inPlane.Contains(o) || Math.Abs(Vec3.Dot(o.Axis, n)) > 0.7) continue;   // any member crossing the plate (a floor beam, a girder beside a lateral node)
+                            if (conn.Any(c => c.m == o) || inPlane.Contains(o) || IsBearOn(o) || Math.Abs(Vec3.Dot(o.Axis, n)) > 0.7) continue;   // any member crossing the plate (a floor beam, a girder beside a lateral node)
                             double len = (o.B - o.A).Length, ta = Vec3.Dot(P - o.A, o.Axis);
                             if (ta < -0.3 || ta > len + 0.3) continue;
                             var foot = o.A + o.Axis * Math.Clamp(ta, 0, len) + o.Y * o.Def.OffsetZ;

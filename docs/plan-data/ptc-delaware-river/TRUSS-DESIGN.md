@@ -1119,3 +1119,19 @@ Clash rows of the main span (`sbm clash --bridge "Arch truss"`) between members 
   the flanges of the stringers present at the dam station (framing angles not built), every dam with supports (Piers 10 / 13 / 17 / 20 / 24 / 27, W22).
 - Reported, not changed: FB22 x wind chord W21-W22 (0.26 in.) = the p.69 / p.94 plan conflict already flagged; N-BGFX* floor lateral plates x FB16 / FB18 / FB20 bottom
   flange (0.23-0.31 in.) = bracing plate generator (left to the lateral bracing review).
+
+## 36. Floor lateral bottom plates under the floor beams, merged rebuild (2026-11-02, coordinator)
+
+- p.99 (FLOOR LATERAL CONN. AT FLOOR BEAMS W16, W18 & W20, quarter / half bottom sections): the 7/16 bottom plate runs under the floor beam and is riveted to its
+  bottom flange (rivet row along the CL floor beam). The model laid it on the lateral bottoms, 0.23 - 0.31 in. INTO the FB16 / FB18 / FB20 bottom flanges (6 clash rows).
+  New OPTIONAL `TrussBracingGussetDefinition.BearOn` (members the plate is riveted to: plate face beyond theirs, not clipped at them) + `MemberFills` on the
+  bottom plate (details-ptc.csx section 3): plate top on the floor beam bottom, fills of the modeled gap under the laterals (fill not drawn; flag text says so).
+- Merged rebuild of the PTC model with sections 33-35 + this (truss-ptc-arch -> deck -> connections -> shoes -> walkways -> floor-connections -> bracing -> details ->
+  girder-details -> rivets, then walkways + rivets again, see CLAUDE.md): clash rows all 7 units 3,732 -> 3,357 (main span 1,124 -> 825, approaches -16 / -22 each,
+  girder spans unchanged); check-truss-ptc 616 / 19 / 73 / 2 CONFLICT, approach 1,792 / 16 / 168, girders 128 / 9 / 14, location 389 / 37 (all unchanged by the review).
+- Main span left (825): 478 rail member x post (rails through their posts, by design), 188 inspection cable x walkway post (rope through the post holes, p.105,
+  holes not cut), 60 suspender socket x pin (pin through the socket), ~50 walkway x floor lateral (walk level drawn, not dimensioned; reported), 12 FB22 x wind
+  chord (p.69 / p.94 plan conflict), 8 L13H edge angle x strut channel 0.075 in., 16 rail corner laps 5/32.
+- Approach trusses / girder spans, found by the same clash run (NOT reviewed yet): approach shoes at L0 / L8 / L10 / L20 - gussets through the sole plates, pins and
+  shoe bodies (1 - 3 in.), sole plate x chord / fill; girder spans sole plate x girder 0.09 in. (80); approach ladder stiles x cross walkway gratings at FB0 (3/8 in.).
+

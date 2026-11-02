@@ -816,6 +816,11 @@ public sealed class TrussBracingGussetDefinition
     /// referred to the panel point. Members ending there are connected like members ending at the point (laps / fills / rivets from their own cut end).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string? WorkPoint { get; set; }
+    /// <summary>OPTIONAL: members (names or marks) crossing the plate that it BEARS ON (riveted to), e.g. a lateral plate under a floor beam bottom flange
+    /// (p.99): the plate face is also beyond their face at the point (Below: under their lowest face, Above: over their highest), the plate passes them
+    /// without being clipped, and connected members standing off it get fills with <see cref="MemberFills"/>. Null = none.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? BearOn { get; set; }
 }
 
 /// <summary>

@@ -220,7 +220,7 @@ if (T(Main) is { } tmK)
 // Rivets 7/8 carbon (p.99 notes). Counts per lateral end read on the details: 14 BP 73 8 per plate, 2-15[ 50 24 per plate, at the wind chord 10.
 string flXFlag = U("p.99", "floor lateral connection plates at the floor beams W14 / W16 / W18 / W20 (bottom 3/4 or 7/16 Pl., 2 top 7/16 Pls., L 3 1/2 x 3 x 3/8)",
     "the details draw plates, angles and rivets without outline dimensions or gages; the fillers on the floor beam web are not dimensioned",
-    "the X diagonals are split at the crossing and stop clear of the floor beam; bottom plate = envelope of the four member laps under them, top plates one per side stopping 1/4 in. clear of the floor beam with the angle on the floor beam face, rivets 8 (14 BP 73) / 24 (2-15[ 50) per member per plate in 4 lines 5 3/4 / 4 in. from the member CL; fillers on the floor beam web not built.");
+    "the X diagonals are split at the crossing and stop clear of the floor beam; bottom plate = envelope of the four member laps, under the floor beam bottom flange (riveted to it, p.99) with fills of the modeled gap where a lateral face stands off it (fill not drawn), top plates one per side stopping 1/4 in. clear of the floor beam with the angle on the floor beam face, rivets 8 (14 BP 73) / 24 (2-15[ 50) per member per plate in 4 lines 5 3/4 / 4 in. from the member CL; fillers on the floor beam web not built.");
 string flWFlag = U("p.99", "floor lateral plates at the wind chord W15 / W17 / W19 / W21 (7/16 Pl., 1-L 7 x 4 x 3/4 to the floor beam)",
     "Sections A / B draw the plate under the wind chord and the lateral ends with its rivets but no outline dimensions; the plate passes through a slot in the floor beam web",
     "one 7/16 plate under the lateral ends and the wind chord = envelope of the lateral laps (not clipped at the chord), 10 rivets per lateral; the angles to the floor beam and the web slot are not built.");
@@ -272,7 +272,11 @@ if (T(Main) is { } tmF)
                 Rivets = rv, RivetPitch = In(3), RivetGage = In(5.75), RivetGage2 = In(4), RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
                 Material = "C", Unresolved = flXFlag, Source = "p.99",
             };
-            t.BracingGussets.Add(G("floor lat. bottom PL", TrussBracingPlateSide.Below, c == 14 ? In(0.75) : In(7.0 / 16), new() { X1a, X1b, X2a, X2b }, "", false));
+            // p.99 quarter / half bottom sections: the bottom plate runs under the floor beam and is riveted to its bottom flange (rivet row along the CL floor
+            // beam) -> it bears on the floor beam (BearOn); laterals whose bottom face stands off it get fills (MemberFills)
+            var bot = G("floor lat. bottom PL", TrussBracingPlateSide.Below, c == 14 ? In(0.75) : In(7.0 / 16), new() { X1a, X1b, X2a, X2b }, "", false);
+            bot.BearOn = new() { "FB" + P(c) }; bot.MemberFills = true;
+            t.BracingGussets.Add(bot);
             t.BracingGussets.Add(G("floor lat. top PL", TrussBracingPlateSide.Above, In(7.0 / 16), new() { X1a, X1b }, "-1", true));
             t.BracingGussets.Add(G("floor lat. top PL", TrussBracingPlateSide.Above, In(7.0 / 16), new() { X2a, X2b }, "-2", true));
         }
