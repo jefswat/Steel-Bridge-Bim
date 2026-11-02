@@ -22,7 +22,7 @@ public class TrussTests : IDisposable
     public TrussTests() => Directory.CreateDirectory(_dir);
     public void Dispose() { SqliteConnection.ClearAllPools(); try { Directory.Delete(_dir, true); } catch (IOException) { } }
 
-    private const double Panel = 6.096, Depth = 6.096, Half = 4.572;   // 20 ft panels, 20 ft deep, trusses 30 ft c-c
+    internal const double Panel = 6.096, Depth = 6.096, Half = 4.572;   // 20 ft panels, 20 ft deep, trusses 30 ft c-c
 
     private static TrussSectionDefinition Plate(string n, double w, double d) => new() { Name = n, Kind = TrussSectionKind.Plate, Width = w, Depth = d, Label = n };
 
