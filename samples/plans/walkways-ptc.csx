@@ -285,7 +285,10 @@ foreach (var (bn, east, pts) in units)
         if (box == null) { Print($"{bn}: {fb} not found"); continue; }
         double sta = double.IsNaN(ladderFt) ? box.Value.sta - east * (In(9.5) + FI(1, 2)) : box.Value.sta + east * Ft(ladderFt);
         double zw = box.Value.zMin + In(1.75);   // grating top (absolute)
-        double from = full ? -Ft(LadderOff) : -Ft(LadderOff), to = full ? Ft(LadderOff) : Ft(ClOffsetFt) - Ft(1);   // north cross walks end at the CL walkway's north edge (3'-0 north)
+        // the ladders rise past the cross walk's end (stiles 1'-4 apart along the walk, inside its 2'-0 width): the walk ends at the outer face of the stiles' 3 in. legs
+        // across (2026-11-02 agent review: it ran to the ladder CL, the stiles passed through its grating and channels, 3/8 / 7/32 in. clash rows at every approach ladder)
+        double stileFace = ladder ? In(1.5) : 0;
+        double from = -Ft(LadderOff) + stileFace, to = full ? Ft(LadderOff) - (ladder && both ? stileFace : 0) : Ft(ClOffsetFt) - Ft(1);   // north cross walks end at the CL walkway's north edge (3'-0 north)
         Walk(bn, $"cross walkway {fb}", true, sta, from, to, zw / In(1), false, "p.101", crossFlag);
         if (!ladder) continue;
         foreach (int north in both ? new[] { -1, 1 } : new[] { -1 })

@@ -5,6 +5,8 @@
 //   main spans: L0 / L0' rocker shoes (p.73), L11 fixed cast shoe (pier 18) and L11' expansion roller nest (pier 19) (p.96: cast steel base / walls / ribs,
 //   steel forging top, five segmental forged rollers).
 // Generic input: TrussShoeDefinition.Pieces (TrussShoePiece: profile in the shoe frame swept across / along / up, copies, mirrors).
+// 2026-11-02 (TRUSS-DESIGN.md 37): approach / girder soles beveled to the chord / girder slope, approach soles seated on the pin, approach shoe-joint gussets cut
+// at the sole top (finished to bear, p.52 / p.59 / p.63) - run after connections-ptc.csx (it restores the traced outlines).
 // Re-runnable; run AFTER truss-ptc-arch, truss-ptc-approach, girders-ptc, deck-ptc, connections-ptc (they rebuild Truss):
 //   sbm run samples\plans\shoes-ptc.csx "samples\plans\PTC Delaware River Bridge.sbm"
 // Shoe frame: origin = pin centre (girder shoes: the W.P. on the sole plate top), u along the bridge, n across (right +), z up; all values below in INCHES.
@@ -54,8 +56,63 @@ const TrussShoePieceAxis Across = TrussShoePieceAxis.Across, Along = TrussShoePi
 const TrussShoePieceKind Body = TrussShoePieceKind.Body, Plate = TrussShoePieceKind.Plate, Sole = TrussShoePieceKind.Sole, Rocker = TrussShoePieceKind.Rocker, Roller = TrussShoePieceKind.Roller;
 
 string bevel(string pg) => U(pg, "sole plate bevel", "the sole plate is beveled to the grade, only its thickness on the CL is listed", "level plate of the listed CL thickness.");
+// 2026-11-02 agent review: slope (rise / station) of the lower chord(s) at a truss point = mean of the chords ending there
+double ChordSlope(TrussDefinition td, string pt)
+{
+    var p0 = td.Points.First(q => q.Name == pt);
+    var sl = new List<double>();
+    foreach (var m in td.Members.Where(m => m.Role is TrussMemberRole.LowerChord or TrussMemberRole.Girder && (m.From == pt || m.To == pt)))
+    {
+        string o = m.From == pt ? m.To : m.From;
+        var p1 = td.Points.FirstOrDefault(q => q.Name == o);
+        if (p1 != null && Math.Abs(p1.Station - p0.Station) > 0.1) sl.Add((p1.Elevation - p0.Elevation) / (p1.Station - p0.Station));
+    }
+    // a point on a member, not at its end (girder shoes: the W.P. on the CL bearing, the girder runs from end to end past it)
+    if (sl.Count == 0)
+        foreach (var m in td.Members.Where(m => m.Role is TrussMemberRole.LowerChord or TrussMemberRole.Girder))
+        {
+            var a = td.Points.FirstOrDefault(q => q.Name == m.From); var b = td.Points.FirstOrDefault(q => q.Name == m.To);
+            if (a == null || b == null || Math.Abs(b.Station - a.Station) < 0.1) continue;
+            if ((p0.Station - a.Station) * (p0.Station - b.Station) <= 0) sl.Add((b.Elevation - a.Elevation) / (b.Station - a.Station));
+        }
+    return sl.Count > 0 ? sl.Average() : 0;
+}
+// polygon (u, v) kept above the line v = vMin + slope u (Sutherland-Hodgman against one half plane; works for non-convex outlines)
+List<TrussUV> KeepAbove(List<TrussUV> poly, double vMin, double slope)
+{
+    double F(TrussUV q) => q.V - vMin - slope * q.U;
+    var res = new List<TrussUV>();
+    for (int i = 0; i < poly.Count; i++)
+    {
+        var a = poly[i]; var b = poly[(i + 1) % poly.Count];
+        double fa = F(a), fb = F(b);
+        bool ina = fa >= -1e-9, inb = fb >= -1e-9;
+        if (ina) res.Add(a);
+        if (ina != inb) { double t = fa / (fa - fb); res.Add(new TrussUV(a.U + t * (b.U - a.U), a.V + t * (b.V - a.V))); }
+    }
+    return res;
+}
+// sole plate (x along the bridge, z up from the pin centre, inches): bottom at zb with the upper half bore of the pin (radius r) when the pin reaches into it,
+// top on the CL at zTop beveled to the slope bev
+List<TrussUV> SoleWithSeat(double half, double zb, double zTop, double bev, double r)
+{
+    var pts = new List<double> { -half, zb };
+    if (r > zb + 1e-6)
+    {
+        double x0 = Math.Sqrt(r * r - zb * zb), a = Math.Asin(zb / r) * 180 / Math.PI;
+        pts.AddRange(new[] { -x0, zb });
+        pts.AddRange(Arc(r, 180 - a, a).Skip(2).SkipLast(2));
+        pts.AddRange(new[] { x0, zb });
+    }
+    pts.AddRange(new[] { half, zb, half, zTop + half * bev, -half, zTop - half * bev });
+    return Poly(pts.ToArray());
+}
+string seatFlag(string pg) => U(pg, "pin seat in the sole plate", "the pin is drawn bearing in the sole plate (its top half above the sole bottom) but the seat is not dimensioned", "upper half bore of the pin radius cut in the sole bottom (the pin passed through the solid plate: clash rows).");
+int gussetsFinished = 0;
 var report = new List<string>();
 int shoes = 0;
+var soleTopV = new Dictionary<string, double>();   // approach shoes: sole top on the CL, inches above (+) the panel point
+var soleSlope = new Dictionary<string, double>();  // and its bevel (rise / run along the bridge)
 
 // ================================================================ girder spans (p.44), reference = W.P. (top of the sole plate on the girder CL)
 foreach (var bn in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
@@ -63,7 +120,11 @@ foreach (var bn in new[] { "PTC Girder spans 1-10", "PTC Girder spans 28-31" })
     var t = Doc.Project.Bridges.First(b => b.Name == bn).Truss!;
     foreach (var s in t.Shoes)
     {
-        var pc = new List<TrussShoePiece> { P("sole plate", Sole, Across, Rect(-5.5, 5.5, -3, 0), -9, 9, "C", "PL 11 x 4 3/4 x 1'-6 beveled (3 in. on the CL)", flag: bevel("p.44")) };
+        // 2026-11-02: top beveled to the girder slope about the W.P. (3 in. on the CL as listed): the level top left the girder's bottom angles 0.09 in. inside
+        // the plate at the high end (clash rows S-G1-A4 x SHOE-S-1a-01)
+        double bevG = ChordSlope(t, s.Point);
+        var pc = new List<TrussShoePiece> { P("sole plate", Sole, Across, Poly(-5.5, -3, 5.5, -3, 5.5, 5.5 * bevG, -5.5, -5.5 * bevG), -9, 9, "C", "PL 11 x 4 3/4 x 1'-6 beveled (3 in. on the CL)",
+            flag: U("p.44", "sole plate bevel", "the sole plate is listed 'beveled (3 in. on the CL)' without the bevel", "top beveled to the girder slope about the W.P., 3 in. on the CL.")) };
         if (s.Type == TrussShoeType.Expansion)
         {
             // rocker 17 5/8 x 9 x 3'-0: top 1 3/4 R nose on the pin centre (3 in. under the W.P.), bottom R 1'-6 about the pin centre, 1/2 in. chamfers at the top corners
@@ -103,7 +164,12 @@ foreach (var bn in new[] { "PTC 3-span truss 11-13", "PTC 4-span truss 14-17", "
             // CORRECTION rows (shoes.csv, third pass 2026-10-20): p.67 is identical to p.52 - sole 10 3/16 (not 10 7/16), wings 29 7/8 (not 29 3/4), stems 2'-5 7/8 (not 5 5/8 / 5 3/8)
             double soleT = 10.1875, wingH = 29.875;
             s.MasonryLength = FI(5, 6); s.MasonryWidth = In(60);    // 'Masonry Pl. 60 x 6 x 5'-6': 5'-6 along the truss (2'-9 + 2'-9 about the CL brg), 60 in. across (2'-6 + 2'-6)
-            pc.Add(P("sole plate", Sole, Across, Rect(-11, 11, 0.1875, 0.1875 + soleT), -19, 19, "S", "PL 22 x 10 3/16 (on CL) x 3'-2", flag: bevel(pg)));
+            // 2026-11-02: sole top beveled to the bottom chord slope at the shoe (the listed thickness is ON THE CL; p.52 / p.67 'Sole PL 22 x 10 3/16 (on CL)'),
+            // gussets finished to bear on it (p.52 section 'FIN. Gussets to Bear', see the gusset cut after the pieces)
+            double bevF = ChordSlope(t, s.Point);
+            pc.Add(P("sole plate", Sole, Across, SoleWithSeat(11, 0.1875, 0.1875 + soleT, bevF, s.PinDiameter / In(1) / 2), -19, 19, "S", "PL 22 x 10 3/16 (on CL) x 3'-2",
+                flag: U(pg, "sole plate bevel", "the sole plate is beveled to the grade, only its thickness on the CL is listed", "top beveled to the mean bottom chord slope at the shoe, the listed thickness on the CL.") + " " + seatFlag(pg)));
+            soleTopV[s.Name] = -s.PinBelowPoint / In(1) + 0.1875 + soleT; soleSlope[s.Name] = bevF;
             pc.Add(P("stem plate", Body, Across, SeatTop(new double[] { -4.5, -30.25, 4.5, -30.25 }, 4.5, -30.25 + 29.875, 2.75), 2, 15, "C", "PL 13 x 9 x 2'-5 7/8", mirrorN: true));
             var wing = SeatTop(new double[] { -31.75, -30.25, 31.75, -30.25 }, 5.5, -30.25 + wingH, 2.75);
             string wingFlag = U(pg, "wing plate top width", "the wing plates are drawn as triangles reaching the pin (29 7/8 x 4 x 5'-3 1/2 listed on p.52 and p.67)", "5'-3 1/2 at the masonry plate tapering to 11 in. at the pin seat.");
@@ -148,7 +214,12 @@ foreach (var bn in new[] { "PTC 3-span truss 11-13", "PTC 4-span truss 14-17", "
                 report.Add($"{bn} {s.Name}: W.P. to bottom of shoe {total / In(1):0.###} in. (model) vs {pinBelow + h:0.###} in. printed chain ({pg}); pin {pinBelow} in. below the W.P., {h} in. above the bottom (was {s.PinBelowPoint / In(1):0.###} / {s.Height / In(1):0.###})");
                 s.PinBelowPoint = In(pinBelow); s.Height = total - In(pinBelow);
             }
-            pc.Add(P("sole plate", Sole, Across, Rect(-11, 11, 0.375, 0.375 + soleT), -soleHalfN, soleHalfN, "S", soleTxt, flag: bevel(pg)));
+            // 2026-11-02: sole top beveled to the bottom chord slope (thickness listed 'on CL', p.49 / p.59 / p.63), gussets finished to bear on it
+            // (p.59 View A-A, p.63 section 'Finish Gussets to Bear'; see the gusset cut after the pieces)
+            double bevR = ChordSlope(t, s.Point);
+            pc.Add(P("sole plate", Sole, Across, SoleWithSeat(11, 0.375, 0.375 + soleT, bevR, s.PinDiameter / In(1) / 2), -soleHalfN, soleHalfN, "S", soleTxt,
+                flag: U(pg, "sole plate bevel", "the sole plate is beveled to the grade, only its thickness on the CL is listed", "top beveled to the mean bottom chord slope at the shoe, the listed thickness on the CL.") + " " + seatFlag(pg)));
+            soleTopV[s.Name] = -s.PinBelowPoint / In(1) + 0.375 + soleT; soleSlope[s.Name] = bevR;
             pc.Add(P("stem plate", Body, Across, SeatTop(new double[] { -stemHalf, baseTop, stemHalf, baseTop }, stemHalf, stemTop, s.PinDiameter / In(1) / 2), -across / 2, across / 2, "C", stemTxt));
             pc.Add(P("wing plate", Plate, Across, Poly(-half, baseTop, half, baseTop, stemHalf, baseTop + wingH, -stemHalf, baseTop + wingH), across / 2, across / 2 + wingT, "C", wingTxt, mirrorN: true,
                 flag: U(pg, "wing plate outline", "the wing plates are drawn as trapezoids from the rocker base to the stem; only height x thickness x length are listed", $"trapezoid {2 * half} in. at the base tapering to the stem width {2 * stemHalf} in.")));
@@ -162,6 +233,28 @@ foreach (var bn in new[] { "PTC 3-span truss 11-13", "PTC 4-span truss 14-17", "
         }
         s.Pieces = pc;
         shoes++;
+    }
+    // 2026-11-02 agent review: the gussets at the shoe points are FINISHED TO BEAR on the sole plate (p.52 / p.67 section 'FIN. Gussets to Bear', p.59 View A-A,
+    // p.63 section 'Finish Gussets to Bear'). The outlines traced from the joint elevations (gusset-outlines.csv) carried a 'pin extension' round the shoe pin -
+    // in the elevations that is the sole / stem of the shoe drawn under the chord - so the gussets ran through the sole plate, the pin and the stem (clash rows).
+    // Cut the inner gusset and every layer outline at the sole top line (parallel to the chord: v = const in the gusset frame).
+    foreach (var s in t.Shoes)
+    {
+        if (!soleTopV.TryGetValue(s.Name, out double vIn)) continue;
+        double vMin = In(vIn), sl = soleSlope.GetValueOrDefault(s.Name);
+        foreach (var jd in t.Joints.Where(j => j.Point == s.Point && (j.Plane.Length == 0 || j.Plane == s.Plane)))
+        {
+            bool cut = false;
+            // (the gusset frame u is level along the alignment, v up: the sole top line is v = vMin + slope u)
+            if (jd.Outline.Count >= 3 && jd.Outline.Min(q => q.V - sl * q.U) < vMin - 1e-6) { jd.Outline = KeepAbove(jd.Outline, vMin, sl); cut = true; }
+            foreach (var ly in jd.GussetLayers ?? new())
+                if (ly.Outline.Count >= 3 && ly.Outline.Min(q => q.V - sl * q.U) < vMin - 1e-6) { ly.Outline = KeepAbove(ly.Outline, vMin, sl); cut = true; }
+            if (!cut) continue;
+            gussetsFinished++;
+            string fin = $"gussets finished to bear on the sole plate top ({(s.Source.Contains("p.59") ? "p.59 View A-A" : four ? "p.63 / p.67 sections" : "p.49 / p.52 sections")}): outline cut {vIn:0.##} in. from the panel point";
+            if (!jd.Source.Contains("finished to bear")) jd.Source = (jd.Source + "; " + fin).Trim(' ', ';');
+            report.Add($"{bn} {s.Name}: {fin} (joint {s.Point}{(jd.Plane.Length > 0 ? " " + jd.Plane : "")})");
+        }
     }
 }
 
@@ -358,6 +451,6 @@ foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null && b.Name.Start
     Print($"{b.Name}: {b.Truss!.Shoes.Count} shoes, {parts.Count} shoe parts; " + string.Join(", ", by.Select(g => $"{g.Key} {g.Sum(p => p.Mass) * lb:N0} lb")));
     foreach (var e in rep.Errors.Where(e => e.StartsWith(b.Name))) Print("  ERROR " + e);
 }
-Print($"{shoes} shoe definitions given pieces.");
+Print($"{shoes} shoe definitions given pieces; {gussetsFinished} shoe joint gussets finished to bear on the sole plate.");
 Doc.Save(outPath);
 Print($"Saved {outPath}");

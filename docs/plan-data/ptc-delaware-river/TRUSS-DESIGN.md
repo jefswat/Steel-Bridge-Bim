@@ -1135,3 +1135,30 @@ Clash rows of the main span (`sbm clash --bridge "Arch truss"`) between members 
 - Approach trusses / girder spans, found by the same clash run (NOT reviewed yet): approach shoes at L0 / L8 / L10 / L20 - gussets through the sole plates, pins and
   shoe bodies (1 - 3 in.), sole plate x chord / fill; girder spans sole plate x girder 0.09 in. (80); approach ladder stiles x cross walkway gratings at FB0 (3/8 in.).
 
+## 37. Approach shoes, girder sole plates, approach cross walks (2026-11-02 agent review; clash run of the merged model, coordinator section 36)
+
+Evidence: p.52 / p.67 (fixed shoes L8 / L20) section 'FIN. Gussets to Bear', p.59 View A-A (end shoes L0 / L0': the gusset plates stop on the sole plate, pin
+5 1/2 x 3'-2 1/8 through sole + stem below them), p.63 section 'Finish Gussets to Bear' (rockers L10 / L10'), p.44 girder sole 'PL 11 x 4 3/4 x 1'-6 beveled (3 in. on
+the CL)', p.101 / p.102 ladders at the cross walkways. All changes in `samples/plans/shoes-ptc.csx` and `walkways-ptc.csx` (no generator code).
+- Shoe-joint gussets (18 approach joints: L0 / L8 / L0' 3-span, L0 / L10 / L20 / L10' / L0' 4-span): the outlines traced from the joint elevations
+  (`connections/gusset-outlines.csv`) carried a 'pin extension' round the shoe pin - in the elevations that is the shoe sole / stem drawn under the chord. The
+  gussets ran 3 - 5 in. through the sole plate, the pin and the shoe body. Now the inner gusset and every layer outline are cut at the sole top line
+  (v = sole top on the CL + bevel x u in the level gusset frame; report lines "gussets finished to bear ..."). The CSV keeps the raw trace.
+- Approach sole plates beveled to the mean bottom chord slope at the shoe (listed thickness 'on CL'; the level plate was the old flagged assumption) and given an
+  upper half bore of the pin radius (the pin was drawn bearing in the sole, its top 2 3/8 - 3 5/8 in. was inside the solid plate; seat not dimensioned, flagged).
+- Girder spans 1-10 / 28-31: sole plate top beveled to the girder slope about the W.P., 3 in. on the CL (the girder's bottom angles were 0.09 in. inside the level plate).
+- Approach cross walkways: they ran to the ladder CL; the stiles (1'-4 apart along the 2'-0 walk) passed through the grating and channels (3/8 / 7/32 in.). The walks
+  now end at the outer face of the stiles' 3 in. across legs.
+- Clash rows (all 7 units, merged model 1a1a69e -> this): 3-span 350 -> 274 / 346 -> 270, 4-span 541 -> 425 / 535 -> 419, girder spans 540 -> 460 / 220 -> 188,
+  main span 825 unchanged; total 3,357 -> 2,861. Checks unchanged: check-truss-ptc 616 / 19 / 73 / 2 CONFLICT, approach 1,792 / 16 / 168, girders 128 / 9 / 14.
+- Left (reported, not adjusted):
+  - 3-span L0 (piers 10 / 27): the 9 in. 'L0' sole sits 0.57 in. into the chord (and its fill 0.51, bottom lateral plate S-BGL0 0.76, its edge angle 0.32, strut BS0 0.28).
+    p.59 chains the 'L0' shoe W.P. -> pin as 8 3/4 + 8 13/16 = 17 9/16 and the 'L0'' shoe 8 3/4 + 7 3/8 = 16 1/8 ('shoes for both ends ... alike except top shoes');
+    the model keeps one W.P. -> pin per unit (16 1/8 in the 3-span, 17 9/16 in the 4-span) from the printed seats, so the 3-span L0 and the 4-span L0' do not
+    follow the p.59 chain (the W.P. reading itself is uncertain: every end shoe leaves 0.5 - 2 in. between chord and sole otherwise). PLAN / MODEL CONFLICT, not adjusted.
+  - Bottom lateral plates at L8 / L10 under the chord vs the beveled sole 0.11 - 0.26 in. (p.52 / p.63 put the lateral plates on the strut flanges; their level is drawn).
+  - Bearing plate x masonry plate 1.00 in. (8 per unit): the bearing plate is let 1 in. into the masonry plate (p.59 / p.63, flagged; the recess is not cut).
+  - Gusset x vertical at U2 (4-span, 0.09 in.) / U8 (3-span, 0.21 in.): the 14 WF verticals at the printed areas are deeper than the printed gusset in-to-in.
+  - Lateral apex plate edge angles x bottom laterals 0.10 - 0.22 in. (N-BGLM*-T-EA x BL-*), walkway CL posts x cross walk rails 0.16 in., platform FB0' rail x gusset
+    L0' 0.38 in., floor beam stiffener x cross walk rail FB0' 0.22 in. (layout drawn only).
+

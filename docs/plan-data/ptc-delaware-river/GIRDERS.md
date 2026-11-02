@@ -74,3 +74,6 @@ Several bullets above are superseded:
   (11 in. from its CL) and at the crown (`StartCut` / `EndCut`), the girder stiffeners at them and the end stiffener pairs normal to grade and moved onto the leaning
   web planes; tension plates / fills parallel to the grade, CL walkway pieces clear of the leaning webs. The floor beam x girder (140) and floor beam x floor beam (70)
   clash rows are gone.
+- (2026-11-02, TRUSS-DESIGN.md section 37) sole plates beveled to the girder slope about the W.P. (p.44 'PL 11 x 4 3/4 x 1'-6 beveled (3 in. on the CL)'): the level
+  plate left the girder's bottom flange angles 0.09 in. inside it at the high end (80 + 32 clash rows, gone).
+
