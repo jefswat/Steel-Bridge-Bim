@@ -5833,6 +5833,7 @@
     "CrsName": "EPSG:26915",
     "Description": "NAD83 / UTM zone 15N (m); project X/Y = UTM metres",
     "GeodeticDatum": "NAD83",
+    "VerticalDatum": "NAVD88",
     "MapProjection": "Transverse Mercator",
     "MapZone": "UTM 15N",
     "MapUnitUsSurveyFoot": false,

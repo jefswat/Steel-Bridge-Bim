@@ -1192,6 +1192,7 @@ public sealed partial class MainViewModel : ObservableObject
         var origin = _origin;
         bool projectedAll = ProjectedPlanAll;
         var sw = Stopwatch.StartNew();
+        string? loadProfile = null;
         try
         {
             var (framings, steels, drawing, scene) = await Task.Run(() =>
@@ -1199,7 +1200,11 @@ public sealed partial class MainViewModel : ObservableObject
                 // Incremental: unchanged bridges come from the cache; changed ones regenerate in parallel
                 // (framing and steel generators also parallelize internally).
                 var bridges = project.Bridges.ToArray();
-                var models = _regenCache.Regenerate(project, true, LodOutput.Viewport);
+                // load-time profile (SBM.Core.Project.RegenerationProfiler) -> session log "LOAD PROFILE"
+                var prof = SBM.Core.Project.RegenerationProfiler.Start();
+                List<SBM.Core.Project.BridgeModel?> models;
+                using (SBM.Core.Project.RegenerationProfiler.Step("", "regenerate")) models = _regenCache.Regenerate(project, true, LodOutput.Viewport);
+                var profScene = SBM.Core.Project.RegenerationProfiler.Step("", "plan drawing + 3D scene");
                 var results = models.Select(m => m?.Framing).ToArray();
                 var steel = models.Select(m => m?.Steel).ToArray();
                 var concrete = models.Select(m => m?.Concrete).OfType<SBM.Core.Concrete.ConcreteModel>().ToList();
@@ -1229,6 +1234,7 @@ public sealed partial class MainViewModel : ObservableObject
                 UtilityPlanBuilder.Add(merged, utilities);
                 AddProjectedPlans(merged, models, projectedAll);
                 // A stable origin keeps reference models (built separately) aligned with the bridge.
+                var profSolids = SBM.Core.Project.RegenerationProfiler.Step("", "plan drawing + 3D scene/3D solids");
                 var sc = SceneBuilder.Build(merged, origin);
                 sc.BridgeNames.AddRange(bridges.Select(b => b.Name));
                 try { AddSolidsPerBridge(sc, models); }
@@ -1250,6 +1256,9 @@ public sealed partial class MainViewModel : ObservableObject
                 sc.Gradings = gradings;
                 if (utilities.Count > 0) SceneBuilder.AddUtilities(sc, utilities, project.Units);
                 sc.Utilities = utilities;
+                profSolids.Dispose(); profScene.Dispose();
+                var (ps, pms) = SBM.Core.Project.RegenerationProfiler.Stop(prof);
+                loadProfile = SBM.Core.Project.RegenerationProfiler.Report(ps, pms, 25);
                 return (results, models, merged, sc);
             });
             if (version != _regenVersion) return; // superseded
@@ -1332,6 +1341,7 @@ public sealed partial class MainViewModel : ObservableObject
                   $"{tons:N1} {(Units.IsUS ? "tons" : "t")} steel, {scene.Solids.Sum(s => s.Triangles):N0} triangles";
             if (scene.DetailSkipped) StatusText += " - bolts, studs, welds and rebar not drawn (out of memory)";
             Log("REGEN: " + StatusText);
+            if (loadProfile != null) Log($"LOAD PROFILE (background work; the rest of the {sw.ElapsedMilliseconds} ms = layers / explorer / GPU upload on the UI thread):" + Environment.NewLine + loadProfile);
         }
         catch (Exception ex)
         {

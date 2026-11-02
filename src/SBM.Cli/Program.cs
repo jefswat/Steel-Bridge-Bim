@@ -117,6 +117,8 @@ public static partial class Program
                                                             distances, rebar); "sbm measure" alone lists the options. Never saves the model.
           sbm centerlines <file.sbm> [--bridge NAME] [--kind sub,part] [--category Column] [--csv f] [--json f] [--dxf f]
                                                             Geometric centerline + section centroid line of every element; "sbm centerlines" alone = help.
+          sbm profile <file.sbm> [--runs N] [--top N] [--csv f]
+                                                            Time of every regeneration step (open, terrain, framing, steel, concrete, rebar, substructure ...); "sbm profile" alone = help.
           sbm crossframes <file.sbm> [--bridge NAME] [--csv f] [--twist] [--top L --depth L ...]
                                                             Standard cross frame depth report, hole-shift table and twist (read-only); "sbm crossframes" alone = help.
           sbm review <file.sbm> [--all] [--no-regen] [--confirm PATH] [--accept-pdf FILE]   agent review: PDFs attached / unchanged,
@@ -362,6 +364,9 @@ public static partial class Program
                         var res = doc.ExportIfc(ifc, geometry, chord, args.Contains("--for-check"), args.Contains("--keep-designations"));
                         Console.WriteLine($"  IFC 4.3 ({geometry}{(args.Contains("--for-check") ? ", FOR CHECK" : "")}) → {ifc}  ({sw.Elapsed.TotalSeconds:0.0} s, {new FileInfo(ifc).Length / 1048576.0:0.0} MB, {res.EntityCount:N0} entities" +
                                           (geometry == SBM.IO.Ifc.IfcGeometryMode.ReferenceView ? $", {res.PolygonalSolids:N0} polygonal face sets, chord tol {res.ChordTolerance * 1000:0.###} mm)" : ")"));
+                        int nUn = res.Unclassified.Values.Sum();
+                        Console.WriteLine($"  US Bridge Dictionary classes: {res.Classified.Sum(c => c.Count):N0} elements in {res.Classified.Count} classes; no fitting class: {nUn:N0}" +
+                                          (nUn > 0 ? " (" + string.Join(", ", res.Unclassified.OrderByDescending(kv => kv.Value).Take(args.Contains("--classes") ? 1000 : 8).Select(kv => $"{kv.Key} {kv.Value:N0}")) + ")" : ""));
                     }
                     if (Opt("--3dm") is { } r3)
                     {
@@ -748,6 +753,8 @@ public static partial class Program
                     return CableStayedCommand.Run(args);
                 case "review":
                     return ReviewCommand.Run(args);
+                case "profile":
+                    return ProfileCommand.Run(args);
                 case "section":
                     if (args.Length < 3) { Console.WriteLine(MeasureCommand.Help); return args.Length < 2 ? 1 : 0; }
                     return MeasureCommand.Section(args);

@@ -1394,6 +1394,14 @@ public static class ModelDatabase
                 ur.Props = new Json().Add("columns", unit.Columns.Count).Add("pedestals", unit.Pedestals.Count).Add("foundations", unit.Foundations.Count)
                     .Add("cap_top", unit.CapTopDescription).ToString();
                 _w.Add(ur);
+                // the unit's FOUNDATION bridge part (IFC: footings, piles, drilled shafts are contained in it; US bridge IDS)
+                if (unit.Solids.Any(so => !so.Mesh.IsEmpty && so.Kind is SubElementKind.Footing or SubElementKind.WingFooting or SubElementKind.Pile
+                        or SubElementKind.DrilledShaft or SubElementKind.PileCasing))
+                {
+                    var fr = New(Id(IfcKeys.Foundation(uk)), uid, "part", "foundation", "IFCBRIDGEPART", unit.Name + " foundation");
+                    fr.Support = unit.Name; SetStation(fr, unit.Station, unit.Station);
+                    _w.Add(fr);
+                }
                 string concMat = $"Concrete, f'c = {unit.Definition.Reinforcement.ConcreteStrengthKsi:0.#} ksi";
 
                 // Groups at the plans' granularity: cap (concrete + pedestals + cap bars), each column (concrete + its bars, ties), each footing

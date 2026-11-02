@@ -138,3 +138,32 @@ are misleading for tubes (OpenCascade meshes the IfcCircle bores coarsely: 8" pi
 Consumers: ifcopenshell.geom needs ~0.15 s per AbV plate with holes vs ~0.07 s for the extrusion.
 GlobalIds: every element GlobalId is the same in both modes; SBM_Fabrication property sets are keyed by the STEP id of
 their first element, so their GlobalIds differ between modes (pre-existing keying).
+
+
+## US bridge IDS (2026-11-01)
+
+`python -I tools/run_ids.py model.ifc temp/usbridge-ids/usBrSpec_<name>.ids` (General, Classes, PropertySets, SpatialBreakdown, AbV Exclusions) on all 14 sample models.
+Before: AbV Exclusions 261/261 everywhere; PropertySets 130/130 (we write none of the usBr property sets, so nothing is checked); General, Classes and SpatialBreakdown
+fail everywhere. Fixed in the exporter (no plan data needed): spatial breakdown (superstructure / substructure COMPLEX + VERTICAL, deck under the superstructure,
+piers / abutments VERTICAL, FOUNDATION parts), element types with a usBr equivalent (deck FLOOR, DECK_DRAIN, CURB, BACKWALL / WINGWALL / MASK_WALL,
+FILL_PLATE, BASE_PLATE, BEAM), bar / tendon types, fastener diameter / length, vertical datum where a source states it (Bonner 5 / 6 NAVD88 p.35-36, Br02069 NAVD88 adj.
+p.34, PTC NGVD29 as printed, Blatnik / Richmond NAVD88 from 3DEP). Bonner Unit 5 had lost its EPSG:2264 georeference in the 2026-10-31 rebuild (only terrain-bonner.csx
+set it): build-bonner-unit5.csx now runs it.
+
+Still failing, by cause:
+- No usBr class exists: IfcMember is limited to retaining-wall types (BRACE / CHORD / STRUT / STRINGER / POST / STAY_CABLE all fail), no assembly types for field splices,
+  built-up members, gusset stacks, floorbeams; walkway plates, gratings, sole plates, cable sockets, pins, spherical nuts.
+- Spec conflicts with IFC: 'Pedestal' = IfcProjectionElement contained in the pier part (IFC requires IfcRelProjectsElement to a host and forbids its containment:
+  tried, 60 schema + 60 EXPRESS errors on Northaven, reverted to IfcColumn); bars / tendons: material required on the type but prohibited on the occurrence, and
+  ifctester inherits the type's material (one failure per bar / tendon either way).
+- Classification: DONE (user decision 2026-11-01) with the US Bridge Dictionary in bSDD (https://identifier.buildingsmart.org/uri/usTransportation/usBridge/1,
+  publisher usTransportation, version 1, 2026-08-25, status Preview, "No license (rights reserved)": only the codes are written, no copy of the dictionary is kept).
+  Its class names are the IDS rule names. Mapping: `src/SBM.IO/Ifc/UsBridgeClassification.cs`. Elements without a fitting class (truss chords / diagonals / verticals,
+  stringers, floor beams, stay cables, arch ribs, hangers, walkway pieces, welds, pins, sockets, spherical nuts, knuckle / fin / connection plates, lateral and truss
+  bracing assemblies, field splice / built-up member assemblies, deck end blocks, segment anchor / deviation blocks, fenders, lighting / solar fixtures) stay unclassified
+  and are listed by `sbm export --ifc ... --classes`. Spec conflict: bar / tendon classification is required on the type and prohibited on the occurrence; ifctester
+  inherits the type's, so every bar / tendon fails once more (as for the material).
+- Needs plan data per model: Pset_ProjectCommon / usBrPset_* (project location, bridge identification, feature, design loading, pay items, plate common / fatigue),
+  Person / Organization / Actor role.
+- Local-grid models (I-80 + Ramp G, Nebraska, Woodbury, PTC main truss copy): no CRS name; NHT / ODOT: vertical datum not stated in our sources; Br02069 CRS is ESRI:103708
+  (not EPSG).

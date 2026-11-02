@@ -7154,6 +7154,7 @@
     "CrsName": "ESRI:103708",
     "Description": "NAD83(HARN) Adj MN Anoka (ftUS) county coordinate system; project X / Y = plan X / Y used as ft. UNRESOLVED: system not named on the plans",
     "GeodeticDatum": "NAD83(HARN)",
+    "VerticalDatum": "NAVD88 (adjusted)",
     "MapProjection": "Lambert Conformal Conic",
     "MapZone": "Anoka County, Minnesota",
     "MapUnitUsSurveyFoot": false,

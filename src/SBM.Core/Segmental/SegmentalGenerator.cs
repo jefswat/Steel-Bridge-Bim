@@ -62,14 +62,15 @@ public sealed partial class SegmentalGenerator
             Warn(UnresolvedFlag.Text(Pages, "variable depth curve between the printed sections",
                 "the plans print only the depth table; the curve is a reconstruction (parabola, vertex at x = " +
                 $"{_d.ParabolaVertexX / Ft(1):0.##} ft), not a plan value", "Used: printed depths at the joints, the parabola between them."));
-        BuildSegments();
-        BuildTendons();
-        BuildTransverse();
-        BuildBearings();
-        BuildPiers();
-        BuildDetails();
-        BuildMisc();
-        if (_d.SectionBars is { Count: > 0 }) BuildSectionBars();
+        void P(string step, Action a) { using (SBM.Core.Project.RegenerationProfiler.Step(_f.Definition.Name, "superstructure/segmental/" + step)) a(); }
+        P("segments", BuildSegments);
+        P("tendons", BuildTendons);
+        P("transverse tendons", BuildTransverse);
+        P("bearings", BuildBearings);
+        P("piers", BuildPiers);
+        P("details", BuildDetails);
+        P("misc", BuildMisc);
+        if (_d.SectionBars is { Count: > 0 }) P("section bars", BuildSectionBars);
         Report();
     }
 

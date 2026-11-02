@@ -78,8 +78,10 @@ public sealed class RegenerationCache
             (BridgeFraming, SteelModel?, Concrete.ConcreteModel?, Prestressed.PrestressedModel?) hit;
             bool found;
             lock (_lock) found = _super.TryGetValue(key, out hit);
-            if (found) { parts[i] = (hit.Item1, hit.Item2, hit.Item3, hit.Item4, true); return; }
-            var f = FramingGenerator.Generate(b, a);
+            if (found) { parts[i] = (hit.Item1, hit.Item2, hit.Item3, hit.Item4, true); using (RegenerationProfiler.Step(b.Name, "superstructure (cached)")) { } return; }
+            using var prof1 = RegenerationProfiler.Step(b.Name, "superstructure");
+            BridgeFraming f;
+            using (RegenerationProfiler.Step(b.Name, "superstructure/framing")) f = FramingGenerator.Generate(b, a);
             SteelModel? st = null;
             Concrete.ConcreteModel? cm = null;
             Prestressed.PrestressedModel? ps = null;
@@ -90,7 +92,8 @@ public sealed class RegenerationCache
             else if (includeSteel && !f.HasErrors && b.Arch != null)
             {
                 // Steel tied arch: its own generator; steel parts + seats in a SteelModel, the slab / curbs in a ConcreteModel.
-                var am = SBM.Core.Arch.ArchGenerator.Generate(f, project.Units, geo);
+                SBM.Core.Arch.ArchModel am;
+                using (RegenerationProfiler.Step(b.Name, "superstructure/arch")) am = SBM.Core.Arch.ArchGenerator.Generate(f, project.Units, geo);
                 st = am.Steel;
                 cm = am.Concrete;
                 RoundBends(cm, null);
@@ -98,21 +101,24 @@ public sealed class RegenerationCache
             else if (includeSteel && !f.HasErrors && b.Truss != null)
             {
                 // Steel truss: its own generator; members / gussets / floor / suspenders / shoes in a SteelModel, the deck slab in a ConcreteModel.
-                var tm = SBM.Core.Truss.TrussGenerator.Generate(f, project.Units, (lod?.LevelFor(b.Name, LodGroup.Fasteners) ?? LodSettings.Full) >= LodSettings.Full);
+                SBM.Core.Truss.TrussModel tm;
+                using (RegenerationProfiler.Step(b.Name, "superstructure/truss")) tm = SBM.Core.Truss.TrussGenerator.Generate(f, project.Units, (lod?.LevelFor(b.Name, LodGroup.Fasteners) ?? LodSettings.Full) >= LodSettings.Full);
                 st = tm.Steel;
                 cm = tm.Concrete;
             }
             else if (includeSteel && !f.HasErrors && b.CableStayed != null)
             {
                 // Cable-stayed footbridge: deck / pylon / stays in a SteelModel (+ a concrete deck), piers in its own substructure (taken in phase 2).
-                var csm = SBM.Core.CableStayed.CableStayedGenerator.Generate(f, project.Units);
+                SBM.Core.CableStayed.CableStayedModel csm;
+                using (RegenerationProfiler.Step(b.Name, "superstructure/cable-stayed")) csm = SBM.Core.CableStayed.CableStayedGenerator.Generate(f, project.Units);
                 st = csm.Steel;
                 cm = csm.Concrete;
             }
             else if (includeSteel && !f.HasErrors && b.Segmental != null)
             {
                 // Precast segmental box: its own generator; segments / tendons / bearings / bents hang on a concrete model without a deck.
-                var sm = SBM.Core.Segmental.SegmentalGenerator.Generate(f, project.Units);
+                SBM.Core.Segmental.SegmentalModel sm;
+                using (RegenerationProfiler.Step(b.Name, "superstructure/segmental")) sm = SBM.Core.Segmental.SegmentalGenerator.Generate(f, project.Units);
                 cm = new Concrete.ConcreteModel { Segmental = sm };
                 cm.Diagnostics.AddRange(sm.Diagnostics);
                 // OPTIONAL details: segment bill bars and the parapets go on the concrete model so every bar / barrier consumer has them
@@ -127,8 +133,8 @@ public sealed class RegenerationCache
             else if (includeSteel && !f.HasErrors && b.Girders.IsPrestressed)
             {
                 // Prestressed concrete girders instead of steel.
-                var tp = Task.Run(() => Prestressed.PrestressedGenerator.Generate(f, project.Units));
-                cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
+                var tp = Task.Run(() => { using (RegenerationProfiler.Step(b.Name, "superstructure/prestressed beams")) return Prestressed.PrestressedGenerator.Generate(f, project.Units); });
+                using (RegenerationProfiler.Step(b.Name, "superstructure/concrete")) cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
                 ps = tp.Result;
                 RoundBends(cm, ps);
                 if (b.PsSteelDiaphragms is { } dd) st = SteelDiaphragms(dd, ps);
@@ -136,16 +142,21 @@ public sealed class RegenerationCache
             else if (includeSteel && !f.HasErrors)
             {
                 // Steel and concrete are independent: generate them concurrently.
-                var ts = Task.Run(() => SteelModelGenerator.Generate(f, project.Units, geo));
-                cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
+                var ts = Task.Run(() => { using (RegenerationProfiler.Step(b.Name, "superstructure/steel")) return SteelModelGenerator.Generate(f, project.Units, geo); });
+                using (RegenerationProfiler.Step(b.Name, "superstructure/concrete")) cm = Concrete.ConcreteGenerator.Generate(f, project.Units, geo);
                 st = ts.Result;
                 RoundBends(cm, null);
-                if (cm != null && st != null) { Checks.DeckEndBlockCheck.Run(f, st, cm, project.Units); Checks.DeckRebarCheck.Run(f, st, cm, project.Units); }
+                if (cm != null && st != null)
+                {
+                    using (RegenerationProfiler.Step(b.Name, "superstructure/deck end block check")) Checks.DeckEndBlockCheck.Run(f, st, cm, project.Units);
+                    using (RegenerationProfiler.Step(b.Name, "superstructure/deck rebar check")) Checks.DeckRebarCheck.Run(f, st, cm, project.Units);
+                }
             }
             // Pedestrian railings (OPTIONAL): on the finished concrete (deck, curbs, arch curbs); parts merged into the bridge's steel model.
             if (includeSteel && !f.HasErrors && b.Railings is { Count: > 0 })
             {
-                var rm = Railing.PedestrianRailingGenerator.Generate(f, cm, project.Units);
+                Railing.RailingModel rm;
+                using (RegenerationProfiler.Step(b.Name, "superstructure/railings")) rm = Railing.PedestrianRailingGenerator.Generate(f, cm, project.Units);
                 st ??= new SteelModel { Bolt = new BoltGeometry(Units.UnitSystem.In(0.875)), BoltGrade = "A325" };
                 st.Assemblies.AddRange(rm.Assemblies);
                 st.Parts.AddRange(rm.Parts);
@@ -164,7 +175,7 @@ public sealed class RegenerationCache
                 }
             }
             // OPTIONAL level of detail: reduce this entry's own fresh objects (the level is part of the key)
-            if (lod != null && lod.KeyFor(b.Name) != "") LodApply.Superstructure(lod, b.Name, st, cm, ps);
+            if (lod != null && lod.KeyFor(b.Name) != "") using (RegenerationProfiler.Step(b.Name, "superstructure/level of detail")) LodApply.Superstructure(lod, b.Name, st, cm, ps);
             lock (_lock) _super[key] = (f, st, cm, ps);
             parts[i] = (f, st, cm, ps, false);
         });
@@ -237,14 +248,14 @@ public sealed class RegenerationCache
                     foreign[j] = list;
                 }
                 bool Skip(int j) => b.SupportAt(j).SharedPier is { Length: > 0 } id && owners.ContainsKey(id) && !IsOwner(id, i);
-                sub = Substructure.SubstructureGenerator.Generate(pt.f, seats, project.Units, Ground, foreign, Skip);
+                using (RegenerationProfiler.Step(b.Name, "substructure")) sub = Substructure.SubstructureGenerator.Generate(pt.f, seats, project.Units, Ground, foreign, Skip);
                 if (sub != null && sub.Bars.Count > 0)
                 {
                     var rs = Concrete.RebarBends.Apply(sub.Marks, sub.Bars);
                     if (rs.Bends > 0) sub.Diagnostics.Add(new Diagnostic(DiagnosticSeverity.Info, rs.Text));
                 }
                 if (sub != null && (b.Misc != null || b.Drains.Any(d => d.Trench != null)))
-                    sub.Misc = Misc.MiscItemsGenerator.Generate(pt.f, pt.s, sub, project.Units, Ground);
+                    using (RegenerationProfiler.Step(b.Name, "misc items")) sub.Misc = Misc.MiscItemsGenerator.Generate(pt.f, pt.s, sub, project.Units, Ground);
                 if (lod != null && lod.KeyFor(b.Name) != "") LodApply.Substructure(lod, b.Name, sub);
                 lock (_lock) _sub[subKey] = sub;
             }
@@ -255,7 +266,7 @@ public sealed class RegenerationCache
             if (phase2Cached) { }
             // Concrete end / pier diaphragms: superstructure elements built after the beams and the substructure.
             else if (includeSteel && pt.ps != null && !pt.f.HasErrors)
-                pt.ps.ConcreteDiaphragms = Diaphragms.ConcreteDiaphragmGenerator.Generate(pt.f, pt.ps, project.Units, GeometrySettings.Active(project) != null);
+                using (RegenerationProfiler.Step(b.Name, "concrete diaphragms")) pt.ps.ConcreteDiaphragms = Diaphragms.ConcreteDiaphragmGenerator.Generate(pt.f, pt.ps, project.Units, GeometrySettings.Active(project) != null);
             // Architectural surface treatments (form liner / thin brick) on the barrier, substructure and diaphragm faces: after everything they sit on
             // (cheap; always rebuilt). Kept on the substructure model, which every consumer (viewport, IFC, database) already receives.
             if (sub != null && !phase2Cached)
@@ -283,6 +294,7 @@ public sealed class RegenerationCache
     /// before any consumer (checks, cache, viewport, IFC, database) reads them (<see cref="Concrete.RebarBends"/>).</summary>
     private static void RoundBends(Concrete.ConcreteModel? cm, Prestressed.PrestressedModel? ps)
     {
+        using var _ = RegenerationProfiler.Step("", "rebar bends");
         if (cm != null && cm.Bars.Count > 0)
         {
             var r = Concrete.RebarBends.Apply(cm.Marks, cm.Bars);

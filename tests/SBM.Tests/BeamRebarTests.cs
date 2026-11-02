@@ -211,7 +211,7 @@ public class BeamRebarTests
             string ifc = Path.Combine(dir, "m.ifc");
             doc.ExportIfc(ifc);
             string text = File.ReadAllText(ifc);
-            var bars = Regex.Matches(text, @"IFCREINFORCINGBAR\('[^']+',\$,'Bar (G\d{3}E)',.*?,(\.[A-Z]+\.),\.TEXTURED\.\);").Cast<Match>().ToList();
+            var bars = Regex.Matches(text, @"IFCREINFORCINGBAR\('[^']+',\$,'Bar (G\d{3}E)',.*?,(\.[A-Z]+\.),\$\);").Cast<Match>().ToList();
             Assert.Equal(perBeam * beams, bars.Count);
             Assert.All(bars.Where(m => m.Groups[1].Value == "G402E"), m => Assert.Equal(".LIGATURE.", m.Groups[2].Value));
             Assert.All(bars.Where(m => m.Groups[1].Value == "G301E"), m => Assert.Equal(".MAIN.", m.Groups[2].Value));

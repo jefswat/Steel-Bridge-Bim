@@ -17,6 +17,7 @@ Doc.Project.Georeference = new GeoreferenceDefinition
     CrsName = "EPSG:2264",
     Description = "NAD83 / North Carolina (ftUS), NCDOT localized project coordinates (NSRS 2007 CORS96); vertical NAVD88",
     GeodeticDatum = "NAD83",
+    VerticalDatum = "NAVD88",                                 // plan p.35 / p.36 "VERTICAL DATUM IS NAVD88"
     MapProjection = "Lambert Conformal Conic",
     MapZone = "North Carolina",
     MapUnitUsSurveyFoot = true,
@@ -34,6 +35,8 @@ Doc.Project.References.Add(new ReferenceModelDefinition
     ContourInterval = Ft(2), R = 120, G = 135, B = 150,
 });
 
+// called from a build script with "--no-regen": georeference + terrain reference only (the caller regenerates and saves)
+if (Args.Contains("--no-regen")) { Print($"Georeference {Doc.Project.Georeference.CrsName} (vertical {Doc.Project.Georeference.VerticalDatum}), terrain reference {TerrainName}."); return; }
 var rep = Doc.Regenerate();
 foreach (var e in rep.Errors) Print("ERROR " + e);
 Print($"Regenerated in {rep.Elapsed.TotalSeconds:F1} s; georeference {Doc.Project.Georeference.CrsName}, scale {Doc.Project.Georeference.GridScale}, terrain {TerrainName}.");

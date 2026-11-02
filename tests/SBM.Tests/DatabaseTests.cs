@@ -17,7 +17,8 @@ public class DatabaseTests : IDisposable
     private static readonly HashSet<string> NotElements = new()
     {
         "IFCRELAGGREGATES", "IFCRELCONTAINEDINSPATIALSTRUCTURE", "IFCPROPERTYSET", "IFCRELDEFINESBYPROPERTIES", "IFCRELASSOCIATESMATERIAL",
-        "IFCRELDEFINESBYTYPE", "IFCMECHANICALFASTENERTYPE", "IFCOPENINGELEMENT", "IFCRELVOIDSELEMENT",
+        "IFCRELDEFINESBYTYPE", "IFCMECHANICALFASTENERTYPE", "IFCREINFORCINGBARTYPE", "IFCTENDONTYPE", "IFCOPENINGELEMENT", "IFCRELVOIDSELEMENT",
+        "IFCRELASSOCIATESCLASSIFICATION",
         // IFC 4.3 alignment structure below the IfcAlignment row (layouts, segments, stationing referents) and its relations.
         "IFCRELNESTS", "IFCRELREFERENCEDINSPATIALSTRUCTURE", "IFCALIGNMENTHORIZONTAL", "IFCALIGNMENTVERTICAL", "IFCALIGNMENTSEGMENT", "IFCREFERENT",
     };
@@ -93,6 +94,63 @@ public class DatabaseTests : IDisposable
         c.CommandText = "SELECT COUNT(*) FROM elements WHERE parent_global_id = $g AND level = 'bar'";
         c.Parameters.AddWithValue("$g", gid);
         Assert.Equal(12, Convert.ToInt32(c.ExecuteScalar()));      // the schedule-only mark has no bar element
+    }
+
+    [Fact]
+    public void Ifc_UsBridgeIds_SpatialBreakdownAndTypes()
+    {
+        // US bridge IDS (usBrSpec_SpatialBreakdown / Classes): superstructure + substructure COMPLEX / VERTICAL, deck under the superstructure,
+        // piers / abutments ELEMENT / VERTICAL with a FOUNDATION part, bar size / length / material on IfcReinforcingBarType
+        var (doc, _, _) = Build();
+        string ifc = Path.Combine(_dir, "ids.ifc");
+        doc.ExportIfc(ifc);
+        string t = File.ReadAllText(ifc);
+        Assert.Matches(@"IFCBRIDGEPART\('[^']+',\$,'Superstructure',.*\.COMPLEX\.,\.VERTICAL\.,\.SUPERSTRUCTURE\.\);", t);
+        Assert.Matches(@"IFCBRIDGEPART\('[^']+',\$,'Substructure',.*\.COMPLEX\.,\.VERTICAL\.,\.SUBSTRUCTURE\.\);", t);
+        Assert.Matches(@"\.ELEMENT\.,\.VERTICAL\.,\.PIER\.\);", t);
+        Assert.Matches(@"\.PARTIAL\.,\.VERTICAL\.,\.FOUNDATION\.\);", t);
+        Assert.DoesNotMatch(@"\.LATERAL\.", t);
+        Assert.DoesNotContain("IFCPROJECTIONELEMENT(", t);   // pedestals stay IfcColumn: IFC forbids a contained, host-less projection element
+        Assert.Matches(@"IFCREINFORCINGBARTYPE\('[^']+',\$,'Bar [^']+','[^']*','IfcReinforcingBar',", t);
+        Assert.Matches(@"IFCREINFORCINGBAR\('[^']+',\$,'Bar [^']+','[^']*',\$,#\d+,#\d+,'[^']*',\$,\$,\$,\$,\.[A-Z]+\.,\$\);", t);
+        Assert.Matches(@"IFCMECHANICALFASTENER\('[^']+',\$,'[^']*',\$,\$,#\d+,#\d+,\$,[0-9.E-]+,[0-9.E-]+,\.BOLT\.\);", t);
+    }
+
+    [Fact]
+    public void Ifc_UsBridgeDictionary_Classification()
+    {
+        // US Bridge Dictionary (bSDD usTransportation/usBridge/1): one IfcClassification with source / edition / date / name, a reference per class used,
+        // every association pointing at written entities; bars and tendons classified through their TYPES only (the IDS prohibits it on the occurrence)
+        var (doc, _, _) = Build();
+        string ifc = Path.Combine(_dir, "cls.ifc");
+        var res = doc.ExportIfc(ifc);
+        string t = File.ReadAllText(ifc);
+        Assert.Single(Regex.Matches(t, @"=IFCCLASSIFICATION\('usTransportation','1','2026-08-25','US Bridge Dictionary',"));
+        var ent = new Dictionary<int, string>();
+        foreach (Match m in Regex.Matches(t, @"^#(\d+)=(IFC[A-Z0-9]+)\(", RegexOptions.Multiline)) ent[int.Parse(m.Groups[1].Value)] = m.Groups[2].Value;
+        var refs = new Dictionary<int, string>();
+        foreach (Match m in Regex.Matches(t, @"^#(\d+)=IFCCLASSIFICATIONREFERENCE\('https://identifier\.buildingsmart\.org/uri/usTransportation/usBridge/1/class/(usBridge_\w+)','\2','[^']+',#\d+,\$,\$\);", RegexOptions.Multiline))
+            refs[int.Parse(m.Groups[1].Value)] = m.Groups[2].Value;
+        Assert.Contains("usBridge_DeckSlab", refs.Values);
+        Assert.Contains("usBridge_BoltAssembly", refs.Values);
+        Assert.Contains("usBridge_CrossFrame", refs.Values);
+        Assert.Contains("usBridge_CrossFrameMember", refs.Values);
+        Assert.Contains("usBridge_GirderSegmentSteel", refs.Values);
+        Assert.Contains("usBridge_ReinforcingBar", refs.Values);
+        var classOf = new Dictionary<int, string>();
+        foreach (Match m in Regex.Matches(t, @"=IFCRELASSOCIATESCLASSIFICATION\('[^']+',\$,\$,\$,\(([^)]*)\),#(\d+)\);"))
+        {
+            int r = int.Parse(m.Groups[2].Value);
+            foreach (var id in m.Groups[1].Value.Split(',').Select(x => int.Parse(x.TrimStart('#'))))
+            {
+                Assert.True(ent.ContainsKey(id));
+                if (refs.TryGetValue(r, out var code)) Assert.True(classOf.TryAdd(id, code), $"#{id} classified twice");
+            }
+        }
+        Assert.DoesNotContain(classOf.Keys, id => ent[id] is "IFCREINFORCINGBAR" or "IFCTENDON");
+        Assert.Contains(classOf, kv => ent[kv.Key] == "IFCREINFORCINGBARTYPE");
+        Assert.Contains(classOf, kv => ent[kv.Key] == "IFCMEMBER" && kv.Value == "usBridge_CrossFrameMember");
+        Assert.Equal(res.Classified.Sum(c => c.Count), classOf.Count);
     }
 
     [Fact]

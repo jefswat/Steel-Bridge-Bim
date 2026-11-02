@@ -1467025,6 +1467025,7 @@
     "CrsName": "EPSG:2272",
     "Description": "NAD83 / Pennsylvania South (ftUS); model X / Y = grid coordinates in metres; elevations NGVD29 as printed (NAVD88 = NGVD29 - 1.020 ft, VERTCON 3.0)",
     "GeodeticDatum": "NAD83",
+    "VerticalDatum": "NGVD29",
     "MapProjection": "Lambert Conformal Conic",
     "MapZone": "Pennsylvania South (3702)",
     "MapUnitUsSurveyFoot": true,

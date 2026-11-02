@@ -9,7 +9,7 @@
 Doc.Project.Georeference = new SBM.Core.Project.GeoreferenceDefinition
 {
     CrsName = "ESRI:103708", Description = "NAD83(HARN) Adj MN Anoka (ftUS) county coordinate system; project X / Y = plan X / Y used as ft. UNRESOLVED: system not named on the plans",
-    GeodeticDatum = "NAD83(HARN)", MapProjection = "Lambert Conformal Conic", MapZone = "Anoka County, Minnesota", MapUnitUsSurveyFoot = false, GridScale = 1,
+    GeodeticDatum = "NAD83(HARN)", VerticalDatum = "NAVD88 (adjusted)" /* plan datum N.A.V.D. 88 ADJ., p.34 */, MapProjection = "Lambert Conformal Conic", MapZone = "Anoka County, Minnesota", MapUnitUsSurveyFoot = false, GridScale = 1,
     Basis = "Inferred (plans give X / Y only, p.34): SB65 STA 248+67.045 X 508192.059 Y 153852.460 = 45.18305 N 93.2349 W under ESRI:103708; confirmed on the 3DEP relief (T.H. 65 x 117th Ave intersection within ~40 ft)",
 };
 Doc.Project.References.RemoveAll(x => x.Name == "3DEP lidar 1 m (T.H. 65 Blaine)");

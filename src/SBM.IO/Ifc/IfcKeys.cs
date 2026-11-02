@@ -47,6 +47,8 @@ public static class IfcKeys
     public static string SuperPart(string bk) => bk + "/super";
     public static string DeckPart(string bk) => bk + "/deck";
     public static string SubPart(string bk) => bk + "/sub";
+    /// <summary>FOUNDATION bridge part of a substructure unit (footings, piles, drilled shafts; US bridge IDS spatial breakdown).</summary>
+    public static string Foundation(string unitKey) => unitKey + "/foundation";
     public static string Unit(string bk, string unitName) => $"{bk}/sub/{unitName}";
     public static string SubSolid(string uk, int k) => $"{uk}/{k}";
     public static string SubBar(string uk, int n) => $"{uk}/bar/{n}";

@@ -832,6 +832,25 @@ sbm utilities model.sbm [--profile out] [--ve 10] [--no-clash]   # structures, p
 - **Terrain queries:** terrain uses a uniform-grid spatial index. A 335,000-triangle TIN indexes in about 30 ms and
   answers an elevation query in about 0.3 µs.
 
+### Load-time profiler (`sbm profile`, 2026-11-01)
+
+`sbm profile model.sbm [--runs N] [--top N] [--csv samples.csv]` opens the model and regenerates it from scratch, timing every
+step: open (read + parse), terrain load, framing, steel (layouts, cross frames, field splices, girder plates, studs, stiffeners,
+bearings, inspection access / walkways ...), concrete (deck slab, haunches, barriers, joints, rebar, bar marks), prestressed beams,
+arch / truss / cable-stayed / segmental generators (segments, tendons, piers, details, misc, section bars), rebar bends, the deck end
+block and deck rebar checks, railings, level of detail, substructure, misc items, concrete diaphragms. Step times are wall time on the
+step's own thread; bridges (and the steel / concrete of one bridge) run in parallel, so sums exceed the elapsed time - the per-bridge
+list shows the critical path. A last run with the in-memory cache shows what re-regenerating an unchanged model costs.
+
+The app logs the same breakdown on every regeneration (session log `LOAD PROFILE`: regenerate, plan drawing + 3D scene, 3D solids;
+the rest of the status-bar time is layers / explorer / GPU upload on the UI thread).
+
+Code: `SBM.Core/Project/RegenerationProfiler.cs` (`using (RegenerationProfiler.Step(bridge, "steel/connections")) ...`; no recorder =
+a null check; `Start` / `Stop` per flow, async and parallel work included). New steps: name them `parent/child`.
+
+First finding (I-80 WB + Ramp G, debug CLI): the deck end block check took 13 s of Unit 2's 25 s critical path (every vertex of all
+~60 k steel parts probed against each block). A bounding-box pre-filter + parallel scan gives identical rows: regeneration 32.6 -> 19.5 s.
+
 ## Model pipeline (`sbm pipeline`, default after `sbm run`) - REQUIRED final step of every model
 
 ```

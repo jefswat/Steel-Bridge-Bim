@@ -309,7 +309,7 @@ public sealed class SbmDocument
     private RegenerationReport Regenerate(bool includeSteel, LodOutput? output)
     {
         var sw = Stopwatch.StartNew();
-        EnsureTerrain();
+        using (RegenerationProfiler.Step("", "terrain load")) EnsureTerrain();
         _models = _cache.Regenerate(Project, includeSteel, output ?? _output);
         var warn = new List<string>();
         var err = new List<string>();

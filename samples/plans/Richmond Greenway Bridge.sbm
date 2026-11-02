@@ -1886,7 +1886,8 @@
             "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
-            "Type": "parallel strand stay"
+            "Type": "parallel strand stay",
+            "PylonAnchorInset": 0
           },
           {
             "Name": "left back stays",
@@ -1901,7 +1902,8 @@
             "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
-            "Type": "parallel strand stay"
+            "Type": "parallel strand stay",
+            "PylonAnchorInset": 0
           },
           {
             "Name": "right fan",
@@ -1916,7 +1918,8 @@
             "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
-            "Type": "parallel strand stay"
+            "Type": "parallel strand stay",
+            "PylonAnchorInset": 0
           },
           {
             "Name": "right back stays",
@@ -1931,7 +1934,8 @@
             "PylonTo": 1,
             "Diameter": 0.07619999999999999,
             "Area": 0,
-            "Type": "parallel strand stay"
+            "Type": "parallel strand stay",
+            "PylonAnchorInset": 0
           }
         ],
         "Struts": [
@@ -2067,6 +2071,7 @@
     "CrsName": "EPSG:26910",
     "Description": "NAD83 / UTM zone 10N (m); project X/Y = UTM metres",
     "GeodeticDatum": "NAD83",
+    "VerticalDatum": "NAVD88",
     "MapProjection": "Transverse Mercator",
     "MapZone": "UTM 10N",
     "MapUnitUsSurveyFoot": false,

@@ -114,9 +114,13 @@ public sealed partial class SteelModelGenerator
     private GirderSection Sec => _def.Girders.Section;
     private double HoleDia => _model.Bolt.HoleDiameter;
 
+    // profiler step (Project/RegenerationProfiler): "superstructure/steel/<name>"
+    private Action T(string name, Action a) => () => { using (SBM.Core.Project.RegenerationProfiler.Step(_def.Name, "superstructure/steel/" + name)) a(); };
+
     private void Run()
     {
         // Phase 1: layouts.
+        var prof = SBM.Core.Project.RegenerationProfiler.Step(_def.Name, "superstructure/steel/layouts");
         SetupIntegralCaps();   // OPTIONAL integral steel caps: the girders are cut at the caps (before the field sections are formed)
         foreach (var g in _f.Girders)
         {
@@ -137,21 +141,22 @@ public sealed partial class SteelModelGenerator
                 + (grp.Key.HasCope ? $", web end cope {In(d0.Def.CopeInset)} ({In(d0.Def.CopeEdge)} tabs, {In(d0.Def.CopeRun)} transition, R {In(d0.Def.CopeRadius)})" : "") + (d0.Def.Source != "" ? $" ({d0.Def.Source})" : "") + "."));
         }
 
+        prof.Dispose();
         // Phase 2: connections (register holes).
         var conn = new List<Action>();
-        foreach (var c in _f.CrossFrames) { var cc = c; conn.Add(() => BuildCrossFrame(cc)); }
-        foreach (var sp in _f.Splices) { var s = sp; conn.Add(() => BuildFieldSplice(s)); }
-        conn.Add(BuildLateralBracing);
-        conn.Add(BuildInspectionAccess);
-        conn.Add(BuildFlangeDeflectors);
-        foreach (var x in _f.CrossGirders) { var xx = x; conn.Add(() => BuildCrossGirder(xx)); }   // registers bolt holes in girder webs
-        foreach (var cp in _caps) { var cc = cp; conn.Add(() => BuildIntegralCap(cc)); }   // registers top flange holes and stud exclusions
+        foreach (var c in _f.CrossFrames) { var cc = c; conn.Add(T("cross frames", () => BuildCrossFrame(cc))); }
+        foreach (var sp in _f.Splices) { var s = sp; conn.Add(T("field splices", () => BuildFieldSplice(s))); }
+        conn.Add(T("lateral bracing", BuildLateralBracing));
+        conn.Add(T("inspection access", BuildInspectionAccess));
+        conn.Add(T("flange deflectors", BuildFlangeDeflectors));
+        foreach (var x in _f.CrossGirders) { var xx = x; conn.Add(T("cross girders", () => BuildCrossGirder(xx))); }   // registers bolt holes in girder webs
+        foreach (var cp in _caps) { var cc = cp; conn.Add(T("integral caps", () => BuildIntegralCap(cc))); }   // registers top flange holes and stud exclusions
         Parallel.ForEach(conn, a => a());
-        BuildInspectionWalkways();   // after the connections: the walkways bear on the generated cross frames / cross girders
+        T("inspection walkways", BuildInspectionWalkways)();   // after the connections: the walkways bear on the generated cross frames / cross girders
 
         // Phase 3: members.
         var members = new List<Action>();
-        foreach (var g in _f.Girders) { var gg = g; members.Add(() => BuildGirder(gg)); members.Add(() => BuildStuds(gg)); }
+        foreach (var g in _f.Girders) { var gg = g; members.Add(T("girder plates", () => BuildGirder(gg))); members.Add(T("studs", () => BuildStuds(gg))); }
         // Stiffener numbers (G2-2-CS1, CS2 ...) are assigned up front in girder-distance order, not by whichever parallel
         // task gets there first: a mark (and the IFC GlobalId derived from it) must name the same plate on every run.
         var stiffNo = new int[_f.Stiffeners.Count];
@@ -167,11 +172,11 @@ public sealed partial class SteelModelGenerator
         _stiffMarks = new string[_f.Stiffeners.Count];
         for (int i = 0; i < _f.Stiffeners.Count; i++)
             if (stiffNo[i] > 0) _stiffMarks[i] = $"{SectionMark(_f.Stiffeners[i].Girder, _f.Stiffeners[i].GirderDistance)}-{StiffenerCode(_f.Stiffeners[i].Kind)}{stiffNo[i]}";
-        for (int i = 0; i < _f.Stiffeners.Count; i++) { var ss = _f.Stiffeners[i]; int no = stiffNo[i]; members.Add(() => BuildStiffener(ss, no)); }
+        for (int i = 0; i < _f.Stiffeners.Count; i++) { var ss = _f.Stiffeners[i]; int no = stiffNo[i]; members.Add(T("stiffeners", () => BuildStiffener(ss, no))); }
         foreach (var b in _f.Bearings)
         {
             if (_def.SupportAt(b.Support).IntegralSteelCap != null && _caps.Any(c => c.Support == b.Support)) continue;   // girders frame into the cap: no girder bearings
-            var bb = b; members.Add(() => BuildBearing(bb));
+            var bb = b; members.Add(T("bearings", () => BuildBearing(bb)));
         }
         Parallel.ForEach(members, a => a());
     }

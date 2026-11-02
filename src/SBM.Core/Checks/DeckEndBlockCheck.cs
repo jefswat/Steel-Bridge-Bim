@@ -1,6 +1,7 @@
 using SBM.Core.Concrete;
 using SBM.Core.Framing;
 using SBM.Core.Geometry;
+using SBM.Core.Solids;
 using SBM.Core.Steel;
 using SBM.Core.Units;
 using static SBM.Core.Units.UnitSystem;
@@ -24,8 +25,16 @@ public static class DeckEndBlockCheck
         var blocks = concrete.Joints.Select(j => j.EndBlock).Where(b => b != null).Select(b => b!).ToList();
         if (blocks.Count == 0) return;
         var asm = steel.Assemblies.ToDictionary(a => a.Mark, a => a, StringComparer.Ordinal);
+        // Pre-filter: only steel whose bounding box reaches the block's (+ 0.15 m) is probed point by point (Probe / PlanX per vertex of all
+        // ~60 k parts was 13 s per bridge on I-80 Unit 2; same result - every point inside the block lies inside its mesh bounds).
+        var partBox = new Box3[steel.Parts.Count];
+        Parallel.For(0, steel.Parts.Count, i => partBox[i] = steel.Parts[i].Mesh.Bounds());
         foreach (var blk in blocks)
         {
+            var bb = blk.Mesh.Bounds();
+            const double M = 0.15;
+            bool Near(Box3 x) => bb.IsEmpty || !(x.Max.X < bb.Min.X - M || x.Min.X > bb.Max.X + M || x.Max.Y < bb.Min.Y - M || x.Min.Y > bb.Max.Y + M || x.Max.Z < bb.Min.Z - M || x.Min.Z > bb.Max.Z + M);
+            bool NearP(Vec3 p) => bb.IsEmpty || !(p.X < bb.Min.X - M || p.X > bb.Max.X + M || p.Y < bb.Min.Y - M || p.Y > bb.Max.Y + M || p.Z < bb.Min.Z - M || p.Z > bb.Max.Z + M);
             var rows = new Dictionary<string, (bool intended, HashSet<string> parts, double max, string note)>();
             void Hit(string member, bool intended, string part, double above, string note)
             {
@@ -34,9 +43,12 @@ public static class DeckEndBlockCheck
                 r.max = Math.Max(r.max, above);
                 rows[member] = (r.intended && intended, r.parts, r.max, r.note);
             }
-            foreach (var part in steel.Parts)
+            var scanned = new double[steel.Parts.Count];
+            Parallel.For(0, steel.Parts.Count, i => scanned[i] = Near(partBox[i]) ? Scan(blk, steel.Parts[i].Mesh) : -1);
+            for (int pi = 0; pi < steel.Parts.Count; pi++)
             {
-                double above = Scan(blk, part.Mesh);
+                var part = steel.Parts[pi];
+                double above = scanned[pi];
                 if (above < 0) continue;
                 asm.TryGetValue(part.Assembly, out var a);
                 var (name, intended, note) = Classify(part, a, above);
@@ -48,6 +60,7 @@ public static class DeckEndBlockCheck
                 double above = double.MinValue;
                 foreach (var p in new[] { st.Frame.Origin, st.Frame.Origin + st.Frame.Z * st.Length })
                 {
+                    if (!NearP(p)) continue;
                     var h = blk.Probe(p);
                     if (h.Inside) above = Math.Max(above, h.AboveSoffit);
                 }
@@ -61,6 +74,7 @@ public static class DeckEndBlockCheck
                 double above = double.MinValue;
                 foreach (var p in new[] { b.Frame.Origin, b.Frame.Origin + b.Frame.Z * b.Length })
                 {
+                    if (!NearP(p)) continue;
                     var h = blk.Probe(p);
                     if (h.Inside) above = Math.Max(above, h.AboveSoffit);
                 }

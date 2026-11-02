@@ -409,6 +409,10 @@ Doc.Project.Bridges.Add(br);
 // Piles, bent centring (Detail C), deck drains, modular expansion joints (re-runnable on its own).
 { var rr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", "misc-bonner-unit5.csx"), Doc, new[] { "--no-regen" }); Print(rr.Output.TrimEnd()); if (!rr.Success) Print($"ERROR in misc-bonner-unit5.csx: {rr.Error}"); }
 
+// Georeference (NC State Plane, localized about B2500-2, NAVD88) + terrain reference: terrain-bonner.csx (CLAUDE.md checklist step 1; a rebuild without it
+// left the model on the project grid, 2026-10-31).
+{ var rr = await SBM.Api.ScriptHost.RunFileAsync(Path.Combine("samples", "plans", "terrain-bonner.csx"), Doc, new[] { "--no-regen" }); Print(rr.Output.TrimEnd()); if (!rr.Success) Print($"ERROR in terrain-bonner.csx: {rr.Error}"); }
+
 // ================================================================ 4. regenerate, save, report
 var rep = Doc.Regenerate();
 Print($"Regenerated {rep.Bridges} bridge(s) in {rep.Elapsed.TotalSeconds:0.0} s; {rep.Warnings.Count} warnings, {rep.Errors.Count} errors");

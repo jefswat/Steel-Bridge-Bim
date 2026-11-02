@@ -37,7 +37,7 @@ var al = Doc.AddAlignment(AlName, staWest - Ft(800), pis.Select(q => { var p = L
 al.Description = "Richmond Greenway Bridge concept: Greenway trail line (OSM trail ends), R 400 onto a tangent square to 23rd St through the pylon in the median, R 350 right onto the east tangent read from the near-plan aerial rendering";
 Doc.Project.Georeference = new SBM.Core.Project.GeoreferenceDefinition
 {
-    CrsName = "EPSG:26910", Description = "NAD83 / UTM zone 10N (m); project X/Y = UTM metres", GeodeticDatum = "NAD83", MapProjection = "Transverse Mercator",
+    CrsName = "EPSG:26910", Description = "NAD83 / UTM zone 10N (m); project X/Y = UTM metres", GeodeticDatum = "NAD83", VerticalDatum = "NAVD88" /* elevations from USGS 3DEP (EPQS), NAVD88 ft */, MapProjection = "Transverse Mercator",
     MapZone = "UTM 10N", MapUnitUsSurveyFoot = false, GridScale = 1,
     Basis = "OpenStreetMap Greenway trail ends (2026-10-26) projected with tools/terrain geotiff.utm(10); elevations NAVD88 ft from USGS 3DEP (EPQS point queries)",
 };

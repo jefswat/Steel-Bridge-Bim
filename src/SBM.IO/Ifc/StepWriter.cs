@@ -20,6 +20,9 @@ public sealed class StepWriter
 
     public int Count => _next - 1 - _skipped;
 
+    /// <summary>Optional hook called with every entity written (id, type, final attribute list), e.g. the US Bridge classification.</summary>
+    public Action<int, string, string>? Observer { get; set; }
+
     /// <summary>Writes an entity and returns its id. <paramref name="body"/> is the attribute list without parentheses.</summary>
     public int Add(string type, string body)
     {
@@ -38,6 +41,7 @@ public sealed class StepWriter
         _w.Write('(');
         _w.Write(body);
         _w.Write(");\n");
+        Observer?.Invoke(id, type, body);
         return id;
     }
 

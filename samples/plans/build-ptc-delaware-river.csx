@@ -89,7 +89,7 @@ U("p.5, 16, 32, 42", "map coordinates of the baseline", "the plans give no coord
 Doc.Project.Georeference = !Georeferenced ? null : new SBM.Core.Project.GeoreferenceDefinition
 {
     CrsName = "EPSG:2272", Description = "NAD83 / Pennsylvania South (ftUS); model X / Y = grid coordinates in metres; elevations NGVD29 as printed (NAVD88 = NGVD29 - 1.020 ft, VERTCON 3.0)",
-    GeodeticDatum = "NAD83", MapProjection = "Lambert Conformal Conic", MapZone = "Pennsylvania South (3702)", MapUnitUsSurveyFoot = true, GridScale = 0.999976,
+    GeodeticDatum = "NAD83", VerticalDatum = "NGVD29" /* elevations NGVD29 as printed (not yet moved to NAVD88) */, MapProjection = "Lambert Conformal Conic", MapZone = "Pennsylvania South (3702)", MapUnitUsSurveyFoot = true, GridScale = 0.999976,
     Basis = "Fit 2026-10-19 to USGS 3DEP 1 m + NAIP 2023 (approach-fill ends + land-span LiDAR footprint); plan bearing = true north; no survey control",
 };
 Doc.Project.References.RemoveAll(x => x.Name.StartsWith("3DEP lidar 1 m (Delaware River"));

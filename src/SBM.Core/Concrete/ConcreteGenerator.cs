@@ -192,7 +192,9 @@ public sealed partial class ConcreteGenerator
 
     private void Run()
     {
-        var tasks = new List<Action> { BuildDeckSolid, BuildHaunches, BuildBarriers, BuildJoints, BuildCapHaunches, BuildApproachSlabs };
+        Action T(string step, Action a) => () => { using (SBM.Core.Project.RegenerationProfiler.Step(_def.Name, "superstructure/concrete/" + step)) a(); };
+        var tasks = new List<Action> { T("deck slab", BuildDeckSolid), T("haunches", BuildHaunches), T("barriers", BuildBarriers), T("joints", BuildJoints),
+            T("cap haunches", BuildCapHaunches), T("approach slabs", BuildApproachSlabs) };
         Parallel.ForEach(tasks, t => t());
         _m.CapHaunches.Sort((x, y) => string.CompareOrdinal(x.Support, y.Support));
         var bars = new ConcurrentBag<(string series, RebarSize size, BarShape shape, string loc, bool epoxy, BarPlacement placement)>();
@@ -205,8 +207,8 @@ public sealed partial class ConcreteGenerator
         }
         if (Deck.Barrier.Type == BarrierType.TxDotSstr && Deck.Barrier.Reinforcement) rebarTasks.Add(() => BuildSstrRebar(bars));
         rebarTasks.Add(BuildCapHaunchRebar);   // OPTIONAL plan bars of integral steel cap haunches (their own definition, not the deck's switch)
-        Parallel.ForEach(rebarTasks, t => t());
-        AssignMarks(bars);
+        Parallel.ForEach(rebarTasks, t => T("rebar", t)());
+        T("bar marks", () => AssignMarks(bars))();
     }
 
     /// <summary>Explicit plan bar sets of the deck (<see cref="PlanBarSet"/>, project coordinates): marks + bars, clear cover against the deck concrete

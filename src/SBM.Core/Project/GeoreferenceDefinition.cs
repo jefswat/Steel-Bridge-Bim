@@ -11,6 +11,10 @@ public sealed class GeoreferenceDefinition
     public string CrsName { get; set; } = "";
     public string Description { get; set; } = "";
     public string GeodeticDatum { get; set; } = "";
+    /// <summary>OPTIONAL vertical datum of the elevations as the plans state it (e.g. "NAVD88", "NGVD29"); IFC IfcProjectedCRS.VerticalDatum. Empty = not stated
+    /// (omitted from the .sbm).</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public string VerticalDatum { get; set; } = "";
     public string MapProjection { get; set; } = "";
     public string MapZone { get; set; } = "";
     /// <summary>Map unit = US survey foot (else the project length unit).</summary>

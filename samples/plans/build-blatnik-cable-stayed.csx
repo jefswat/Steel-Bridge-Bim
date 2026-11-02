@@ -33,7 +33,7 @@ var al = Doc.AddAlignment(AlName, Sta("100+00"), new[]
 al.Description = "I-535 / US 53 Blatnik Bridge centerline: mean of the OpenStreetMap carriageways (2026-10-27), tangents and radii fitted; concept for a replacement on the existing line";
 Doc.Project.Georeference = new SBM.Core.Project.GeoreferenceDefinition
 {
-    CrsName = "EPSG:26915", Description = "NAD83 / UTM zone 15N (m); project X/Y = UTM metres", GeodeticDatum = "NAD83", MapProjection = "Transverse Mercator",
+    CrsName = "EPSG:26915", Description = "NAD83 / UTM zone 15N (m); project X/Y = UTM metres", GeodeticDatum = "NAD83", VerticalDatum = "NAVD88" /* elevations from USGS 3DEP (EPQS), NAVD88 ft */, MapProjection = "Transverse Mercator",
     MapZone = "UTM 15N", MapUnitUsSurveyFoot = false, GridScale = 1,
     Basis = "OpenStreetMap I-535 carriageways (2026-10-27) projected with tools/terrain geotiff.utm(15); elevations NAVD88 ft from USGS 3DEP (EPQS point queries)",
 };

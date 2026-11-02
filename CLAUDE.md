@@ -474,7 +474,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
     on a shared block, seats beyond the cap, step top vs seat) go to `ElevationChain.Reported` — never adjusted. Shared
     piers built by another bridge are found via `others` (`SbmDocument.BearingElevations` passes the other bridges' units).
     Plan reconciliation: `samples\plans\check-substructure-chains.csx`.
-  - `Project/RegenerationCache.cs` â€” per-bridge hash cache used by app and API. Phase 2 concrete diaphragms + surface treatments are reused when the bridge's superstructure AND substructure came from the cache (`_phase2`; they were rebuilt every call: Woodbury 15.5 s per cached regeneration -> 0).
+  - `Project/RegenerationCache.cs` â€” per-bridge hash cache used by app and API. Timing: `Project/RegenerationProfiler.cs` (steps `superstructure/steel/...`,
+    `sbm profile` = `SBM.Cli/ProfileCommand.cs`, app session log `LOAD PROFILE`; docs/API.md "Load-time profiler"). Phase 2 concrete diaphragms + surface treatments are reused when the bridge's superstructure AND substructure came from the cache (`_phase2`; they were rebuilt every call: Woodbury 15.5 s per cached regeneration -> 0).
   - Lateral bracing ZONES (OPTIONAL `LateralBracingDefinition.Zones` = `LateralBracingZone` list, JSON omitted when null; null = the single Bays / Spans / Flange / Pattern layout, output unchanged):
     per zone Spans / Bays (empty = all), Flange, panel range `FromPanel` / `ToPanel` (1-based cross-frame panel points of the span, negative = from the last) or `FromDistance` / `ToDistance`
     (along the bay's left girder from the span's first CL bearing), Pattern (Warren / SingleDiagonal / X), `DiagonalStart`, Angle / GussetThickness / BoltsPerConnection (null = definition),
@@ -572,6 +573,19 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
   Validate with IfcOpenShell (`pip install ifcopenshell pytest`; `ifcopenshell.validate.validate(f, log, express_rules=True)`);
   reusable: `python -I tools/validate_ifc.py model.ifc [--express-sample N] [--geom N] [--geom-all REGEX] [--json out]`.
   Last full-model result (2026-10-11, 347 MB, 3.76 M entities): 0 schema + 0 EXPRESS issues; see docs/plan-data/ifc-validation.md.
+  US BRIDGE IDS (usBrSpec_*.ids in temp/usbridge-ids; `tools/run_ids.py`; 2026-11-01, docs/plan-data/ifc-validation.md "US bridge IDS"): bridge > superstructure (.COMPLEX.,
+  .VERTICAL.) > deck (.ELEMENT., .LONGITUDINAL.) and substructure (.COMPLEX., .VERTICAL.) > piers / abutments (.ELEMENT., .VERTICAL.) > FOUNDATION part (.PARTIAL., `IfcKeys.Foundation`,
+  footings / piles / shafts contained there; DB row "foundation"); pedestals stay IfcColumn 'PEDESTAL' (the IDS's contained IfcProjectionElement is invalid IFC: no host relation, containment forbidden); deck slab .FLOOR.; drains 'DECK_DRAIN' in the deck
+  part; kerbs ObjectType 'CURB'; walls BACKWALL / WINGWALL / MASK_WALL userdefined; fillers 'FILL_PLATE'; bearing plates .BASE_PLATE.; truss floor / pylon cross beams .BEAM.; bars:
+  `IfcReinforcingBarType` per mark (size, area, scheduled length, surface, material) and occurrences without them; tendons: `IfcTendonType` per kind / size / material (`TendonTyped`);
+  fasteners carry NominalDiameter / NominalLength. `GeoreferenceDefinition.VerticalDatum` (OPTIONAL) -> IfcProjectedCRS. NOT mappable (spec has no class): cross frame / truss members,
+  stringers, posts, stay cables, walkway plates, gratings, field splice / built-up member assemblies; owner metadata and the usBrPset_* property sets are open.
+  CLASSIFICATION (user decision 2026-11-01): US Bridge Dictionary (bSDD usTransportation/usBridge/1, Preview 2026-08-25; the IDS rule names are its class names),
+  `Ifc/UsBridgeClassification.cs`: `StepWriter.Observer` sees every entity written, `Rules` map ENTITY|PREDEFINEDTYPE[|OBJECTTYPE] -> class code, the exporter calls
+  `usbr.Set(id, code|null)` where the type alone is ambiguous (cross frame vs diaphragm assemblies / members, concrete barriers written as IfcRailing = Barrier, girder field
+  sections, steel deck pieces, pylon legs, MSE / CIP walls); no fitting class = unclassified, counted in `IfcExportResult.Unclassified` (printed by `sbm export`, `--classes` = all).
+  Bars / tendons: classified on their TYPES only (IDS prohibits the occurrence; ifctester inherits the type's: one failure per bar, like the material). New element kinds:
+  add a rule or a Set, never a near-miss class.
   RHINO 3DM export (2026-10-26): `Rhino3dm/` = `Rhino3dmExporter` (+ `RhinoBrepBuilder`, `Rhino3dmInfo` read-back) on McNeel rhino3dm 8.17.0 (NuGet
   `Rhino3dm`, MIT, openNURBS; native `librhino3dm_native.dll` via runtimes/win-x64 -> root of a `-r win-x64` publish). `SbmDocument.Export3dm`,
   `sbm export --3dm out.3dm [--bridges A,B] [--no-detail] [--mesh-only] [--terrain] [--bar-solids]`, `sbm 3dm-info`, app Output > CAD > Export Rhino (.3dm). `--bar-solids` (2026-10-30) = exact closed pipe B-reps per bar (`Rhino3dm/RhinoBarPipe.cs`: 4 quarter faces over the whole bar, lines degree-elevated, arcs revolved, C0 double knots, planar caps; frame carried exactly through arcs, re-squared on lines; mesh tube for kinks > 10 deg / self-overlapping centerlines; `Rhino3dmResult.BarBreps / BarBrepsClosed`; tests `RhinoBarPipeTests`).

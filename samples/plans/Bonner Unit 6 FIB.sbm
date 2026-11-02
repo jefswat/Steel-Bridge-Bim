@@ -55148,6 +55148,7 @@
     "CrsName": "EPSG:2264",
     "Description": "NAD83 / North Carolina (ftUS), NCDOT localized project coordinates (NSRS 2007 CORS96); vertical NAVD88",
     "GeodeticDatum": "NAD83",
+    "VerticalDatum": "NAVD88",
     "MapProjection": "Lambert Conformal Conic",
     "MapZone": "North Carolina",
     "MapUnitUsSurveyFoot": true,
