@@ -98,7 +98,7 @@ string mainFloorLatFlag = U("p.99", "floor lateral (14 BP 73 X / 2-12[ 25 K) con
     "not built; the members stop clear of the wind chord joint and of each other.");
 string mainPortalFlag = U("p.100, p.79", "portal at U11: portal strut (box 34 1/2 deep) and the curved knee braces ('2-[ 26 b.b. / Cov. Pl 36 1/2' with 6 x 6 angles, 1 in. rivets)",
     "p.100 draws the portal knee braces as curved built-up members with section cuts but their curve (radius / centre) and the plate widths along the curve are not dimensioned",
-    "the portal strut stays the nominal envelope between the U11 points; the knee braces are not built.");
+    "the portal strut is the p.71 box (truss-ptc-arch.csx); its U11 connection plates are section 2b, the knee braces and their gussets details-ptc.csx section 2.");
 if (T(Main) is { } tm0)
 {
     var t = tm0;
@@ -278,6 +278,8 @@ if (T(Main) is { } tm0)
     foreach (var spec in pts)
     {
         string pt = spec[(spec.IndexOf(':') + 1)..];
+        // U11 / U11': the drawn plates (p.79) are face plates, section 2b below
+        if (pt.TrimEnd('\'') == "U11") continue;
         bool apex = pt.StartsWith("UM") || pt.StartsWith("LM");
         bool quarter = pt.StartsWith("LQ");   // double K apex on the floor beam F8 (p.95: gussets riveted to its bottom flange, no edge angle)
         var rv = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -319,14 +321,6 @@ if (T(Main) is { } tm0)
             flag = U($"p.{lr["page"]}", $"main span lateral plates at {pt} ({lr["edge_angle"]}, {lr["thickness_in"]} in.)",
                 "View K / Section B show the plate pair on the chord inner web at the lateral's top / bottom faces in an oblique view without dimensions; its outline and position along the chord, and the angle's rivets, are not given",
                 "plate = envelope of the lateral lap carried to the stack (1/4 in. clear) under the angle, lying on the lateral's top / bottom face (flat in the bracing plane); angle rivets not placed.");
-        // 2026-11-02 agent review fork-bracing (d): U11 (p.79 top plan view) is NOT a plate pair: ONE 7/8 in. 'Spl. & Lat. Pl. (S)' on the chord top cover (it is also
-        // the chord cover splice, 1 1/8 in. H.S. rivets) with an R = 3'-0 edge toward the portal, the lateral under it on 2-Fills 13 x 1 (C), the portal on a Beveled Fill (C)
-        // and a 1/4 in. fill. The generator puts bracing plates on the members' faces (with fills); a plate on the chord's top face, bent over the U11 chord kink, with
-        // the chord splice rivets is not an input yet: the envelope pair stays, flagged with what the sheet draws.
-        if (bn == "U11")
-            flag = U("p.79", $"lateral / portal connection plate at {pt}",
-                "the top plan view draws ONE 7/8 in. 'Spl. & Lat. Pl. (S)' lying on the chord top cover plate (also the chord cover splice, 1 1/8 in. H.S. rivets), with an R = 3'-0 edge toward the portal strut, 2-Fills 13 x 1 (C) under the lateral, a Beveled Fill (C) and a 1/4 in. fill under the portal; outline not dimensioned; a plate on the chord's top face over the U11 kink is not a generator input",
-                "envelope pair of 1/2 in. plates in the lateral plane on the gusset edge angle (NOT the drawn plate: thickness, level and outline differ).");
         foreach (var members in groups)
             t.BracingGussets.Add(new TrussBracingGussetDefinition
             {
@@ -354,6 +348,106 @@ if (T(Main) is { } tm0)
         "Section B draws the plate, both angles and the rivets (about 24 x 1 in. in the lateral, 20 in the 8 x 8 angle) without dimensions, Section C the bend to the floor beam angle without its offset; the plate's level relative to the modeled 2-15[ 50 lateral L13 - W14 (p.71) is not given - a flat plate from the trace stood up to 8 3/4 in. off it and cut the F8 stiffeners",
         "not built (outline traced in truss/lateral-plates.csv row L13F for a later pass); the floor laterals end clear of the truss joint."));
     report.Add($"{Main}: {t.BracingGussets.Count} bracing plate definitions");
+}
+
+// ================================================================ 2b. U11 / U11' portal + upper lateral connection plates (p.79; agent review 2 2026-11-03, fork-u11)
+// p.79 top plan view (drawn for the N truss, unprimed, in a view normal to the U11-U12 top cover; 300 dpi, 8.97 px / in. calibrated on '2'-5 in. in. Gus. Pls.' = the
+// web outer faces, checked on the portal top PL 24 1/2 = 220 px; origin = the drawn U11 working line = the foot of the perpendicular from U11 on the cover):
+//   ONE 7/8 in. '7/8 Spl. & Lat. Pl. (S)' lying ON the chord top cover (it is also the top cover splice: 63 x 1 1/8 in. H.S. rivets in 5 lines at 4 in., U -43.3 .. +31.5),
+//   from U -47 to +35 over the 24 in. cover, an R = 3'-0 fillet from the cover edge to the portal's down-station side, over the portal end to 3'-10 from the truss CL
+//   (a lobe to 4'-4 over the down-station half: 'Beveled Fill (C)'), '1/4 Fill' under the rest of the portal, a straight edge across the lateral at 3'-1 .. 3'-9;
+//   portal 36 x 1 in. rivets in 8 lines (19 3/4 in. wide, 7 3/4 in. pitch, staggered), lateral 13 rivets drawn under the plate (shop dots, 3 lines).
+//   The plate is bent over the chord kink (16.0 / 18.9 deg): built as two flat pieces meeting on the line where the two cover faces meet (TrussDefinition.FacePlates,
+//   generic). The portal top lies 1/4 in. under the U11-U12 cover face (the 1/4 fill; the bent-down piece over U10-U11 gives the beveled fill) and the lateral 1 1/8 in.
+//   under it (p.79: '2-Fills 13 x 1 (C)'): fills = the probed gaps.
+// p.79 Section B (the bottom plane): '9/16 Lat. Pl. (C)' (R = 3'-0) under the portal and the lateral bottom faces (both lie in the plane of the laterals, flush within
+//   1/64 in.), on an angle strip along the gusset (26 field rivets in 2 rows), lateral 13 rivets (3 lines, '4 4' gage, '3 1/2 min. spacing typical for top lats.'),
+//   portal 13 field rivets. p.71 '26-Riv. each end of lateral diagonals' = 13 top + 13 bottom. Rivets through the main gussets at U11 are 1 1/4 in. H.S. (p.79 note).
+// The lateral end: the drawn rivets start 3'-0 along the lateral from U11 (its end 2'-10 1/2 from U11; it stopped 4'-7 from U11 by the corner clearance rule, 1'-2 short
+//   of its drawn rivets): StartSetback set (scaled, flagged).
+string u11Flag = U("p.79", "U11 lateral / portal connection plates (7/8 Spl. & Lat. Pl. on the chord top cover, 9/16 Lat. Pl. under the portal and lateral)",
+    "the top plan view and Section B draw the plates, fills and rivets without outline dimensions; outlines, rivet positions and the lateral end scaled at 8.97 px / in. (300 dpi, calibrated on '2'-5 in. in. Gus. Pls.', checked on the portal top PL 24 1/2), +-1 in.; the 7/8 plate bent over the chord kink is modeled as two flat pieces meeting on the bend line; the bottom plate's edge angle (a 3 1/2 - 4 in. strip in Section B) is not called out",
+    "plates as traced (mirrored for the S truss / primed half); fills = the gap between the plate and the member face; bottom edge angle L 7 x 4 x 1/2 (the p.97 / p.98 lateral angle) on the gusset over 4'-2 with 26 + 13 rivets.");
+string u11Open = U("p.79", "U11: the two 1-Fill 13 x 1 (C) and 13 field rivets drawn on the lateral BEYOND the drawn plate edge",
+    "the top plan view draws the plate edge across the lateral between the 13 rivets under the plate and two fills with 13 field rivets outside it; what those rivets connect is not drawn (no plate shown over them)",
+    "not built; the lateral is connected by the 13 rivets under the 7/8 plate and the 13 in the 9/16 plate (p.71: 26 per end).");
+string u11PortalEnd = U("p.79", "U11 portal strut end",
+    "the top plan view draws the portal top 1'-5 3/8 from the truss CL (1 3/4 in. past the gusset) and its first rivet row at 1'-6 5/8; Section B draws the portal 3 1/2 - 4 in. clear of the gusset (the angle strip)",
+    "the portal end stays at the stack clearance (1'-8 3/8 from the CL, room for the bottom edge angle); its rivet rows are laid from its end (1 1/2 in.).");
+if (T(Main) is { } tmU)
+{
+    var t = tmU;
+    t.FacePlates ??= new();
+    t.FacePlates.RemoveAll(f => f.Point.EndsWith(":U11") || f.Point.EndsWith(":U11'"));
+    t.Unresolved.RemoveAll(s => s.Contains("U11: the two 1-Fill 13 x 1 (C)") || s.Contains("U11 portal strut end"));
+    t.Unresolved.Add(u11Open); t.Unresolved.Add(u11PortalEnd);
+    double I(double v) => In(v);
+    // ---- drawn data (inches; U along the plate from the drawn U11 line, + up-station; V from the truss CL, + inboard = toward the portal)
+    var arc = new List<(double u, double v)>();
+    for (int k = 0; k <= 9; k++) { double a = -k * 10 * Math.PI / 180; arc.Add((-47.0 + 36 * Math.Cos(a), 48.0 + 36 * Math.Sin(a))); }   // R 3'-0, centre (-47, 48): (-11, 48) -> (-47, 12)
+    var topOut = new List<(double u, double v)> { (-47.0, -12.0), (35.1, -12.0), (34.8, 36.6), (24.8, 44.9), (15.6, 46.1), (-0.2, 46.0), (-2.3, 52.0), (-11.0, 52.0) };
+    topOut.AddRange(arc);
+    // bottom 9/16 plate: inboard of the gusset (1/4 in. clear of its face, V 15.9) - the same R 3'-0 down-station edge, across the portal at 3'-10, the lateral edge
+    var botOut = new List<(double u, double v)> { (-30.7, 15.9), (35.0, 15.9), (34.8, 36.6), (24.8, 44.9), (15.6, 46.1), (-11.06, 46.0) };
+    for (int k = 0; k <= 6; k++) { double a = (-3.2 - k * (63.1 - 3.2) / 6) * Math.PI / 180; botOut.Add((-47.0 + 36 * Math.Cos(a), 48.0 + 36 * Math.Sin(a))); }
+    // chord splice rivets (p.79 top view, detected symbols, 1 1/8 in. H.S.)
+    var splice = new (double u, double v)[] {
+        (-43.3,-8.0),(-43.3,0.0),(-43.2,4.0),(-43.1,-3.9),(-43.1,8.2),(-39.7,-8.1),(-39.6,8.2),(-33.0,8.2),(-32.8,0.2),(-32.8,-8.0),(-26.2,-8.0),(-26.2,8.3),(-21.7,0.2),(-21.6,8.3),
+        (-21.5,-7.9),(-15.0,-7.9),(-15.0,4.1),(-14.9,-4.0),(-14.7,8.3),(-10.0,-3.9),(-9.9,4.1),(-9.9,-7.9),(-9.9,8.3),(-9.8,0.1),(-6.7,4.2),(-6.5,-4.0),(-6.5,8.3),(-6.5,-7.9),(-6.5,0.1),
+        (-3.2,8.4),(-3.2,0.1),(-3.2,-4.1),(-3.2,4.1),(-3.1,-8.1),(3.3,-8.0),(3.5,4.0),(3.5,0.1),(3.6,8.3),(3.7,-4.0),(7.2,0.0),(7.3,4.2),(7.3,-3.9),(7.3,-8.0),(7.5,8.3),(11.3,0.1),
+        (11.4,4.1),(11.4,-4.0),(11.4,8.4),(11.5,-7.9),(16.9,-3.9),(17.0,-8.0),(17.1,4.1),(17.1,8.2),(22.8,8.2),(22.8,0.1),(22.8,-7.9),(26.6,8.3),(26.7,-8.0),(31.2,-4.1),(31.2,-8.0),
+        (31.3,4.1),(31.3,0.3),(31.5,8.2) };
+    int nFp = 0;
+    foreach (var pr in new[] { "", "'" })
+        foreach (var pl in new[] { "N", "S" })
+        {
+            double su = pr == "'" ? -1 : 1, sv = pl == "S" ? 1 : -1;     // S truss: inboard = left (+V); primed half mirrored along the bridge
+            TrussUV P2(double u, double v) => new(I(u) * su, I(v) * sv);
+            List<TrussUV> Poly(IEnumerable<(double u, double v)> q) => q.Select(x => P2(x.u, x.v)).ToList();
+            string lat = $"UL-{pl}U11{pr}-UM12{pr}", portal = $"PORTAL-U11{pr}";
+            var latDef = t.Members.FirstOrDefault(m => m.Name == lat || m.Name == $"UL-{pl}U11{pr}-UM12{pr}");
+            if (latDef != null)
+            {
+                bool startHere = latDef.From.EndsWith(":U11" + pr);
+                if (startHere) latDef.StartSetback = I(34.5); else latDef.EndSetback = I(34.5);
+            }
+            else report.Add($"U11{pr} ({pl}): lateral {lat} not found");
+            // fills: under the portal end (1/4 fill; beveled where the plate is bent down over U10-U11) and the lobe; under the lateral lap
+            var latLap = new[] { (15.6, 31.4), (25.8, 23.8), (34.6, 36.4), (24.6, 44.6) };
+            t.FacePlates.Add(new TrussFacePlateDefinition
+            {
+                Point = $"{pl}:U11{pr}", Label = "7/8 Spl. & Lat. Pl. (S)", Thickness = I(0.875), Side = TrussBracingPlateSide.Above, OriginOnBack = pr == "'",
+                Outline = Poly(topOut), Material = "S", Source = "p.79", Unresolved = u11Flag,
+                Fills = new()
+                {
+                    new TrussFacePlateFill { Member = portal, Outline = Poly(new[] { (-12.5, 20.6), (13.3, 20.6), (13.3, 45.8), (-12.5, 45.8) }), Label = "1/4 Fill / Beveled Fill (C)", PlanThickness = I(0.25), Material = "C" },
+                    new TrussFacePlateFill { Member = portal, Outline = Poly(new[] { (-11.0, 45.8), (-2.3, 45.8), (-2.3, 51.8), (-11.0, 51.8) }), Label = "Beveled Fill (C)", Material = "C" },
+                    new TrussFacePlateFill { Member = lat, Outline = Poly(latLap), Label = "2-Fills 13 x 1 (C)", PlanThickness = I(1), Material = "C" },
+                },
+                Rivets = splice.Select(q => new TrussFacePlateRivet(I(q.u) * su, I(q.v) * sv) { Diameter = I(1.125), Material = "High strength rivet steel" }).ToList(),
+                MemberRivets = new()
+                {
+                    new TrussFacePlateRivetGroup { Member = portal, Count = 36, Rows = 8, Gage = I(2.8), Pitch = I(7.75), FromEnd = I(1.5), Stagger = true },
+                    new TrussFacePlateRivetGroup { Member = lat, Count = 13, Rows = 3, Gage = I(4), Pitch = I(3.5), FromEnd = I(1.5), Stagger = true },
+                },
+                RivetDiameter = I(1), RivetMaterial = "1 in carbon steel rivet",
+            });
+            t.FacePlates.Add(new TrussFacePlateDefinition
+            {
+                Point = $"{pl}:U11{pr}", Suffix = "-B", Label = "9/16 Lat. Pl. (C)", Thickness = I(0.5625), Side = TrussBracingPlateSide.Below,
+                BearOn = new() { portal, lat }, NormalFrom = lat, Outline = Poly(botOut), Material = "C", Source = "p.79", Unresolved = u11Flag,
+                EdgeAngle = "L7x4x1/2", EdgeAngleLabel = "L 7 x 4 x 1/2 (not called out at U11)", EdgeAngleU0 = pr == "'" ? -I(30) : -I(20), EdgeAngleU1 = pr == "'" ? I(20) : I(30),
+                EdgeAngleRivetsPlate = 26, EdgeAngleRowsPlate = 2, EdgeAngleRivetsStack = 13, EdgeAngleStackRivetDiameter = I(1.25), EdgeAngleStackRivetMaterial = "High strength rivet steel",
+                MemberRivets = new()
+                {
+                    new TrussFacePlateRivetGroup { Member = portal, Count = 13, Rows = 4, Gage = I(5.5), Pitch = I(6), FromEnd = I(1.5), Stagger = true },
+                    new TrussFacePlateRivetGroup { Member = lat, Count = 13, Rows = 3, Gage = I(4), Pitch = I(3.5), FromEnd = I(1.5), Stagger = true },
+                },
+                RivetDiameter = I(1), RivetMaterial = "1 in carbon steel rivet",
+            });
+            nFp += 2;
+        }
+    report.Add($"{Main}: U11 / U11' face plates {nFp} (7/8 top + 9/16 bottom per truss and half), lateral ends at 2'-10 1/2 from U11");
 }
 
 // ================================================================ 3. girder spans (p.43 plan, p.45 "Bracing conn. at CL floor bm." + the floor beam / girder plan)

@@ -89,6 +89,10 @@ public sealed class TrussDefinition
     /// planar plates and constant sections swept along a planar path of straight runs and filleted (arc) corners, e.g. curved portal knee braces.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussPlaneItemDefinition>? PlaneItems { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): connection plates lying flat on member faces at a point (<see cref="TrussFacePlateDefinition"/>),
+    /// e.g. a lateral / portal plate on a chord's top cover, bent over the chord kink (one flat piece per chord), with fills, rivets and an edge angle.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussFacePlateDefinition>? FacePlates { get; set; }
 
     public TrussSectionDefinition? Section(string name) => Sections.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
     public TrussPlaneDefinition? Plane(string name) => Planes.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -926,6 +930,10 @@ public sealed class TrussPlaneItemDefinition
     /// contiguous steel found along the shank after every part is built (one rivet per hole: a rivet already placed in the same hole takes it). Mirrored with the piece.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TrussPlaneItemRivet>? Rivets { get; set; }
+    /// <summary>OPTIONAL (false = every rivet placed, omitted when false): a rivet of a Plate piece whose grip is the piece alone (nothing behind it at that point,
+    /// e.g. over an access hole or past the end of the member it connects) is not placed (counted in the Info line).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool RivetsNeedSteelBehind { get; set; }
 }
 
 /// <summary>A rivet of a <see cref="TrussPlaneItemDefinition"/>: a point (U, V, W) inside the steel of the piece, the shank direction (AxisU, AxisV, AxisW) in the

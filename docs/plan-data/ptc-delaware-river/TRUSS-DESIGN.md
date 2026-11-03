@@ -1375,3 +1375,52 @@ match the p.90 outline after the cut.
 
 Open: the bracing edge-angle rivet of S/N-BGL22-T/B at u = 0 (on the CL, in the 1/8 in. gusset split and the chord joint line: grip 1 5/8 in.) belongs to the bracing
 plates (TrussGeneratorBracing, other fork); the shop bolt holes (flagged above); lines X are traced on the raster (+-1 in., dimension-only flag on the outline).
+
+## 43. U11 / U11' portal and upper lateral connections, agent review 2 (2026-11-03, fork-u11; evidence `qc/ptc/main-span/work11/review/B3`, `B6`)
+Review rows: PORTAL-U11 / U11' had no rivets (the envelope plates S-BGU11-T / -B stood 9.3 in. above / 13.1 in. below its faces), UL-*U11-UM12 reached its plates only
+through 9 11/16 / 11 7/8 in. fills, the top edge angle floated 1-2 in. above the stack with no rivet into it, and the knee braces PK / PK' had no gussets or rivets at the post.
+Sheets read at 300 dpi (p.79 top plan view, Section B and the notes; p.100 PORTAL AT U11 and its knee section; p.71 TOP CHORD LATERAL SYSTEM):
+- p.79 top plan view (drawn for the N truss in a view normal to the U11-U12 top cover, 8.97 px / in. calibrated on '2'-5 in. in. Gus. Pls.' = the web outer faces and
+  checked on the portal top PL 24 1/2): ONE '7/8 Spl. & Lat. Pl. (S)' lies ON the chord top cover (it is the top cover splice: 63 x 1 1/8 in. H.S. rivets in 5 lines at
+  4 in.), U -47 .. +35 in. from the drawn U11 line, R = 3'-0 fillet from the cover edge to the portal, over the portal end to 3'-10 from the truss CL (a lobe to 4'-4 with the
+  'Beveled Fill (C)'), '1/4 Fill' under the rest of the portal, edge across the lateral 3'-1 .. 3'-9 from the CL; 36 x 1 in. portal rivets in 8 lines, 13 lateral rivets under
+  the plate. The U11 working line is the foot of the perpendicular from U11 on the cover (Section D-D: the portal top is centred on it, -1'-0 13/16 / +1'-1 1/4; the model's
+  portal box agrees). Section B: '9/16 Lat. Pl. (C)' (R = 3'-0) under the portal and the lateral (their bottom faces lie in one plane in the model, within 1/64 in.), on an
+  angle strip along the gusset with 26 field rivets, 13 rivets per member ('4 4' gage, '3 1/2 min. spacing typical for top lats.'). p.71: 26 rivets each end of lateral
+  diagonals = 13 top + 13 bottom. Rivet note: rivets through the main gussets at U11 1 1/4 in. H.S.; bracing connections 1 in. carbon.
+- p.100: the knee box is 2'-4 1/2 b.b. Ls IN the portal plane (the section draws that side with the 14 x 20 manholes on the faces normal to it; the knee scales 29 in. deep
+  in the portal elevation) and 2'-11 3/4 b.b. Ls along the bridge = the post's out-to-out covers: the model had the two swapped (in-plane depth 3'-0 3/4). The knee working
+  line meets the post CL 20'-1 5/8 below U11 (read 20'-1 1/8 before). The '2-3/4" gussets' lie on the post cover plates (faces along the bridge, 1'-6 3/8 from the post CL),
+  64 x 1 in. carbon field rivets in the post (4 lines at 6 in.), 37 x 1 in. shop rivets in the knee; the knee end is drawn at the post web face.
+Generic additions (OPTIONAL, omitted from the .sbm when unset; other bridges unchanged):
+- `TrussDefinition.FacePlates` = `Bridge/TrussFacePlate.cs` (`TrussFacePlateDefinition`, generator `Truss/TrussGeneratorFacePlates.cs`, called after the plane items):
+  a connection plate FLAT ON MEMBER FACES - `Side` Above / Below the extreme face of `BearOn` (null = the chords at the point; probed on the built parts), `NormalFrom` null =
+  BENT over the chord kink as one flat piece per chord meeting on the line where the two face planes meet (the evidence-supported representation of a plate bent over a
+  kink, 39 d), or a member = one flat piece in its flange plane; outline in plate coordinates (origin = foot of the perpendicular from the point, `OriginOnBack` for the
+  mirrored half; developed along the plate); `Fills` = the probed gap to a member face (beveled where it varies; drawn thickness compared in an Info line); `Rivets` at plate
+  points, `MemberRivets` (`TrussFacePlateRivetGroup`: rows / gage / pitch / stagger from a member's cut end), an `EdgeAngle` on the member-side face with its other leg on
+  the probed stack face (`EdgeAngleRowsPlate`, own stack-leg rivet size). Rivet grips probed; a position whose steel is the plate alone, not in steel, or whose head would
+  sit over a head already placed is not placed (counted). Parts TrussConnectionPlate `{plane}-FP{point}{suffix}`, FillerPlate `-F<n>`, TrussConnectionAngle `-EA`.
+- `TrussPlaneItemDefinition.RivetsNeedSteelBehind`: a plate item's rivet with nothing behind the piece is not placed (counted).
+Tests `TrussFacePlateTests` (bent plate on a 45 deg kink, fill, rivets, round trip; flat plate under a member with an edge angle; plane item rivets).
+PTC data: `bracing-ptc.csx` section 2b (the envelope BracingGussets at U11 / U11' are no longer built), `details-ptc.csx` section 2 (knee section, 20'-1 5/8, gussets):
+- 7/8 plate on the chord top covers (bent: 2.90 deg, bend line 5 7/16 in. down-station of the U11 line) with the 63 chord splice rivets as drawn, the portal 36 (8 rows from
+  the portal end) and the lateral 13 (3 rows); 9/16 plate under the portal and lateral, L 7 x 4 x 1/2 on the gusset (not called out at U11: the p.97 / p.98 angle, flagged)
+  with 26 + 13 rivets (stack leg 1 1/4 H.S.), 13 + 13 member rivets. Fills: portal 11/16 - 1 3/8 (beveled), lateral 2 in. (drawn 1/4 / 1): the portal and lateral tops lie
+  7/8 in. lower under the cover than p.79 draws (reported in the Info lines, members not moved).
+- The lateral end moved to 2'-10 1/2 from U11 along its axis (`StartSetback`; the corner clearance rule had it at 4'-7, 1'-2 short of its drawn rivets; scaled, flagged).
+- Knee: section swapped to p.100, h = 14 3/4, R at the back of the top angles 20'-0 -> centreline 18'-9 3/4, end square, top corner 1/4 in. clear of the post web face;
+  gussets 3/4 on the post covers with the traced outline, 64 + 37 rivets each (positions traced; rivets with nothing behind the gusset are not placed: post cover access
+  holes under the gusset (bracing-ptc section 6 rule) and the knee end wedge at the post).
+Open (flagged): the two '1-Fill 13 x 1 (C)' and 13 field rivets drawn on the lateral beyond the plate edge (what they connect is not drawn); the portal end (p.79 top view:
+1'-5 3/8 from the CL, Section B: 3 1/2 - 4 in. clear of the gusset; kept at the stack clearance 1'-8 3/8, so 6 of the 36 portal rows fall past the drawn plate edge); the
+5/8 knee-to-strut gusset (E-E); the catwalk posts S33 / N33 on the top chord at U11 stand on the cover where the 7/8 plate now lies (walkways-ptc, 3 clash rows, 0.19 - 0.44 in.);
+the post cover access holes under the knee gussets (drawn rivets there).
+Results (reduced main-span model, base = committed PTC model, chain bracing -> details -> components -> rivets with the HEAD scripts vs the new ones; walkways-ptc needs the
+other bridges and was not re-run): placed rivets whose shank crosses member AND plate, per U11 end (S, N, U11, U11' alike): portal 0 -> 43 (30 of the 36 top rows; 6 fall
+past the drawn plate edge, see the portal end above; 13 bottom), lateral 13 through 9 11/16 - 11 7/8 in. fills -> 25 (12 top + 13 bottom) through a 2 in. top fill and no bottom
+fill, top plate to the chord covers 0 -> 62 of the 63 drawn splice rivets, bottom edge angle to the gusset stack 16 -> 22; knee gussets: post and knee rivets per gusset as
+drawn less the positions with nothing behind (160 over the 8 gussets: post cover access holes, knee end wedge at the post). Face plate rivets 630 placed (32 shared holes,
+18 not placed with a head over a joint rivet head, 28 off the steel). Steel 14,531,035 -> 14,535,362 lb. Clash (main span, no bolts) 882 -> 885 (+3 = the catwalk posts on
+the 7/8 plate, above); with bolts Bolt x Bolt 1,068 -> 1,068 (other Bolt x part rows grow with the ~1,000 new rivet shanks). check-truss-ptc 616 PASS / 19 DIFF / 73 INFO /
+2 CONFLICT before and after. Tests 799 / 799.
