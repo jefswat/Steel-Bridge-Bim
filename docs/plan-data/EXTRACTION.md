@@ -13,6 +13,8 @@ summary maps 1:1 onto model inputs (`samples/plans/*.csx`). Lessons from I-80 WB
   `UNVERIFIED`, `UNRESOLVED`.
 
 ## Tools
+- Current tool list and workflow (2026-11-02): [../PDF-READING.md](../PDF-READING.md). PyMuPDF now loads (`python -I`, system Python); the
+  pypdfium2 note below is from the early sandbox.
 - Python: `C:\SBM\temp\pytools\python.exe -I` (embedded 3.12). Use **pypdfium2** (text + rendering); PyMuPDF does
   NOT load in the sandbox (no VC++ runtime).
 - Text cache + sheet index first: one `pNNN.txt` per page + `INDEX.md` (PDF page -> design sheet -> drawing title)

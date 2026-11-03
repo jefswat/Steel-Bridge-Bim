@@ -20,6 +20,8 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Release: `dotnet publish src/SBM.App -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -o dist/SteelBridgeModeler`
   and the same for `src/SBM.Cli` (same output folder â†’ `sbm.exe` beside the app).
 - Automation docs for the user: `docs/API.md`; example scripts in `samples/scripts`.
+- User docs: `docs/USER-GUIDE.md` (the app), `docs/PDF-READING.md` (reading plan PDFs: rules, tools, workflow), `docs/TERRAIN-AND-AERIALS.md`
+  (georeference, automatic 3DEP terrain, NAIP orthoimage via `tools/terrain/aerial.py`, Google Earth check). Keep them current with the features.
 - Windows Sandbox (`sandbox/start.ps1`, see `sandbox/README.md`): full Windows incl. the WPF app; repo mapped at `C:\SBM`, tools/NuGet/Claude login in `C:\sbmcache` (= host `%USERPROFILE%\SBMSandbox`), `dotnet` on PATH (not Program Files).
 
 ## New plan-set model checklist (REQUIRED - a model is not finished without it)
