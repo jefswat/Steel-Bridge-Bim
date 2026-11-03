@@ -9,6 +9,7 @@ using SBM.Core;
 using SBM.Core.Bridge;
 using SBM.Core.Steel;
 using SBM.Core.Truss;
+using SBM.Core.Geometry;
 
 string outPath = Args.Length > 0 ? Args[0] : (Doc.FilePath ?? @"samples\plans\PTC Delaware River Bridge.sbm");
 string U(string pages, string item, string why, string then = "") => UnresolvedFlag.Text(pages, item, why, then);
@@ -91,9 +92,13 @@ foreach (var bn in approach)
 string mainSwayFlag = U("p.97, p.71", "main span sway frame bottom connections at the strut CL (2-1/2 Pls., 2-Ls 4 x 4 x 3/4, 2-Ls 3 1/2 x 3 x 3/8)",
     "the detail at L7 ('L8 similar', other points 'similar to L7 / L8 / L9') draws the plates, angles and rivets without outline dimensions or gages; the 1-Pl 15 x 1 1/8 (L7 / L8) / 15 x 1 (L10) under the angles has no length",
     "1/2 in. plates on both channel webs = envelope of the member laps standing on the lateral gusset plate on the strut top (1/4 in. gap), 12 rivets 1 in. per diagonal per plate in 4 lines, edge angle L 4 x 4 x 3/4 on each plate's outer face on the strut, 10 rivets per leg; the 2-Ls 3 1/2 x 3 x 3/8 along the plate top edge and the 15 in. strut plate not built.");
+var swayTopMembers = new List<TrussMemberDefinition>();
 string mainSwayTopFlag = U("p.85", "main span sway frame top connections under the floor beam (2-1/2 Gusset Pls, 4-Ls 6 x 4 x 1/2, 1 in. rivets)",
     "Section D-D and the elevation draw the plates, the four angles and the rivets with only the 1'-4 / 6 in. / 5 in. edge dimensions; no outline, gages or rivet count",
-    "1/2 in. plates on both channel webs = envelope of the member laps stopping 1/4 in. under the floor beam and clear of the truss post; per plate one L 6 x 4 x 1/2 on the floor beam bottom and one on the post face (outer face), 6 rivets per leg; 12 rivets per diagonal per plate.");
+    "1/2 in. plates on both channel webs = envelope of the member laps stopping 1/4 in. under the floor beam and clear of the truss post; per plate one L 6 x 4 x 1/2 on the floor beam bottom and one on the post face, both INSIDE the plate pair (6 in. legs toward the floor beam web, 4 in. legs on the plate; Section D-D, fork-swaytop 2026-11-03), 6 rivets per leg (drawn: 9 in the floor beam leg in two staggered rows and 10 in its plate leg, 6 + 6 in the post angle; one count per bracing plate in the generator); diagonal tops 1/4 in. under the 4 in. leg (drawn about 1 in.); 11 rivets per diagonal per plate as drawn (3 lines drawn, laid in the generator's 4 lines at 2 1/2 / 5 1/2 in.); the drawn plate fills the corner between the floor beam and the post (about 28 3/4 x 21 in.), the generator's envelope of the member lap meets the floor beam / post over the lap only, so the angles' plate legs are riveted only where the plate is behind them.");
+string mainSwayTop11Flag = U("p.79", "main span sway frame top connection at L11 under FB11 (2-1/2 Pls, 2-Ls 6 x 4 1/2 x 1/2 on the floor beam, 2-Ls 6 x 5 x 1/2 on the post)",
+    "FLOOR BEAM CONNECTION TO U11-L11 draws the plates, angles and rivets without outline dimensions or gages; its Section A draws the floor beam bottom there with 2-Ls 9 x 4 x 5/8 and a 1-Pl 37 x 1, which the model floor beam FB11 (typical F6 section, flange angles to 8 5/16 in. from the web) does not have",
+    "as the typical p.85 connection with L 6 x 4 1/2 x 1/2 angles inside the plate pair (the post angle is modeled 6 x 4 1/2, drawn 6 x 5) and 12 rivets per diagonal per plate as drawn; the plates on the 2-18[ webs (1'-11 5/8 b.b.) lie 3 1/2 in. outside the FB11 flange angles, so the floor beam angle legs have no floor beam steel above their rivet line and those rivets are not placed until FB11 gets its p.79 bottom flange material.");
 if (T(Main) is { } tmS)
 {
     var t = tmS;
@@ -101,6 +106,7 @@ if (T(Main) is { } tmS)
     Flag(t, "main span sway frame connections", null);
     Flag(t, "main span sway frame bottom connections", mainSwayFlag);
     Flag(t, "main span sway frame top connections", mainSwayTopFlag);
+    Flag(t, "main span sway frame top connection at L11", mainSwayTop11Flag);
     t.BracingGussets ??= new();
     t.BracingGussets.RemoveAll(b => b.Label is "2-1/2 Pls. (sway)" or "2-1/2 Pls. (sway top)" or "2-1/2 Guss. Pls. (sway L11)");
     int n = 0, nt = 0;
@@ -127,12 +133,18 @@ if (T(Main) is { } tmS)
         {
             var tm = t.Members.FirstOrDefault(x => x.Role == TrussMemberRole.Sway && x.From == top);
             if (tm == null) continue;
+            // fork-swaytop 2026-11-03: the top end is set below (after the regeneration) clear of the floor beam angle's plate leg; automatic first
+            tm.StartSetback = null;
+            swayTopMembers.Add(tm);
+            // L11: p.79 FLOOR BEAM CONNECTION TO U11-L11 draws the sway top as 2-1/2" Pls (C) + 2-Ls 6 x 4 1/2 x 1/2 (C) under the floor beam and 2-Ls 6 x 5 x 1/2 (C) on the
+            // post, 12 field rivets per plate in the 2-18[ 42.7 diagonal (p.85 Section D-D is "P.P. 0 To 10 Incl. & 12")
+            bool top11 = top.EndsWith(":SW11") || top.EndsWith(":SW11'");
             t.BracingGussets.Add(new TrussBracingGussetDefinition
             {
                 Point = top, Members = new() { tm.Name }, Label = "2-1/2 Pls. (sway top)", Suffix = "-SW", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
-                EdgeAngle = "L6x4x1/2", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeAngleAlsoOnStack = true, PlateToStack = true, EdgeRivets = 6, ProbeFaces = true, RivetGapTolerance = In(3.0 / 16),
-                RivetsPerMember = 12, RivetPitch = In(3), RivetGage = In(5.5), RivetGage2 = In(2.5), RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet",
-                Material = "C", Unresolved = mainSwayTopFlag, Source = "p.85",
+                EdgeAngle = top11 ? "L6x4-1/2x1/2" : "L6x4x1/2", EdgeAngleOnCrossing = true, EdgeAngleAlsoOnStack = true, PlateToStack = true, EdgeRivets = 6, ProbeFaces = true, RivetGapTolerance = In(3.0 / 16),
+                RivetsPerMember = top11 ? 12 : 11, RivetPitch = In(3), RivetGage = In(5.5), RivetGage2 = In(2.5), RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet",
+                Material = "C", Unresolved = top11 ? mainSwayTop11Flag : mainSwayTopFlag, Source = top11 ? "p.79" : "p.85",
             });
             nt++;
         }
@@ -481,6 +493,31 @@ foreach (var b in Doc.Project.Bridges.Where(b => b.Truss != null))
     foreach (var d in st.Diagnostics.Where(d => d.Message.Contains("bracing connection plates -") || d.Message.Contains("end connections -") || d.Message.Contains("stringer splices -") || d.Message.Contains("plane items -") || (d.Message.Contains("CHECK") && !d.Message.Contains("rivets 1\" per") && !d.Message.Contains("CHECK shoe")))) Print("   " + d.Message[..Math.Min(400, d.Message.Length)]);
     foreach (var d in st.Diagnostics.Where(d => d.Severity != DiagnosticSeverity.Info && d.Message.Contains("not built") && !d.Message.StartsWith("UNRESOLVED")).Take(10)) Print("   " + d.Severity + ": " + d.Message[..Math.Min(300, d.Message.Length)]);
     foreach (var e in rep.Errors.Where(e => e.StartsWith(b.Name))) Print("  ERROR " + e);
+}
+// fork-swaytop 2026-11-03 (agent review 2 B1 / B6, p.85 Section D-D): the floor beam angle of each sway top plate lies INSIDE the plate pair (6 in. leg under the
+// floor beam bottom flange toward the floor beam web, 4 in. leg down the plate's member-side face), so the 2-15[ ends stop below that leg: the automatic end (clear
+// of the post / floor beam) is lengthened until the highest corner of the end section is 1/4 in. below the 4 in. leg (p.85 draws the upper channel flange end about
+// 5 in. under the floor beam, i.e. about 1 in. below the leg; scaled, the 1/4 in. is the program's plate gap). Set after this regeneration (the automatic end comes from it);
+// rivets-ptc.csx regenerates with it. Re-runnable: the section above resets the ends to automatic first.
+if (T(Main) != null && swayTopMembers.Count > 0 && Doc.Model(Main).Steel is { Truss: { } tmSw } stSw)
+{
+    int nSet = 0; double dMax = 0;
+    foreach (var def in swayTopMembers)
+    {
+        double legDrop = (def.From.EndsWith(":SW11") || def.From.EndsWith(":SW11'") ? In(4.5) : In(4)) + In(0.25);
+        var res = tmSw.Members.FirstOrDefault(r => r.Name == def.Name || r.Mark == def.Name);
+        if (res == null) { Print($"  sway top end: member {def.Name} not in the model"); continue; }
+        var axis = (res.B - res.A).Normalized();
+        var verts = stSw.Parts.Where(p => p.Member == res.Mark || p.Mark == res.Mark || p.Mark.StartsWith(res.Mark + "-")).Where(p => p.Mesh is { IsEmpty: false })
+            .SelectMany(p => p.Mesh.Positions).Where(v => (v - res.A).Length < 3.0).ToList();
+        if (verts.Count == 0 || axis.Z > -0.1) { Print($"  sway top end: {res.Mark} has no parts near its top / is not descending"); continue; }
+        double sAuto = verts.Min(v => Vec3.Dot(v - res.A, axis));
+        double zTop = verts.Where(v => Vec3.Dot(v - res.A, axis) < sAuto + 0.005).Max(v => v.Z);
+        double ds = (zTop - (res.A.Z - legDrop)) / -axis.Z;
+        def.StartSetback = sAuto + Math.Max(0, ds);
+        if (ds > 0) { nSet++; dMax = Math.Max(dMax, ds); }
+    }
+    Print($"  {Main}: sway diagonal top ends lengthened clear of the floor beam angle leg at {nSet} of {swayTopMembers.Count} ends (largest {dMax / 0.0254:0.00} in.)");
 }
 foreach (var s in report) Print("  " + s);
 if (Environment.GetEnvironmentVariable("DETAILS_CLASH") == "1")
