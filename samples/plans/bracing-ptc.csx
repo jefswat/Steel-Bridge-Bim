@@ -199,6 +199,38 @@ if (T(Main) is { } tm0)
     t.Unresolved.Add(U("p.80, p.104", "CONFLICT (p.80 Section A dimension strings): L11 bottom strut above its work line",
         "Section A prints 2'-3 3/8 above / 1'-1 1/8 below the work line (= 3'-4 1/2 b. to b. Ls, CL of strut 7 1/8 above; p.104 Section A agrees: top 12'-9 3/8 above the pier) and '6 7/8' from the CL of strut to the same line",
         "CL of strut 7 1/8 in. above the work line (the chain that closes on the 3'-4 1/2 depth); the 1/4 in. difference is reported, not adjusted."));
+    // ---- 2026-11-02 agent review fork-bracing (a): bottom strut connection angles at L1 - L10 (+ primes). p.97 CROSS SECTION AT CL BRIDGE at L1 ("Details shown
+    // for L1, use similar details for L2 to L8 incl.") and at L10 ("Use similar Details at L9") draw '1-L 5 x 5 x 7/16' on each side of the strut: one leg on the
+    // gusset (3 rivets, drawn), the other on the strut side plate (edge-on, rivets not drawn); p.75 calls them out at L3. The strut stopped 4 3/4 in. clear of the
+    // stack (room for the 4 in. leg of the 7 x 4 edge angle under the lateral plate) and was held by the lateral plates only. p.97 L1 plan: the side plates run
+    // to about 1 3/4 in. from the gusset line, the channel webs (hidden) end about 5 in. from it (scaled, 2.166 pt / in.): the strut end is moved to the probed
+    // gusset face + 1 3/4 in. (TrimMember) except the channel webs / flange tips under the edge angle legs (a 1/16 in. notch keeps them at the stack setback).
+    // Angle size from the callout; length 17 1/2 in., rivet pitch 7 in., gage 3 in. scaled on the cross sections (calibrated on the 2'-8 1/4 strut depth).
+    string strutAngFlag = U("p.97, p.75", "bottom strut connection angles 1-L 5 x 5 x 7/16 each side (L1 - L10)",
+        "the cross sections at CL bridge (L1, L10) draw the angles and 3 rivets in the gusset leg without dimensions; the rivets through the leg on the strut side plate are edge-on in every view (not drawn); the strut side plate / channel web ends are drawn in the L1 plan without dimensions",
+        "angle 17 1/2 in. long centred on the strut, 3 rivets 1 in. at 7 in. pitch, 3 in. gage in the gusset leg (scaled at 2.166 pt / in.); no rivets in the leg on the strut; strut side plates to 1 3/4 in. from the gusset face, channel webs at the stack setback.");
+    {
+        var sb = SBM.Core.Truss.TrussSections.Build(t.Section("STRUT")!);
+        double xo = sb.Pieces.Max(pc => pc.Polygon.Max(q => Math.Abs(q.X))), tw0 = sb.WebThickness;
+        int nSa = 0;
+        foreach (var m in t.Members.Where(m => m.Role == TrussMemberRole.Strut && m.Section == "STRUT" && System.Text.RegularExpressions.Regex.IsMatch(m.Name, @"^LS-L([1-9]|10)'?$")))
+        {
+            m.EndConnections ??= new();
+            m.EndConnections.RemoveAll(e => e.Label == "1-L 5x5x7/16 strut to gusset");
+            m.EndConnections.Add(new TrussEndConnection
+            {
+                End = TrussMemberEnd.Both, Label = "1-L 5x5x7/16 strut to gusset", Angle = "L5x5x7/16", StandOff = xo - tw0 / 2, Top = In(8.75), Length = In(17.5),
+                OutRivets = new() { new TrussRivetColumn(In(3), 3, In(7), In(1.75)) }, RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet",
+                Material = "C", Source = "p.97", Unresolved = strutAngFlag, TrimMember = In(1.75),
+            });
+            m.Notches ??= new();
+            m.Notches.RemoveAll(n => n.Label == "channel webs at the stack setback");
+            foreach (var (y0, y1) in new[] { (In(15.5), 1e3), (-1e3, -In(15.5)) })
+                m.Notches.Add(new TrussMemberNotch { End = TrussMemberEnd.Both, From = 0, Length = In(1.0 / 16), YMin = y0, YMax = y1, Label = "channel webs at the stack setback", Source = "p.97" });
+            nSa++;
+        }
+        report.Add($"{Main}: strut connection angles L 5x5x7/16 on {nSa} struts (L1 - L10)");
+    }
     // W.P. specs map back to their panel point (one plate pair per point)
     string ToPanel(string spec)
     {
@@ -265,15 +297,21 @@ if (T(Main) is { } tm0)
         string pl = spec[..spec.IndexOf(':')], bn = pt.TrimEnd('\'');
         bool primed = pt.EndsWith("'");
         lpFor.TryGetValue(bn, out var lr);
-        if (apex || quarter) lr = null;
+        // apex rows (detail LM.. / UM..: the K apex plate on the strut at the CL bridge, 2026-11-02 fork-bracing) are kept for apex points only
+        bool apexRow = lr != null && (lr["detail"].StartsWith("LM") || lr["detail"].StartsWith("UM"));
+        if (quarter || apex != apexRow) lr = null;
         List<TrussUV>? drawn = null;
         if (lr != null && lr["outline_in"].Length > 0)
             drawn = lr["outline_in"].Split(';').Select(q => q.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries))
                 .Select(q => new TrussUV { U = In(double.Parse(q[0], inv)) * (primed ? -1 : 1), V = In(double.Parse(q[1], inv)) * (pl == "S" ? -1 : 1) }).ToList();
         double thk = lr != null ? In(double.Parse(lr["thickness_in"], inv)) : In(0.5);
-        string ang = lr != null ? AngleOf(lr["edge_angle"]) : apex || quarter || deep.Count > 0 ? "" : pt.StartsWith("L13H") ? "L7-1/2x4x1/2" : "L7x4x1/2";
+        string ang = lr != null ? (lr["edge_angle"].Length > 0 ? AngleOf(lr["edge_angle"]) : "") : apex || quarter || deep.Count > 0 ? "" : pt.StartsWith("L13H") ? "L7-1/2x4x1/2" : "L7x4x1/2";
         string flag = mainPlateFlag;
-        if (lr != null && drawn != null)
+        if (lr != null && drawn != null && apexRow)
+            flag = U($"p.{lr["page"]}", $"main span lateral apex plate outline at {pt} (as drawn for {lr["detail"]}{(lr["detail"] != bn ? ", 'similar'" : "")})",
+                $"the half top / part bottom view draws the plate symmetric about the CL bridge without dimensions: outline traced at 500 dpi ({lr["confidence"]} confidence, about +-1 in.){(primed ? ", mirrored for this half" : "")}; the 2-Ls 3 1/2 x 3 x 3/8 and the 1/2 in. fill drawn there are part of the sway frame connection (not dimensioned, not built); rivet gages / pitch not dimensioned",
+                $"plate {lr["thickness_in"]} in. pair as traced, in the plane of the laterals; rivets at the counts of the detail, lines 2 1/2 in. from the member sides, 3 in. pitch.");
+        else if (lr != null && drawn != null)
             flag = U($"p.{lr["page"]}", $"main span lateral / strut gusset plate outline at {pt} (as drawn for {lr["detail"]}{(lr["detail"] != bn ? ", 'similar'" : "")})",
                 $"the plate is drawn, not dimensioned: outline traced from a 300 dpi render ({lr["confidence"]} confidence, about +-1 in.){(primed || pl == "S" ? ", mirrored for this truss / half" : "")}; rivet gages / pitch not dimensioned",
                 $"plate {lr["thickness_in"]} in. pair as traced (clipped 1/4 in. clear of the joint stack under the {lr["edge_angle"]}); rivets at the p.71 counts, 4 lines 2 1/2 in. from the member sides, 3 in. pitch.");
@@ -281,6 +319,14 @@ if (T(Main) is { } tm0)
             flag = U($"p.{lr["page"]}", $"main span lateral plates at {pt} ({lr["edge_angle"]}, {lr["thickness_in"]} in.)",
                 "View K / Section B show the plate pair on the chord inner web at the lateral's top / bottom faces in an oblique view without dimensions; its outline and position along the chord, and the angle's rivets, are not given",
                 "plate = envelope of the lateral lap carried to the stack (1/4 in. clear) under the angle, lying on the lateral's top / bottom face (flat in the bracing plane); angle rivets not placed.");
+        // 2026-11-02 agent review fork-bracing (d): U11 (p.79 top plan view) is NOT a plate pair: ONE 7/8 in. 'Spl. & Lat. Pl. (S)' on the chord top cover (it is also
+        // the chord cover splice, 1 1/8 in. H.S. rivets) with an R = 3'-0 edge toward the portal, the lateral under it on 2-Fills 13 x 1 (C), the portal on a Beveled Fill (C)
+        // and a 1/4 in. fill. The generator puts bracing plates on the members' faces (with fills); a plate on the chord's top face, bent over the U11 chord kink, with
+        // the chord splice rivets is not an input yet: the envelope pair stays, flagged with what the sheet draws.
+        if (bn == "U11")
+            flag = U("p.79", $"lateral / portal connection plate at {pt}",
+                "the top plan view draws ONE 7/8 in. 'Spl. & Lat. Pl. (S)' lying on the chord top cover plate (also the chord cover splice, 1 1/8 in. H.S. rivets), with an R = 3'-0 edge toward the portal strut, 2-Fills 13 x 1 (C) under the lateral, a Beveled Fill (C) and a 1/4 in. fill under the portal; outline not dimensioned; a plate on the chord's top face over the U11 kink is not a generator input",
+                "envelope pair of 1/2 in. plates in the lateral plane on the gusset edge angle (NOT the drawn plate: thickness, level and outline differ).");
         foreach (var members in groups)
             t.BracingGussets.Add(new TrussBracingGussetDefinition
             {
@@ -299,6 +345,14 @@ if (T(Main) is { } tm0)
                 CrossingFaceOffset = deep.Count > 0 && lr != null ? In(5) : 0,
             });
     }
+    // ---- 2026-11-02 agent review fork-bracing (e): floor lateral connection plate at L13 (p.83 Section B / C; traced as lateral-plates.csv row L13F). Section B
+    // draws ONE 3/4 in. plate ('1-3/4" Gusset Pl. (Bent) (C)') on the floor lateral with 1-L 8 x 8 x 3/4 on the chord and 1-L 8 x 4 x 1 on the floor beam F8 web, the
+    // plate bent down to that angle (Section C). Built flat from the trace (trial 2026-11-02) it stood up to 8 3/4 in. off the modeled L13 - W14 lateral (2-15[ 50
+    // laced channels, p.71, not the 14 BP 73 of Section B) and cut the F8 stiffeners 3/8 in.: not built, flagged with what the sheet draws.
+    t.Unresolved.RemoveAll(s => s.Contains("floor lateral connection plate at L13"));
+    t.Unresolved.Add(U("p.83, p.71", "floor lateral connection plate at L13 (1-3/4 in. Gusset Pl. (Bent), 1-L 8 x 8 x 3/4 on the chord, 1-L 8 x 4 x 1 on the floor beam)",
+        "Section B draws the plate, both angles and the rivets (about 24 x 1 in. in the lateral, 20 in the 8 x 8 angle) without dimensions, Section C the bend to the floor beam angle without its offset; the plate's level relative to the modeled 2-15[ 50 lateral L13 - W14 (p.71) is not given - a flat plate from the trace stood up to 8 3/4 in. off it and cut the F8 stiffeners",
+        "not built (outline traced in truss/lateral-plates.csv row L13F for a later pass); the floor laterals end clear of the truss joint."));
     report.Add($"{Main}: {t.BracingGussets.Count} bracing plate definitions");
 }
 

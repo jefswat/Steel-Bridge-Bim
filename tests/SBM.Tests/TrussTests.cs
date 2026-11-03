@@ -1053,6 +1053,42 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void BracingGussets_SteepLateralConnectedByThePlate_IsNotClearedOfIt()
+    {
+        // PTC main span L11 - LM12 / L13 1/2 - LQ13 (agent review 2026-11-02): a lateral rising 15 - 22 deg in a sloped chord panel, connected by the plate at its
+        // end, was cleared of that plate's slab like a sway diagonal (|axis . up| > 0.25): set back 8 - 12 ft. A member the plate connects keeps the normal ends.
+        (BridgeModel bm, double setA) Build(double rise)
+        {
+            var (p, b) = Model();
+            var t = b.Truss!;
+            t.Members.RemoveAll(m => m.Name.StartsWith("FB"));
+            t.Sections.Add(Plate("DEEP", In(19), In(32)));        // 2'-8 1/4 b.b. laced channel struts / laterals of the PTC main span
+            t.Points.Add(new TrussPointDefinition("LM3", Ft(100) + 3 * Panel, Ft(60) + rise) { Offset = Half, Planes = new() { "N" } });
+            t.Members.Add(new TrussMemberDefinition { Name = "STRUT2", From = "N:L2", To = "S:L2", Section = "DEEP", Role = TrussMemberRole.Strut });
+            t.Members.Add(new TrussMemberDefinition { Name = "KA", From = "N:L2", To = "N:LM3", Section = "DEEP", Role = TrussMemberRole.LowerLateral });
+            t.JointDefaults.BracingCornerClearance = In(0.5);
+            t.JointDefaults.BracingStackClearance = In(4);
+            t.BracingGussets = new()
+            {
+                new TrussBracingGussetDefinition { Point = "N:L2", Orientation = TrussBracingPlateOrientation.Fitted, Thickness = In(0.5), Side = TrussBracingPlateSide.Both,
+                    RivetsPerMember = 6, RivetPitch = In(3), RivetGage = In(4), RivetDiameter = In(0.875) },
+            };
+            var m = Regen(p);
+            var ka = m.Steel!.Truss!.Member("KA")!;
+            var part = m.Steel.Parts.Single(x => x.Mark == "KA");
+            double s0 = part.Mesh.Positions.Min(q => Vec3.Dot(q - ka.A, (ka.B - ka.A).Normalized()));
+            return (m, s0);
+        }
+        var (flat, sFlat) = Build(0);
+        double horiz = Math.Sqrt(Panel * Panel + Half * Half);
+        var (steep, sSteep) = Build(0.4 * horiz);                    // about 22 deg: |axis . up| = 0.37
+        // the steep lateral ends near where the level one ends (the stack / strut clearances), not metres back
+        Assert.True(sSteep < sFlat + Ft(2), $"steep lateral set back {sSteep / 0.0254:0.0} in. vs level {sFlat / 0.0254:0.0} in.");
+        Assert.True(sSteep < Ft(4), $"steep lateral set back {sSteep / 0.0254:0.0} in.");
+        Assert.Contains(steep.Steel!.Parts, x => x.Mark == "N-BGL2-T");
+    }
+
+    [Fact]
     public void SwayPlates_EdgeAngleOnCrossingMember_RotatedEndConnection_NoStackClip()
     {
         // inverted V sway frame from U3 (both planes) down to the CL point LM3 of strut 3 (the strut passes it); the diagonals are rolled shapes turned 90 deg
