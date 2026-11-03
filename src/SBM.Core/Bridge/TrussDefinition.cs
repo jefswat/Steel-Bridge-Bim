@@ -922,6 +922,25 @@ public sealed class TrussPlaneItemDefinition
     /// <summary>OPTIONAL (null = the material's density, omitted from the .sbm): density of the piece, kg/m3.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Density { get; set; }
+    /// <summary>OPTIONAL (null = none, omitted from the .sbm): rivets of the piece at given points of its frame (<see cref="TrussPlaneItemRivet"/>); the grip is the
+    /// contiguous steel found along the shank after every part is built (one rivet per hole: a rivet already placed in the same hole takes it). Mirrored with the piece.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussPlaneItemRivet>? Rivets { get; set; }
+}
+
+/// <summary>A rivet of a <see cref="TrussPlaneItemDefinition"/>: a point (U, V, W) inside the steel of the piece, the shank direction (AxisU, AxisV, AxisW) in the
+/// same frame (any direction, e.g. normal to a member cover plate lying in the plane), diameter, material, OPTIONAL dimension-only flag text. Meters.</summary>
+public sealed class TrussPlaneItemRivet
+{
+    public double U { get; set; }
+    public double V { get; set; }
+    public double W { get; set; }
+    public double AxisU { get; set; }
+    public double AxisV { get; set; }
+    public double AxisW { get; set; } = 1;
+    public double Diameter { get; set; }
+    public string? Material { get; set; }
+    public string? Unresolved { get; set; }
 }
 
 /// <summary>
