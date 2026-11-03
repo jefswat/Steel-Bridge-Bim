@@ -74,7 +74,7 @@
       "target": [ { "level": "part", "category": "abutment" } ] },
 
     { "id": "framing-plan", "sheets": "^FRAMING PLAN", "basis": "Framing plan: beam lines, bearings, diaphragms",
-      "target": [ { "level": "part", "category": "superstructure" } ] },
+      "target": [ { "level": "part", "category": "superstructure" }, { "level": "assembly", "category": [ "prestressed girder", "cross frame" ] } ] },
     { "id": "beam", "sheets": "^30MH PRESTRESSED CONCRETE BEAM", "basis": "30MH beam: section, strand pattern, debonding",
       "target": [ { "level": "assembly", "category": "prestressed girder" } ] },
     { "id": "diaphragm-connection", "sheets": "^PRESTRESSED CONCRETE BEAM DIAPHRAGM CONNECTION", "basis": "Beam / end diaphragm connection (inserts in the beams)",

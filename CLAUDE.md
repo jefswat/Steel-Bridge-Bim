@@ -20,6 +20,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Release: `dotnet publish src/SBM.App -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -o dist/SteelBridgeModeler`
   and the same for `src/SBM.Cli` (same output folder â†’ `sbm.exe` beside the app).
 - Automation docs for the user: `docs/API.md`; example scripts in `samples/scripts`.
+- To-do list of requested features not built yet: `docs/TODO.md` (street view on an alignment, drop a person on the ground, GeoTIFF support). Add new requests there.
 - User docs: `docs/USER-GUIDE.md` (the app), `docs/PDF-READING.md` (reading plan PDFs: rules, tools, workflow), `docs/TERRAIN-AND-AERIALS.md`
   (georeference, automatic 3DEP terrain, NAIP orthoimage via `tools/terrain/aerial.py`, Google Earth check). Keep them current with the features.
 - Windows Sandbox (`sandbox/start.ps1`, see `sandbox/README.md`): full Windows incl. the WPF app; repo mapped at `C:\SBM`, tools/NuGet/Claude login in `C:\sbmcache` (= host `%USERPROFILE%\SBMSandbox`), `dotnet` on PATH (not Program Files).
@@ -32,7 +33,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
    `SBM.Api/ModelPipeline.cs`, docs/MODEL-PIPELINE.md): regenerate -> georeference check -> terrain (3DEP DEM for the model extents when georeferenced, CRS table
    `tools/terrain/crs.py`, cached in `C:\SBMData\terrain` if writable else `<repo>\dist\terrain`) -> plan sheet index (`tools/plan_index_auto.py`: text layer / OCR ->
    `sheet-index-<set>.auto.json`; skeleton `sheet-links-<model>.json` when no rules file names the model; a curated `"sheets"` index always wins, merge only adds missing
-   pages) -> companion database + sheet links. Opt-outs: `--no-pipeline` (on `sbm run`), `--no-regen --no-db --no-index --no-terrain --offline`, env `SBM_PIPELINE=0`,
+   pages) -> companion database + sheet links. Opt-outs: `--no-pipeline` (on `sbm run`; it still builds the companion database - user rule 2026-11-03: a saved model always gets its database, only `--no-db` skips it), `--no-regen --no-db --no-index --no-terrain --offline`, env `SBM_PIPELINE=0`,
    `SBM_OFFLINE=1`. `sbm pipeline <model.sbm> --status` = report only (`sbm regen` also says when items are open).
 3. Resolve what it prints as UNRESOLVED: write the link rules in the sheet-links file (title regex -> element selectors), correct low-confidence / scanned pages
    (paste a curated `"sheets"` index), set the georeference. Re-run `sbm pipeline <model.sbm>` until it says "nothing open" (or every open item is a reported user decision).

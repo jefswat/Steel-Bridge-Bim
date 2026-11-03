@@ -50,7 +50,18 @@ public static partial class Program
         if (!saved) return;   // check / report scripts do not save: no pipeline
         if (own.Contains("--no-pipeline") || Environment.GetEnvironmentVariable("SBM_PIPELINE") is "0" or "false")
         {
-            Console.WriteLine($"Model pipeline NOT run (--no-pipeline / SBM_PIPELINE=0). Required before the model is finished: sbm pipeline \"{path}\"");
+            // user rule 2026-11-03: a saved model ALWAYS gets its companion database (only an explicit --no-db skips it); --no-pipeline skips the
+            // other steps (terrain, sheet index, agent review stay for `sbm pipeline`)
+            if (own.Contains("--no-db"))
+            {
+                Console.WriteLine($"Model pipeline and database NOT run (--no-pipeline --no-db). Required before the model is finished: sbm pipeline \"{path}\"");
+                return;
+            }
+            Console.WriteLine($"Model pipeline NOT run (--no-pipeline / SBM_PIPELINE=0): companion database only. Required before the model is finished: sbm pipeline \"{path}\"");
+            var m0 = doc.FilePath == path ? doc : SbmDocument.Open(path!);
+            var o0 = PipelineOptionsFrom(own);
+            o0.Terrain = false; o0.SheetIndex = false; o0.Database = true;
+            Console.WriteLine(ModelPipeline.Run(m0, o0).ToText());
             return;
         }
         Console.WriteLine($"Model pipeline (the script saved {Path.GetFileName(path)}; opt out with --no-pipeline):");

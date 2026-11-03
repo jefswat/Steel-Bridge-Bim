@@ -126,7 +126,7 @@
     { "id": "longitudinal-section", "sheets": "^LONGITUDINAL SECTION", "basis": "Longitudinal section: spans, top of pier details, bearing pads",
       "target": [ { "level": "part", "category": "superstructure" } ] },
     { "id": "beam-layout", "sheets": "^BEAM LAYOUT", "basis": "Beam layout: beam lines, work points, diaphragm locations",
-      "target": [ { "level": "part", "category": "superstructure" } ] },
+      "target": [ { "level": "part", "category": "superstructure" }, { "level": "assembly", "category": [ "prestressed girder", "cross frame" ] } ] },
     { "id": "deck", "sheets": "^(DECK PLAN & REINFORCEMENT|TRANSVERSE DECK REINFORCING)", "basis": "Deck plan, reinforcing and placement",
       "target": [ { "level": "part", "category": "deck" } ] },
     { "id": "quantities-bar-list", "sheets": "^DECK, ABUT\\. & DIAPH\\. QUANTITIES", "basis": "Deck / abutment / diaphragm bar list and quantities",
