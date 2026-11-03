@@ -955,6 +955,10 @@ public sealed class TrussPlaneItemDefinition
     /// e.g. over an access hole or past the end of the member it connects) is not placed (counted in the Info line).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool RivetsNeedSteelBehind { get; set; }
+    /// <summary>OPTIONAL (0 = contiguous steel only, omitted from the .sbm): the rivet grip of <see cref="Rivets"/> continues across air gaps up to this (m) on
+    /// both sides of the given point - a flat plate over members whose faces differ slightly is drawn up by the rivet (bridged gaps counted in the Info line).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double RivetGapTolerance { get; set; }
 }
 
 /// <summary>A rivet of a <see cref="TrussPlaneItemDefinition"/>: a point (U, V, W) inside the steel of the piece, the shank direction (AxisU, AxisV, AxisW) in the
@@ -985,6 +989,13 @@ public sealed class TrussItemFrame
     public double Elevation { get; set; }
     public double AngleDegrees { get; set; }
     public bool Horizontal { get; set; }
+    /// <summary>OPTIONAL (0 = level, omitted from the .sbm): U rises by this angle (degrees; turned about the horizontal axis normal to U: V of a horizontal frame, W of a vertical one; e.g. a plate lying on members
+    /// that follow the profile grade). The frame stays orthonormal.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double PitchDegrees { get; set; }
+    /// <summary>OPTIONAL (0 = none, omitted from the .sbm): the frame then turned about U by this angle (degrees, right-hand about U).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double RollDegrees { get; set; }
 }
 
 /// <summary>Joint (panel point) detail: gusset plates and rivet groups.</summary>

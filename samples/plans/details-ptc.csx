@@ -268,22 +268,23 @@ if (T(Main) is { } tmK)
 // plates and fillers on web of floor beam"), 1-L 3 1/2 x 3 x 3/8 along the floor beam; at W14 the halves toward L13 are "2-Web Pls 12 x 1/2, 2-15[ 50.0,
 // 2-Pls (13-6) x 1/2" (= the L13-W14 wind chord section), the others 14 BP 73. "FOR WIND CHORD CONN. AT W15, W17 & W19" (Sections A / B): a 7/16 Pl. under the wind
 // chord and the lateral ends ("Slot lateral Pl." in the floor beam web, 1-L 7 x 4 x 3/4 to the floor beam); W21 (K to the tongue beam) similar.
-// Rivets 7/8 carbon (p.99 notes). Counts per lateral end read on the details: 14 BP 73 8 per plate, 2-15[ 50 24 per plate, at the wind chord 10.
-string flXFlag = U("p.99", "floor lateral connection plates at the floor beams W14 / W16 / W18 / W20 (bottom 3/4 or 7/16 Pl., 2 top 7/16 Pls., L 3 1/2 x 3 x 3/8)",
-    "the details draw plates, angles and rivets without outline dimensions or gages; the fillers on the floor beam web are not dimensioned",
-    "the X diagonals are split at the crossing and stop clear of the floor beam; bottom plate = envelope of the four member laps, under the floor beam bottom flange (riveted to it, p.99) with fills of the modeled gap where a lateral face stands off it (fill not drawn), top plates one per side stopping 1/4 in. clear of the floor beam with the angle on the floor beam face, rivets 8 (14 BP 73) / 24 (2-15[ 50) per member per plate in 4 lines 5 3/4 / 4 in. from the member CL; fillers on the floor beam web not built.");
-string flWFlag = U("p.99", "floor lateral plates at the wind chord W15 / W17 / W19 / W21 (7/16 Pl., 1-L 7 x 4 x 3/4 to the floor beam)",
-    "Sections A / B draw the plate under the wind chord and the lateral ends with its rivets but no outline dimensions; the plate passes through a slot in the floor beam web",
-    "one 7/16 plate under the lateral ends and the wind chord = envelope of the lateral laps (not clipped at the chord), 10 rivets per lateral; the angles to the floor beam and the web slot are not built.");
+// Rivets 7/8 carbon (p.99 notes). Rivets per lateral END = p.71 (20 per 14 BP 73, 52 per 2-15[ 50, 16 per 2-12[ 25 K), half in each plate (agent review 2, 2026-11-03).
+string flXFlag = U("p.99", "floor lateral bottom plates at the floor beams W14 / W16 / W18 / W20 (bottom 3/4 or 7/16 Pl.)",
+    "the details draw the plate under the floor beam with its rivets but without outline dimensions; the fillers on the floor beam web are not dimensioned",
+    "the X diagonals are split at the crossing and stop clear of the floor beam; bottom plate = envelope of the four member laps, under the floor beam bottom flange with fills of the modeled gap where a lateral face stands off it (fill not drawn), 10 (14 BP 73) / 26 (2-15[ 50) rivets per member in 4 lines 5 3/4 / 4 in. from the member CL; the floor beam rivets, top plates and angles: section 3b.");
 if (T(Main) is { } tmF)
 {
     var t = tmF;
     Flag(t, "floor lateral (14 BP 73 X / 2-12[ 25 K) connections", null);
     Flag(t, "floor lateral connection plates at the floor beams W14", flXFlag);
-    Flag(t, "floor lateral plates at the wind chord W15", flWFlag);
-    Flag(t, "floor lateral connections at L13 and at the tongue beam", U("p.95, p.99, p.93", "floor lateral connections at L13 (floor beam F8) and at the tongue beam W22",
-        "p.95 draws the lateral gussets on the F8 bottom flange and p.93 / p.99 the tongue beam and shear lock at W22 without outline dimensions",
-        "not built; the laterals stop clear of the floor beam / joint."));
+    Flag(t, "floor lateral plates at the wind chord W15", null);   // built as drawn in section 3b
+    Flag(t, "floor lateral connections at L13 and at the tongue beam", null);   // L13 / L13' and the W21' K at F7: section 3b
+    Flag(t, "W21 K at the shear lock tongue beam", U("p.93, p.99, p.71", "connection of the W21 K (from the unprimed half) to the shear lock tongue beam at WM22",
+        "p.93 Section E frames the W21 K on 2-7/16 Lat. Pls. to a 14 WF 48 at the end of the tongue beam (16 WF 88 + 2-Cov. Pls. 11 1/2 x 1/2 x 5'-6, detail Sheet 53 - not in the set), with its work point 2'-0 toward W21; the tongue beam is not built (16 WF 88 not in AISC v16, Sheet 53 missing)",
+        "the W21 K ends stop clear of F7 at the modeled apex on the F7 CL, no plates / rivets at that end."));
+    Flag(t, "double K W33 x 130 at LQ13", U("p.95", "connection of the L13 1/2 double K (33 WF 130) to F8 at LQ13 / LQ13'",
+        "the rotated section draws the 1/2 gusset and the L 4 x 3 1/2 x 7/16 edge angle riveted to F8 and to both W33s, but the plate lies in the inclined plane of the K and neither its outline nor the W33 laps nor the plate level on F8 are dimensioned",
+        "not built; the W33 ends stop clear of F8."));
     var planeN = t.Planes.First(p => p.Name == "N");
     t.BracingGussets ??= new();
     t.BracingGussets.RemoveAll(b => b.Label.StartsWith("floor lat."));
@@ -315,7 +316,8 @@ if (T(Main) is { } tmF)
                 }
             }
             string X1a = Xa + "1", X1b = Xb + "1", X2a = Xa + "2", X2b = Xb + "2";
-            var rv = new Dictionary<string, int> { [X1a] = a == 13 ? 24 : 8, [X1b] = a == 13 ? 24 : 8, [X2a] = 8, [X2b] = 8 };
+            // p.71 'Riv. in lateral diagonals' per END: 20 (14 BP 73), 52 (L13 - W14 2-15[ 50) = half in this bottom plate, half in the top plate (3b)
+            var rv = new Dictionary<string, int> { [X1a] = a == 13 ? 26 : 10, [X1b] = a == 13 ? 26 : 10, [X2a] = 10, [X2b] = 10 };
             TrussBracingGussetDefinition G(string label, TrussBracingPlateSide side, double th, List<string> mem, string suffix, bool angle) => new()
             {
                 Point = "N:" + FX, Label = label, Orientation = TrussBracingPlateOrientation.Horizontal, Side = side, Thickness = th, Members = mem, Suffix = suffix,
@@ -328,18 +330,8 @@ if (T(Main) is { } tmF)
             var bot = G("floor lat. bottom PL", TrussBracingPlateSide.Below, c == 14 ? In(0.75) : In(7.0 / 16), new() { X1a, X1b, X2a, X2b }, "", false);
             bot.BearOn = new() { "FB" + P(c) }; bot.MemberFills = true;
             t.BracingGussets.Add(bot);
-            t.BracingGussets.Add(G("floor lat. top PL", TrussBracingPlateSide.Above, In(7.0 / 16), new() { X1a, X1b }, "-1", true));
-            t.BracingGussets.Add(G("floor lat. top PL", TrussBracingPlateSide.Above, In(7.0 / 16), new() { X2a, X2b }, "-2", true));
+            // the top plates, edge angles, web angles and the floor beam rivets are built as drawn in section 3b (plane items); the wind chord plates too
         }
-        foreach (int w in new[] { 15, 17, 19, 21 })
-            foreach (var pl in new[] { "N", "S" })
-                t.BracingGussets.Add(new TrussBracingGussetDefinition
-                {
-                    Point = $"{pl}:W{P(w)}", Label = "floor lat. wind chord PL", Orientation = TrussBracingPlateOrientation.Horizontal, Side = TrussBracingPlateSide.Below, Thickness = In(7.0 / 16),
-                    Members = t.Members.Where(m => m.System == "Floor laterals" && (m.From == $"{pl}:W{P(w)}" || m.To == $"{pl}:W{P(w)}")).Select(m => m.Name).ToList(), NoStackClip = true,
-                    RivetsPerMember = 10, RivetPitch = In(3), RivetGage = In(5.75), RivetGage2 = In(4), RivetDiameter = In(0.875), RivetMaterial = "7/8 in carbon steel rivet",
-                    Material = "C", Unresolved = flWFlag, Source = "p.99",
-                });
     }
     report.Add($"{Main}: floor lateral X split at the floor beams ({split} members -> halves), {t.BracingGussets.Count(b => b.Label.StartsWith("floor lat."))} floor lateral plate definitions");
 }
@@ -478,6 +470,547 @@ if (T(Main) is { } tmB)
 // p.99 Sections A / B put the wind chord CL on the floor beam's bottom flange level ("Beveled Fill" between the floor beam and the wind chord), the wind chord top
 // plate riveted to the floor beam bottom; p.69 gives the wind chord CL elevations and p.94 the floor beam depth below the gutter: they leave 0.3 in. less than the
 // 14 BP 73 half depth. Re-checked 2026-10-21: the overlap is the same with the floor lateral connections built (plan conflict between the two sheets; flag kept).
+
+// ================================================================ 3b. span 19 floor lateral connections as drawn (agent review 2, 2026-11-03; TRUSS-DESIGN.md section 42)
+// p.99 FLOOR LATERAL CONN. AT FLOOR BEAMS W14 / W16, W18 & W20 (half / quarter TOP and BOTTOM sections) and SECTIONS A / B / C FOR WIND CHORD CONN. AT W15, W17 & W19
+// / AT W21 (raster, calibrated on the 14 BP 73 flange width 14.585 in. drawn in Section A at W21: 2.10 pt / in., 3/4" = 1'-0 halved; every scaled value is a
+// dimension-only flag). Built as explicit plane items (generic `TrussPlaneItemDefinition` with a pitched `TrussItemFrame` + rivets at drawn positions, grip probed):
+//  * FX (the X crossing at the CL of the floor beam): the BOTTOM plate stays the generated plate under the floor beam bottom flange (section 3: BearOn + fills), now
+//    riveted to the floor beam bottom flange (2 staggered columns of 7/8 rivets each side of the web, 9 per quarter = 36 per crossing) and to the laterals (10 per
+//    14 BP 73 / 26 per 2-15[ 50 end = half the p.71 count); one TOP plate per side on the lateral tops (7/16, 3/4 toward L13 at W14) to 1/16 in. from the floor
+//    beam web, carried by a web angle under it (L 4 1/2 x 3 1/2 x 1/2 N.S. / L 3 1/2 x 3 1/2 x 1/2 F.S., p.99 callout; W14 L13 side 2-Ls 8 x 8 x 1/2 on top, leg up)
+//    with a column of rivets into the plate and the web rivets through both angles; the L 3 1/2 x 3 x 3/8 along the free plate edge on every plate (p.99: 25 in.
+//    from the CL floor beam, scaled), 5 rivets per half. Laterals: 10 / 26 rivets per end in the top plate = the p.71 count per end with the bottom plate.
+//  * W (wind chord, Sections A / B / C): one 7/16 TOP plate on the chord top flange and the lateral / K top faces (slotted for the floor beam web inward of the
+//    chord, "Slot Lateral Pl."), one 7/16 BOTTOM plate under the chord bottom flange and the lateral / K bottoms, each = the drawn rectangle (+-24 in. along the
+//    chord, chord outer edge to 31 1/2 in. inside the CL chord) united with the member rivet laps; chord rivets 4 rows (28 per plate: the plates are the chord
+//    flange splice at W15 / W17 / W19 / W21), lateral rivets 10 / K rivets 8 per plate; the floor beam bent angles L 7 x 4 x 3/4 riveted to the top plate (2
+//    columns each side, 7 per side), the floor beam bottom angles to the bottom plate through a beveled fill (Section B, 6 x 2 per side); Section C chord web splice
+//    2-Pls 11 x 3/8 x 13 1/4 with 10 x 1 in. rivets at W15 / W17 / W19 / W21.
+string flDrawnFlag = U("p.99", "floor lateral connection details as drawn (plate outlines, rivet positions, angle positions / lengths)",
+    "the details give the members, plate thicknesses, angle sizes and rivet diameters but almost no dimensions: outlines, rivet positions and angle lengths are scaled at 2.10 pt / in. (14 BP 73 flange width in Section A at W21)",
+    "plates = the drawn rectangle united with 1 1/2 in. margins round the member rivets, rivets at the drawn rows / columns (positions +-1/2 in.), web angles under the top plates with the web rivets at the plate rivet stations (web rivets not drawn in plan), the L 3 1/2 x 3 x 3/8 along the free plate edges.");
+string flBendFlag = U("p.99", "'Bend Line' of the floor lateral top plates at the floor beams",
+    "the plan marks a bend line about 10 in. from the CL floor beam but no bend angle or the plate's other plane",
+    "flat plates on the member tops (pitched with the lateral grade), not bent.");
+string flAngleConflict = "CONFLICT (p.99 vs p.94): Section A draws the floor beam bent angles L 7 x 4 x 3/4 riveted on the 7/16 lateral plate on the wind chord top flange; the modeled floor beam end (p.94 / p.69 elevations) seats those angles directly on the chord, so the plate and the angles overlap 7/16 in. - reported, nothing moved.";
+string flWebConflict = "CONFLICT (p.99 vs p.94): the 7/16 top lateral plate is slotted for the floor beam web only inside the wind chord (Section A 'Slot Lateral Pl.'); over the chord the modeled floor beam web reaches the chord top flange (p.94 end detail), so it passes through the plate there - reported, nothing moved.";
+if (T(Main) is { } tmX && Environment.GetEnvironmentVariable("DETAILS_NO_FLX") != "1")
+{
+    var t = tmX;
+    t.PlaneItems ??= new();
+    t.PlaneItems.RemoveAll(p => p.Name.StartsWith("FLC-"));
+    // geometry of the generated members (first regeneration; the final one below then rebuilds the main span only)
+    Doc.Regenerate();
+    var st0 = Doc.Model(Main).Steel!; var tm0 = st0.Truss!;
+    var bdef = Doc.Project.Bridges.First(b => b.Name == Main);
+    var al = Doc.Project.Alignments.First(a => a.Name == bdef.AlignmentName);
+    var parts0 = st0.Parts.Where(p => p.Mesh is { IsEmpty: false }).Select(p => (p, b: p.Mesh.Bounds())).ToList();
+    const double inch = 0.0254;
+    double I_(double m) => m / inch;
+    // vertical ray: steel intervals (z bottom, z top, mark) through (x, y)
+    List<(double z0, double z1, string mark)> RayZ(double x, double y)
+    {
+        var res = new List<(double, double, string)>();
+        foreach (var (p, b) in parts0)
+        {
+            if (x < b.Min.X || x > b.Max.X || y < b.Min.Y || y > b.Max.Y) continue;
+            var P = p.Mesh.Positions; var X = p.Mesh.Indices; var hz = new List<double>();
+            for (int k = 0; k + 2 < X.Count; k += 3)
+            {
+                var A = P[X[k]]; var B = P[X[k + 1]]; var C = P[X[k + 2]];
+                double d = (B.X - A.X) * (C.Y - A.Y) - (C.X - A.X) * (B.Y - A.Y);
+                if (Math.Abs(d) < 1e-14) continue;
+                double l1 = ((B.X - x) * (C.Y - y) - (C.X - x) * (B.Y - y)) / d, l2 = ((C.X - x) * (A.Y - y) - (A.X - x) * (C.Y - y)) / d, l3 = 1 - l1 - l2;
+                if (l1 < 0 || l2 < 0 || l3 < 0) continue;
+                hz.Add(l1 * A.Z + l2 * B.Z + l3 * C.Z);
+            }
+            if (hz.Count >= 2) res.Add((hz.Min(), hz.Max(), p.Mark));
+        }
+        return res;
+    }
+    // frame of a point: origin = its world point, U = tangent turned up by the pitch, V = left, W = normal
+    (TrussItemFrame fr, Vec3 o, Vec3 u, Vec3 v, Vec3 w) FrameAt(TrussPointResult pr, double pitch)
+    {
+        var a2 = al.PointAt(pr.Station); var t2 = Vec2.FromAngle(al.AngleAt(pr.Station));
+        double off = (pr.World.X - a2.X) * t2.Right.X + (pr.World.Y - a2.Y) * t2.Right.Y;
+        var uh = new Vec3(t2.X, t2.Y, 0); var vv = new Vec3(-t2.Y, t2.X, 0);
+        var u1 = (uh * Math.Cos(pitch) + new Vec3(0, 0, 1) * Math.Sin(pitch)).Normalized();
+        var w1 = Vec3.Cross(u1, vv).Normalized();
+        return (new TrussItemFrame { Station = pr.Station, Offset = off, Elevation = pr.World.Z, Horizontal = true, PitchDegrees = pitch * 180 / Math.PI }, pr.World, u1, vv, w1);
+    }
+    (double U, double V) UV((TrussItemFrame fr, Vec3 o, Vec3 u, Vec3 v, Vec3 w) F, Vec3 q)
+    {
+        // plan point q -> frame (U, V) on the frame plane (W measured from it)
+        var d = q - F.o; var uh = new Vec3(F.u.X, F.u.Y, 0); double cu = uh.Length; uh = uh.Normalized();
+        return (Vec3.Dot(new Vec3(d.X, d.Y, 0), uh) / cu, Vec3.Dot(new Vec3(d.X, d.Y, 0), F.v));
+    }
+    double Wof((TrussItemFrame fr, Vec3 o, Vec3 u, Vec3 v, Vec3 w) F, Vec3 q) => Vec3.Dot(q - F.o, F.w);
+    List<TrussUV> Ccw(List<(double U, double V)> poly)
+    {
+        double a = 0; for (int i = 0; i < poly.Count; i++) { var p = poly[i]; var q = poly[(i + 1) % poly.Count]; a += p.U * q.V - q.U * p.V; }
+        if (a < 0) poly.Reverse();
+        return poly.Select(p => new TrussUV(p.U, p.V)).ToList();
+    }
+    List<(double U, double V)> Hull(List<(double U, double V)> pts)
+    {
+        var p = pts.Distinct().OrderBy(q => q.U).ThenBy(q => q.V).ToList();
+        if (p.Count < 3) return p;
+        double Cr((double U, double V) o, (double U, double V) a, (double U, double V) b) => (a.U - o.U) * (b.V - o.V) - (a.V - o.V) * (b.U - o.U);
+        var h = new List<(double U, double V)>();
+        foreach (var q in p) { while (h.Count >= 2 && Cr(h[^2], h[^1], q) <= 0) h.RemoveAt(h.Count - 1); h.Add(q); }
+        int lo = h.Count + 1;
+        for (int i = p.Count - 2; i >= 0; i--) { var q = p[i]; while (h.Count >= lo && Cr(h[^2], h[^1], q) <= 0) h.RemoveAt(h.Count - 1); h.Add(q); }
+        h.RemoveAt(h.Count - 1);
+        return h;
+    }
+    // member end at a point: plan direction outward (from the point along the member), cut-end distance, perpendicular (left of the outward direction)
+    (Vec3 d, double s0, Vec3 perp, List<Vec3> verts)? EndOf(string memberName, string plane, string point, Vec3 P)
+    {
+        var mr = tm0.Members.FirstOrDefault(m => m.Name == memberName);
+        if (mr == null) return null;
+        bool atA = mr.From.EndsWith(":" + point) || mr.From == point;
+        var far = atA ? mr.B : mr.A; var near = atA ? mr.A : mr.B;
+        var d = new Vec3(far.X - near.X, far.Y - near.Y, 0).Normalized();
+        var verts = parts0.Where(x => x.p.Mark.StartsWith(mr.Mark + "-") || x.p.Mark == mr.Mark).SelectMany(x => x.p.Mesh.Positions)
+            .Where(q => Math.Abs(q.X - P.X) < 2.5 && Math.Abs(q.Y - P.Y) < 2.5).ToList();
+        if (verts.Count == 0) return null;
+        double s0 = verts.Min(q => Vec3.Dot(new Vec3(q.X - near.X, q.Y - near.Y, 0), d));
+        return (d, s0, new Vec3(-d.Y, d.X, 0), verts);
+    }
+    var gen = new Dictionary<string, int>();   // counts for the report
+    TrussPlaneItemDefinition Item(string name, string label, (TrussItemFrame fr, Vec3 o, Vec3 u, Vec3 v, Vec3 w) F, string flag, string source, PartCategory cat) => new()
+    {
+        Name = name, Label = label, Frame = F.fr, Category = cat, AssemblyKind = AssemblyKind.TrussBracing, Assembly = "BR-FLOORLAT", AssemblyDescription = "Floor lateral connections",
+        Material = "C", Unresolved = flag, Source = source, Rivets = new(), RivetGapTolerance = In(1.0 / 8), Panel = "",
+    };
+    TrussPlaneItemRivet Rv((TrussItemFrame fr, Vec3 o, Vec3 u, Vec3 v, Vec3 w) F, Vec3 planPt, double W, double dia) { var (uu, vv) = UV(F, planPt); return new TrussPlaneItemRivet { U = uu, V = vv, W = W, Diameter = dia, Material = dia > In(0.9) ? "1 in carbon steel rivet" : "7/8 in carbon steel rivet" }; }
+    // member rivet pattern on the face: lines at the gages (left of outward +), rivet stations along the member from its cut end
+    IEnumerable<Vec3> MemberRivets(Vec3 P0, (Vec3 d, double s0, Vec3 perp, List<Vec3> verts) e, (double g, double[] a)[] lines)
+    {
+        foreach (var (g, aa) in lines) foreach (var a in aa) yield return P0 + e.d * (e.s0 + In(a)) + e.perp * In(g);
+    }
+    var hp = new[] { (5.5, new[] { 1.75, 5.25, 8.75 }), (2.75, new[] { 3.5, 7.0 }), (-2.75, new[] { 3.5, 7.0 }), (-5.5, new[] { 1.75, 5.25, 8.75 }) };   // 10 per plate (p.71 20 per end)
+    var box = new[] { (5.5, new[] { 1.75, 4.75, 7.75, 10.75, 13.75, 16.75, 19.75 }), (2.75, new[] { 3.25, 6.25, 9.25, 12.25, 15.25, 18.25 }),
+                      (-2.75, new[] { 3.25, 6.25, 9.25, 12.25, 15.25, 18.25 }), (-5.5, new[] { 1.75, 4.75, 7.75, 10.75, 13.75, 16.75, 19.75 }) };   // 26 per plate (p.71 52)
+    var kk = new[] { (4.5, new[] { 1.75, 4.75 }), (2.25, new[] { 1.75, 4.75 }), (-2.25, new[] { 1.75, 4.75 }), (-4.5, new[] { 1.75, 4.75 }) };   // 8 per plate (p.71 16)
+    (double, double[])[] PatternOf(string member) => member.StartsWith("FL-K") ? kk : (member.StartsWith("FL-X13") && member.EndsWith("1")) ? box : hp;
+    // margin squares round rivets for the plate hull (1 1/2 in.)
+    IEnumerable<(double U, double V)> Margins((TrussItemFrame fr, Vec3 o, Vec3 u, Vec3 v, Vec3 w) F, IEnumerable<Vec3> pts, double m)
+    { foreach (var q in pts) { var (uu, vv) = UV(F, q); yield return (uu - m, vv - m); yield return (uu + m, vv - m); yield return (uu + m, vv + m); yield return (uu - m, vv + m); } }
+    // angle swept along a path in the frame plane: leg on the plate (width b, on the left of the path) + outstanding leg (h) away from the plate face Wf (dir +1 up / -1 down)
+    List<TrussUV> AngleSec(double Wf, int dir, double h, double b, double ta) => new()
+    {
+        new TrussUV(Wf, 0), new TrussUV(Wf + dir * h, 0), new TrussUV(Wf + dir * h, ta), new TrussUV(Wf + dir * ta, ta), new TrussUV(Wf + dir * ta, b), new TrussUV(Wf, b),
+    };
+    List<TrussPathVertex> PathLeft((double U, double V) a, (double U, double V) b, (double U, double V) toward)
+    {
+        // path a -> b, reversed when its left side does not face 'toward'
+        double dU = b.U - a.U, dV = b.V - a.V; double lU = -dV, lV = dU;
+        double s = lU * (toward.U - a.U) + lV * (toward.V - a.V);
+        return s >= 0 ? new() { new(a.U, a.V), new(b.U, b.V) } : new() { new(b.U, b.V), new(a.U, a.V) };
+    }
+    int nItems = 0, nRiv = 0;
+    void Add(TrussPlaneItemDefinition it) { t.PlaneItems!.Add(it); nItems++; nRiv += it.Rivets?.Count ?? 0; }
+
+    foreach (var pr in new[] { "", "'" })
+    {
+        string Pn(int n) => n == 22 ? "22" : $"{n}{pr}";
+        // ---------------------------------------------------------------- FX crossings at the floor beams W14 / W16 / W18 / W20
+        foreach (int c in new[] { 14, 16, 18, 20 })
+        {
+            string FX = "FX" + Pn(c);
+            var px = tm0.Points.FirstOrDefault(p => p.Name == FX);
+            if (px == null) { report.Add($"{Main}: {FX} not generated"); continue; }
+            var P = px.World;
+            var halves = t.Members.Where(m => m.System == "Floor laterals" && (m.From == "N:" + FX || m.To == "N:" + FX)).Select(m => m.Name).ToList();
+            var ends = halves.Select(h => (h, e: EndOf(h, "N", FX, P))).Where(x => x.e != null).Select(x => (x.h, e: x.e!.Value)).ToList();
+            // floor beam bottom (ray at the floor beam CL beside the web) and the generated bottom plate
+            var t2 = Vec2.FromAngle(al.AngleAt(px.Station)); var uh = new Vec3(t2.X, t2.Y, 0); var nr = new Vec3(t2.Right.X, t2.Right.Y, 0);
+            var rz = RayZ(P.X + uh.X * In(3), P.Y + uh.Y * In(3));
+            var bot = rz.Where(r => r.mark.StartsWith("N-BGFX" + Pn(c)) && !r.mark.Contains("-F")).OrderByDescending(r => r.z1).FirstOrDefault();
+            if (bot.mark == null) { report.Add($"{Main}: {FX} bottom plate not found"); continue; }
+            // sides: a = toward the lower-numbered panel point, b = the other
+            foreach (int side in new[] { -1, 1 })
+            {
+                var sm = ends.Where(x => Math.Sign(Vec3.Dot(x.e.d, uh)) == side).ToList();
+                if (sm.Count == 0) continue;
+                string sTag = side < 0 ? "a" : "b";
+                // grade of this side's laterals along the station
+                var mr0 = tm0.Members.First(m => m.Name == sm[0].h);
+                double grade = (mr0.B.Z - mr0.A.Z) / Vec3.Dot(new Vec3(mr0.B.X - mr0.A.X, mr0.B.Y - mr0.A.Y, 0), uh);
+                var F = FrameAt(px, Math.Atan(grade));
+                bool boxSide = sm.Any(x => x.h.StartsWith("FL-X13") && x.h.EndsWith("1"));
+                double tp = boxSide ? In(0.75) : In(7.0 / 16);
+                // top plate on the highest member top (in the pitched frame)
+                double W0 = sm.SelectMany(x => x.e.verts).Where(q => Vec3.Dot(new Vec3(q.X - P.X, q.Y - P.Y, 0), uh) * side > 0).Max(q => Wof(F, q));
+                double Wm = W0 + tp / 2;
+                var rivPts = sm.SelectMany(x => MemberRivets(P, x.e, PatternOf(x.h)).Select(q => q)).ToList();
+                // floor beam web face on this side at the web angle level (ray toward the web; web plates at W14)
+                var wh = FirstHit(P + uh * (side * In(12)) + new Vec3(0, 0, W0 - In(1.75)), -uh * side, In(14));
+                double wFace = wh == null ? In(0.3125) : In(12) - wh.Value.t;
+                double webFace = wFace + In(1.0 / 16);
+                // drawn: plate from the web to 27 in. from the CL floor beam (free edge with the L 3 1/2 x 3 x 3/8), +-34 in. across, united with the rivet margins
+                var outline = new List<(double U, double V)> { (side * webFace, -In(34)), (side * In(27), -In(34)), (side * In(27), In(34)), (side * webFace, In(34)) };
+                outline.AddRange(Margins(F, rivPts, In(1.5)));
+                var hull = Hull(outline).Select(q => (U: side > 0 ? Math.Max(q.U, webFace) : Math.Min(q.U, -webFace), q.V)).ToList();
+                var top = Item($"FLC-{FX}-T{sTag}", $"floor lateral top PL {(boxSide ? "3/4" : "7/16")} at {FX}", F, (flDrawnFlag + " " + flBendFlag).Trim(), "p.99", PartCategory.TrussConnectionPlate);
+                top.Kind = TrussPlaneItemKind.Plate; top.Outline = Ccw(hull); top.W0 = W0; top.W1 = W0 + tp;
+                foreach (var q in rivPts) top.Rivets!.Add(Rv(F, q, Wm, In(0.875)));
+                Add(top);
+                // edge angle L 3 1/2 x 3 x 3/8 along the free edge (3 1/2 leg on the plate, outstanding leg up), n +-19, 5 rivets per half
+                double eU = side * In(27 - 0.25);
+                var ea = Item($"FLC-{FX}-T{sTag}-EA", $"1-L 3 1/2 x 3 x 3/8 at {FX} (top PL edge)", F, flDrawnFlag, "p.99", PartCategory.TrussConnectionAngle);
+                ea.Kind = TrussPlaneItemKind.Sweep; ea.Path = PathLeft((eU, -In(19)), (eU, In(19)), (0, 0)); ea.Section = AngleSec(W0 + tp, 1, In(3), In(3.5), In(0.375));
+                foreach (double vv in new[] { -17.0, -12.75, -8.5, -4.25, 0, 4.25, 8.5, 12.75, 17.0 }) ea.Rivets!.Add(new TrussPlaneItemRivet { U = eU - side * In(1.75), V = In(vv), W = W0 + tp / 2, Diameter = In(0.875), Material = "7/8 in carbon steel rivet" });
+                Add(ea);
+                // web angle under the top plate (horizontal leg under it from the web face, vertical leg down the web); rivets: a column into the plate, the web
+                // rivets through both angles (each side at its own leg height; one rivet per hole)
+                bool wide = side < 0;   // N.S. = the down-station side: L 4 1/2 x 3 1/2 x 1/2 (4 1/2 leg under the plate); F.S. L 3 1/2 x 3 1/2 x 1/2
+                string aLabel = boxSide ? "L 8 x 8 x 1/2" : wide ? "1-L 4 1/2 x 3 1/2 x 1/2 N.S." : "1-L 3 1/2 x 3 1/2 x 1/2 F.S.";
+                double hb = boxSide ? In(8) : wide ? In(4.5) : In(3.5), hv = boxSide ? In(8) : In(3.5), ta = boxSide ? In(0.5) : In(0.5);
+                var wa = Item($"FLC-{FX}-W{sTag}", $"{aLabel} (floor lateral top PL to the floor beam web) at {FX}", F, flDrawnFlag, "p.99", PartCategory.TrussConnectionAngle);
+                double wu = side * wFace;
+                wa.Kind = TrussPlaneItemKind.Sweep; wa.Path = PathLeft((wu, -In(33)), (wu, In(33)), (side * In(10), 0));
+                // W14 L13 side: 2-Ls 8 x 8 x 1/2 on top of the plate, leg up the web (the floor beam bottom angles fill the web below)
+                wa.Section = boxSide ? AngleSec(W0 + tp, 1, hv, hb, ta) : AngleSec(W0, -1, hv, hb, ta);
+                double gage = boxSide ? In(4.5) : wide ? In(3.1) : In(2.0);
+                double Wleg = boxSide ? W0 + tp + ta / 2 : W0 - ta / 2;
+                var stations = new List<double>(); for (double vv = -30; vv <= 30.01; vv += 4.25) stations.Add(vv);
+                foreach (double vv in stations)
+                {
+                    wa.Rivets!.Add(new TrussPlaneItemRivet { U = side * (wFace + gage), V = In(vv), W = Wleg, Diameter = In(0.875), Material = "7/8 in carbon steel rivet" });
+                    wa.Rivets!.Add(new TrussPlaneItemRivet { U = 0, V = In(vv), W = boxSide ? W0 + tp + In(2.5) : W0 - In(2.0), AxisU = 1, AxisV = 0, AxisW = 0, Diameter = In(0.875), Material = "7/8 in carbon steel rivet" });
+                }
+                Add(wa);
+            }
+            // bottom plate: rivets into the floor beam bottom flange + the edge angles under it (frame level at the bottom plate)
+            var Fb = FrameAt(px, 0);
+            double Wb0 = bot.z0 - P.Z, Wb1 = bot.z1 - P.Z;
+            foreach (int side in new[] { -1, 1 })
+            {
+                double eU = side * In(27 - 0.25);
+                var be = Item($"FLC-{FX}-B{(side < 0 ? "a" : "b")}-EA", $"1-L 3 1/2 x 3 x 3/8 at {FX} (bottom PL edge)", Fb, flDrawnFlag, "p.99", PartCategory.TrussConnectionAngle);
+                be.Kind = TrussPlaneItemKind.Sweep; be.Path = PathLeft((eU, -In(19)), (eU, In(19)), (0, 0)); be.Section = AngleSec(Wb0, -1, In(3), In(3.5), In(0.375));
+                foreach (double vv in new[] { -17.0, -12.75, -8.5, -4.25, 0, 4.25, 8.5, 12.75, 17.0 }) be.Rivets!.Add(new TrussPlaneItemRivet { U = eU - side * In(1.75), V = In(vv), W = (Wb0 + Wb1) / 2, Diameter = In(0.875), Material = "7/8 in carbon steel rivet" });
+                // plate to the floor beam bottom flange: staggered columns 3.7 / 6.8 in. from the CL floor beam, 7.6 in. pitch each (p.99 quarter bottom section)
+                foreach (int ns in new[] { -1, 1 })
+                {
+                    foreach (double vv in new[] { 2.0, 9.6, 17.2, 24.8, 32.4 }) be.Rivets!.Add(new TrussPlaneItemRivet { U = side * In(6.8), V = ns * In(vv), W = (Wb0 + Wb1) / 2, Diameter = In(0.875), Material = "7/8 in carbon steel rivet" });
+                    foreach (double vv in new[] { 5.8, 13.4, 21.0, 28.6 }) be.Rivets!.Add(new TrussPlaneItemRivet { U = side * In(3.7), V = ns * In(vv), W = (Wb0 + Wb1) / 2, Diameter = In(0.875), Material = "7/8 in carbon steel rivet" });
+                }
+                Add(be);
+            }
+        }
+        // ---------------------------------------------------------------- wind chord W15 / W17 / W19 / W21 (S and N)
+        foreach (int c in new[] { 15, 17, 19, 21 })
+            foreach (var pl in new[] { "S", "N" })
+            {
+                string W = "W" + Pn(c);
+                var pw = tm0.Points.FirstOrDefault(p => p.Name == W && p.Plane == pl);
+                if (pw == null) { report.Add($"{Main}: {pl}:{W} not generated"); continue; }
+                var P = pw.World;
+                var t2 = Vec2.FromAngle(al.AngleAt(pw.Station)); var uh = new Vec3(t2.X, t2.Y, 0); var nr = new Vec3(t2.Right.X, t2.Right.Y, 0);
+                var mem = t.Members.Where(m => m.System == "Floor laterals" && (m.From == $"{pl}:{W}" || m.To == $"{pl}:{W}")).Select(m => m.Name).ToList();
+                var ends = mem.Select(h => (h, e: EndOf(h, pl, W, P))).Where(x => x.e != null).Select(x => (x.h, e: x.e!.Value)).ToList();
+                if (ends.Count == 0) continue;
+                // inward = toward the bridge CL (side of the laterals)
+                double inS = Math.Sign(Vec3.Dot(ends[0].e.d, nr));
+                // chord grade: the two chord pieces at the point
+                var chords = tm0.Members.Where(m => m.Mark.StartsWith(pl + "-") && m.Name.Split('-') is [var na, var nb] && (na == W || nb == W) && na.StartsWith("W") && nb.StartsWith("W")).ToList();
+                double g = chords.Count == 0 ? 0 : chords.Average(m => (m.B.Z - m.A.Z) / Vec3.Dot(new Vec3(m.B.X - m.A.X, m.B.Y - m.A.Y, 0), uh));
+                var F = FrameAt(pw, Math.Atan(g));
+                // chord top / bottom at the point (ray beside the joint)
+                var rz = RayZ(P.X + uh.X * In(-3) + nr.X * In(3), P.Y + uh.Y * In(-3) + nr.Y * In(3)).Where(r => chords.Any(m => r.mark.StartsWith(m.Mark + "-") || r.mark == m.Mark)).ToList();
+                if (rz.Count == 0) { report.Add($"{Main}: {pl}:{W} chord not found by the ray"); continue; }
+                double cTop = rz.Max(r => r.z1) - P.Z, cBot = rz.Min(r => r.z0) - P.Z;
+                double tp = In(7.0 / 16);
+                var rivAll = ends.SelectMany(x => MemberRivets(P, x.e, PatternOf(x.h))).ToList();
+                // drawn rectangle: +-24 in. along the chord, chord outer flange edge (7.3 in. outside the CL chord) to 31 1/2 in. inside it
+                Vec3 PP(double uu, double nn) => P + uh * In(uu) + nr * (In(nn) * inS);
+                var rect = new[] { PP(-24, -7.3), PP(24, -7.3), PP(24, 31.5), PP(-24, 31.5) };
+                var hullPts = rect.Select(q => UV(F, q)).ToList(); hullPts.AddRange(Margins(F, rivAll, In(1.5)));
+                var hull = Hull(hullPts);
+                // chord rivets: 4 rows (2.7 / 5.9 in. each side of the chord web), drawn columns
+                var chordRiv = new List<Vec3>();
+                foreach (double nn in new[] { -5.9, 5.9 }) foreach (double uu in new[] { -22.3, -16.4, -9.4, -2.45, 2.45, 9.4, 16.4, 22.3 }) chordRiv.Add(PP(uu, nn));
+                foreach (double nn in new[] { -2.7, 2.7 }) foreach (double uu in new[] { -19.65, -12.95, -5.95, 5.95, 12.95, 19.65 }) chordRiv.Add(PP(uu, nn));
+                foreach (bool isTop in new[] { true, false })
+                {
+                    double Wf = isTop ? cTop : cBot - tp;            // plate bottom face (top plate on the chord top, bottom plate under the chord bottom)
+                    // the members' faces may stand higher / lower than the chord: plate on the outermost
+                    var mv = ends.SelectMany(x => x.e.verts).Select(q => Wof(F, q)).ToList();
+                    if (mv.Count > 0) Wf = isTop ? Math.Max(Wf, mv.Where(x => x > 0).DefaultIfEmpty(Wf).Max()) : Math.Min(Wf, mv.Where(x => x < 0).DefaultIfEmpty(Wf + tp).Min() - tp);
+                    double Wm = Wf + tp / 2;
+                    var poly = hull.ToList();
+                    if (isTop)
+                    {
+                        // slot for the floor beam web inside the chord ("Slot Lateral Pl."): notch from the inner edge to the chord inner flange edge
+                        var s0 = UV(F, PP(-(0.3125 + 1.0 / 16), 7.3)); var s1 = UV(F, PP(0.3125 + 1.0 / 16, 7.3));
+                        var e0 = UV(F, PP(-(0.3125 + 1.0 / 16), 60)); var e1 = UV(F, PP(0.3125 + 1.0 / 16, 60));
+                        poly = SlotPolygon(poly, s0, s1, e0, e1);
+                    }
+                    var it = Item($"FLC-{pl}-{W}-{(isTop ? "T" : "B")}", $"floor lateral / wind chord {(isTop ? "top" : "bottom")} PL 7/16 at {W} (also the chord flange splice)", F, flDrawnFlag, "p.99 Section " + (isTop ? "A" : "B"), PartCategory.TrussConnectionPlate);
+                    it.Kind = TrussPlaneItemKind.Plate; it.Outline = Ccw(poly); it.W0 = Wf; it.W1 = Wf + tp;
+                    foreach (var q in rivAll) it.Rivets!.Add(Rv(F, q, Wm, In(0.875)));
+                    foreach (var q in chordRiv) it.Rivets!.Add(Rv(F, q, Wm, In(0.875)));
+                    // floor beam connection: top = the bent angles L 7 x 4 x 3/4 (2 columns each side, 7 per side); bottom = the floor beam bottom angles through a beveled fill
+                    foreach (int us in new[] { -1, 1 })
+                    {
+                        if (isTop) { int k = 0; foreach (double nn in new[] { 9.0, 12.5, 16.0, 19.5, 23.0, 26.5, 29.5 }) it.Rivets!.Add(Rv(F, PP(us * (k++ % 2 == 0 ? 5.9 : 3.2), nn), Wm, In(0.875))); }
+                        else foreach (double uu in new[] { 3.2, 6.3 }) foreach (double nn in new[] { 10.5, 14.2, 17.9, 21.6, 25.3, 29.0 }) it.Rivets!.Add(Rv(F, PP(us * uu, nn), Wm, In(0.875)));
+                    }
+                    it.Unresolved = (flDrawnFlag + " " + (isTop ? flAngleConflict + " " + flWebConflict : "")).Trim();
+                    Add(it);
+                }
+                // beveled fill between the floor beam bottom angles and the bottom plate (Section B 'Beveled Fill'; thickness = the modeled gap)
+                var rf = RayZ(P.X + uh.X * In(4) + nr.X * In(20) * inS, P.Y + uh.Y * In(4) + nr.Y * In(20) * inS).Where(r => r.mark.StartsWith($"FB{Pn(c)}-A")).ToList();
+                if (rf.Count > 0)
+                {
+                    double fbBot = rf.Min(r => r.z0) - P.Z, Wtop = cBot;   // plate top = chord bottom
+                    if (fbBot - Wtop > In(1.0 / 32))
+                    {
+                        var fl = Item($"FLC-{pl}-{W}-BF", $"beveled fill (floor beam bottom angles to the bottom lateral PL) at {W}", F, U("p.99", $"beveled fill at {W}", "Section B names a beveled fill between the floor beam and the lateral plate without its thickness", "thickness = the modeled gap at the CL floor beam (" + $"{I_(fbBot - Wtop):0.00} in.), level"), "p.99 Section B", PartCategory.FillerPlate);
+                        fl.Kind = TrussPlaneItemKind.Plate;
+                        fl.Outline = Ccw(new() { UV(F, PP(-8.31, 8.75)), UV(F, PP(8.31, 8.75)), UV(F, PP(8.31, 30.5)), UV(F, PP(-8.31, 30.5)) });
+                        fl.W0 = Wtop; fl.W1 = fbBot; fl.Rivets = null;
+                        Add(fl);
+                    }
+                }
+                // Section C: chord web splice 2-Pls 11 x 3/8 x 13 1/4, 10 x 1 in. rivets (FIN.) - vertical frame along the chord (pitched with it)
+                {
+                    var Fv = FrameAt(pw, Math.Atan(g));
+                    var fv = new TrussItemFrame { Station = Fv.fr.Station, Offset = Fv.fr.Offset, Elevation = Fv.fr.Elevation, Horizontal = false, PitchDegrees = Fv.fr.PitchDegrees };
+                    // vertical frame: U = tangent (pitched), V = up, W = U x V = right; the chord web at W = 0 (web 0.505)
+                    foreach (int ws in new[] { -1, 1 })
+                    {
+                        var sp = new TrussPlaneItemDefinition
+                        {
+                            Name = $"FLC-{pl}-{W}-WS{(ws < 0 ? "L" : "R")}", Label = $"wind chord web splice PL 11 x 3/8 at {W}", Frame = fv, Kind = TrussPlaneItemKind.Plate,
+                            Outline = new() { new(-In(6.625), -In(5.5)), new(In(6.625), -In(5.5)), new(In(6.625), In(5.5)), new(-In(6.625), In(5.5)) },
+                            W0 = ws < 0 ? -In(0.2525 + 0.375) : In(0.2525), W1 = ws < 0 ? -In(0.2525) : In(0.2525 + 0.375),
+                            Category = PartCategory.SplicePlate, AssemblyKind = AssemblyKind.TrussBracing, Assembly = "BR-FLOORLAT", AssemblyDescription = "Floor lateral connections",
+                            Material = "C", Source = "p.99 Section C", Unresolved = U("p.99", $"wind chord web splice at {W} (2-Pls 11 x 3/8)", "Section C gives the plates and the 1 in. rivets; the plate length and rivet positions are scaled", "13 1/4 in. long, rivets 4 + 2 + 4 as drawn."),
+                        };
+                        if (ws > 0)
+                        {
+                            sp.Rivets = new();
+                            foreach (double uu in new[] { -4.9, -1.85, 1.85, 4.9 }) foreach (double zz in new[] { -3.8, 3.8 }) sp.Rivets.Add(new TrussPlaneItemRivet { U = In(uu), V = In(zz), W = 0, AxisU = 0, AxisV = 0, AxisW = 1, Diameter = In(1), Material = "1 in carbon steel rivet" });
+                            foreach (double uu in new[] { -4.9, 4.9 }) sp.Rivets.Add(new TrussPlaneItemRivet { U = In(uu), V = 0, W = 0, AxisW = 1, Diameter = In(1), Material = "1 in carbon steel rivet" });
+                        }
+                        Add(sp);
+                    }
+                }
+            }
+    }
+    // ---------------------------------------------------------------- general ray: first steel face along a direction (t from o), mark
+    (double t, string mark)? FirstHit(Vec3 o, Vec3 d, double reach)
+    {
+        d = d.Normalized(); (double t, string mark)? best = null;
+        foreach (var (p, b) in parts0)
+        {
+            var e = o + d * reach;
+            if (Math.Max(o.X, e.X) < b.Min.X || Math.Min(o.X, e.X) > b.Max.X || Math.Max(o.Y, e.Y) < b.Min.Y || Math.Min(o.Y, e.Y) > b.Max.Y || Math.Max(o.Z, e.Z) < b.Min.Z || Math.Min(o.Z, e.Z) > b.Max.Z) continue;
+            var P = p.Mesh.Positions; var X = p.Mesh.Indices;
+            for (int k = 0; k + 2 < X.Count; k += 3)
+            {
+                var A = P[X[k]]; var B = P[X[k + 1]]; var C = P[X[k + 2]];
+                var e1 = B - A; var e2 = C - A; var q = Vec3.Cross(d, e2); double det = Vec3.Dot(e1, q);
+                if (Math.Abs(det) < 1e-14) continue;
+                var s = o - A; double uu = Vec3.Dot(s, q) / det; if (uu < 0 || uu > 1) continue;
+                var r = Vec3.Cross(s, e1); double vv = Vec3.Dot(d, r) / det; if (vv < 0 || uu + vv > 1) continue;
+                double tt = Vec3.Dot(e2, r) / det;
+                if (tt > 1e-6 && tt < reach && (best == null || tt < best.Value.t)) best = (tt, p.Mark);
+            }
+        }
+        return best;
+    }
+    foreach (var pr in new[] { "", "'" })
+    {
+        // ---------------------------------------------------------------- L13 / L13' floor lateral (p.83 Section B / C; lateral-plates.csv row L13F)
+        foreach (var pl in new[] { "S", "N" })
+        {
+            string L = "L13" + pr;
+            var pL = tm0.Points.FirstOrDefault(p => p.Name == L && p.Plane == pl);
+            var mL = t.Members.FirstOrDefault(m => m.System == "Floor laterals" && (m.From == $"{pl}:{L}" || m.To == $"{pl}:{L}"));
+            if (pL == null || mL == null) { report.Add($"{Main}: {pl}:{L} floor lateral not found"); continue; }
+            var P = pL.World;
+            var e = EndOf(mL.Name, pl, L, P); if (e == null) continue;
+            var t2 = Vec2.FromAngle(al.AngleAt(pL.Station)); var uh = new Vec3(t2.X, t2.Y, 0); var nr = new Vec3(t2.Right.X, t2.Right.Y, 0);
+            double su = Math.Sign(Vec3.Dot(e.Value.d, uh)), inS = Math.Sign(Vec3.Dot(e.Value.d, nr));
+            Vec3 PP(double uu, double ii) => P + uh * (In(uu) * su) + nr * (In(ii) * inS);
+            var mr = tm0.Members.First(m => m.Name == mL.Name);
+            double grade = (mr.B.Z - mr.A.Z) / Vec3.Dot(new Vec3(mr.B.X - mr.A.X, mr.B.Y - mr.A.Y, 0), uh);
+            var F = FrameAt(pL, Math.Atan(grade));
+            double tp = In(0.75);
+            double W0 = e.Value.verts.Select(q => Wof(F, q)).Where(x => x > 0).DefaultIfEmpty(0).Max();
+            // face of the truss joint stack toward the bridge CL at the plate level (horizontal ray from inside)
+            var o = PP(20, 40) + new Vec3(0, 0, W0 + tp / 2);
+            var hit = FirstHit(o, -nr * inS, 1.2);
+            double stackIn = hit == null ? 15.625 : 40 - I_(hit.Value.t);
+            var rivPts = MemberRivets(P, e.Value, box).ToList();
+            var drawn = new[] { (3.9, 15.0), (39.5, 15.0), (39.5, 21.7), (30.5, 51.5), (28.0, 56.6), (4.6, 57.4) };   // row L13F (u from the CL floor beam, inside the CL truss)
+            var hullPts = drawn.Select(q => UV(F, PP(q.Item1, Math.Max(q.Item2, stackIn + 0.25)))).ToList(); hullPts.AddRange(Margins(F, rivPts, In(1.5)));
+            var hull = Hull(hullPts).Select(q => q).ToList();
+            string l13Flag = U("p.83, p.71, p.99", $"floor lateral connection at {L} (1-3/4 Gusset Pl. (Bent), 1-L 8 x 8 x 3/4, 1-L 8 x 4 x 1)",
+                "Section B draws the plate on the top of the 14 BP 73 of the first issue (p.99 'As Built Revision: L13 - W14 mat'l changed' to the 2-15[ 50 box) and Section C bends it down to the 1-L 8 x 4 x 1 on the F8 web without the bend or the angle level; positions scaled (2.265 pt / in., row L13F)",
+                "one flat 3/4 plate on the box top (pitched with the lateral), the drawn outline united with the rivet margins; 1-L 8 x 8 x 3/4 on the plate along its chord edge, leg up the joint stack face (10 rivets into the plate, 10 through the stack); 1-L 8 x 4 x 1 on the plate with the 8 in. leg up the F8 web in the clear stretches between the F8 end connection angles / stiffeners (plate notched round them: the bend that clears them is not modeled; up to the p.83 27 x 1 in. web rivets, one plate rivet per 3 1/2 in.); 26 rivets in the lateral (half the p.71 52 per end; the box bottom has no plate drawn).");
+            // obstacles on the F8 web face (end connection angles, stiffeners) at the plate level and in the angle zone above it (ray toward the web)
+            double wf = 0.3125;
+            List<(double n0, double n1, double d)> Obst(double Wz)
+            {
+                var res = new List<(double n0, double n1, double d)>();
+                for (double nn = stackIn; nn <= stackIn + 46; nn += 0.25)
+                {
+                    var h = FirstHit(PP(10, nn) + new Vec3(0, 0, Wz), -uh * su, In(12));
+                    double d = h == null ? 0 : 10 - I_(h.Value.t);
+                    if (d > wf + 0.1) { if (res.Count > 0 && res[^1].n1 >= nn - 0.26) res[^1] = (res[^1].n0, nn, Math.Max(res[^1].d, d)); else res.Add((nn, nn, d)); }
+                }
+                return res;
+            }
+            var obsP = Obst(W0 + tp / 2); var obsA = Obst(W0 + tp + In(4));
+            var it = Item($"FLC-{pl}-{L}-P", $"floor lateral gusset PL 3/4 (bent) at {L}", F, l13Flag, "p.83 Section B", PartCategory.TrussConnectionPlate);
+            // notch the plate round them (swap U / V to cut the notch with SlotPolygon)
+            var poly = hull.ToList();
+            foreach (var ob in obsP)
+            {
+                var sw = poly.Select(q => (U: q.V, V: q.U)).ToList();
+                (double U, double V) Sw((double U, double V) q) => (q.V, q.U);
+                var s0 = Sw(UV(F, PP(ob.d + 1.0 / 16, ob.n0 - 1.0 / 16))); var s1 = Sw(UV(F, PP(ob.d + 1.0 / 16, ob.n1 + 1.0 / 16)));
+                var e0 = Sw(UV(F, PP(-20, ob.n0 - 1.0 / 16))); var e1 = Sw(UV(F, PP(-20, ob.n1 + 1.0 / 16)));
+                poly = SlotPolygon(sw, s0, s1, e0, e1).Select(q => (U: q.V, V: q.U)).ToList();
+            }
+            it.Kind = TrussPlaneItemKind.Plate; it.Outline = Ccw(poly); it.W0 = W0; it.W1 = W0 + tp;
+            foreach (var q in rivPts) it.Rivets!.Add(Rv(F, q, W0 + tp / 2, In(1)));
+            Add(it);
+            // 1-L 8 x 8 x 3/4 on the stack face, horizontal leg on the plate, vertical leg up the stack (the lateral box end lies under the plate there)
+            var ca = Item($"FLC-{pl}-{L}-CA", $"1-L 8 x 8 x 3/4 (floor lateral gusset to the chord) at {L}", F, l13Flag, "p.83 Section B", PartCategory.TrussConnectionAngle);
+            var a0 = UV(F, PP(3.9, stackIn)); var a1 = UV(F, PP(39.5, stackIn)); var aIn = UV(F, PP(20, stackIn + 10));
+            ca.Kind = TrussPlaneItemKind.Sweep; ca.Path = PathLeft(a0, a1, aIn); ca.Section = AngleSec(W0 + tp, 1, In(8), In(8), In(0.75));
+            for (int k = 0; k < 10; k++)
+            {
+                double uu = 6.0 + k * 3.5;
+                ca.Rivets!.Add(Rv(F, PP(uu, stackIn + 4.5), W0 + tp / 2, In(1)));                       // horizontal leg + plate
+                var rw = Rv(F, PP(uu, stackIn + 0.375), W0 + tp + In(4.5), In(1)); var ax = UV(F, P + nr * inS);  // vertical leg + stack
+                var axd = (U: ax.U - UV(F, P).U, V: ax.V - UV(F, P).V); double al2 = Math.Sqrt(axd.U * axd.U + axd.V * axd.V);
+                rw.AxisU = axd.U / al2; rw.AxisV = axd.V / al2; rw.AxisW = 0; ca.Rivets.Add(rw);
+            }
+            Add(ca);
+            // 1-L 8 x 4 x 1 on the plate along the F8 web (4 in. leg on the plate, 8 in. leg up the web face), in the clear stretches between the web obstacles
+            var clear = new List<(double a, double b)>(); double cur = stackIn + 0.5;
+            foreach (var ob in obsA.Concat(obsP).OrderBy(x => x.n0)) { if (ob.n0 - 1.0 / 16 > cur) clear.Add((cur, ob.n0 - 1.0 / 16)); cur = Math.Max(cur, ob.n1 + 1.0 / 16); }
+            if (stackIn + 43.5 > cur) clear.Add((cur, stackIn + 43.5));
+            int nPl = 0, nWeb = 0, piece = 0;
+            foreach (var (ca0, cb) in clear.Where(c => c.b - c.a >= 6))
+            {
+                var fa = Item($"FLC-{pl}-{L}-FA{++piece}", $"1-L 8 x 4 x 1 (floor lateral gusset to F8) at {L}", F, l13Flag, "p.83 Section B / C", PartCategory.TrussConnectionAngle);
+                var f0 = UV(F, PP(wf, ca0)); var f1 = UV(F, PP(wf, cb)); var fIn = UV(F, PP(10, (ca0 + cb) / 2));
+                fa.Kind = TrussPlaneItemKind.Sweep; fa.Path = PathLeft(f0, f1, fIn); fa.Section = AngleSec(W0 + tp, 1, In(8), In(4), In(1));
+                for (double nn = ca0 + 1.5; nn <= cb - 1.5; nn += 3.5) { fa.Rivets!.Add(Rv(F, PP(wf + 2.5, nn), W0 + tp / 2, In(1))); nPl++; }
+                int k = 0;
+                for (double nn = ca0 + 1.5; nn <= cb - 1.5; nn += 1.5, k++)
+                {
+                    var rw = Rv(F, PP(wf + 0.5, nn), W0 + tp + In(k % 2 == 0 ? 3.0 : 6.0), In(1));
+                    var ax = UV(F, P + uh * su); var o0 = UV(F, P); double dU = ax.U - o0.U, dV = ax.V - o0.V, ln = Math.Sqrt(dU * dU + dV * dV);
+                    rw.AxisU = dU / ln; rw.AxisV = dV / ln; rw.AxisW = 0; fa.Rivets!.Add(rw); nWeb++;
+                }
+                Add(fa);
+            }
+            report.Add($"{Main}: {pl}:{L} floor lateral gusset - web obstacles {obsP.Count} (plate notched) / {obsA.Count}, 8 x 4 x 1 in {piece} pieces, {nWeb} web rivets (p.83 27), {nPl} into the plate");
+        }
+        // ---------------------------------------------------------------- WM22: the W21' K on F7 (p.93 Section E: 2-7/16 Lat. Pls. + 2-Ls 4 x 4 x 7/16); the W21 K frames to the tongue beam (not built)
+        if (pr == "'")
+        {
+            var pw = tm0.Points.FirstOrDefault(p => p.Name == "WM22" && p.Plane == "N");
+            var ks = t.Members.Where(m => m.System == "Floor laterals" && m.Name.StartsWith("FL-K21'") && (m.To.EndsWith(":WM22") || m.From.EndsWith(":WM22"))).ToList();
+            if (pw != null && ks.Count > 0)
+            {
+                var P = pw.World;
+                var t2 = Vec2.FromAngle(al.AngleAt(pw.Station)); var uh = new Vec3(t2.X, t2.Y, 0); var nr = new Vec3(t2.Right.X, t2.Right.Y, 0);
+                var ends = ks.Select(k => (k.Name, e: EndOf(k.Name, k.To.Split(':')[0], "WM22", P))).Where(x => x.e != null).Select(x => (x.Name, e: x.e!.Value)).ToList();
+                double su = Math.Sign(Vec3.Dot(ends[0].e.d, uh));
+                var mr = tm0.Members.First(m => m.Name == ends[0].Name);
+                double grade = (mr.B.Z - mr.A.Z) / Vec3.Dot(new Vec3(mr.B.X - mr.A.X, mr.B.Y - mr.A.Y, 0), uh);
+                var F = FrameAt(pw, Math.Atan(grade));
+                // F7 web face toward the K (horizontal ray from beyond the K ends back toward the point)
+                var hit = FirstHit(P + uh * (su * In(40)) + new Vec3(0, 0, In(1)), -uh * su, 1.5);
+                double face = hit == null ? 12.7 : 40 - I_(hit.Value.t);
+                Vec3 PP(double uu, double nn) => P + uh * (In(uu) * su) + nr * In(nn);
+                var rivAll = ends.SelectMany(x => MemberRivets(P, x.e, kk)).ToList();
+                double tp = In(7.0 / 16);
+                string wmFlag = U("p.93", "connection of the W21' K at F7 (WM22; Section E: 2-7/16 Lat. Pls., 2-Ls 4 x 4 x 7/16)",
+                    "Section E draws the plate pair and the angles with ~9 rivets per plate per member but no outline, gages or angle lengths; the W21 K on the other side frames to the shear lock tongue beam (16 WF 88, 14 WF 48, Sheet 53) which is not built",
+                    "plates top and bottom of the K from 1/16 in. off the F7 web to the rivet margins, 8 rivets per member per plate (p.71 16 per end), one 4 x 4 x 7/16 per plate on the web face (outstanding leg away from the K) with one rivet line into the plate and one into the web.");
+                foreach (bool isTop in new[] { true, false })
+                {
+                    var mv = ends.SelectMany(x => x.e.verts).Select(q => Wof(F, q)).ToList();
+                    double Wf = isTop ? mv.Max() : mv.Min() - tp;
+                    var hullPts = new List<(double U, double V)> { UV(F, PP(face + 1.0 / 16, -34)), UV(F, PP(face + 1.0 / 16, 34)) };
+                    hullPts.AddRange(Margins(F, rivAll, In(1.5)));
+                    var hull = Hull(hullPts).Select(q => q).ToList();
+                    var it = Item($"FLC-WM22-K'-{(isTop ? "T" : "B")}", $"floor lateral PL 7/16 ({(isTop ? "top" : "bottom")}) of the W21' K at F7 (WM22)", F, wmFlag, "p.93 Section E", PartCategory.TrussConnectionPlate);
+                    it.Kind = TrussPlaneItemKind.Plate; it.Outline = Ccw(hull); it.W0 = Wf; it.W1 = Wf + tp;
+                    foreach (var q in rivAll) it.Rivets!.Add(Rv(F, q, Wf + tp / 2, In(1)));
+                    Add(it);
+                    var an = Item($"FLC-WM22-K'-{(isTop ? "T" : "B")}-A", $"L 4 x 4 x 7/16 (W21' K plate to F7) at WM22", F, wmFlag, "p.93 Section E", PartCategory.TrussConnectionAngle);
+                    var a0 = UV(F, PP(face, -32)); var a1 = UV(F, PP(face, 32)); var aIn = UV(F, PP(face + 10, 0));
+                    an.Kind = TrussPlaneItemKind.Sweep; an.Path = PathLeft(a0, a1, aIn);
+                    an.Section = isTop ? AngleSec(Wf + tp, 1, In(4), In(4), In(7.0 / 16)) : AngleSec(Wf, -1, In(4), In(4), In(7.0 / 16));
+                    for (double nn = -29.75; nn <= 29.76; nn += 4.25)
+                    {
+                        an.Rivets!.Add(Rv(F, PP(face + 2.25, nn), isTop ? Wf + tp / 2 : Wf + tp / 2, In(1)));
+                        var rw = Rv(F, PP(face + 7.0 / 32, nn), isTop ? Wf + tp + In(2.25) : Wf - In(2.25), In(1));
+                        var ax = UV(F, P + uh * su); var o0 = UV(F, P); double dU = ax.U - o0.U, dV = ax.V - o0.V, ln = Math.Sqrt(dU * dU + dV * dV);
+                        rw.AxisU = dU / ln; rw.AxisV = dV / ln; rw.AxisW = 0; an.Rivets.Add(rw);
+                    }
+                    Add(an);
+                }
+            }
+        }
+    }
+    // the generated bracing plates at the wind chord are replaced by the drawn ones; the FX top plates likewise (section 3 keeps the FX bottom plates)
+    report.Add($"{Main}: floor lateral connections as drawn - {nItems} plane items, {nRiv} rivet positions");
+}
+List<(double U, double V)> SlotPolygon(List<(double U, double V)> poly, (double U, double V) s0, (double U, double V) s1, (double U, double V) e0, (double U, double V) e1)
+{
+    // cut a slot (rectangle s0-s1-e1-e0, open toward e0 / e1 beyond the outline) out of a convex polygon: polygon minus the strip, as one simple polygon
+    // with a notch. Works for a strip crossing one edge of the polygon (the slot runs out of the plate there).
+    var sU0 = Math.Min(s0.U, s1.U); var sU1 = Math.Max(s0.U, s1.U);
+    // in the plate's (U, V): the strip is |U - Uc| < half, V beyond the slot root toward e
+    double Uc = (sU0 + sU1) / 2, half = (sU1 - sU0) / 2, Vroot = (s0.V + s1.V) / 2; double dirV = Math.Sign(((e0.V + e1.V) / 2) - Vroot);
+    var res = new List<(double U, double V)>();
+    for (int i = 0; i < poly.Count; i++)
+    {
+        var a = poly[i]; var b = poly[(i + 1) % poly.Count];
+        bool ain = Math.Abs(a.U - Uc) < half && (a.V - Vroot) * dirV > 0;
+        if (!ain) res.Add(a);
+        // crossing of the outline edge with the strip's two side lines, on the slot side of the root
+        double Ua = a.U, Ub = b.U;
+        var cuts = new List<(double t, (double U, double V) p, int k)>();
+        foreach (var (Ul, k) in new[] { (Uc - half, 0), (Uc + half, 1) })
+        {
+            if ((Ua - Ul) * (Ub - Ul) >= 0) continue;
+            double tt = (Ul - Ua) / (Ub - Ua); var p = (Ul, a.V + tt * (b.V - a.V));
+            if ((p.Item2 - Vroot) * dirV > 0) cuts.Add((tt, p, k));
+        }
+        foreach (var cc in cuts.OrderBy(x => x.t))
+        {
+            res.Add(cc.p);
+            // entering the strip: go down the side to the root, across, and back up the other side
+            bool entering = Math.Abs(((a.U + (b.U - a.U) * (cc.t + 1e-6)) - Uc)) < half;
+            if (entering)
+            {
+                double Uother = cc.k == 0 ? Uc + half : Uc - half;
+                res.Add((cc.p.Item1, Vroot)); res.Add((Uother, Vroot));
+                // the matching exit point is added when the other side line is crossed
+            }
+        }
+    }
+    // remove the points inside the strip and duplicates
+    var o = new List<(double U, double V)>();
+    foreach (var q in res) if (o.Count == 0 || Math.Abs(o[^1].U - q.U) > 1e-7 || Math.Abs(o[^1].V - q.V) > 1e-7) o.Add(q);
+    return o;
+}
 
 TrussMemberDefinition Clone2(TrussMemberDefinition m) => System.Text.Json.JsonSerializer.Deserialize<TrussMemberDefinition>(System.Text.Json.JsonSerializer.Serialize(m))!;
 
