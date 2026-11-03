@@ -1162,3 +1162,45 @@ the CL)', p.101 / p.102 ladders at the cross walkways. All changes in `samples/p
   - Lateral apex plate edge angles x bottom laterals 0.10 - 0.22 in. (N-BGLM*-T-EA x BL-*), walkway CL posts x cross walk rails 0.16 in., platform FB0' rail x gusset
     L0' 0.38 in., floor beam stiffener x cross walk rail FB0' 0.22 in. (layout drawn only).
 
+
+## 38. Main span lateral / strut / sway bracing connections, agent review 2026-11-02 (fork-bracing; evidence `qc/ptc/main-span/work10/review/batch1-6`)
+Findings of the six review batches on the bracing connections, what the sheets draw, and what changed (scripts `bracing-ptc.csx`, data `truss/lateral-plates.csv`,
+generator `Truss/TrussGeneratorBracing.cs`; test `TrussTests.BracingGussets_SteepLateralConnectedByThePlate_IsNotClearedOfIt`).
+- (a) Bottom strut connection angles L1 - L10 (+ primes): p.97 CROSS SECTION AT CL BRIDGE at L1 ("use similar details for L2 to L8 incl.") and at L10 ("similar at L9")
+  draw 1-L 5 x 5 x 7/16 each side of the strut (one leg on the gusset with 3 rivets drawn, the other on the strut side plate, edge-on); p.75 calls them out at L3. The
+  strut was held by the lateral plates only, 4 3/4 in. clear of the stack. Now `TrussEndConnection` on LS-L1..L10 / L1'..L10': angle 17 1/2 in. centred on the strut,
+  3 x 1 in. rivets at 7 in., gage 3 in. in the gusset leg (scaled on the cross sections, calibrated on the 2'-8 1/4 strut depth), no rivets in the strut leg (not drawn);
+  p.97 L1 plan draws the side plates to about 1 3/4 in. from the gusset line and the channel webs about 5 in. from it: `TrimMember` 1 3/4 in. from the probed gusset face
+  plus a 1/16 in. notch above / below |y| 15 1/2 in. so the channel webs stay at the stack setback (clear of the 7 x 4 edge angle legs). Dimension-only flag (p.97 / p.75).
+  80 angles, 240 rivets (all grip steel; the 88 "no steel behind the outstanding leg" rivets of the CHECK line are pre-existing floor beam connections).
+- (b) / (c) L11 up-station lateral 87 in. inside the truss line, L13 1/2 lateral 116 in. inside: GENERATOR rule. `CornerClearSetback` clears a member "steep to a bracing
+  plate at the point" (|axis . plate normal| > 0.25, meant for sway diagonals at lateral plates) of the slab of the flatter higher-rank members; the L11 - LM12 lateral
+  rises 22 deg (k = 0.38) and the L13 1/2 - LQ13 W33 15 deg (k = 0.27) in their sloped chord panels and the strut slab pushed them back 8 - 12 ft (setbacks 121.9 / 139.5
+  in.; LM12 end 97 in.). Now a member CONNECTED by a plate of the same family at the point (named, or picked by the plate's selection rule; families = sway plates
+  (transverse or naming only sway members) / lateral plates) is not cleared of that family's plates; the slab is sampled to 2.5 m along the flatter members (the plate
+  envelope reaches that far along laterals running into a K apex: the LM9 / LM10 sway diagonals touched it in a trial). Other trusses: only members with k > 0.25 that a plate
+  connects change (none in the approach trusses / girder spans; clash of the whole model before / after below).
+  With the lateral at its normal end, the L11 '-b' plate is the short plate on the 1-L 8 x 7 1/2 x 1/2 of p.80 View K (envelope, flagged as before).
+  L13 1/2: the p.98 BOTTOM CHORD BRACING ADJACENT TO L13 plate traced (row L13H, W.P. 1'-2 1/2, 2-Ls 7 1/2 x 4 x 1/2); the W33 lateral now runs to the drawn W.P.
+- (d) U11 (p.79 top plan view): ONE 7/8 in. 'Spl. & Lat. Pl. (S)' on the chord top cover (also the chord cover splice, 1 1/8 in. H.S. rivets), R = 3'-0 edge toward the
+  portal, 2-Fills 13 x 1 (C) under the lateral, Beveled Fill (C) + 1/4 fill under the portal. A plate on the chord's top face bent over the U11 kink is not a generator
+  input: the envelope pair stays; its flag now says what the sheet draws (NOT the drawn plate). Open.
+- (e) L13 floor lateral (p.83 Section B / C): '1-3/4" Gusset Pl. (Bent) (C)' = ONE 3/4 in. plate (the review read 1 3/4 in.), 1-L 8 x 8 x 3/4 on the chord (20 rivets),
+  1-L 8 x 4 x 1 on the F8 web, ~24 x 1 in. rivets in the lateral, plate bent down to the floor beam angle (Section C). Traced (row L13F, calibrated on '2'-5 in to in Guss.
+  Pls.' 2.265 pt / in.). Built flat in a trial it stood up to 8 3/4 in. off the modeled L13 - W14 lateral (2-15[ 50, p.71, not the 14 BP 73 drawn in Section B) and cut the
+  F8 stiffeners 3/8 in.: NOT built, truss-level UNRESOLVED flag (p.83 / p.71). Open.
+- (f) L17 - L21 lateral plates "4.5 - 6.5 in. off along the bridge": verified, no change. The trace is in the plate's own plane (u along the sloped chord); the plates lie at
+  +-16 3/8 in. normal to that plane (top / bottom faces of the 2'-8 1/4 laterals), so their PLAN positions shift by h sin(slope) each way: at L17 (chord 17.9 / 21.5 deg) the
+  top plate spans u -17.9 .. 25.7 and the bottom -7.7 .. 35.9 in plan (shift 10.2 in. = 2 x 16.4 sin 19.7 deg = 11.0), both centred on the trace (-13.4 .. 32.3 along the slope);
+  at L21 (4 deg) they coincide with the trace within 1 in. Residual: if p.98 drew a true horizontal projection the trace's u would be foreshortened by cos(slope) (<= 6 %,
+  2.7 in. at the far edge at L17) - the sheet does not say; kept as the plate's true shape.
+- (g) Envelopes: LM1 - LM8 apex plates (+ primes) traced from the p.97 HALF TOP / PART BOT. VIEW 'Sym. abt. CL Bridge' under DETAILS SHOWN FOR L1 (row LM1, 500 dpi line
+  scans, left edge on the strut 6.2 in. down-station of its CL, 49 x 73 in.; 27.6 -> 15.5 SF per plate); the 2-Ls 3 1/2 x 3 x 3/8 and 1/2 fill drawn there belong to the sway
+  connection (not built). Still envelopes (flagged): LM0 (p.73 / Sheet 33), LM9 - LM13, UM apexes (p.98 apex views not traced), L0 (p.73), L22 / U22 (p.90 Sections, not traced),
+  U11 (see d), L11 (no outline, as section 33).
+Results (main span only chain bracing -> details -> rivets on a copy of the committed model, same chain with the 8bd1cf5 binary + script as baseline): clash (main span, no
+bolts) 825 -> 825, identical category counts; check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after (bracing rivets per end all PASS); bracing plates
+388 / edge angles 264 unchanged; bracing plate rivets 19,696 -> 19,408 (positions within 1 1/4 d of an edge 40 -> 184: the smaller drawn apex plates and the L11 / L13 1/2
+plates now at the laterals' real ends); end connection rivets +240 (strut angles); steel 14,087,762 -> 14,056,473 lb (envelopes replaced by drawn plates).
+Whole model, regenerated from the same committed copy with the old and the new binary (`sbm clash`, no bolts): 3,357 -> 3,357, every bridge unchanged (girder spans 540 / 220,
+3-span 350 / 346, 4-span 541 / 535, main 825). Tests 783 / 783.

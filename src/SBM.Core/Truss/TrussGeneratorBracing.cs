@@ -103,7 +103,9 @@ public static partial class TrussGenerator
             // defined at the point (a sway diagonal at a lateral plate) also clears the plate thickness
             double rm = offs.Max(o => o.Length);
             // a member steep to a bracing plate defined at the point (a sway diagonal at a lateral plate) clears the plate: the slab between the lowest and
-            // highest face of the flatter bracing members there (over 1.5 m from the point) grown by the plate thickness
+            // highest face of the flatter bracing members there (over 2.5 m from the point: the plate envelope reaches that far along laterals that run into a K apex) grown by the plate thickness. A member that a plate at the point
+            // CONNECTS (named in its Members, or picked by the plate's own rule: bracing of its kind within 60 deg of the plate) is not cleared of the plates
+            // of that family there: a lateral rising more than 14 deg in a sloped chord panel (PTC main span L11 - LM12, L13 1/2 - LQ13) was set back 8 - 12 ft.
             if (_d.BracingGussets != null)
                 foreach (var bg in _d.BracingGussets)
                 {
@@ -113,6 +115,7 @@ public static partial class TrussGenerator
                     var bn = bg.Orientation == TrussBracingPlateOrientation.Transverse ? Tangent(StationOf(P)) : Up;
                     double k = Vec3.Dot(d1, bn);
                     if (Math.Abs(k) <= 0.25) continue;
+                    if (ConnectedByPlateAt(m, P, bg.Orientation == TrussBracingPlateOrientation.Transverse)) continue;
                     double zlo = double.PositiveInfinity, zhi = double.NegativeInfinity;
                     foreach (var o in _inst)
                     {
@@ -123,7 +126,7 @@ public static partial class TrussGenerator
                         if (!atA && !atB && !through) continue;
                         var dirs = atA ? new[] { o.Axis } : atB ? new[] { -o.Axis } : new[] { o.Axis, -o.Axis };
                         foreach (var dd in dirs)
-                            foreach (double sa in new[] { 0.0, 1.5 })
+                            foreach (double sa in new[] { 0.0, 1.5, 2.5 })
                                 foreach (var c in Corners(o))
                                 {
                                     double z = Vec3.Dot(dd * sa + o.X * c.x + o.Y * c.y, bn);
@@ -185,6 +188,34 @@ public static partial class TrussGenerator
                 if (Tm is { } tmv && tmv < 0.5 * (m.B - m.A).Length) T = Math.Max(T, tmv);   // (a clearance over half the member: not an end condition)
             }
             return T;
+        }
+
+        /// <summary>True when a bracing plate defined at the point <paramref name="P"/> connects member <paramref name="m"/> (the selection rule of
+        /// <see cref="BuildBracingGussets"/>: named in the plate's Members, or - Members empty - bracing of the plate's kind (sway for transverse plates) whose
+        /// axis is within 60 deg of the plate plane). Only plates of one family count: sway plates (transverse, or naming only sway members) or the others (lateral / strut plates), so
+        /// a sway diagonal held by its sway plate still clears the lateral plates at the same point.</summary>
+        private bool ConnectedByPlateAt(Inst m, Vec3 P, bool transverseFamily)
+        {
+            if (_d.BracingGussets == null) return false;
+            foreach (var bg in _d.BracingGussets)
+            {
+                string spec = bg.Point.Trim(), bpt = spec.Contains(':') ? spec[(spec.IndexOf(':') + 1)..].Trim() : spec;
+                var bpls = spec.Contains(':') ? new[] { spec[..spec.IndexOf(':')].Trim() } : _d.Planes.Select(x => x.Name).ToArray();
+                if (!bpls.Any(bp => _pts.TryGetValue((bp.ToUpperInvariant(), bpt.ToUpperInvariant()), out var bpP) && (bpP - P).Length < 0.005)) continue;
+                bool transverse = bg.Orientation == TrussBracingPlateOrientation.Transverse;
+                // family of a plate: transverse orientation, or every member it names is a sway member (a sway plate defined by its members)
+                bool swayFamily = transverse || bg.Members.Count > 0 && bg.Members.All(x => _inst.Any(o => o.Def.Role == TrussMemberRole.Sway
+                    && (x.Equals(o.Def.Name, StringComparison.OrdinalIgnoreCase) || x.Equals(o.Mark, StringComparison.OrdinalIgnoreCase))));
+                if (swayFamily != transverseFamily) continue;
+                if (bg.Members.Count > 0)
+                {
+                    if (bg.Members.Any(x => x.Equals(m.Def.Name, StringComparison.OrdinalIgnoreCase) || x.Equals(m.Mark, StringComparison.OrdinalIgnoreCase))) return true;
+                    continue;
+                }
+                var bn = transverse ? Tangent(StationOf(P)) : Up;
+                if (IsBracing(m.Def.Role) && (m.Def.Role == TrussMemberRole.Sway) == transverse && Math.Abs(Vec3.Dot(m.Axis, bn)) <= 0.5) return true;
+            }
+            return false;
         }
 
         // ------------------------------------------------------------------ bracing connection plates (TrussDefinition.BracingGussets)
