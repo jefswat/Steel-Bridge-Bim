@@ -231,7 +231,26 @@ if (T(Main) is { } tm0)
         }
         report.Add($"{Main}: strut connection angles L 5x5x7/16 on {nSa} struts (L1 - L10)");
     }
-    // W.P. specs map back to their panel point (one plate pair per point)
+    // ---- 2026-11-03 agent review 2 (fork-lowerlat, B2 / B5 LM13): p.95 Section D puts the w.p. of the L12 - L13 laterals ON THE F8 WEB, 6 1/4 in. above its
+    // bottom (dimensioned; '1'-4 1/8' each side of the lateral CL), and Sections B / C hold the 3/4 lateral gusset at the laterals' top face between the F8 shelf
+    // angles L 9 x 4 x 1 (below) and L 7 x 4 x 7/8 (above). The apex LM13 / LM13' was at the lower chord work point elevation (the plates hung 17.6 - 19.5 in.
+    // below the F8 bottom flange, not fastened to it): moved up to the drawn w.p. (F8 bottom from its section + 6 1/4 in.).
+    int nLm13 = 0;
+    foreach (var q in new[] { "", "'" })
+    {
+        var fbm = t.Members.FirstOrDefault(m => m.Name == "FB13" + q);
+        var fbp = t.Points.FirstOrDefault(p => p.Name == "FB13" + q);
+        var lmp = t.Points.FirstOrDefault(p => p.Name == "LM13" + q);
+        if (fbm == null || fbp == null || lmp == null || t.Section(fbm.Section) is not { } fs) continue;
+        double bot = fbp.Elevation + fbm.OffsetZ + SBM.Core.Truss.TrussSections.Build(fs).YMin;
+        double el = bot + In(6.25);
+        report.Add($"{Main}: LM13{q} apex moved from El. {lmp.Elevation / 0.3048:0.000} to the p.95 Section D w.p. El. {el / 0.3048:0.000} ft (F8 bottom {bot / 0.3048:0.000} + 6 1/4 in.)");
+        foreach (var p in t.Points.Where(p => p.Name == "LM13" + q)) { p.Elevation = el; p.Source = "p.95 Section D: w.p. of the L12 - L13 laterals on the F8 web 6 1/4 in. above its bottom"; }
+        nLm13++;
+    }
+    string lm13Flag = U("p.95", "lateral gusset plates at LM13 / LM13' on the floor beam F8 (3/4 Gusset Pl. between the F8 shelf angles L 9 x 4 x 1 / L 7 x 4 x 7/8)",
+        "Sections B - D draw the gusset at the laterals' top face held between the F8 shelf angles and the w.p. on the F8 web (6 1/4 in. above its bottom, dimensioned), but not the plate outline, the shelf angle length or their rivets; the bottom gusset plate's connection (to the F8 bottom extension 3/4 Pl. / 2-Ls 7 x 4 x 7/8, not built in truss-ptc-arch) is not dimensioned",
+        "plate pair = envelope of the lateral laps; the top plate stops 1/4 in. clear of the F8 web and sits on a L 9 x 4 x 1 on the web (the lower shelf angle), 10 rivets 1 in. per leg spread over the angle; the upper shelf angle L 7 x 4 x 7/8 and the bottom plate's connection are not built (the bottom plate is NOT fastened to F8: reported by the bracing connection audit).");
     string ToPanel(string spec)
     {
         string pl0 = spec[..spec.IndexOf(':')], p0 = spec[(spec.IndexOf(':') + 1)..];
@@ -306,8 +325,21 @@ if (T(Main) is { } tm0)
                 .Select(q => new TrussUV { U = In(double.Parse(q[0], inv)) * (primed ? -1 : 1), V = In(double.Parse(q[1], inv)) * (pl == "S" ? -1 : 1) }).ToList();
         double thk = lr != null ? In(double.Parse(lr["thickness_in"], inv)) : In(0.5);
         string ang = lr != null ? (lr["edge_angle"].Length > 0 ? AngleOf(lr["edge_angle"]) : "") : apex || quarter || deep.Count > 0 ? "" : pt.StartsWith("L13H") ? "L7-1/2x4x1/2" : "L7x4x1/2";
+        bool lm13 = bn == "LM13";
+        if (lm13) ang = "L4x9x1";   // p.95 Section B: L 9 x 4 x 1 shelf under the gusset, the 4 in. leg on the F8 web (the 9 in. leg under the plate)
+        // 2026-11-03 agent review 2 (fork-lowerlat, B1 / B6 LM1 - LM8): the traced apex plate (row LM1, 49 x 73 in., 6.2 in. down-station .. 24.7 in. up-station of the
+        // strut CL) cannot hold the laterals: they must stop at the strut side (2-13[ 31.8 with 29 1/2 in. cover plates, 47 deg to the bridge: tips 29 - 35 in. from the
+        // W.P.) and lapped only its corner (18 / 12 / 6 rivets per end at LM1-6 / LM7 / LM8 vs p.71 26). p.97 HALF TOP VIEW draws the lateral lap and its ~13 rivets
+        // per plate INSIDE the plate: the trace is not used; the plate is the envelope of the laps (as at LM9 / LM10, which give the p.71 counts).
+        bool lmTraceDropped = apexRow && lr!["detail"] == "LM1";
+        if (lmTraceDropped) drawn = null;
         string flag = mainPlateFlag;
-        if (lr != null && drawn != null && apexRow)
+        if (lmTraceDropped)
+            flag = U("p.97", $"main span lateral apex plate at {pt} (HALF TOP / PART BOT. VIEW under DETAILS SHOWN FOR L1, 'similar' L2 - L8)",
+                "the view draws the plate pair and the lateral lap (about 13 rivets per plate in 4 lines) without dimensions; the outline traced at 500 dpi (lateral-plates.csv row LM1) is too short for the laterals, which must stop at the strut side, so the drawn lap would lie outside it",
+                "plate pair = envelope of the lateral laps (p.71 26 rivets per end, 4 lines 2 1/2 in. from the member sides, 3 in. pitch) and the strut lap; the 2-Ls 3 1/2 x 3 x 3/8 and the 1/2 in. fill drawn there belong to the sway connection.");
+        else if (lm13) flag = lm13Flag;
+        else if (lr != null && drawn != null && apexRow)
             flag = U($"p.{lr["page"]}", $"main span lateral apex plate outline at {pt} (as drawn for {lr["detail"]}{(lr["detail"] != bn ? ", 'similar'" : "")})",
                 $"the half top / part bottom view draws the plate symmetric about the CL bridge without dimensions: outline traced at 500 dpi ({lr["confidence"]} confidence, about +-1 in.){(primed ? ", mirrored for this half" : "")}; the 2-Ls 3 1/2 x 3 x 3/8 and the 1/2 in. fill drawn there are part of the sway frame connection (not dimensioned, not built); rivet gages / pitch not dimensioned",
                 $"plate {lr["thickness_in"]} in. pair as traced, in the plane of the laterals; rivets at the counts of the detail, lines 2 1/2 in. from the member sides, 3 in. pitch.");
@@ -318,7 +350,7 @@ if (T(Main) is { } tm0)
         else if (lr != null)
             flag = U($"p.{lr["page"]}", $"main span lateral plates at {pt} ({lr["edge_angle"]}, {lr["thickness_in"]} in.)",
                 "View K / Section B show the plate pair on the chord inner web at the lateral's top / bottom faces in an oblique view without dimensions; its outline and position along the chord, and the angle's rivets, are not given",
-                "plate = envelope of the lateral lap carried to the stack (1/4 in. clear) under the angle, lying on the lateral's top / bottom face (flat in the bracing plane); angle rivets not placed.");
+                "plate = envelope of a 2'-6 lateral lap (rivet positions clipped at the strut tee side do not count: the rows continue along the lateral) carried to the stack (1/4 in. clear) under the angle with the whole lap projected onto the stack line (the plate runs along the chord under the angle over the lap, View K), lying on the lateral's top / bottom face (flat in the bracing plane); 13 rivets 1 in. per angle leg spread over the angle (count / gage not dimensioned; View K draws two staggered rows in the plate leg); the laterals at the p.71 counts (36 / 40 per end).");
         // 2026-11-02 agent review fork-bracing (d): U11 (p.79 top plan view) is NOT a plate pair: ONE 7/8 in. 'Spl. & Lat. Pl. (S)' on the chord top cover (it is also
         // the chord cover splice, 1 1/8 in. H.S. rivets) with an R = 3'-0 edge toward the portal, the lateral under it on 2-Fills 13 x 1 (C), the portal on a Beveled Fill (C)
         // and a 1/4 in. fill. The generator puts bracing plates on the members' faces (with fills); a plate on the chord's top face, bent over the U11 chord kink, with
@@ -334,7 +366,8 @@ if (T(Main) is { } tm0)
                 Point = spec, Label = lr != null ? $"2-{(lr["thickness_in"] == "0.5" ? "1/2" : lr["thickness_in"] == "0.75" ? "3/4" : lr["thickness_in"] == "0.625" ? "5/8" : lr["thickness_in"])} Pls." : "2-1/2 Pls.",
                 Orientation = TrussBracingPlateOrientation.Fitted, Side = TrussBracingPlateSide.Both, Thickness = thk,
                 Outline = drawn, WorkPoint = lr?["work_point"] == "1'-2 1/2" ? (bn.StartsWith("U") ? "UW" : "LW") + bn[1..] + (primed ? "'" : "") : null,
-                EdgeAngle = ang, EdgeRivets = apex || quarter || ang.Length == 0 || lr?["detail"] == "L11" ? 0 : 13, Rivets = rv, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
+                EdgeAngle = ang, EdgeRivets = lm13 ? 10 : apex || quarter || ang.Length == 0 ? 0 : 13, Rivets = rv,
+                CarryWholeLap = lr?["detail"] == "L11", RivetsFillCount = lr?["detail"] == "L11", Lap = lr?["detail"] == "L11" ? In(30) : 0, EdgeAngleOnCrossing = lm13, EdgeAngleSide = lm13 ? TrussBracingPlateSide.Above : null, RivetPitch = In(3), RivetGage = In(15.25), RivetGage2 = In(12.75),
                 RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet", Material = "C", Unresolved = flag, Source = lr != null ? $"p.{lr["page"]}" : "p.97 / p.98",
                 // batch 5a: since batch 1b the members are 14 / 19 in. wide (channels top and bottom): plate in the plane of the members it connects, fills
                 // where a member face stands off it, plate carried to the stack under the edge angle, 4 rivet lines across each member's own width

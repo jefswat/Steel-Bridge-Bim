@@ -253,6 +253,7 @@ public static partial class TrussGenerator
             foreach (var s in _d.Suspenders) BuildSuspender(s);
             for (int i = 0; i < _d.Shoes.Count; i++) BuildShoe(_d.Shoes[i], i);
             if (Fasteners && _d.RivetHeadsFlushAtSolePlates) FlushRivetsAtSolePlates();
+            if (Fasteners) AuditBracingConnections();
             if (_d.PlanSteelWeightLb > 0)
             {
                 double lb = steel.SteelMass * 2.20462262;

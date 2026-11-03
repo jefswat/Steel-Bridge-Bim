@@ -68,6 +68,9 @@ public sealed class TrussModel
     public int Rivets => Steel.Bolts.Count(b => b.Kind == BoltKind.Rivet);
     /// <summary>Drawn rivet positions (<see cref="Bridge.TrussRivetGroup.Positions"/>) that were not placed, with the reason (diagnostics / QC dumps).</summary>
     public List<TrussDroppedRivet> DroppedRivets { get; } = new();
+    /// <summary>Bracing connection audit (after every rivet is placed): PLACED rivets whose shank crosses each bracing member end and its plate(s), and
+    /// whether each bracing plate is fastened to the truss (rivets into steel other than the members ending on it, directly or through its edge angles).</summary>
+    public List<TrussBracingConnection> BracingConnections { get; } = new();
     public double SlabArea { get; set; }
     public List<Diagnostic> Diagnostics => Steel.Diagnostics;
 
@@ -78,4 +81,11 @@ public sealed class TrussModel
 
 /// <summary>A drawn rivet position that was dropped: joint frame (u, v) and member coordinates (s along the member from its cut start, y in its section), reason
 /// "range" (beyond the member's cut length), "head" (on another rivet's head), "stack-outside" (outside the section's in-plane extent), "stack" (no clean plate stack).</summary>
+/// <summary>One bracing plate definition at one point (<see cref="TrussModel.BracingConnections"/>): Where = "plane:point[suffix]"; per member ending on it the
+/// placed rivets whose shank crosses the member and one of the plates (or their fills); per plate the rivets into the truss (Direct: plate / fill + steel that is
+/// not a bracing plate and not an ending member; ViaAngles: through an edge angle riveted both to the plate and to such steel) and the edge angles with no
+/// rivet into that steel.</summary>
+public sealed record TrussBracingConnection(string Where, IReadOnlyList<(string Member, bool Start, int Rivets)> Ends,
+    IReadOnlyList<(string Plate, int Direct, int ViaAngles, bool Fastened)> Plates, IReadOnlyList<(string Angle, int ToPlate, int ToStack)> Angles);
+
 public sealed record TrussDroppedRivet(string Plane, string Point, string Member, double U, double V, double S, double Y, double Diameter, bool Beyond, string Reason);

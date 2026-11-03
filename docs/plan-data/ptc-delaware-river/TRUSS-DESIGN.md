@@ -1329,3 +1329,38 @@ Results (copy of the committed PTC model, components-ptc only; the later scripts
 positions, 30 suspender support diaphragms (60 web plate pieces + 120 angles, 1,080 rivet positions), 8 diagonal fills (U21 / U21' / L21 / L21', both trusses). Lug starts moved
 clear of the members already at the joint by 0.4 - 6.7 in. (report line). CHECK rows printed by the script: the inner-edge lugs next to the vertical are short after the clearance (U15 / U15' 16 rivets on 24 in. = 2 13/16 in., U16 / U16' 12 on 15 5/16 in. = 2 1/4 in. per gage
 line (under 3 d). Clash rows (all 7 units, no bolts) 3,357 -> 3,357 (no component clashes); check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after; tests 783 passed.
+
+## 42. Main span lower laterals, apexes, sway bottoms, L0 / L11 struts; bracing connection audit (agent review 2, 2026-11-03, fork-lowerlat; evidence `qc/ptc/main-span/work11/review/B1, B2, B5, B6`)
+Rule of the review: a bracing connection is complete only when PLACED rivets cross the member and its plate and the plate is fastened to the truss / strut /
+floor beam. Generic code (TrussGeneratorBracing.cs; all inputs OPTIONAL, omitted from the .sbm when unset; tests `TrussBracingAuditTests`):
+- (g) bracing connection AUDIT after every rivet is placed (`AuditBracingConnections`, `TrussModel.BracingConnections`): per member end ending on a plate the placed rivets
+  whose shank crosses member + plate (or its fill); per plate the rivets into steel that is neither a "-BG" part nor an ending member, directly or through an edge angle
+  riveted both ways. WARNING ("Truss CHECK bracing connection ...") per end with no rivet, per plate not fastened, per edge angle not riveted, per bracing fill over 1 in.
+  Geometry unchanged. (h) check-truss-ptc "bracing rivets per end" now reads these PLACED counts (was the definition counts) + row "bracing connections complete".
+- `CarryWholeLap` (envelope carried to the stack / crossing face with the whole lap projected), `RivetsFillCount` (rivet positions clipped at the plate edge do not count;
+  rows continue), `EdgeAngleFill` / `EdgeAngleFillLabel` (probed fill under the crossing-member leg of an edge angle; flat across the leg, beveled along it),
+  `EdgeAngleSide` (angle on one plate of a pair only; the crossing face probe uses that plate's level), `LapCrossing` + `LapRivetRows` / `LapRivetsPerRow` (plate laps the
+  crossing member's side, fill where it stands off, rivet rows through plate + fill + member), and for the sway-top fork `EdgeRivetCounts` (per angle / leg),
+  `EdgeRivetPlateRows` (staggered rows in the plate leg), `RivetLines = 3`.
+PTC data (bracing-ptc.csx, details-ptc.csx sections 1 (apex only) / 6):
+- (a) L11 / L11' laterals (p.80 View K / Section B, p.71): envelope carried along the chord under the 1-L 8 x 7 1/2 x 1/2 (CarryWholeLap), 13 rivets per angle leg (count /
+  gage not dimensioned, flagged), 2'-6 lap with RivetsFillCount: placed rivets per end 20 -> 36 (L10-L11) / 40 (L11-L12) = p.71; plates fastened: '-a' 2/2, '-b' 1/2 (the
+  down-station-of-gusset angle b-B-EA lies past the gusset edge on the chord web line: no steel behind its stack leg - still a warning, open: the angle on the chord web
+  beyond the gusset needs a fill or the plate moved, Section B not dimensioned).
+- (b) LM1 - LM8 (+ primes): the traced apex plate (row LM1) could not hold the laterals, which must stop at the strut side (29 - 35 in. from the W.P.): envelope of the laps
+  instead (flag says why): placed rivets per end 18 / 12 / 6 -> 26 / 26 / 32 = p.71.
+- (c) sway apexes LM0 - LM12: `EdgeAngleFill` under the 2-Ls 4 x 4 x 3/4 (p.97 '1-Pl 15 x 1 1/8 / 15 x 1 1/4' under the angles, modeled under each leg): plates fastened
+  0/2 -> 1/2 at LM0 - LM4 / LM6, 2/2 at LM5; still 0/2 at LM7 - LM10 / LM12 (the angle beyond the lateral plate edge stands > 3 in. off / off the strut flange width:
+  the modeled sway plates sit wider than the drawn 15 in. plate allows - open). LM11 (p.80 Section A, scaled 5.92 px/in. on 2'-3 3/8): plates lap the L11 strut webs
+  1'-4 7/8 (sway channel webs b.b. 1'-11 5/8 = strut web outer faces), fill, 3 rows x 9 rivets: 0/2 -> 2/2 fastened. LM12: sway diagonals 0 rivets (they must stop
+  ~67 in. from the CL above the rolled L12 strut, their plates are clipped by the crossing L11 - LM12 laterals) - open, flagged by the audit.
+- (d) LM13 / LM13': apex moved to the p.95 Section D w.p. (F8 web, 6 1/4 in. above its bottom, dimensioned: El. 140.762 -> 140.658); top plate on a L 9 x 4 x 1 shelf
+  (4 in. leg on the F8 web, 10 plate-leg rivets). Still NOT fastened: the web-leg rivets find no web behind the leg (the probe still sees the F8 flange level); bottom
+  plate's connection (F8 bottom extension 3/4 Pl. / 2-Ls 7 x 4 x 7/8, not built) open; flags give p.95 and the reason.
+- (e) L0 / L0' strut: TrimMember 0 (p.73 'Fin. Strut'), webs to the angle backs. (f) L11 tees (p.80 Section A verified): the black field rivets are 2 x 9 per tee
+  (= model); the open-circle bands are the strut's shop rivets; strut trimmed to the tee flange (TrimMember 0) so the stem rivets grip the web.
+Results (main span only copy of the committed model; chain bracing -> details -> components -> girder-details -> walkways -> rivets): audit plates not fastened 180 -> 148,
+member ends without a rivet 64 -> 64 (the rest: floor laterals FX / W, portal U11, sway tops SW - other forks, LM12 sway 4), check-truss-ptc 609 PASS / 27 DIFF -> 613 / 23
+(lower diagonals L0-L8, L8-L10, L10-L11, L11-L12 now PASS on placed counts; still DIFF: struts L1-L7 32 / L8-L10 38-39 placed at some ends vs 40 / 46 - B1 / B6 UNSURE rows,
+double K 24 / 28); clash (main span, no bolts) 882 -> 892: 6 edge-angle fill x lateral plate (1/16 - 1/8 in.), 4 LM11 sway plate x walkway on strut L11 (1/4 in.: the walkway
+must clear the lapped plates - walkways-ptc). Other bridges: no input changed (all options opt-in, set on the main span only). Tests 801 / 801.
