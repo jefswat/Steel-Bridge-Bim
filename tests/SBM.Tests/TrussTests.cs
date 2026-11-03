@@ -1183,6 +1183,37 @@ public class TrussTests : IDisposable
     }
 
     [Fact]
+    public void PlaneItems_Rivets_GripFromTheStackAndMirrored()
+    {
+        // two plates stacked across W (1/2 + 3/4 in.), one rivet along W through both: grip = the whole stack; Mirror = a second rivet at the mirrored point;
+        // a rivet given in the same hole twice = one rivet
+        int Rivets(bool with)
+        {
+            var (p, b) = Model();
+            var t = b.Truss!;
+            var rv = new List<TrussPlaneItemRivet>
+            {
+                new() { U = Ft(3), V = -Ft(2), W = In(5.25), AxisW = 1, Diameter = In(0.875), Material = "test rivet" },
+                new() { U = Ft(3), V = -Ft(2), W = In(5.9), AxisW = -1, Diameter = In(0.875), Material = "test rivet" },
+            };
+            t.PlaneItems = new()
+            {
+                new TrussPlaneItemDefinition { Name = "G", PointA = "N:U3", PointB = "S:U3", Kind = TrussPlaneItemKind.Plate, W0 = In(5), W1 = In(5.5), Mirror = true,
+                    Outline = { new(Ft(2), -Ft(3)), new(Ft(4), -Ft(3)), new(Ft(4), -Ft(1)), new(Ft(2), -Ft(1)) }, Rivets = with ? rv : null },
+                new TrussPlaneItemDefinition { Name = "H", PointA = "N:U3", PointB = "S:U3", Kind = TrussPlaneItemKind.Plate, W0 = In(5.5), W1 = In(6.25), Mirror = true,
+                    Outline = { new(Ft(2), -Ft(3)), new(Ft(4), -Ft(3)), new(Ft(4), -Ft(1)), new(Ft(2), -Ft(1)) } },
+            };
+            var st = Regen(p).Steel!;
+            var mine = st.Bolts.Where(x => x.Material == "test rivet").ToList();
+            Assert.All(mine, x => Assert.Equal(In(1.25), x.Grip, 6));
+            return mine.Count;
+        }
+        Assert.Equal(0, Rivets(false));
+        Assert.Equal(2, Rivets(true));
+        Assert.DoesNotContain("Rivets", System.Text.Json.JsonSerializer.Serialize(new TrussPlaneItemDefinition()));
+    }
+
+    [Fact]
     public void EndConnection_OutFill_FillsTheStandOffBelowTheGusset()
     {
         // FB2's N end: the angle backs lie on the L2 gusset (10 3/4 in. from the plane); above the gusset the outstanding legs stand off the vertical's
