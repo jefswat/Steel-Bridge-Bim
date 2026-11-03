@@ -1362,3 +1362,9 @@ pitched frame, chord faces, floor beam web faces and bottoms by ray; every item 
   L 4 x 4 x 7/16 per plate on the F7 web face (outstanding leg away from the K), one rivet line into the plate, one into the web.
 Still open (truss-level flags): the W21 K at the shear lock tongue beam (16 WF 88 / 14 WF 48, Sheet 53 not in the set; apex 2'-0 toward W21 not moved); the L13 1/2 double
 K W33 x 130 at LQ13 / LQ13' (p.95 plate in the inclined K plane, not dimensioned - now expressible with a pitched + rolled frame, not done).
+Results (main span only, `details-ptc.csx` on a copy of the committed PTC model, DETAILS_ONLY; old script vs new): floor lateral member ends connected (a placed rivet whose
+shank crosses the member and a connection plate, and the plate chain riveted to a floor beam / chord; `qc/ptc/main-span/work11/fix2-floorlat/flcheck.csx`) 0 / 80 -> 70 / 80
+(open: the 2 W21 K ends at the tongue beam, the 8 LQ13 / LQ13' W33 ends); member-to-plate rivets 368 -> 1,528 (every FX / W end = the p.71 count 20 / 52 / 16; L13 26 of 52);
+160 plane items, 4,080 rivet positions. Clash rows (main span, no bolts) 882 -> 942: the two reported CONFLICTs (top plate x bent angles L 7 x 4 x 3/4 19, top plate x floor beam
+web over the chord 16), walkway rows (cross walk W20 / nav walks x the plates, walk level drawn, not dimensioned: 11 + 6), L13 angles at the F8 end connection / chord
+lateral 4 + 6 (<= 3/8 in.), small (<= 1/16 in.) 6. check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after; tests 797 passed.
