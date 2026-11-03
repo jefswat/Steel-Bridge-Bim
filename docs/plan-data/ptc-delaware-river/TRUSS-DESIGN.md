@@ -1329,3 +1329,47 @@ Results (copy of the committed PTC model, components-ptc only; the later scripts
 positions, 30 suspender support diaphragms (60 web plate pieces + 120 angles, 1,080 rivet positions), 8 diagonal fills (U21 / U21' / L21 / L21', both trusses). Lug starts moved
 clear of the members already at the joint by 0.4 - 6.7 in. (report line). CHECK rows printed by the script: the inner-edge lugs next to the vertical are short after the clearance (U15 / U15' 16 rivets on 24 in. = 2 13/16 in., U16 / U16' 12 on 15 5/16 in. = 2 1/4 in. per gage
 line (under 3 d). Clash rows (all 7 units, no bolts) 3,357 -> 3,357 (no component clashes); check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after; tests 783 passed.
+
+## 42. Main span sway frame TOP connections SW0-SW12 (agent review 2 2026-11-03, fork-swaytop; evidence `qc/ptc/main-span/work11/review/B1.csv`, `B6.csv`)
+
+Finding (B1 / B6, 52 points = SW0-SW12 + primes, both trusses): the sway top plates were not fastened to the truss. The floor beam angle of every plate sat OUTBOARD of
+the plate pair (u 7-13 in. from the floor beam web; the floor beam bottom flange angles reach 8 5/16 in.) with 0 rivets into the floor beam, the post angle 0 rivets at
+SW1-SW8 (post face only to 9 in.), 1-2 plate-to-angle rivets per angle.
+
+Sheets (re-read at 400 / 600 dpi; scale 3/8 in. = 1'-0, calibrated on the printed 1'-4 and on the 6 in. angle leg of Section D-D: 18.1 - 18.75 px/in at 600 dpi):
+- p.85 elevation + SECTION D-D "TYPICAL FRAMED INTERMEDIATE FLOOR BEAM, P.P. 0 To 10 Incl. & 12", "Bracing Connection 2-1/2" Gusset Pls, 4-Ls 6 x 4 x 1/2 (C), 1" Rivets (C)":
+  per plate one angle under the floor beam bottom flange and one on the post, BOTH legs of each angle pointing INSIDE the plate pair (D-D: the 6 in. legs run from the
+  plate toward the floor beam web, two staggered rows of 4 + 5 = 9 field rivets per angle; the post angle's 6 in. leg lies on the post face toward the web, 6 field rivets);
+  4 in. legs on the plates (10 shop rivets in the floor beam angle, 6 in the post angle). Diagonal to plate: 11 field rivets per plate in 3 lines (4 / 3 / 4, pitch about 3 in.).
+  The upper channel flange ends about 5 in. under the floor beam (about 1 in. below the 4 in. angle leg). Plate drawn as a full corner plate about 28 3/4 x 21 in.
+- p.79 FLOOR BEAM CONNECTION TO U11-L11 (SW11 / SW11'): 2-1/2" Pls (C), 2-Ls 6 x 4 1/2 x 1/2 (C) under the floor beam, 2-Ls 6 x 5 x 1/2 (C) on the post, 12 field rivets per plate
+  in the 2-18[ 42.7 diagonal; Section A draws the floor beam bottom there with 2-Ls 9 x 4 x 5/8 and a 1-Pl 37 x 1 (S).
+
+Changes (`samples/plans/details-ptc.csx`, sway top block; data only, no generator change):
+- `EdgeAngleOutside` off: both angles inside the plate pair (generator default = the angle on the plate's member-side face, legs toward the members).
+- The 2-15[ tops are set back clear of the floor beam angle's 4 in. (L11: 4 1/2 in.) leg: after the script's regeneration each sway top end gets
+  `StartSetback` = automatic end + the drop needed to put the highest corner of the end section 1/4 in. under the leg (36 of 52 ends, up to 4.95 in.); the block
+  first resets the ends to automatic, so the script stays re-runnable (rivets-ptc.csx regenerates with them).
+- 11 rivets per diagonal per plate (drawn; the generator lays them in its 4 lines); SW11: L 6 x 4 1/2 x 1/2, 12 rivets, source p.79, own flag.
+
+Result (placed rivets whose shank crosses both parts, `temp`-style audit script, every SW point both trusses):
+
+| | before | after |
+|---|---|---|
+| floor beam angle -> floor beam (per point, 2 angles) | 0 | 12 (SW11: 0) |
+| post angle -> post | 0 at SW1-SW8, 12 (N SW9 6) at SW0 / SW9-SW12 | 12 everywhere |
+| plate -> angles | 2-6 | 4-8 (SW11 6) |
+| diagonal -> plates | 24 | 22 (SW11 24) |
+
+Clash (all bridges) 2,918 rows before and after (none on the sway top parts); check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after.
+
+Open (flags `main span sway frame top connections` / `... at L11`):
+- One `EdgeRivets` count per plate (6 per leg) while p.85 draws 9 (two staggered rows) + 10 in the floor beam angle and 6 + 6 in the post angle - needs a per-angle /
+  per-leg count and a two-row option in `TrussGeneratorBracing.cs` (requested from fork-lowerlat, owner of that file).
+- The automatic plate (envelope of the diagonal lap) meets the floor beam / post over the lap only; the drawn plate fills the corner. With an explicit `Outline` the generator
+  skips the crossing-member search and builds no floor beam angle, so the outline cannot be given as data - generator change requested (carry the whole outline to the
+  crossing face / stack face, or keep the crossing search with an explicit outline). Until then 4-8 of the 24 angle-to-plate rivets per point are placed.
+- 3 drawn member rivet lines vs the generator's 2 / 4.
+- SW11: FB11 is the typical F6 section in the model (flange angles to 8 5/16 in.); p.79 Section A draws 2-Ls 9 x 4 x 5/8 + 1-Pl 37 x 1 there. The SWAY11 plates (1'-11 5/8 b.b.)
+  lie 3 1/2 in. outside the modeled flange, so the floor beam angle rivets are not placed until FB11 gets that material (floor beam data, not this block). Post angle drawn
+  6 x 5, modeled 6 x 4 1/2.
