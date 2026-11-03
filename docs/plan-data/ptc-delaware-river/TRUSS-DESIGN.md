@@ -1162,3 +1162,58 @@ the CL)', p.101 / p.102 ladders at the cross walkways. All changes in `samples/p
   - Lateral apex plate edge angles x bottom laterals 0.10 - 0.22 in. (N-BGLM*-T-EA x BL-*), walkway CL posts x cross walk rails 0.16 in., platform FB0' rail x gusset
     L0' 0.38 in., floor beam stiffener x cross walk rail FB0' 0.22 in. (layout drawn only).
 
+## 38. Main span chord field splice material as drawn (2026-11-02 agent review, fork-splices; the review's most common finding, ~81 rows of `qc/ptc/main-span/work10/review/batch1-6`)
+
+Cause (confirmed): `splices.csv` listed most main-span chord splice callouts (U6-U22, L5-L22) WITHOUT a length, so `connections-ptc.csx` section 1 skipped them;
+the ones with a length were often the cover-plate length reused for the web plates (L2 web splice 24 vs ~38 in., L4 cover 24 vs ~38 in., U6 o.s. 97 vs ~107 in.),
+fills were centred on the joint instead of lying on the lighter member and ending at the FIN. line (U1 / L4 cover fills, U3 / U4 / U5 web fills), inlay plates were
+never built ("lies in the web ply") and a 34 in. fill given the inside face floated on the outstanding angle legs (U5 S-FU5-1 / S-SPU5-8 about 6 in. inside the box).
+
+Reading (2026-11-02, four readers, crops + helpers untracked in the fork's temp folder): every chord splice / fill / inlay callout of p.74-90 with the two ends of its
+dimension line in 150-dpi page px, projected on the drawn chord through the joint W.P. of `gusset-outlines.csv` (own W.P. read for L11, L19, U21, L21), 4.28 px/in
+(3/4 in. = 1 ft-0 reduced print; per-page checks on printed dimensions within 2 %: p.74 -0.9 %, p.75 / p.76 / p.86-p.88 / p.90 within 0.2 %, p.77 +1.9 %, p.82 +2.0 %,
+only the p.84 plan-view figures +2.8 / +3.1 %), u from the drawn FIN. line, + toward the higher panel number. No splice length is printed on these sheets (the only
+figure is L15 7'-0 to the end of the 31 1/2 x 11/16 plates), so every extent is SCALED, +-1 in., and every plate carries a dimension-only UNRESOLVED flag naming the page
+and the scale. Plan strips (HALF TOP / HALF BOTTOM FLANGE) are drawn parallel to the chord at the elevation scale (true lengths; checked on the 4 in. pitch and the 20 in.
+manholes); one strip draws both flanges, so a "2-..." cover plate / fill read in one half is built top and bottom.
+
+Data: `connections/splices.csv` new columns `face` (cover / cover-top / cover-bot / web-os / web-is / fill-os / fill-is / fill-cover(-top|-bot) / inlay-os / inlay-is /
+none = recorded only), `u0_in` / `u1_in` (from the FIN. line), `replaces` (inlay: the chord web plies it replaces, "L:34x3/4;R:34x1 1/8", "#2" = second ply of that size
+from the outside), `scale_note`, `printed_length`; 225 rows with a read extent at 41 joints (inlays 28). Faces: 31 1/2 in. plates / fills and 18 / 22 in. fills lie INSIDE
+(31 1/2 between the outstanding legs on the vertical angle legs, 18 / 22 between the vertical legs = the angle-leg packing), 34 in. plates in / on the outer web layer.
+Cover rivet counts of the old rows carried over. Fills ending within 1.2 in. of FIN (or read "to / from FIN") end exactly at the joint (they lie on one chord only).
+Material per the sheet note (p.75 "All material listed on this sheet shall be silicon steel except where noted (C)").
+
+Generator (generic, OPTIONAL, omitted from the .sbm when unset; tests `TrussJointDetailTests.InlayPlates_*`, `PlateRivetZones_*`):
+- `TrussJointPlate.Replaces` (`TrussPlyRef` Side / Width / Thickness / Index): INLAY plate in the layer of the listed chord web plies; each listed ply of the chord on that
+  side stops at the plate end (`PieceSpan` via `InlayTrim`, per member end, so the NJ half mirrors by the joint data); the stack bases skip those plies where the inlay
+  covers the plate's whole reach on that chord (`ReplacedAt`: a longer plate still bears on the ply beyond the inlay end), and an inlay also ignores the chord's
+  between-gusset (inlaid gusset layer) plies. Inlays are listed first so the other plates of the face stack on them. `TrussSectionPiece.PlyIndex` added.
+- `TrussJointPlate.RivetZones` (`TrussPlateRivetZone` From / To / Count): plate rivets only in those stretches (rows = `RivetRows`, a zone end inside the plate starts one
+  pitch from it). Used for the rivets drawn on the web splice plates / fills BEYOND the gusset edge (U6, L7, L9, U8, U10, U21, L21, L12-L15 ...): symbols counted by
+  `tools/ptc_splice_rivets_beyond.py` (detector of `tools/ptc_rivet_count.py`) between max(gusset edge, outermost beyond rivet already in `rivet-positions.csv`) + 1 1/2 in.
+  and the plate end -> `connections/splice-rivets-beyond.csv` (21 zones; U21 / L21 gusset edges from the plate end less the ~30 / 21-24 in. read on p.89); 1 1/8 in.
+  (p.70 chord splice rivets), grip probed, flagged.
+- The batch-3b "under the gusset" o.s. plates (U8, L9, U10, U21, L21) are replaced by the read o.s. plates; U22 pin plates keep that rule.
+
+NOT built (recorded in splices.csv with face none, flagged): L11 (the 1 1/8 / 3/4 web plies end where the gusset layers take their place: fork-gussets' layers), the L13 /
+L15 inlays (they lie in a web layer of chords whose outer ply is the INLAID gusset layer, p.69; which layer each plate occupies is not determinable), the U21' / L21'
+erection closure plates (temporary-bolted 31 1/2 x 15/16 plates, loose cover plates: no extents), the flange-angle corner fills (L5 2-3/4, L7 7 x 5/8, L3 6 x 1/2, no
+extent), the U11 '7/8 Spl. & Lat. Pl.' (lateral plate = bracing). Readings that differ from the review rows (the review was right about the defects, several of its
+extents were off by an origin shift): U5 inlay -19.4..+19.8 (review -23.6..+15.6), U6 o.s. -52.5..+54.4 (review -65..+57; the outermost line is the 18 x 3/4 fill),
+L6 cover 36.4 in. (review ~48), U8 upper i.s. plate reads 7/8 (splices.csv had 5/8), L12 2-Inlay Pls. 31 1/2 x 3/4 (missing before; the plan "31 1/2 x 1/4 Fill" is the
+web fill seen edge-on, no cover fill), L13 first inlay 34 x 1 1/16, L14 i.s. fills 1/2 + 9/16 (was one 1 1/8), L16 18 x 1 fill on L15-L16 (not at the vertical foot).
+
+Two generic fixes found by the clash run of the new plates (tests `TrussJointDetailTests.JointPlates_ThirdChordRoleMember_*`): (1) more than two chord-role members at a
+point (the wind chord at L13 / L13'): the joint plates take their axis and stack level from the most collinear chord pair only (the wind chord's narrow section had put
+the L13 fills / I.S. plate about 6 in. inside the box); (2) web members cut parallel to the chord (`TrussEndCut.ParallelToChord`) now also clear the Top / Bottom
+joint plates on that face when `WebMemberClearOfJointPlates` is set, as the square-cut ends already did (U12-L12 vertical vs the new L12 cover splice).
+
+Results (copy of the committed model, chain connections-ptc .. rivets-ptc, 2026-11-02): 516 splice / fill / inlay plate definitions (225 read rows at 41 joints,
+both halves), 42 beyond-gusset rivet zones; check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after (silicon steel 9.82 -> 10.27 M lb = PASS,
+carbon 4.30 -> 4.22 M lb, C + S 89.4 -> 91.8 % of p.42); `sbm clash` all bridges 3,357 -> 2,918 rows (approach / girder bridges 2,532 -> 2,036 - from re-running
+the chain on the committed model, none of their rows rise), main span 825 -> 882: the new rows are 56 plate x chord rows, 52 of them at L13 / L13' (fills 18 x 1 and
+31 1/2 x 5/8, I.S. 31 1/2 x 13/16 and cover 24 x 15/16 plates 1/8 - 1/2 in. into the L12-L13 / L13-L14 angles and cover plates: the steep kinked joint where the
+wind chord meets, plate band vs the chord pieces not resolved - OPEN) and 4 x 1/16 in. at L15 (18 x 1 x 16'-0 web extra plates vs the L14-L15 18 x 1 plies). Also open:
+the L14 bottom cover splice is drawn as two half plan views each with its own CL of splice (built as one plate -27.2 .. +20.0 in.; the hanger L14-W14 passes it; no
+clash in the final run, the plate split at the hanger is not dimensioned), U14 cover fill 24 x 1/4 drawn only 4 in. long (built as drawn, low confidence).

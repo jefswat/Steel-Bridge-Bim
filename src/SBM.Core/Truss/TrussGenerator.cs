@@ -512,6 +512,16 @@ public static partial class TrussGenerator
             var n = nsum.Normalized();
             double den = Vec3.Dot(d1, n);
             if (den < 0.2) return null;
+            // OPTIONAL TrussJointDefaults.WebMemberClearOfJointPlates: the end also clears the chord splice plates on that chord face (as the square-cut ends do)
+            if (_d.JointDefaults.WebMemberClearOfJointPlates > 0)
+            {
+                var face = Vec3.Dot(d1, chords[0].Y) >= 0 ? TrussPlateFace.Top : TrussPlateFace.Bottom;
+                double hw = Math.Max(m.Sec.XMax - m.Sec.XMin, m.Sec.YMax - m.Sec.YMin) / 2 / Math.Max(0.2, den);
+                double stack = _d.Joints.Where(j => j.Point.Equals(pt, StringComparison.OrdinalIgnoreCase) && (j.Plane.Length == 0 || j.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase)) && j.Plates != null)
+                    .SelectMany(j => j.Plates!).Where(p => p.Member == null && p.Face == face && p.Thickness > 0 && p.Length > 0 && p.Width > 0
+                        && p.Offset - p.Length / 2 < hw && p.Offset + p.Length / 2 > -hw).Sum(p => p.Thickness);
+                if (stack > 0) { h += stack; clr = Math.Max(clr, _d.JointDefaults.WebMemberClearOfJointPlates); }
+            }
             // cut plane at H along the mean normal: every end corner clear of EVERY chord face by clr (a kinked chord: the mean face alone let the corners
             // dip into the steeper chord piece, batch 8c / recheck N04); one chord = the old plane h + clr
             double H = h + clr;
@@ -841,6 +851,53 @@ public static partial class TrussGenerator
         };
 
         private readonly Dictionary<Inst, (double a, double b)> _gussetSpan = new();
+        private bool? _hasInlays;
+        private bool HasInlays => _hasInlays ??= _d.Joints.Any(j => j.Plates?.Any(p => p.Replaces is { Count: > 0 } && p.Member == null) == true);
+        private readonly Dictionary<(Inst m, int ply, bool atA), double> _inlayTrim = new();
+
+        /// <summary><see cref="TrussJointPlate.Replaces"/>: distance from the working point (A or B) along member <paramref name="m"/> to where web ply
+        /// <paramref name="pc"/> stops because an inlay plate of that end joint lies in its layer; 0 = the ply is not replaced there.</summary>
+        private double InlayTrim(Inst m, TrussSectionPiece pc, bool atA)
+        {
+            if (pc.PlyIndex < 0 || !HasInlays) return 0;
+            var key = (m, pc.PlyIndex, atA);
+            if (_inlayTrim.TryGetValue(key, out var hit)) return hit;
+            double res = 0;
+            string pl = atA ? m.PlaneA : m.PlaneB, pt = atA ? m.PointA : m.PointB;
+            var here = atA ? m.A : m.B; var other = atA ? m.B : m.A;
+            int side = Vec3.Dot(other - here, Tangent(StationOf(here))) >= 0 ? 1 : -1;
+            // the web plies of the section in listed order with their depth x thickness (+x side pieces)
+            var plies = m.Sec.Pieces.Where(q => q.PlyIndex >= 0 && q.Polygon.Min(v => v.X) >= -1e-9)
+                .Select(q => (q.PlyIndex, w: q.Polygon.Max(v => v.Y) - q.Polygon.Min(v => v.Y), t: q.Polygon.Max(v => v.X) - q.Polygon.Min(v => v.X)))
+                .OrderBy(q => q.PlyIndex).ToList();
+            const double tol = 0.0254 / 32;
+            foreach (var jd in _d.Joints.Where(j => j.Point.Equals(pt, StringComparison.OrdinalIgnoreCase) && (j.Plane.Length == 0 || j.Plane.Equals(pl, StringComparison.OrdinalIgnoreCase))))
+                foreach (var p in jd.Plates ?? new())
+                {
+                    if (p.Member != null || p.Replaces is not { Count: > 0 } refs || p.Length <= 0) continue;
+                    double d = side > 0 ? p.Offset + p.Length / 2 : -(p.Offset - p.Length / 2);
+                    if (d <= 0) continue;
+                    foreach (var r in refs.Where(r => r.Side == side))
+                    {
+                        var match = plies.Where(q => Math.Abs(q.w - r.Width) <= tol && Math.Abs(q.t - r.Thickness) <= tol).ToList();
+                        int n = Math.Max(1, r.Index);
+                        if (match.Count >= n && match[n - 1].PlyIndex == pc.PlyIndex) res = Math.Max(res, d);
+                    }
+                }
+            _inlayTrim[key] = res;
+            return res;
+        }
+
+        /// <summary>True when web ply <paramref name="pc"/> of chord <paramref name="c"/> is replaced by an inlay plate at joint (plane, point).</summary>
+        /// <remarks>Only when the inlay covers the whole <paramref name="reach"/> of the plate being stacked on that chord: a longer plate also bears on the ply beyond
+        /// the inlay end (e.g. a 34 x 1 1/8 inlay longer than the 34 x 13/16 inlay under it).</remarks>
+        private bool ReplacedAt(Inst c, TrussSectionPiece pc, string plane, string point, double reach)
+        {
+            if (pc.PlyIndex < 0 || !HasInlays) return false;
+            double tr = c.PointA.Equals(point, StringComparison.OrdinalIgnoreCase) && c.PlaneA.Equals(plane, StringComparison.OrdinalIgnoreCase) ? InlayTrim(c, pc, true)
+                : c.PointB.Equals(point, StringComparison.OrdinalIgnoreCase) && c.PlaneB.Equals(plane, StringComparison.OrdinalIgnoreCase) ? InlayTrim(c, pc, false) : 0;
+            return tr > 0 && tr >= reach - 1e-3;
+        }
         /// <summary>Extent of a section piece along the member solid (start from the cut start, length): full, partial centred (+ Offset), from
         /// <see cref="TrussSectionPiece.Start"/> after the start working point, or between the end gussets; null = nothing left.</summary>
         private (double ps, double pl)? PieceSpan(Inst m, TrussSectionPiece pc, double cut)
@@ -859,6 +916,16 @@ public static partial class TrussGenerator
                 double s0 = ps, s1 = ps + pl;
                 if (inl.Contains(m.PointA, StringComparer.OrdinalIgnoreCase)) s0 = Math.Max(s0, GussetReach(m, true) - m.SA);
                 if (inl.Contains(m.PointB, StringComparer.OrdinalIgnoreCase)) s1 = Math.Min(s1, len - GussetReach(m, false) - m.SA);
+                ps = s0; pl = s1 - s0;
+            }
+            if (pc.PlyIndex >= 0 && HasInlays)
+            {
+                // inlay plates at the member's end joints (TrussJointPlate.Replaces): the ply stops at the plate end
+                double len = (m.B - m.A).Length;
+                double ta = InlayTrim(m, pc, true), tb = InlayTrim(m, pc, false);
+                double s0 = ps, s1 = ps + pl;
+                if (ta > 0) s0 = Math.Max(s0, ta - m.SA);
+                if (tb > 0) s1 = Math.Min(s1, len - tb - m.SA);
                 ps = s0; pl = s1 - s0;
             }
             if (pc.BetweenGussets)
@@ -1758,14 +1825,14 @@ public static partial class TrussGenerator
 
         /// <summary>Level of the steel of member <paramref name="c"/> a joint plate on <paramref name="face"/> bears on within its band [b0, b1] (section x for
         /// Top / Bottom, section y + OffsetZ for the webs): the highest top / lowest bottom, or the innermost / outermost web-side face of the pieces of the +x
-        /// half (sections are symmetric). Partial-length pieces are ignored. Null = no piece in the band.</summary>
-        internal static double? PieceLevel(TrussBuiltSection sec, double offsetZ, TrussPlateFace face, double b0, double b1)
+        /// half (sections are symmetric). Partial-length pieces and the pieces <paramref name="skip"/> names (web plies an inlay plate replaces at the joint) are ignored. Null = no piece in the band.</summary>
+        internal static double? PieceLevel(TrussBuiltSection sec, double offsetZ, TrussPlateFace face, double b0, double b1, Func<TrussSectionPiece, bool>? skip = null)
         {
             const double eps = 1e-5;
             double? best = null;
             foreach (var pc in sec.Pieces)
             {
-                if (pc.Length > 0 || !double.IsNaN(pc.Start)) continue;
+                if (pc.Length > 0 || !double.IsNaN(pc.Start) || skip?.Invoke(pc) == true) continue;
                 if (face is TrussPlateFace.Top or TrussPlateFace.Bottom)
                 {
                     var cl = ClipBand(pc.Polygon, 0, b0 + eps, b1 - eps);
@@ -1828,6 +1895,17 @@ public static partial class TrussGenerator
                     var tan = Tangent(st);
                     // chord direction toward the higher station (mean of the members at the point)
                     var dirs = chords.Select(c => Vec3.Dot(c.Axis, tan) >= 0 ? c.Axis : -c.Axis).ToList();
+                    // more than two chord-role members at the point (e.g. a wind chord meeting the truss chord): the splice lies on the most collinear pair
+                    // (and any member within 30 deg of it); the others neither set the plate axis nor its stacking level
+                    if (chords.Count > 2)
+                    {
+                        int bi = 0, bj = 1; double best = double.NegativeInfinity;
+                        for (int i = 0; i < chords.Count; i++)
+                            for (int k = i + 1; k < chords.Count; k++)
+                                if (Vec3.Dot(dirs[i], dirs[k]) > best) { best = Vec3.Dot(dirs[i], dirs[k]); bi = i; bj = k; }
+                        var keep = Enumerable.Range(0, chords.Count).Where(i => i == bi || i == bj || Vec3.Dot(dirs[i], (dirs[bi] + dirs[bj]).Normalized()) > Math.Cos(Math.PI / 6)).ToList();
+                        chords = keep.Select(i => chords[i]).ToList(); dirs = keep.Select(i => dirs[i]).ToList();
+                    }
                     var ax = dirs.Aggregate(new Vec3(0, 0, 0), (a, b) => a + b).Normalized();
                     var c0 = chords[0];
                     var xv = (c0.X - ax * Vec3.Dot(c0.X, ax)).Normalized();
@@ -1861,7 +1939,7 @@ public static partial class TrussGenerator
                             bool through = Through(pl.Name, jdef.Point).Contains(c);
                             double dir = Vec3.Dot(StartsAt(c, pl.Name, jdef.Point) ? c.Axis : -c.Axis, ax);
                             if (!through && !(dir > 0 ? a1 > 1e-4 : a0 < -1e-4)) continue;
-                            if (PieceLevel(c.Sec, c.Def.OffsetZ, p.Face, b0, b1) is { } lv) Take(lv); else Take(FaceOf(c, p.Face));
+                            if (PieceLevel(c.Sec, c.Def.OffsetZ, p.Face, b0, b1, q => ReplacedAt(c, q, pl.Name, jdef.Point, through ? 0 : (dir > 0 ? a1 : -a0)) ||(q.BetweenGussets && p.Replaces is { Count: > 0 })) is { } lv) Take(lv); else Take(FaceOf(c, p.Face));
                         }
                         if (best == null) foreach (var c in chords) Take(FaceOf(c, p.Face));
                         foreach (var q in placed)
@@ -1878,7 +1956,7 @@ public static partial class TrussGenerator
                         return new TrussJointPlate
                         {
                             Face = p.Face, Width = p.Width, Thickness = p.Thickness, Length = ext.Value.a1 - ext.Value.a0, Offset = (ext.Value.a0 + ext.Value.a1) / 2, Fill = p.Fill,
-                            Label = p.Label, Material = p.Material, Unresolved = p.Unresolved, Source = p.Source, CenterOffset = p.CenterOffset,
+                            Label = p.Label, Material = p.Material, Unresolved = p.Unresolved, Source = p.Source, CenterOffset = p.CenterOffset, Replaces = p.Replaces,
                         };
                     }
                     // marks keep the listed order (fills first), placement follows the stacking order
@@ -1919,7 +1997,7 @@ public static partial class TrussGenerator
                                 foreach (int sx in new[] { -1, 1 }) Box(sx * baseLevel, sx * outer, yc - p.Width / 2, yc + p.Width / 2);
                                 break;
                         }
-                        if (p.RivetCount > 0)
+                        if (p.RivetCount > 0 || p.RivetZones is { Count: > 0 })
                         {
                             // rivet points at mid thickness of the plate (both webs for a web-face plate); kinked (mitred) joints: the side's own chord frame
                             Vec3 Pt(double a, double x, double y)
@@ -1933,12 +2011,21 @@ public static partial class TrussGenerator
                             int rows = Math.Max(1, p.RivetRows);
                             var pts = new List<(Vec3 at, Vec3 dir)>();
                             var acr = Enumerable.Range(0, rows).Select(i => rows == 1 ? 0.0 : -p.Width / 2 + e + (p.Width - 2 * e) * i / (rows - 1)).ToList();
+                            // stretches along the plate with their counts: the whole plate, or the OPTIONAL rivet zones clipped to it
+                            var zones = p.RivetZones is { Count: > 0 } rz
+                                ? rz.Select(z => (lo: Math.Max(a0, Math.Min(z.From, z.To)), hi: Math.Min(a1, Math.Max(z.From, z.To)), n: z.Count)).Where(z => z.hi > z.lo + 1e-4 && z.n > 0).ToList()
+                                : new() { (a0, a1, p.RivetCount) };
+                            foreach (var (za0, za1, zn) in zones)
                             for (int i = 0; i < rows; i++)
                             {
-                                int nr = p.RivetCount / rows + (i < p.RivetCount % rows ? 1 : 0);
+                                int nr = zn / rows + (i < zn % rows ? 1 : 0);
+                                // a zone end inside the plate (e.g. at the gusset edge) is no plate edge: the rivets start one pitch from it (both inside: half a pitch)
+                                double ea = za0 > a0 + 1e-4 ? 0 : e, eb = za1 < a1 - 1e-4 ? 0 : e;
                                 for (int j = 0; j < nr; j++)
                                 {
-                                    double a = nr == 1 ? (a0 + a1) / 2 : a0 + e + (a1 - a0 - 2 * e) * j / (nr - 1);
+                                    double span = za1 - za0 - ea - eb;
+                                    double a = nr == 1 && ea > 0 && eb > 0 ? (za0 + za1) / 2
+                                        : za0 + ea + (ea == 0 && eb == 0 ? span * (j + 0.5) / nr : ea == 0 ? span * (j + 1.0) / nr : eb == 0 ? span * j / nr : span * j / (nr - 1));
                                     double mid = baseLevel + g * p.Thickness / 2;
                                     if (p.Face is TrussPlateFace.Top or TrussPlateFace.Bottom) pts.Add((Pt(a, acr[i], mid), Nrm(a) * g));
                                     else foreach (int sx in new[] { -1, 1 }) pts.Add((Pt(a, sx * mid, yc + acr[i]), xv * (sx * g)));
@@ -1955,7 +2042,7 @@ public static partial class TrussGenerator
                         {
                             Mark = mark, Category = p.Fill ? PartCategory.FillerPlate : PartCategory.SplicePlate, Assembly = asm, Mesh = mesh, Material = Material(p.Material), Length = p.Length, Assumption = asu,
                             Description = $"{(p.Label.Length > 0 ? p.Label : (p.Fill ? "fill" : "splice") + " PL")} {TrussSections.FormatIn(p.Width)} x {TrussSections.FormatIn(p.Thickness)} x {TrussSections.FormatIn(p.Length)} ({p.Face}) at {jdef.Point}"
-                                + (p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside ? " (pair)" : ""),
+                                + (p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside ? " (pair)" : "") + (p.Replaces is { Count: > 0 } ? " - inlay (in the web ply layer)" : ""),
                             Member = _d.PartPerPiece ? JointStack(pl.Name, jdef.Point) : null, Piece = _d.PartPerPiece ? (p.Fill ? "fill" : "splice plate") : null,
                         });
                         Model.PanelOf[mark] = $"Joint {jdef.Point}";

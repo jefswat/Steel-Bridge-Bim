@@ -17,6 +17,8 @@ public sealed record TrussSectionPiece(Vec2[] Polygon, string Label, double Leng
     public string Kind { get; init; } = "";
     /// <summary>Points at which the piece stops at the inlaid gusset (<see cref="Bridge.TrussPly.InlaidAt"/>); null = none.</summary>
     public IReadOnlyList<string>? InlaidAt { get; init; }
+    /// <summary>Index of the web ply in <see cref="Bridge.TrussSectionDefinition.WebPlies"/> this piece was built from (-1 = not a web ply).</summary>
+    public int PlyIndex { get; init; } = -1;
 }
 
 /// <summary>Lacing bar face of a section: bars lie in the plane y = <see cref="Y"/> .. Y + Thickness * Side (outside the face), spanning x = +/- HalfLines.</summary>
@@ -239,7 +241,7 @@ public static class TrussSections
                 double pd = PlyDepth(p);
                 bool ins = InsideAngles(k);
                 double xa = ins ? xi : x0;
-                r.Pieces.Add(new(Rect(sg * xa, sg * (xa - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN, p.BetweenGussets, p.Perforation) { Kind = "web ply", InlaidAt = p.InlaidAt });
+                r.Pieces.Add(new(Rect(sg * xa, sg * (xa - p.Thickness), -pd / 2, pd / 2), p.Label.Length > 0 ? p.Label : $"web PL {L(pd)} x {L(p.Thickness)}", p.Length, 0, p.Start ?? double.NaN, p.BetweenGussets, p.Perforation) { Kind = "web ply", InlaidAt = p.InlaidAt, PlyIndex = k });
                 if (ins) xi -= p.Thickness; else x0 -= p.Thickness;
             }
         }
