@@ -7,9 +7,11 @@ H10 = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'work10')
 H11 = os.path.dirname(os.path.abspath(__file__))
 out = sys.argv[1]
 W, H = 1224, 792
-def jpg(path, px=1100):
+PX = int(os.environ.get('PDF_PX', '900')); Q = int(os.environ.get('PDF_Q', '60')); PART = os.environ.get('PDF_PART', 'all')
+def jpg(path, px=None):
+    px = px or PX
     im = Image.open(path).convert('RGB'); im.thumbnail((px, px))
-    b = io.BytesIO(); im.save(b, 'JPEG', quality=70); return b.getvalue()
+    b = io.BytesIO(); im.save(b, 'JPEG', quality=Q); return b.getvalue()
 conn = {}
 for r in csv.DictReader(open(os.path.join(H11, 'conn_after.csv'))):
     pt = r['where'].split(':')[-1]
@@ -45,7 +47,7 @@ def pages(title, before_dir, after_dir, names, note=lambda n: ""):
         if os.path.exists(b): pg.insert_image(fitz.Rect(20, 80, 20 + s, 80 + s), stream=jpg(b))
         pg.insert_image(fitz.Rect(W / 2 + 10, 80, W / 2 + 10 + s, 80 + s), stream=jpg(a))
 J = sorted([j for j in csv.DictReader(open(os.path.join(H10, 'out_final', 'joints.csv'))) if j['plane'] == 'S'], key=lambda j: float(j['station']))
-pages("Truss joint", os.path.join(H10, 'png'), os.path.join(H10, 'png_final'), [(f"S_{j['name'].replace(chr(39), 'p')}", j['name']) for j in J])
+if PART in ("all", "joints"): pages("Truss joint", os.path.join(H10, 'png'), os.path.join(H10, 'png_final'), [(f"S_{j['name'].replace(chr(39), 'p')}", j['name']) for j in J])
 B = sorted(csv.DictReader(open(os.path.join(H11, 'out_final', 'joints.csv'))), key=lambda j: float(j['station']))
 def note(pt):
     rs = conn.get(pt, [])
@@ -53,6 +55,6 @@ def note(pt):
     ends = [r for r in rs if r['kind'] == 'end']; pl = [r for r in rs if r['kind'] == 'plate']
     return (f"member ends riveted {sum(r['ok'] == '1' for r in ends)}/{len(ends)} (rivets {', '.join(r['n1'] for r in ends[:6])}); "
             f"plates fastened {sum(r['ok'] == '1' for r in pl)}/{len(pl)}")
-pages("Bracing at", os.path.join(H11, 'png'), os.path.join(H11, 'png_final'), [(f"{j['plane']}_{j['name'].replace(chr(39), 'p')}", j['name']) for j in B], note)
+if PART in ("all", "bracing"): pages("Bracing at", os.path.join(H11, 'png'), os.path.join(H11, 'png_final'), [(f"{j['plane']}_{j['name'].replace(chr(39), 'p')}", j['name']) for j in B], note)
 doc.save(out, garbage=3, deflate=True)
 print(out, len(doc), os.path.getsize(out) / 1e6, 'MB')
