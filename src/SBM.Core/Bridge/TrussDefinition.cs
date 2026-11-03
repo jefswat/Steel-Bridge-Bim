@@ -1093,6 +1093,37 @@ public sealed class TrussJointPlate
     /// <summary>Dimension-only flag text of the plate's rivets (positions derived).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? RivetUnresolved { get; set; }
+    /// <summary>OPTIONAL (null = an added plate, omitted when null): INLAY plate - it lies in the layer of these web plies of the chords at the joint
+    /// (old riveted chord splices: "End of 34 x 3/4 webs ... 2-Inlay Spl. Pls."). Each listed ply of the chord on that <see cref="TrussPlyRef.Side"/> stops
+    /// at the plate's end on that side (the member solid is shortened there); the plate (and every other plate of the joint) stacks on the steel under
+    /// the removed ply. Chord plates only (no <see cref="Member"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussPlyRef>? Replaces { get; set; }
+    /// <summary>OPTIONAL (null = <see cref="RivetCount"/> over the whole plate, omitted when null): rivets of the plate only in these stretches along it, each
+    /// with its own count shared over <see cref="RivetRows"/> lines (e.g. the rivets drawn on an outside web splice plate beyond the gusset edge, where the
+    /// joint's own rivets do not reach). Diameter / material / flag as for <see cref="RivetCount"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<TrussPlateRivetZone>? RivetZones { get; set; }
+}
+
+/// <summary>Stretch of a joint plate with rivets (<see cref="TrussJointPlate.RivetZones"/>): <see cref="From"/> .. <see cref="To"/> = distances from the joint
+/// working point along the chord (the frame of <see cref="TrussJointPlate.Offset"/>, m), clipped to the plate; <see cref="Count"/> rivets (per web for web-face plates).</summary>
+public sealed class TrussPlateRivetZone
+{
+    public double From { get; set; }
+    public double To { get; set; }
+    public int Count { get; set; }
+}
+
+/// <summary>A web ply of the chord on one side of a joint (<see cref="TrussJointPlate.Replaces"/>): the <see cref="Index"/>-th ply (from the outside, in the
+/// listed order of the section's web plies) whose depth and thickness match <see cref="Width"/> x <see cref="Thickness"/> within 1/32 in.</summary>
+public sealed class TrussPlyRef
+{
+    /// <summary>-1 = the chord toward the lower station of the joint, +1 = toward the higher station.</summary>
+    public int Side { get; set; }
+    public double Width { get; set; }
+    public double Thickness { get; set; }
+    public int Index { get; set; } = 1;
 }
 
 /// <summary>

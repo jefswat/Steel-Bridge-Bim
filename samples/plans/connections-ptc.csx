@@ -79,27 +79,74 @@ var report = new List<string>();
     }
     report.Add($"main truss: gusset thickness / in-to-in set on {gSet} joints ({gConf} conflicts with joints.csv)");
 
-    // chord splices: rows with a width, thickness and (scaled) length; faces from the callout text
+    // chord splices: rows with a width, thickness and an extent. Agent review 2026-11-02 (fork-splices, TRUSS-DESIGN.md section 38): the main span rows carry
+    // their extent along the chord as u0 / u1 = inches from the drawn FIN. line of the joint, + toward the higher panel number (read from the dimension lines
+    // of the joint sheet, scale_note says how; printed figures where given) and an explicit face (cover / cover-top / cover-bot / web-os / web-is / fill-os /
+    // fill-is / fill-cover(-top|-bot) / inlay-os / inlay-is / none). Inlay plates lie in the layer of the chord web plies they replace (column replaces:
+    // "L:34x3/4;R:34x1 1/8", "#2" = the second ply of that size from the outside) - TrussJointPlate.Replaces stops those plies at the plate ends.
+    // Rows without u0 / u1 keep the older rule (length + side words in the item, centred otherwise).
     var spl = Csv("splices.csv").Where(r => r["structure"] == "main").ToList();
-    int nPl = 0, nSkip = 0;
+    int nPl = 0, nSkip = 0, nInlay = 0, nExt = 0;
     var skipped = new List<string>();
+    var extentJoints = new HashSet<string>();
     foreach (var j in t.Joints) j.Plates = null;
+    double? Frac(string s)
+    {
+        s = s.Trim(); if (s.Length == 0) return null;
+        double v = 0;
+        foreach (var part in s.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (part.Contains('/')) { var q = part.Split('/'); v += double.Parse(q[0], inv) / double.Parse(q[1], inv); }
+            else v += double.Parse(part, inv);
+        }
+        return v;
+    }
+    // "L:34x3/4;R:34x1 1/8#1" -> ply refs (side -1 = the lower panel number side)
+    List<(int side, double w, double th, int idx)> PlyRefs(string s)
+    {
+        var o = new List<(int, double, double, int)>();
+        foreach (var it in s.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var kv = it.Split(':'); if (kv.Length != 2) continue;
+            int sd = kv[0].Trim().ToUpperInvariant() == "L" ? -1 : 1;
+            var sz = kv[1]; int idx = 1;
+            if (sz.Contains('#')) { idx = int.Parse(sz[(sz.IndexOf('#') + 1)..].Trim(), inv); sz = sz[..sz.IndexOf('#')]; }
+            var wt = sz.Split('x'); o.Add((sd, Frac(wt[0])!.Value, Frac(wt[1])!.Value, idx));
+        }
+        return o;
+    }
     foreach (var r in spl)
     {
         string j = r["joint"].Trim(), item = r["item"].ToLowerInvariant();
         if (!System.Text.RegularExpressions.Regex.IsMatch(j, @"^[UL]\d+$")) continue;
         var wid = Num(r["width_in"]); var thk = Num(r["thk_in"]); var len = Num(r["length_in"]);
-        if (wid == null || thk == null || len == null || len <= 0)
+        var u0 = Num(r.GetValueOrDefault("u0_in", "")); var u1 = Num(r.GetValueOrDefault("u1_in", ""));
+        string face = r.GetValueOrDefault("face", "").Trim();
+        if (face == "none") continue;   // read and recorded, not a plate of its own (ply end labels, plates built elsewhere)
+        bool hasExtent = u0 != null && u1 != null && u1 > u0 && face.Length > 0;
+        if (wid == null || thk == null || (!hasExtent && (len == null || len <= 0)))
         {
             if (!item.Contains("angles") && !item.Contains("vertical connection")) { nSkip++; skipped.Add($"{j} {r["item"]}"); }
             continue;
         }
-        bool fill = item.Contains("fill");
-        bool inlay = item.Contains("inlay");
-        if (inlay) { nSkip++; skipped.Add($"{j} {r["item"]} (inlay: lies in the web ply, not an added plate)"); continue; }
+        bool fill = face.StartsWith("fill") || (face.Length == 0 && item.Contains("fill"));
+        bool inlay = face.StartsWith("inlay") || (face.Length == 0 && item.Contains("inlay"));
+        if (inlay && !hasExtent) { nSkip++; skipped.Add($"{j} {r["item"]} (inlay without a read extent)"); continue; }
         var faces = new List<TrussPlateFace>();
+        if (hasExtent)
+        {
+            switch (face)
+            {
+                case "cover": case "fill-cover": faces.Add(TrussPlateFace.Top); faces.Add(TrussPlateFace.Bottom); break;
+                case "cover-top": case "fill-cover-top": faces.Add(TrussPlateFace.Top); break;
+                case "cover-bot": case "fill-cover-bot": faces.Add(TrussPlateFace.Bottom); break;
+                case "web-os": case "inlay-os": case "fill-os": faces.Add(TrussPlateFace.WebOutside); break;
+                case "web-is": case "inlay-is": case "fill-is": faces.Add(TrussPlateFace.WebInside); break;
+                default: nSkip++; skipped.Add($"{j} {r["item"]} (face '{face}' not recognised)"); continue;
+            }
+        }
         // a single cover fill lies on the flange its callout names (QC I043: U1 "Fill 24 x 5/16" under the HALF BOTTOM FLANGE)
-        if (item.Contains("cover") || item.Contains("flange"))
+        else if (item.Contains("cover") || item.Contains("flange"))
         {
             if (fill && r["qty"] == "1") faces.Add(item.Contains("bottom") ? TrussPlateFace.Bottom : TrussPlateFace.Top);
             else { faces.Add(TrussPlateFace.Top); faces.Add(TrussPlateFace.Bottom); }
@@ -107,14 +154,21 @@ var report = new List<string>();
         else if (item.Contains("web") || item.Contains("splice plates") || item.Contains("fills"))
             faces.Add(item.Contains("outside") || item.Contains("o.s.") ? TrussPlateFace.WebOutside : TrussPlateFace.WebInside);
         else { nSkip++; skipped.Add($"{j} {r["item"]} (face not recognised)"); continue; }
-        // along the chord: centred on the joint, or to one side ("left" = toward the lower panel number)
-        var offs = new List<double>();
-        if (item.Contains("each side")) { offs.Add(-1); offs.Add(1); }
-        else if (item.Contains("left")) offs.Add(-1);
-        else if (item.Contains("right")) offs.Add(1);
-        else offs.Add(0);
+        // along the chord: the read extent, or (older rule) centred on the joint / to one side ("left" = toward the lower panel number)
+        var offs = new List<(double c, double l)>();
+        if (hasExtent) offs.Add(((u0!.Value + u1!.Value) / 2, u1.Value - u0.Value));
+        else if (item.Contains("each side")) { offs.Add((-len!.Value / 2, len.Value)); offs.Add((len.Value / 2, len.Value)); }
+        else if (item.Contains("left")) offs.Add((-len!.Value / 2, len.Value));
+        else if (item.Contains("right")) offs.Add((len!.Value / 2, len.Value));
+        else offs.Add((0, len!.Value));
+        var refs = inlay ? PlyRefs(r.GetValueOrDefault("replaces", "")) : new();
+        if (inlay && refs.Count == 0) { nSkip++; skipped.Add($"{j} {r["item"]} (inlay: no replaced ply named)"); continue; }
         int n = int.Parse(j.Substring(1));
         string conf = r["confidence"];
+        string scale = r.GetValueOrDefault("scale_note", "");
+        bool printed = conf == "high" && r.GetValueOrDefault("printed_length", "").Trim().Length > 0;
+        if (hasExtent) { nExt++; extentJoints.Add(j); }
+        if (inlay) nInlay++;
         foreach (bool pr in new[] { false, true })
         {
             if (pr && n == 22) continue;
@@ -123,28 +177,63 @@ var report = new List<string>();
             if (jd == null) { jd = new TrussJointDefinition { Point = pt }; t.Joints.Add(jd); }
             jd.Plates ??= new List<TrussJointPlate>();
             foreach (var f in faces)
-                foreach (double o in offs)
+                foreach (var (oc, ol) in offs)
                 {
                     // PA half: the lower panel number is down-station (left = -); NJ half (primes): mirrored
-                    double sgn = pr ? -o : o;
+                    double sgn = pr ? -1 : 1;
                     // BATCH 4e (R04): 'All Cover Plate Splices: 1 1/8 in. dia high strength rivets' (p.70) - the counted rivets of the cover splice plates (splices.csv
-                    // rivet_count = the symbols drawn in the flange plan view, rivet_rows gage lines); fills get none of their own (the plate's rivets go through them)
-                    int rc = !fill && (item.Contains("cover") || item.Contains("flange")) && Num(r["rivet_count"]) is > 0 and var rcv ? (int)rcv : 0;
+                    // rivet_count = the symbols drawn in the flange plan view, rivet_rows gage lines); fills / inlays get none of their own (the plate's rivets go through them)
+                    int rc = !fill && !inlay && (f is TrussPlateFace.Top or TrussPlateFace.Bottom) && Num(r["rivet_count"]) is > 0 and var rcv ? (int)rcv : 0;
+                    string where = hasExtent
+                        ? $"drawn from {u0!.Value:0.#} to {u1!.Value:0.#} in. from the FIN. line toward the higher panel number"
+                        : (oc == 0 ? "centred on the joint" : "from the joint toward " + (oc < 0 ? "the lower" : "the higher") + " panel number");
                     jd.Plates.Add(new TrussJointPlate
                     {
                         RivetCount = rc, RivetRows = rc > 0 ? (int)(Num(r["rivet_rows"]) ?? 5) : 0, RivetDiameter = rc > 0 ? In(Num(r["rivet_dia_in"]) ?? 1.125) : 0, RivetMaterial = rc > 0 ? "High strength rivet steel" : null,
                         RivetUnresolved = rc > 0 ? U("p." + r["page"], $"rivets of the {r["item"]} at {pt}", $"the flange plan view draws {rc} rivets (image-counted: {r["rivet_note"]}) on {r["rivet_rows"]} gage lines without gages or pitch (p.70: 4 in. max. pitch)",
                             $"{rc} rivets per plate, {r["rivet_rows"]} lines equally spaced across the plate, equally spaced along it, 1.5 d edge distance; grip = the steel under the plate.") : null,
-                        Face = f, Width = In(wid.Value), Thickness = In(thk.Value), Length = In(len.Value), Offset = sgn * In(len.Value) / 2, Fill = fill,
-                        Label = r["item"], Material = r["note"].Contains("(S)") ? "S" : "C", Source = $"p.{r["page"]} ({conf})",
-                        Unresolved = U("p." + r["page"], $"{r["item"]} at {pt}", $"the length is scaled from the joint sheet ({r["extent_note"]}; {conf} confidence) and the plate order in the stack is drawn, not dimensioned",
-                            "plate as listed, length as scaled, " + (o == 0 ? "centred on the joint" : "from the joint toward " + (o < 0 ? "the lower" : "the higher") + " panel number") + ", stacked on the steel under it (web, angle legs or the fills already placed)."),
+                        Face = f, Width = In(wid.Value), Thickness = In(thk.Value), Length = In(ol), Offset = sgn * In(oc), Fill = fill,
+                        Replaces = inlay ? refs.Select(q => new TrussPlyRef { Side = pr ? -q.side : q.side, Width = In(q.w), Thickness = In(q.th), Index = q.idx }).ToList() : null,
+                        // read rows: the joint sheets' MATERIAL note (p.75: "All material listed on this sheet shall be silicon steel except where noted (C)")
+                        Label = r["item"], Material = hasExtent ? (r["item"].Contains("(C)") ? "C" : "S") : (r["note"].Contains("(S)") ? "S" : "C"), Source = $"p.{r["page"]} ({conf})",
+                        Unresolved = printed ? "" : U("p." + r["page"], $"{r["item"]} at {pt}",
+                            hasExtent ? $"the extent is drawn by dimension lines without figures: scaled ({scale}; {conf} confidence) and the plate order in the stack is drawn, not dimensioned"
+                                      : $"the length is scaled from the joint sheet ({r["extent_note"]}; {conf} confidence) and the plate order in the stack is drawn, not dimensioned",
+                            "plate as listed, " + where + (inlay ? ", in the layer of the chord web plies it replaces (they stop at its ends: 'End of ... webs')" : "") + ", stacked on the steel under it (web, angle legs or the fills already placed)."),
                     });
                     nPl++;
                 }
         }
     }
-    report.Add($"main truss: {nPl} splice / fill plate definitions (both halves; WebInside / WebOutside = one plate per web); {nSkip} rows not built (no length / inlay): {string.Join("; ", skipped.Take(12))}{(skipped.Count > 12 ? "; ..." : "")}");
+    // rivets drawn on the web splice plates / fills BEYOND the gusset edge (agent review 2026-11-02: U6, L7, U21 / L21 O.S. plates ...): counted symbols per zone
+    // (splice-rivets-beyond.csv, tools/ptc_splice_rivets_beyond.py) from just past the gusset edge / the drawn beyond rivets already placed by rivets-ptc.csx to the
+    // plate end -> TrussJointPlate.RivetZones on the longest web-face plate of that side (grip probed through all the steel there)
+    int nZone = 0, nZoneR = 0;
+    if (File.Exists(Path.Combine(dataDir, "splice-rivets-beyond.csv")))
+        foreach (var r in Csv("splice-rivets-beyond.csv"))
+        {
+            string j = r["joint"]; int n = int.Parse(j.Substring(1));
+            double f0 = Num(r["from_in"])!.Value, f1 = Num(r["to_in"])!.Value; int cnt = (int)Num(r["count"])!.Value, rows = (int)Num(r["rows"])!.Value;
+            foreach (bool pr in new[] { false, true })
+            {
+                if (pr && n == 22) continue;
+                string pt = j[0] + (pr ? n + "'" : n.ToString());
+                double sgn = pr ? -1 : 1;
+                var jd = t.Joints.LastOrDefault(x => x.Point == pt);
+                var pl = jd?.Plates?.FirstOrDefault(p => p.Label == r["plate"] && p.Face is TrussPlateFace.WebOutside or TrussPlateFace.WebInside);
+                if (pl == null) { report.Add($"beyond-gusset rivets {pt}: plate '{r["plate"]}' not found"); continue; }
+                (pl.RivetZones ??= new()).Add(new TrussPlateRivetZone { From = sgn * In(f0), To = sgn * In(f1), Count = cnt });
+                pl.RivetRows = Math.Max(pl.RivetRows, rows); pl.RivetDiameter = In(1.125); pl.RivetMaterial = "High strength rivet steel";
+                pl.RivetUnresolved = U("p." + r["page"], $"rivets of the {r["plate"]} beyond the gusset at {pt}",
+                    $"the joint sheet draws the rivet field along the splice plate past the gusset edge without pitch or gage ({r["note"]})",
+                    $"{cnt} rivets per web face as counted, {rows} lines across the plate, equally spaced over {Math.Abs(f1 - f0):0.#} in.; 1 1/8 in. (p.70 chord splice rivets); grip = the steel under the plate.");
+                nZone++; nZoneR += cnt * 2;
+            }
+        }
+    report.Add($"main truss: {nZone} beyond-gusset rivet zones on web splice plates / fills ({nZoneR} rivets per truss line, both web faces)");
+    // inlay plates are placed before the other splice plates of their face (stacking order = listed order among equal bases)
+    foreach (var j in t.Joints.Where(j => j.Plates != null)) j.Plates = j.Plates!.OrderBy(p => p.Replaces is { Count: > 0 } ? 0 : 1).ToList();
+    report.Add($"main truss: {nPl} splice / fill / inlay plate definitions (both halves; WebInside / WebOutside = one plate per web); {nExt} rows with a read extent at {extentJoints.Count} joints, {nInlay} inlay rows; {nSkip} rows not built: {string.Join("; ", skipped.Take(12))}{(skipped.Count > 12 ? "; ..." : "")}");
     // BATCH 3b (2026-10-28, GL07): the plates between the chord web and the gusset from U8 / L9 on. The sheets give the gussets an in-to-in wider than the 2'-5 o. to o. chord
     // webs and list outside web splice / pin plates exactly that thick ((in-to-in - 29) / 2); their extent lines carry no figures -> built UNDER THE GUSSET (TrussJointPlate.UnderGusset:
     // length = the gusset outline over the 34 in. web band), flagged. Inside splice plates, inlay plates and fills are inside the web stack (no gusset float) - not built.
@@ -162,6 +251,8 @@ var report = new List<string>();
         };
         foreach (var (j, page, ts, label, note) in ug)
         {
+            // agent review 2026-11-02: o.s. splice / pin plates read with an extent in splices.csv replace the under-the-gusset plate of this list
+            if (spl.Any(r => r["joint"].Trim() == j && r.GetValueOrDefault("face", "").Trim() == "web-os" && Num(r.GetValueOrDefault("u0_in", "")) != null)) { report.Add($"{j}: o.s. plates from splices.csv (read extent), not the under-the-gusset rule"); continue; }
             int n = int.Parse(j.Substring(1));
             foreach (bool pr in new[] { false, true })
             {
@@ -263,8 +354,10 @@ var report = new List<string>();
     }
     // the arch script's general flag on splices is now partly built: replace it
     t.Unresolved.RemoveAll(s => s.Contains("chord splice plates, inlay plates, fills"));
-    t.Unresolved.Add(U("p.69, p.74-90", "inlay plates, lug angles, stiffeners, diaphragms, stitch rivets and the splice plates whose extent was not read",
-        $"they are listed per joint without extents ({nSkip} splice / fill callouts have no length in splices.csv)", "chord cover / web splice plates and fills with a scaled length are built (connections-ptc.csx); the rest is not built."));
+    t.Unresolved.RemoveAll(s => s.Contains("inlay plates, lug angles, stiffeners, diaphragms, stitch rivets"));
+    t.Unresolved.Add(U("p.69, p.74-90", "lug angles, stiffeners, diaphragms, stitch rivets and the chord splice callouts without a read extent",
+        $"the joint sheets list them without extents ({nSkip} splice / fill callouts in splices.csv have none: flange-angle corner fills, the L11 splice in the gusset layers, the L13 / L15 inlays in the inlaid-gusset layer, the U21' / L21' erection closure plates)",
+        "chord cover / web / inlay splice plates and fills with a read extent are built (connections-ptc.csx section 1, splices.csv u0 / u1); the rest is not built."));
 }
 
 // ================================================================ 2. girder spans: stiffeners (fills, crimps, rivets), the two web splices and the longitudinal stiffener (p.43 / p.44)

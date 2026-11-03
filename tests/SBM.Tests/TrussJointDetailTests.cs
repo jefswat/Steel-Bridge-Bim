@@ -144,4 +144,107 @@ public class TrussJointDetailTests
         Assert.Contains("\"PositionsInMemberFrame\"", json);
         Assert.DoesNotContain("\"Positions\"", TrussTests.Model().p.ToJson());
     }
+
+    [Fact]
+    public void InlayPlates_ReplaceTheChordPlyLayer_PlyEndsAtThePlate_OtherPlatesStackOnIt()
+    {
+        static (BridgeModel bm, BridgeProject p) Run(bool inlay)
+        {
+            var (p, b) = TrussTests.Model(extras: false);
+            var t = b.Truss!;
+            t.Sections.Add(new TrussSectionDefinition
+            {
+                Name = "BOX3", Kind = TrussSectionKind.Box, Label = "two ply chord", WebDepth = In(24), WebsOutToOut = In(20), Angle = "L4x4x1/2",
+                WebPlies = { new TrussPly(0, In(0.5)), new TrussPly(0, In(0.375)) },
+            });
+            foreach (var m in t.Members.Where(m => m.Name is "L2-L3" or "L3-L4")) m.Section = "BOX3";
+            var plates = new List<TrussJointPlate>();
+            if (inlay)
+                plates.Add(new TrussJointPlate
+                {
+                    Face = TrussPlateFace.WebOutside, Width = In(24), Thickness = In(0.5), Length = In(24), Offset = In(2), Label = "inlay",
+                    Replaces = new() { new TrussPlyRef { Side = -1, Width = In(24), Thickness = In(0.5) }, new TrussPlyRef { Side = 1, Width = In(24), Thickness = In(0.5) } },
+                });
+            plates.Add(new TrussJointPlate { Face = TrussPlateFace.WebOutside, Width = In(24), Thickness = In(0.375), Length = In(40), Label = "o.s. spl" });
+            t.Joints.Add(new TrussJointDefinition { Point = "L3", Plane = "N", Plates = plates });
+            return (Regen(p), p);
+        }
+        var (m0, p0) = Run(false);
+        var (m1, p1) = Run(true);
+        SteelPart Part(BridgeModel bm, string mark) => bm.Steel!.Parts.Single(x => x.Mark == mark);
+        double in3 = Math.Pow(In(1), 3);
+        // the outer 1/2 ply of each chord stops at the inlay end: 10 in. on L2-L3 (plate -10..+14), 14 in. on L3-L4 (both webs)
+        Assert.Equal(2 * 24 * 0.5 * 10, (Part(m0, "N-L2-L3").Mesh.Volume() - Part(m1, "N-L2-L3").Mesh.Volume()) / in3, 1);
+        Assert.Equal(2 * 24 * 0.5 * 14, (Part(m0, "N-L3-L4").Mesh.Volume() - Part(m1, "N-L3-L4").Mesh.Volume()) / in3, 1);
+        // the inlay lies in the ply layer (|x| 9.5..10 in.), the o.s. splice plate on it (10..10.375) as on the ply without the inlay
+        var tm = m1.Steel!.Truss!;
+        var P = tm.Point("N", "L3")!.World;
+        var mem = tm.Member("N-L3-L4")!;
+        var nx = Vec3.Cross(mem.B - mem.A, new Vec3(0, 0, 1)).Normalized();
+        (double lo, double hi) X(SteelPart part) { var xs = part.Mesh.Positions.Select(q => Math.Abs(Vec3.Dot(q - P, nx)) / In(1)).ToList(); return (xs.Min(), xs.Max()); }
+        var inl = m1.Steel.Parts.Single(x => x.Description.StartsWith("inlay"));
+        Assert.Contains("inlay (in the web ply layer)", inl.Description);
+        Assert.Equal(9.5, X(inl).lo, 3); Assert.Equal(10.0, X(inl).hi, 3);
+        var os1 = m1.Steel.Parts.Single(x => x.Description.StartsWith("o.s. spl"));
+        var os0 = m0.Steel!.Parts.Single(x => x.Description.StartsWith("o.s. spl"));
+        Assert.Equal(X(os0).lo, X(os1).lo, 3); Assert.Equal(10.0, X(os1).lo, 3);
+        // the input is omitted from the .sbm when not used
+        Assert.DoesNotContain("Replaces", p0.ToJson());
+        Assert.Contains("Replaces", p1.ToJson());
+    }
+
+    [Fact]
+    public void JointPlates_ThirdChordRoleMemberAtThePoint_DoesNotSetThePlateAxisOrLevel()
+    {
+        static (double lo, double hi) Fill(bool wind)
+        {
+            var (p, b) = TrussTests.Model(extras: false);
+            var t = b.Truss!;
+            if (wind)
+            {
+                // a wind chord (chord role, narrow section) leaving L3 steeply downward
+                var l3 = t.Points.First(x => x.Name == "L3");
+                t.Points.Add(new TrussPointDefinition("W3", l3.Station + Ft(6), l3.Elevation - Ft(12)));
+                t.Members.Add(new TrussMemberDefinition { Name = "L3-W3", From = "L3", To = "W3", Section = "PL", Role = TrussMemberRole.LowerChord });
+            }
+            t.Joints.Add(new TrussJointDefinition { Point = "L3", Plane = "N", Plates = new()
+            {
+                new TrussJointPlate { Face = TrussPlateFace.WebInside, Width = In(12), Thickness = In(0.5), Length = In(20), Offset = In(10), Fill = true, Label = "fill" },
+            } });
+            var bm = Regen(p);
+            var tm = bm.Steel!.Truss!;
+            var P = tm.Point("N", "L3")!.World;
+            var mem = tm.Member("N-L3-L4")!;
+            var nx = Vec3.Cross(mem.B - mem.A, new Vec3(0, 0, 1)).Normalized();
+            var xs = bm.Steel.Parts.Single(x => x.Description.StartsWith("fill")).Mesh.Positions.Select(q => Math.Abs(Vec3.Dot(q - P, nx)) / In(1)).ToList();
+            return (xs.Min(), xs.Max());
+        }
+        var a = Fill(false); var b2 = Fill(true);
+        Assert.Equal(a.lo, b2.lo, 3);
+        Assert.Equal(a.hi, b2.hi, 3);
+    }
+
+    [Fact]
+    public void PlateRivetZones_RivetsOnlyInTheStretchesBeyondTheGusset()
+    {
+        var (p, b) = TrussTests.Model(extras: false);
+        var plate = new TrussJointPlate
+        {
+            Face = TrussPlateFace.WebOutside, Width = In(24), Thickness = In(0.5), Length = In(100), Label = "o.s. spl", RivetRows = 3, RivetDiameter = In(0.875),
+            RivetZones = new() { new TrussPlateRivetZone { From = -In(50), To = -In(30), Count = 9 }, new TrussPlateRivetZone { From = In(30), To = In(60), Count = 6 } },
+        };
+        b.Truss!.Joints.Add(new TrussJointDefinition { Point = "L3", Plane = "N", Plates = new() { plate } });
+        var bm = Regen(p);
+        var tm = bm.Steel!.Truss!;
+        var P = tm.Point("N", "L3")!.World;
+        var mem = tm.Member("N-L3-L4")!;
+        var ax = (mem.B - mem.A).Normalized();
+        var us = bm.Steel.Bolts.Where(q => q.Kind == BoltKind.Rivet).Select(q => Vec3.Dot(q.Frame.Origin - P, ax) / In(1)).Where(u => Math.Abs(u) > 25 && Math.Abs(u) < 55).ToList();
+        // 15 rivets per web, both webs; the second zone is clipped to the plate end (50 in.); the first starts at the plate edge distance
+        Assert.Equal(30, us.Count(u => Math.Abs(u) >= 29.9 && Math.Abs(u) <= 50.01));
+        Assert.Equal(18, us.Count(u => u < -29.9 && u >= -50.01));
+        Assert.DoesNotContain(us, u => Math.Abs(u) < 30.0 - 1e-6 && Math.Abs(u) > 25);
+        Assert.Contains("RivetZones", p.ToJson());
+        Assert.DoesNotContain("RivetZones", TrussTests.Model(extras: false).p.ToJson());
+    }
 }
