@@ -40,6 +40,29 @@ public class TrussJointFitTests
         Assert.Equal(In(0.125), BridgeProject.FromJson(p.ToJson()).Bridges[0].Truss!.Joints.First(x => x.Point == "U3").GussetSplitGap, 9);
     }
 
+    /// <summary>PTC L22 final condition (2026-11-03): a gusset whose corners were flame cut off is a NON-CONVEX outline (cross shape); split at the
+    /// point with a gap and covered by a convex outer layer that lies inside it, every plate keeps the exact area of the remaining plate.</summary>
+    [Fact]
+    public void SplitGusset_NonConvexCutOutline_ExactAreasAndLayerInside()
+    {
+        var (p, b) = TrussTests.Model();
+        var j = b.Truss!.Joints.First(x => x.Point == "U3");
+        // 2.0 x 1.2 m plate with the four 0.4 x 0.3 m corners cut away (area 2.4 - 0.48 = 1.92 m2)
+        j.Outline = new() { new(-1.0, -0.3), new(-0.6, -0.3), new(-0.6, -0.6), new(0.6, -0.6), new(0.6, -0.3), new(1.0, -0.3), new(1.0, 0.3), new(0.6, 0.3),
+            new(0.6, 0.6), new(-0.6, 0.6), new(-0.6, 0.3), new(-1.0, 0.3) };
+        j.GussetSplitGap = In(0.125);
+        j.GussetLayers = new() { new TrussGussetLayer { Thickness = In(1.125), Outline = { new TrussUV(-0.5, -0.5), new TrussUV(0.5, -0.5), new TrussUV(0.5, 0.5), new TrussUV(-0.5, 0.5) } } };
+        var s = Regen(p).Steel!;
+        double t = j.GussetThickness > 0 ? j.GussetThickness : b.Truss.JointDefaults.GussetThickness;
+        var a = s.Parts.Single(x => x.Mark == "N-GU3-LA"); var c = s.Parts.Single(x => x.Mark == "N-GU3-LB");
+        // each half = half the cut plate less the gap strip (the strip at the point is 1.2 m high)
+        double half = (1.92 - In(0.125) * 1.2) / 2;
+        Assert.Equal(half * t, a.Mesh.Volume(), 6);
+        Assert.Equal(half * t, c.Mesh.Volume(), 6);
+        // the outer layer lies inside the cut plate: clipped to it, it keeps its own 1.0 x 1.0 m
+        Assert.Equal(1.0 * In(1.125), s.Parts.Single(x => x.Mark == "N-GU3-L2").Mesh.Volume(), 6);
+    }
+
     [Fact]
     public void WebsAbutAt_DiagonalCutOnTheVerticalSide_VerticalKeepsItsEnd()
     {

@@ -2,7 +2,8 @@
 //   1. lug angles 2-Ls 8 x 4 x 1/2 on the web members (p.82, p.84, p.87-89)
 //   2. rope suspender support diaphragms at L15-L22 (p.86 "TYPICAL CONNECTION OF ROPE SUSPENDER TO TRUSSES" = Sheet 46, referred to by p.87-89)
 //   3. diagonal fills at U21 / L21 (p.89; defined by connections-ptc.csx batch 8b but not built: their extent was measured to 0)
-//   4. items read but not built (flags): L12 fills, L22 chord diaphragms / end angles / jacking scheme, L14 Section E diaphragm, L1 / L3 strut angles + fills
+//   4. items read but not built (flags): L12 fills, L14 Section E diaphragm, L1 / L3 strut angles + fills; L22 jacking brackets / jacking scheme / erection bolts = erection
+//      equipment, not built (user decision 2026-11-03: L22 in its final condition only)
 // Re-runnable (replaces its own inputs); run AFTER details-ptc.csx and BEFORE girder-details-ptc.csx (CLAUDE.md PTC build order):
 //   sbm run samples\plans\components-ptc.csx "samples\plans\PTC Delaware River Bridge.sbm"
 // The geometry the components sit on (cover plate faces, member ends, gusset inner faces, suspender pins) is read from a regeneration of the main span made
@@ -379,11 +380,23 @@ report.Add($"3. diagonal fills U21 / L21: {nFill} definitions (both planes each)
 Flag("L12 web member fills 2-Fills 26 x 1", U("p.81", "L12 web member fills 2-Fills 26 x 1 on U11-L12 and 2-Fills 28 x 1 on U12-L12",
     "the joint elevation draws them beyond the gusset edge with three rows of field rivets, but the gussets are 2'-5 in. to in. and the model builds these members 2'-5 out to out (the member width is itself not given, p.70): a 1 in. fill each side means the members are 2'-3 out to out, which the sheets do not state",
     "not built (it needs the member width of U11-L12 / U12-L12 decided first)."));
-Flag("L22 chord diaphragms (Diaph. Material 4-Ls 5 x 3 1/2 x 1/2", U("p.90", "L22 chord diaphragms (Diaph. Material 4-Ls 5 x 3 1/2 x 1/2, 1-1/2 Web Pl. F.I.E.) and the end angles 2-Ls 8 x 6 x 1/2 (C) / 2-Ls 4 x 4 x 1/2 (C) at the gusset ends",
-    "the elevation draws a riveted band at each gusset end above and below the chord (4 rows) and the end angles along the FIN. gusset ends against the jacking slabs, but Section D shows the diaphragm only cut through (half, 'Symm. abt. this CL') without its plate width, angle lengths or which plane the 1/2 web lies in, and the end angles bear on the crown jacking scheme (Section A), which is an open user decision",
-    "not built; the drawn rivet rows of these bands are not placed."));
-Flag("L22 crown jacking scheme", U("p.90", "L22 crown jacking scheme (Section A / B: 2-Slabs 22 x 10 1/2 (C), 2 jacking rods, jack 2'-4)",
-    "the sheet does not say whether the jacking slabs and rods stay in the finished bridge or were erection equipment", "not built - user decision (erection item or permanent)."));
+// L22 = FINAL CONDITION ONLY (user decision 2026-11-03: "Fix L22 to be only the final condition"; TRUSS-DESIGN.md section 42). p.90 note "Flame cut 1" gusset plates
+// at L22 on lines "X" after field rivets have been driven": the corner pieces of the 1 in. half gussets outside lines X (gusset-outlines.csv L22 = the plate left after
+// the cut) carry the crown jacking brackets - chord-end diaphragms, end angles bearing on the jacking slabs, fastened to the plate inside line X by "1" Shop Bolts".
+// They, the jacking slabs / rods / bodies (Section A / B) and the "1 1/8 Erection Bolts" are erection equipment: not built.
+Flag("L22 chord diaphragms (Diaph. Material 4-Ls 5 x 3 1/2 x 1/2", null);   // old open-question texts (2026-11-02)
+Flag("L22 crown jacking scheme", null);
+Flag("L22 FINAL CONDITION: crown jacking brackets", "USER DECISION (p.90, 2026-11-03): L22 is modeled in its FINAL CONDITION only. The crown jacking brackets - Diaph. Material "
+    + "4-Ls 5 x 3 1/2 x 1/2 + 1-1/2 Web Pl. (F.1.E.), 1-L 4 x 4 x 1/2 (F.2.E.), end angles 2-Ls 8 x 6 x 1/2 (C) / 2-Ls 4 x 4 x 1/2 (C) on the FIN. gusset ends - sit on the "
+    + "corner pieces of the 1 in. gussets that the p.90 note 'Flame cut 1\" gusset plates at L22 on lines X after field rivets have been driven' removes, fastened inside "
+    + "line X by '1\" Shop Bolts'; with the crown jacking scheme of Section A / B (2-Slabs 22 x 10 1/2 (C), 2 jacking rods, jacking bodies, jack 2'-4) they are erection "
+    + "equipment and are not built; the 1 in. gussets are built as left after the cut (gusset-outlines.csv) and the field rivets of the cut-off pieces are not placed.");
+Flag("L22 shop bolt holes after the cut", U("p.90", "the holes of the '1\" Shop Bolts' that fastened the crown jacking brackets to the 1 in. gussets just inside lines X (3 per band row above the chord, about 4 per side under the 1 1/8 splice gusset below it)",
+    "the sheet does not say whether the bolts are removed with the brackets, left in place, or replaced by rivets in the final condition",
+    "no fasteners placed in them (the generator cuts no holes)."));
+Flag("L22 erection bolts", U("p.90", "the piece fastened by '1 1/8 Erection Bolts' above the L22 gusset east of the CL (2-3/8 Gus. Pls. (C) bracket on the gusset top edge and a member drawn broken above it; U22-L22 is on the CL, so it is not a truss member)",
+    "the sheet names only its fasteners (erection bolts) and draws the piece without a name, size or entry in the joint's material lists",
+    "treated as erection equipment under the final-condition decision (user 2026-11-03): not built, its 6 drawn rivets not placed (rivet-count-zones.csv SKIP)."));
 Flag("L14 internal chord diaphragm (p.84 Section E)", U("p.84", "internal diaphragm at L14 (Section E: DIAPHRAGM 4-Ls 8 x 7 1/2 x 5/8, 3-Ls 5 x 5 x 5/8, 1-L 6 1/2 x 6 x 5/8, 1-3/4 Web Pl., 2-Fills 12 1/4 x 1; 1 1/8 rivets, 2'-5 in. to in. gussets)",
     "Section E gives the make-up across the member but the elevation does not dimension where along the member it sits or its length, and the angles' lengths are not given",
     "not built."));

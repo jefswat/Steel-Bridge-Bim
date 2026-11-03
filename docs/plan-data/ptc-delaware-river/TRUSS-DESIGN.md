@@ -1321,7 +1321,7 @@ the item). Test `TrussTests.PlaneItems_Rivets_GripFromTheStackAndMirrored`.
 | Diagonal fills U21 / L21 (c) | p.89: 2-18 x 1 1/8 Fills (C) on U21-L22, 2-21 x 1 1/8 Fills on U20-L21 (gussets 2'-7 1/4 in. to in., diagonals 2'-5) | connections-ptc batch 8b defined them, but its reach along the member came out 0 and the generator dropped them ("lies beyond the end of member"); rebuilt with the reach measured on the built gussets + the drawn length beyond (4.8 / 18.6 in.) |
 | L12 fills (c) | p.81: 2-Fills 26 x 1 on U11-L12, 28 x 1 on U12-L12 beyond the gusset, 3 rows of field rivets | NOT built, flagged: the members are built 2'-5 out to out = the gusset in-to-in; the fills mean 2'-3 members, which p.70 does not state (member width decision first) |
 | L22 chord diaphragms / end angles (e) | p.90: Diaph. Material 4-Ls 5 x 3 1/2 x 1/2, 1-1/2 Web Pl. F.I.E. at both gusset ends above / below the chord (4 rivet rows), 2-Ls 8 x 6 x 1/2 (C) / 2-Ls 4 x 4 x 1/2 (C) on the FIN. gusset ends against the jacking slabs | NOT built, flagged: Section D cuts the diaphragm only (half, no plate width / angle lengths / web plane), the end angles belong to the crown jacking scheme |
-| L22 jacking scheme (e) | p.90 Section A / B: 2-Slabs 22 x 10 1/2 (C), 2 jacking rods, jack 2'-4 | NOT built - USER DECISION (erection item or permanent) |
+| L22 jacking scheme (e) | p.90 Section A / B: 2-Slabs 22 x 10 1/2 (C), 2 jacking rods, jack 2'-4 | NOT built - USER DECISION 2026-11-03: L22 in its final condition only (section 42) |
 | L14 internal diaphragm (g) | p.84 Section E (300 dpi): DIAPHRAGM 4-Ls 8 x 7 1/2 x 5/8, 3-Ls 5 x 5 x 5/8, 1-L 6 1/2 x 6 x 5/8, 1-3/4 Web Pl., 2-Fills 12 1/4 x 1, 1 1/8 rivets (the review read 4-Ls 3 1/2 x 3 1/2 x 3/8) | NOT built, flagged: its place / length along the member is not dimensioned |
 | L1 / L3 1-L 5 x 5 x 7/16 + 1-Fill 6 x 1/2 (f) | p.75 (L1 'similar to L3', p.74) | NOT built here: the angles are the bottom strut LS-L1 / LS-L3 end connection to the chord web (p.97 L1 section, 'similar for L2 to L8' = batch 1 rows L1-L7) and the fills pack the lateral plates S-BGL1 / S-BGL3: bracing-connection items (bracing-ptc.csx) |
 
@@ -1329,3 +1329,49 @@ Results (copy of the committed PTC model, components-ptc only; the later scripts
 positions, 30 suspender support diaphragms (60 web plate pieces + 120 angles, 1,080 rivet positions), 8 diagonal fills (U21 / U21' / L21 / L21', both trusses). Lug starts moved
 clear of the members already at the joint by 0.4 - 6.7 in. (report line). CHECK rows printed by the script: the inner-edge lugs next to the vertical are short after the clearance (U15 / U15' 16 rivets on 24 in. = 2 13/16 in., U16 / U16' 12 on 15 5/16 in. = 2 1/4 in. per gage
 line (under 3 d). Clash rows (all 7 units, no bolts) 3,357 -> 3,357 (no component clashes); check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after; tests 783 passed.
+
+## 42. L22 final condition (2026-11-03, fork-l22; user decision "Fix L22 to be only the final condition")
+
+Sheet p.90 (DRB-4/50 "MAIN TRUSS SPAN - JOINTS U22 & L22 AND JACKING SCHEME"), read at 450 dpi (page px of the 150 dpi frame of `gusset-outlines.csv`, 4.28 px/in,
+calibrated on the printed U22 plan 2'-11 1/4 o.o.; work files `temp/l22`, untracked).
+
+Evidence:
+- NOTES, RIVETS: "Flame cut 1" gusset plates at L22 on lines "X" after field rivets have been driven."
+- The elevation draws four dash-dot lines labelled Line "X" (two leaders each side). UPPER: vertical from the lower end of each diagonal's gusset edge (x 362 / 877 px,
+  u -60.0 / +60.3 in.) down to the chord top, a round corner, then along the chord top to the outer gusset edge (v +16.1 at the corner, +15.4 at the edge: parallel to
+  the chord). LOWER: along the chord bottom from the outer edge (v -18.9) to the lower corner of the 1 1/8 splice gusset (x 432 / 806 px, v -17.8), then down that
+  plate's 45 deg lower edge (the right-hand leader points at it) to the bottom of the 1 in. plate.
+- The four corner pieces outside lines X carry the crown jacking brackets: "Diaph. Material 4-Ls 5 x 3 1/2 x 1/2, 1-1/2 Web Pl. F.1.E." and "1-L 4 x 4 x 1/2 F.2.E.",
+  the end angles 2-Ls 8 x 6 x 1/2 (C) / 2-Ls 4 x 4 x 1/2 (C) on the "FIN." gusset ends against the jacking slabs of Section A / B (2-Slabs 22 x 10 1/2 (C), 2 jacking rods,
+  jacking bodies, jack 2'-4), field rivets (open rings) on the corner pieces and "1" Shop Bolts" (leaders right side above and below the chord) just inside line X. So the
+  brackets bolt to the plate that stays, the corner pieces are burnt off after the closure is riveted, and the brackets go with them.
+- "1 1/8 Erection Bolts" (top centre): leaders into an unnamed piece above the gusset east of the CL (2-3/8 Gus. Pls. (C) bracket + a member drawn broken). U22-L22 is on
+  the CL, so this is not a truss member.
+
+Model:
+- `gusset-outlines.csv` L22 = the 1 in. plate LEFT after the cut (15-vertex non-convex outline: chord band over the full width + the diagonal / vertical zone above
+  the chord + the part under the 1 1/8 splice gusset below it); 121.06 -> 86.45 SF per face (each half 43.2 SF with the 1/8 in. split gap), about 5,660 lb of 1 in.
+  plate less on the two trusses. The 1 1/8 splice gusset lies inside it (clipped to itself). Flag text names the cut (connections-ptc.csx section 4b).
+  No generator change was needed for the outline (the gusset, split, layer clip, rivet and stack code are all generic for a simple non-convex outline);
+  test `TrussJointFitTests.SplitGusset_NonConvexCutOutline_ExactAreasAndLayerInside`.
+- Rivets of the cut-off pieces: the band field rivets were never placed (rivet-count-zones.csv SKIP rows, now worded as "cut off along line X"); 4 detector symbols of the
+  top-east band that `rivet-positions.csv` had given to U21'-L22 (y -29 .. -38 in. off its axis) moved to `rivet-positions-removed.csv`, rivet-counts.csv U21'-L22 inside
+  66 -> 62 (the U21-L22 mirror has 61). Every other L22 rivet position lies inside the remaining plate.
+- components-ptc.csx: the two open-question flags replaced by "USER DECISION (p.90, 2026-11-03): L22 is modeled in its FINAL CONDITION only ..." (jacking brackets,
+  diaphragm material, end angles, jacking scheme: erection equipment, not built), plus two UNRESOLVED flags: the 1 in. shop bolt holes left in the remaining plate
+  (the sheet does not say whether the bolts stay, are removed or replaced by rivets: nothing placed) and the erection-bolt piece above the gusset (not named:
+  treated as erection equipment, not built). The L22 chord diaphragms are therefore no longer an open "build it" item: they are part of the brackets.
+- INLAY (joint agent review `qc/ptc/main-span/work11/review/J.csv`, FIX WRONG row): p.90 lists L21-L22 "2-Web Pls. 34 x 1 o.s., 2-Web Pls. 34 x 1 1/16, 2-Web Pls.
+  18 x 7/8" and "2-Inlay Spl. Pls. 34 x 1 1/16" = the inlay replaces the SECOND ply while the 34 x 1 o.s. ply runs through to the CL. The generator stacked every
+  inlay on the outermost steel left after removing the replaced ply, so it lay outside the o.s. ply in the gusset layer (n 14.50 - 15.56, inside S-GL22-RA/RB and the
+  1 1/8 layer) while the W2 layer (12.43 - 13.50, cut at u -17.5 / +18.0) was empty: 58 rivets per face crossed a 1 1/16 in. void. Generic fix
+  (`TrussGenerator.InlayLayerBase`, used by the plate stacking): when a ply that is NOT replaced lies outside the replaced ply in the plate's band, the inlay takes the
+  replaced ply's own layer (base = its inner face); otherwise unchanged. L22 inlay now n 12.43 - 13.50; the rivets in the inlay zone grip 5.56 -> 6.69 in. (3.13 -> 4.19 at
+  the chord edges), no void. Test `TrussJointDetailTests.InlayPlate_ReplacingAnInnerPly_LiesInThatPlysLayer_UnderTheOuterPly`; the outer-ply inlay test is unchanged.
+
+Results (copy of the committed PTC model, chain connections-ptc -> rivets-ptc): clash rows (all 7 bridges) 2,918 -> 2,918 (none at L22 before or after);
+check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after; tests 798 passed. Re-rendered S_L22 / N_L22 (dump_joints.csx + render_joints.py)
+match the p.90 outline after the cut.
+
+Open: the bracing edge-angle rivet of S/N-BGL22-T/B at u = 0 (on the CL, in the 1/8 in. gusset split and the chord joint line: grip 1 5/8 in.) belongs to the bracing
+plates (TrussGeneratorBracing, other fork); the shop bolt holes (flagged above); lines X are traced on the raster (+-1 in., dimension-only flag on the outline).

@@ -193,6 +193,46 @@ public class TrussJointDetailTests
         Assert.Contains("Replaces", p1.ToJson());
     }
 
+    /// <summary>PTC L22 (agent review 2026-11-03): an inlay that replaces an INNER web ply (the outer ply runs through) lies in that ply's own layer,
+    /// not outside the outer ply in the gusset layer.</summary>
+    [Fact]
+    public void InlayPlate_ReplacingAnInnerPly_LiesInThatPlysLayer_UnderTheOuterPly()
+    {
+        var (p, b) = TrussTests.Model(extras: false);
+        var t = b.Truss!;
+        t.Sections.Add(new TrussSectionDefinition
+        {
+            Name = "BOX3", Kind = TrussSectionKind.Box, Label = "two ply chord", WebDepth = In(24), WebsOutToOut = In(20), Angle = "L4x4x1/2",
+            WebPlies = { new TrussPly(0, In(0.5)), new TrussPly(0, In(0.375)) },
+        });
+        foreach (var m in t.Members.Where(m => m.Name is "L2-L3" or "L3-L4")) m.Section = "BOX3";
+        var bm0 = Regen(p);
+        t.Joints.Add(new TrussJointDefinition
+        {
+            Point = "L3", Plane = "N", Plates = new()
+            {
+                new TrussJointPlate
+                {
+                    Face = TrussPlateFace.WebOutside, Width = In(24), Thickness = In(0.375), Length = In(24), Label = "inlay",
+                    Replaces = new() { new TrussPlyRef { Side = -1, Width = In(24), Thickness = In(0.375) }, new TrussPlyRef { Side = 1, Width = In(24), Thickness = In(0.375) } },
+                },
+            },
+        });
+        var bm = Regen(p);
+        var tm = bm.Steel!.Truss!;
+        var P = tm.Point("N", "L3")!.World;
+        var mem = tm.Member("N-L3-L4")!;
+        var nx = Vec3.Cross(mem.B - mem.A, new Vec3(0, 0, 1)).Normalized();
+        (double lo, double hi) X(SteelPart part) { var xs = part.Mesh.Positions.Select(q => Math.Abs(Vec3.Dot(q - P, nx)) / In(1)).ToList(); return (xs.Min(), xs.Max()); }
+        var inl = bm.Steel.Parts.Single(x => x.Description.StartsWith("inlay"));
+        // outer 1/2 ply 9.5..10, inner 3/8 ply 9.125..9.5: the inlay takes the inner ply's layer
+        Assert.Equal(9.125, X(inl).lo, 3); Assert.Equal(9.5, X(inl).hi, 3);
+        // the inner ply stops at the inlay end (12 in. each side of the point, both webs); the outer ply is unchanged
+        double in3 = Math.Pow(In(1), 3);
+        SteelPart Part(BridgeModel m, string mark) => m.Steel!.Parts.Single(x => x.Mark == mark);
+        Assert.Equal(2 * 24 * 0.375 * 12, (Part(bm0, "N-L3-L4").Mesh.Volume() - Part(bm, "N-L3-L4").Mesh.Volume()) / in3, 1);
+    }
+
     [Fact]
     public void JointPlates_ThirdChordRoleMemberAtThePoint_DoesNotSetThePlateAxisOrLevel()
     {
