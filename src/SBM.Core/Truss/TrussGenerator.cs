@@ -105,6 +105,17 @@ public static partial class TrussGenerator
             long mask = 0;
             for (int i = 0; i < m.Sec.Pieces.Count && i < 62; i++)
                 if (PieceSpan(m, m.Sec.Pieces[i], cut) is { } sp && s >= sp.ps - 1e-6 && s <= sp.ps + sp.pl + 1e-6) mask |= 1L << i;
+            var res0 = SectionRunMasked(m, y, sx, dia, mask);
+            if (res0 != null || !HasInlays) return res0;
+            // a web ply stopped by an inlay plate (TrussJointPlate.Replaces): the inlay lies in its layer, so the stack there is as clean as with the ply
+            long mask2 = 0;
+            for (int i = 0; i < m.Sec.Pieces.Count && i < 62; i++)
+                if (PieceSpan(m, m.Sec.Pieces[i], cut, ignoreInlays: true) is { } sp && s >= sp.ps - 1e-6 && s <= sp.ps + sp.pl + 1e-6) mask2 |= 1L << i;
+            return mask2 == mask ? null : SectionRunMasked(m, y, sx, dia, mask2);
+        }
+
+        private (double xo, double t)? SectionRunMasked(Inst m, double y, int sx, double dia, long mask)
+        {
             var key = (m, (long)Math.Round(y * 1e4), sx, mask, (long)Math.Round(dia * 1e5));
             if (_runCache.TryGetValue(key, out var hit)) return hit;
             (double xo, double t)? Run(double yy)
@@ -862,7 +873,8 @@ public static partial class TrussGenerator
         /// <paramref name="pc"/> stops because an inlay plate of that end joint lies in its layer; 0 = the ply is not replaced there.</summary>
         private double InlayTrim(Inst m, TrussSectionPiece pc, bool atA)
         {
-            if (pc.PlyIndex < 0 || !HasInlays) return 0;
+            // inlays are chord splice plates: only the CHORD members' plies stop at them (a post / diagonal ply of the same size at the joint runs on)
+            if (pc.PlyIndex < 0 || !HasInlays || !IsChord(m.Def.Role)) return 0;
             var key = (m, pc.PlyIndex, atA);
             if (_inlayTrim.TryGetValue(key, out var hit)) return hit;
             double res = 0;
@@ -903,7 +915,7 @@ public static partial class TrussGenerator
         }
         /// <summary>Extent of a section piece along the member solid (start from the cut start, length): full, partial centred (+ Offset), from
         /// <see cref="TrussSectionPiece.Start"/> after the start working point, or between the end gussets; null = nothing left.</summary>
-        private (double ps, double pl)? PieceSpan(Inst m, TrussSectionPiece pc, double cut)
+        private (double ps, double pl)? PieceSpan(Inst m, TrussSectionPiece pc, double cut, bool ignoreInlays = false)
         {
             double pl = pc.Length > 0 ? Math.Min(pc.Length, cut) : cut;
             double ps = pc.Length > 0 ? Math.Clamp(cut / 2 + pc.Offset - pl / 2, 0, cut - pl) : 0;
@@ -921,7 +933,7 @@ public static partial class TrussGenerator
                 if (inl.Contains(m.PointB, StringComparer.OrdinalIgnoreCase)) s1 = Math.Min(s1, len - GussetReach(m, false) - m.SA);
                 ps = s0; pl = s1 - s0;
             }
-            if (pc.PlyIndex >= 0 && HasInlays)
+            if (pc.PlyIndex >= 0 && HasInlays && !ignoreInlays)
             {
                 // inlay plates at the member's end joints (TrussJointPlate.Replaces): the ply stops at the plate end
                 double len = (m.B - m.A).Length;
@@ -1475,6 +1487,7 @@ public static partial class TrussGenerator
                 Warn($"Truss CHECK rivets: {_tightGroups} distributed rivet groups need a grid under 3 diameters (tightest {_tightest:0.00} d) - the image count and the gusset / member lap (envelope outline where the gussets are not dimensioned) disagree; each group is listed as Info. Positions are not adjusted.");
         }
         private int _tightGroups;
+        private int _stepFills, _stepShort, _outsideGussetPlates, _gapBridged;
         private double _tightest = double.MaxValue;
 
         private void PitchRivets(JointCtx c, Inst m, TrussRivetGroup rg)
@@ -1918,6 +1931,58 @@ public static partial class TrussGenerator
             return (c.Min(q => q.X), c.Max(q => q.X));
         }
 
+        /// <summary><see cref="TrussJointPlate.OutsideGusset"/>: the plate rectangle a0..a1 x y0..y1 (along <paramref name="ax"/> / <paramref name="yv"/> from the point)
+        /// less the joint's inner gusset outline = up to two polygons (left piece: plate end to the gusset's left edge; right piece likewise). Null = the outline
+        /// does not cross the band everywhere. <paramref name="inA1"/> / <paramref name="inB0"/> = the stretches the pieces cover over the whole band.</summary>
+        private List<Vec2[]>? OutsideGussetPieces(string pl, string pt, Vec3 P, Vec3 ax, Vec3 yv, double a0, double a1, double y0, double y1, out double inA1, out double inB0)
+        {
+            inA1 = a1; inB0 = a0;
+            if (JointMembers(pl, pt) is not { } jm) return null;
+            double st = StationOf(P);
+            var u = Tangent(st);
+            var n = Normal(pl, st);
+            var v = Vec3.Cross(n, u).Normalized();
+            u = Vec3.Cross(v, n).Normalized();
+            var outline = GussetOutline(pl, pt, jm.here, jm.jdef, P, u, v);
+            if (outline.Count < 3) return null;
+            var poly = outline.Select(q => { var w = u * q.X + v * q.Y; return new Vec2(Vec3.Dot(w, ax), Vec3.Dot(w, yv)); }).ToList();
+            var ys = new SortedSet<double> { y0, y1 };
+            foreach (var q in poly) if (q.Y > y0 + 1e-6 && q.Y < y1 - 1e-6) ys.Add(q.Y);
+            var lefts = new List<Vec2>(); var rights = new List<Vec2>();
+            foreach (double y in ys)
+            {
+                // crossings of the horizontal line y with the outline (a vertex exactly on y: nudged)
+                double yy = y == y0 ? y + 1e-7 : y == y1 ? y - 1e-7 : y;
+                var xs = new List<double>();
+                for (int i = 0; i < poly.Count; i++)
+                {
+                    var p = poly[i]; var q = poly[(i + 1) % poly.Count];
+                    if ((p.Y > yy) == (q.Y > yy)) continue;
+                    xs.Add(p.X + (q.X - p.X) * (yy - p.Y) / (q.Y - p.Y));
+                }
+                if (xs.Count < 2) return null;
+                lefts.Add(new Vec2(Math.Clamp(xs.Min(), a0, a1), y));
+                rights.Add(new Vec2(Math.Clamp(xs.Max(), a0, a1), y));
+            }
+            var res = new List<Vec2[]>();
+            if (lefts.Any(q => q.X > a0 + 1e-4))
+            {
+                var lp = new List<Vec2> { new(a0, y0) };
+                lp.AddRange(lefts);
+                lp.Add(new Vec2(a0, y1));
+                res.Add(lp.ToArray());
+            }
+            if (rights.Any(q => q.X < a1 - 1e-4))
+            {
+                var rp = new List<Vec2> { new(a1, y1), new(a1, y0) };
+                rp.Reverse();   // a1,y0 -> a1,y1 -> rights from the top down (counter-clockwise)
+                for (int i = rights.Count - 1; i >= 0; i--) rp.Add(rights[i]);
+                res.Add(rp.ToArray());
+            }
+            inA1 = lefts.Min(q => q.X); inB0 = rights.Max(q => q.X);
+            return res;
+        }
+
         private void BuildJointPlates()
         {
             foreach (var jdef in _d.Joints.Where(j => j.Plates is { Count: > 0 }))
@@ -1963,9 +2028,10 @@ public static partial class TrussGenerator
                     // are placed first, the one closest to the member first (a fill between the angle legs before a wider fill that bears on the legs and on it).
                     var placed = new List<(TrussPlateFace f, double a0, double a1, double b0, double b1, double top)>();
                     (double b0, double b1) Band(TrussJointPlate p) => p.Face is TrussPlateFace.Top or TrussPlateFace.Bottom ? (-p.Width / 2, p.Width / 2) : (yc - p.Width / 2, yc + p.Width / 2);
-                    double BaseOf(TrussJointPlate p)
+                    double BaseOf(TrussJointPlate p) => LevelOver(p, p.Offset - p.Length / 2, p.Offset + p.Length / 2);
+                    // level of the steel under plate p over the stretch a0..a1 along the joint (the whole plate = its stack base)
+                    double LevelOver(TrussJointPlate p, double a0, double a1)
                     {
-                        double a0 = p.Offset - p.Length / 2, a1 = p.Offset + p.Length / 2;
                         var (b0, b1) = Band(p);
                         int g = sgnOut(p.Face);
                         double? best = null;
@@ -1996,22 +2062,80 @@ public static partial class TrussGenerator
                         {
                             Face = p.Face, Width = p.Width, Thickness = p.Thickness, Length = ext.Value.a1 - ext.Value.a0, Offset = (ext.Value.a0 + ext.Value.a1) / 2, Fill = p.Fill,
                             Label = p.Label, Material = p.Material, Unresolved = p.Unresolved, Source = p.Source, CenterOffset = p.CenterOffset, Replaces = p.Replaces,
+                            OutsideGusset = p.OutsideGusset,
                         };
                     }
                     // marks keep the listed order (fills first), placement follows the stacking order
                     var listed = jdef.Plates!.Where(p => p.Member == null).Select(Resolve).OrderBy(p => p.Fill ? 0 : 1).Select((p, i) => (p, k: i + 1)).ToList();
                     var order = new List<(TrussJointPlate p, int k, double baseLevel)>();
+                    bool longerInside = _d.JointDefaults.LongerJointPlatesInside;
+                    double stepMin = _d.JointDefaults.JointPlateStepFills;
+                    int kAuto = listed.Count;
                     foreach (bool fillPass in new[] { true, false })
                     {
                         var rest = listed.Where(x => x.p.Fill == fillPass && x.p.Width > 0 && x.p.Thickness > 0 && x.p.Length > 0).ToList();
                         while (rest.Count > 0)
                         {
-                            var pick = rest.Select(x => (x, b: BaseOf(x.p))).OrderBy(z => sgnOut(z.x.p.Face) * z.b).ThenBy(z => z.x.k).First();
+                            var cands = rest.Select(x => (x, b: BaseOf(x.p))).OrderBy(z => sgnOut(z.x.p.Face) * z.b).ThenBy(z => z.x.k).ToList();
+                            var pick = cands[0];
+                            // OPTIONAL LongerJointPlatesInside: among the plates of that face at the same level the longest goes first (against the member)
+                            if (longerInside)
+                            {
+                                var f0 = pick.x.p.Face; double lv0 = sgnOut(f0) * pick.b;
+                                pick = cands.Where(z => z.x.p.Face == f0 && sgnOut(f0) * z.b <= lv0 + In(1.0 / 32))
+                                    .OrderByDescending(z => Math.Round(z.x.p.Length / In(1.0 / 32))).ThenBy(z => z.x.k).First();
+                            }
                             rest.Remove(pick.x);
                             var pp = pick.x.p;
                             var (b0, b1) = Band(pp);
-                            placed.Add((pp.Face, pp.Offset - pp.Length / 2, pp.Offset + pp.Length / 2, b0, b1, pick.b + sgnOut(pp.Face) * pp.Thickness));
+                            double pa0 = pp.Offset - pp.Length / 2, pa1 = pp.Offset + pp.Length / 2;
+                            // OPTIONAL JointPlateStepFills: the steel under the plate along its length (breaks at the joint, the plates already placed, the
+                            // inlay ply ends); a step down by more than stepMin gets a fill of the step thickness (flagged, not drawn on the sheet)
+                            var fills = new List<(double a0, double a1, double lv)>();
+                            if (stepMin > 0 && pp.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside or TrussPlateFace.Top or TrussPlateFace.Bottom)
+                            {
+                                int g = sgnOut(pp.Face);
+                                var bp = new SortedSet<double> { pa0, pa1 };
+                                void Bp(double v) { if (v > pa0 + 1e-4 && v < pa1 - 1e-4) bp.Add(v); }
+                                Bp(0);
+                                foreach (var q in placed) if (q.f == pp.Face && q.b1 > b0 + 1e-5 && q.b0 < b1 - 1e-5) { Bp(q.a0); Bp(q.a1); }
+                                foreach (var c in chords)
+                                {
+                                    bool atA = StartsAt(c, pl.Name, jdef.Point);
+                                    double dir = Vec3.Dot(atA ? c.Axis : -c.Axis, ax);
+                                    foreach (var pc in c.Sec.Pieces.Where(q => q.PlyIndex >= 0))
+                                        if (InlayTrim(c, pc, atA) is var tr and > 0) Bp(dir > 0 ? tr : -tr);
+                                }
+                                var xs = bp.ToList();
+                                for (int i = 0; i + 1 < xs.Count; i++)
+                                {
+                                    if (xs[i + 1] - xs[i] < In(1.0 / 8)) continue;
+                                    double lv = LevelOver(pp, xs[i], xs[i + 1]);
+                                    if (g * (pick.b - lv) <= stepMin + 1e-6) continue;
+                                    if (fills.Count > 0 && Math.Abs(fills[^1].a1 - xs[i]) < 1e-6 && Math.Abs(fills[^1].lv - lv) < 1e-6) fills[^1] = (fills[^1].a0, xs[i + 1], lv);
+                                    else fills.Add((xs[i], xs[i + 1], lv));
+                                }
+                            }
+                            placed.Add((pp.Face, pa0, pa1, b0, b1, pick.b + sgnOut(pp.Face) * pp.Thickness));
                             order.Add((pp, pick.x.k, pick.b));
+                            foreach (var (fa0, fa1, lv) in fills)
+                            {
+                                // a stretch under 1 in. is within the +-1 in. of scaled plate ends: no fill (counted)
+                                if (fa1 - fa0 < In(1)) { _stepShort++; continue; }
+                                double th = Math.Abs(pick.b - lv);
+                                string pg = System.Text.RegularExpressions.Regex.Match(pp.Source ?? "", @"p\.\s*\d+").Value;
+                                var fp = new TrussJointPlate
+                                {
+                                    Face = pp.Face, Width = pp.Width, Thickness = th, Length = fa1 - fa0, Offset = (fa0 + fa1) / 2, Fill = true, CenterOffset = pp.CenterOffset,
+                                    Label = $"step fill under {pp.Label}", Material = pp.Material, Source = pp.Source,
+                                    Unresolved = UnresolvedFlag.Text(pg, $"step fill {TrussSections.FormatIn(pp.Width)} x {TrussSections.FormatIn(th)} x {TrussSections.FormatIn(fa1 - fa0)} under '{pp.Label}' at {jdef.Point} ({pl.Name})",
+                                        $"the plate reaches past the thicker steel it lies on and the sheet draws no fill in the {TrussSections.FormatIn(th)} step beyond it",
+                                        "a fill of the step thickness is built under the plate over that stretch so the plate bears and the rivets grip solid steel (automatic step fill)."),
+                                };
+                                placed.Add((pp.Face, fa0, fa1, b0, b1, pick.b));
+                                order.Add((fp, ++kAuto, lv));
+                                _stepFills++;
+                            }
                         }
                     }
                     foreach (var (p, _) in listed.Where(x => !(x.p.Width > 0 && x.p.Thickness > 0 && x.p.Length > 0)))
@@ -2029,11 +2153,33 @@ public static partial class TrussGenerator
                             var ra = poly.Select(q => P + ax * a0 + xv * q.X + yv * q.Y).ToArray();
                             MeshBuilder.AddLoft(mesh, poly, new[] { ra, ra.Select(q => q + ax * (a1 - a0)).ToArray() });
                         }
+                        // OPTIONAL OutsideGusset: a web-face plate in the gusset layer = the pieces beyond the joint's inner gusset outline over its band
+                        List<Vec2[]>? beyondPieces = null;
+                        double inA1 = a1, inB0 = a0;   // stretch surely covered by the pieces: a0..inA1 and inB0..a1
+                        if (p.OutsideGusset && p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside)
+                        {
+                            beyondPieces = OutsideGussetPieces(pl.Name, jdef.Point, P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, out inA1, out inB0);
+                            if (beyondPieces == null) { Warn($"Truss: plate '{p.Label}' at joint {jdef.Point} ({pl.Name}) - outside-gusset plate, but the gusset outline does not cross its band; built whole."); inA1 = a1; inB0 = a0; }
+                            else _outsideGussetPlates++;
+                        }
                         switch (p.Face)
                         {
                             case TrussPlateFace.Top: case TrussPlateFace.Bottom: Box(-p.Width / 2, p.Width / 2, baseLevel, outer); break;
                             default:
-                                foreach (int sx in new[] { -1, 1 }) Box(sx * baseLevel, sx * outer, yc - p.Width / 2, yc + p.Width / 2);
+                                foreach (int sx in new[] { -1, 1 })
+                                {
+                                    if (beyondPieces == null) { Box(sx * baseLevel, sx * outer, yc - p.Width / 2, yc + p.Width / 2); continue; }
+                                    foreach (var poly in beyondPieces)
+                                    {
+                                        // piece on one side of the joint: that side's chord frame at a kinked (mitred) joint
+                                        bool left = poly.Average(q => q.X) < 0;
+                                        var (uu, yy) = mj is { } mjp ? (left ? (mjp.uL, mjp.yL) : (mjp.uR, mjp.yR)) : (ax, yv);
+                                        double xa = Math.Min(sx * baseLevel, sx * outer), xb = Math.Max(sx * baseLevel, sx * outer);
+                                        var ra = poly.Select(q => P + uu * q.X + yy * q.Y + xv * xa).ToArray();
+                                        var rb = poly.Select(q => P + uu * q.X + yy * q.Y + xv * xb).ToArray();
+                                        MeshBuilder.AddLoft(mesh, poly, new[] { ra, rb });
+                                    }
+                                }
                                 break;
                         }
                         if (p.RivetCount > 0 || p.RivetZones is { Count: > 0 })
@@ -2072,8 +2218,12 @@ public static partial class TrussGenerator
                             }
                             _plateRivetJobs.Add((pts, rd, asm, p.RivetMaterial, p.RivetUnresolved, $"{p.Label} at {jdef.Point} ({pl.Name})"));
                         }
-                        if (p.Face == TrussPlateFace.WebInside) _insidePlates.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
-                        if (p.Face == TrussPlateFace.WebOutside) _outsidePlates.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, a0, a1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
+                        if (p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside)
+                        {
+                            var reg = p.Face == TrussPlateFace.WebInside ? _insidePlates : _outsidePlates;
+                            foreach (var (r0, r1) in beyondPieces == null ? new[] { (a0, a1) } : new[] { (a0, inA1), (inB0, a1) })
+                                if (r1 > r0 + 1e-4) reg.Add((pl.Name.ToUpperInvariant(), jdef.Point.ToUpperInvariant(), P, ax, yv, r0, r1, yc - p.Width / 2, yc + p.Width / 2, p.Thickness));
+                        }
                         string mark = $"{pl.Name}-{(p.Fill ? "F" : "SP")}{jdef.Point}-{k}";
                         Assumption? asu = p.Unresolved.Length > 0 ? Assumption.UnresolvedDimension(p.Unresolved, "plate as listed, extent scaled") : null;
                         if (asu != null) Warn(p.Unresolved);
@@ -2081,13 +2231,15 @@ public static partial class TrussGenerator
                         {
                             Mark = mark, Category = p.Fill ? PartCategory.FillerPlate : PartCategory.SplicePlate, Assembly = asm, Mesh = mesh, Material = Material(p.Material), Length = p.Length, Assumption = asu,
                             Description = $"{(p.Label.Length > 0 ? p.Label : (p.Fill ? "fill" : "splice") + " PL")} {TrussSections.FormatIn(p.Width)} x {TrussSections.FormatIn(p.Thickness)} x {TrussSections.FormatIn(p.Length)} ({p.Face}) at {jdef.Point}"
-                                + (p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside ? " (pair)" : "") + (p.Replaces is { Count: > 0 } ? " - inlay (in the web ply layer)" : ""),
+                                + (p.Face is TrussPlateFace.WebInside or TrussPlateFace.WebOutside ? " (pair)" : "") + (p.Replaces is { Count: > 0 } ? " - inlay (in the web ply layer)" : "") + (beyondPieces != null ? " - in the gusset layer, beyond the gusset edges" : ""),
                             Member = _d.PartPerPiece ? JointStack(pl.Name, jdef.Point) : null, Piece = _d.PartPerPiece ? (p.Fill ? "fill" : "splice plate") : null,
                         });
                         Model.PanelOf[mark] = $"Joint {jdef.Point}";
                         Model.SplicePlates++;
                     }
                 }
+            if (_stepFills > 0) Warn($"Truss {_d.Name}: {_stepFills} automatic step fills under joint plates (a plate reaching past the thicker steel it lies on; the sheets draw no fill there) - flagged UNRESOLVED dimension-only{(_stepShort > 0 ? $"; {_stepShort} steps under 1 in. long (within the scaled plate ends) left without a fill" : "")}.");
+            if (_outsideGussetPlates > 0) Info($"Truss {_d.Name}: {_outsideGussetPlates} joint plates in the gusset layer built as the pieces beyond the gusset edges.");
         }
 
         private readonly List<(List<(Vec3 at, Vec3 dir)> pts, double dia, string asm, string? mat, string? flag, string what)> _plateRivetJobs = new();
@@ -2119,12 +2271,26 @@ public static partial class TrussGenerator
                 {
                     var d = dir.Normalized();
                     if (probe.At(at, d, 1.0) is not { } iv || iv.t1 - iv.t0 < In(1.0 / 8)) { missed++; continue; }
+                    // OPTIONAL PlateRivetGapBridge: the shank continues across a small gap to the steel behind (thin steps under the plate)
+                    if (_d.JointDefaults.PlateRivetGapBridge > 0)
+                    {
+                        var ivs = probe.Intervals(at, d, 1.0);
+                        bool grew = true, bridged = false;
+                        while (grew)
+                        {
+                            grew = false;
+                            foreach (var q in ivs)
+                                if (q.t1 < iv.t0 + 1e-9 && q.t1 >= iv.t0 - _d.JointDefaults.PlateRivetGapBridge - 1e-9 && q.t0 < iv.t0 - 1e-9) { iv = (q.t0, iv.t1); grew = true; bridged = true; }
+                        }
+                        if (bridged) _gapBridged++;
+                    }
                     // head on the plate's outer side (+dir), shank back through the steel
                     MergeRivet(at + d * iv.t1, -d, Up, iv.t1 - iv.t0, dia, asm, mat, asu);
                     placed++; pl0++;
                 }
             }
             Info($"Truss {_d.Name}: {placed} rivets through the joint splice / cover plates (grip probed through the steel){(missed > 0 ? $", {missed} positions not in steel" : "")}.");
+            if (_gapBridged > 0) Info($"Truss {_d.Name}: {_gapBridged} joint plate rivets grip across a gap of at most {L(_d.JointDefaults.PlateRivetGapBridge)} to the steel behind (thin steps under the plate; the gap stays in the grip).");
         }
 
         /// <summary><see cref="TrussJointDefinition.EdgeAngles"/>: angles along gusset edges on the outer face of the stack, each gusset face, with their rivets.</summary>

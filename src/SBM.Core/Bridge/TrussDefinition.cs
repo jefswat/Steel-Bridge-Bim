@@ -712,6 +712,27 @@ public sealed class TrussJointDefaults
     /// face of that plate stack (the plans draw the member end clear of the cover splice plate). Joints without such plates keep <see cref="WebMemberClearance"/>.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double WebMemberClearOfJointPlates { get; set; }
+    /// <summary>OPTIONAL (false = unchanged, omitted when false): joint plates (<see cref="TrussJointDefinition.Plates"/>) of one face whose stack levels are equal
+    /// (within 1/32 in.) are stacked LONGEST FIRST, against the member: a shorter plate then lies on the longer one instead of the longer one riding over the
+    /// shorter and leaving a void beyond its end (riveted splices the sheets draw with no fill beyond the shorter plate).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool LongerJointPlatesInside { get; set; }
+    /// <summary>OPTIONAL (0 = off, omitted when 0): automatic STEP FILLS under joint plates - where the steel under a joint plate (member pieces and the plates
+    /// already placed) steps down by more than this along the plate (a plate that reaches past a thicker ply, fill or plate), a fill of the step thickness is
+    /// added under the plate over that stretch, flagged dimension-only UNRESOLVED (the sheet does not draw it; without it the plate stood off the steel and the
+    /// rivet grips crossed a void). Steps up to this value are left (plates drawn tight by the rivets).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double JointPlateStepFills { get; set; }
+    /// <summary>OPTIONAL (0 = off, omitted when 0): joint plate rivets (<see cref="TrussJointPlate.RivetCount"/> / <see cref="TrussJointPlate.RivetZones"/>): the
+    /// grip probe crosses gaps up to this size along the shank (e.g. a cover splice plate on chord covers 1/16 in. different in thickness: the rivet grips
+    /// both covers, the gap stays in the grip). Counted in an Info line.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double PlateRivetGapBridge { get; set; }
+    /// <summary>OPTIONAL (false = unchanged, omitted when false): rivets drawn just BEYOND the gusset (<see cref="TrussRivetGroup.Beyond"/> positions) whose shank
+    /// would pass through one member piece only (no second ply, angle, splice plate or fill there in the model: the symbol fastens a plate the model does not
+    /// have) are not placed; each is listed in <see cref="Truss.TrussModel.DroppedRivets"/> (reason "one-ply") and one CHECK warning per joint names them.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool DropOnePlyBeyondRivets { get; set; }
     /// <summary>OPTIONAL (null = off, omitted from the .sbm): web members ending at the same panel point stop clear of each other (in the truss plane, by this
     /// clearance; 0 = touching): a member whose end corner lies inside another web member's solid is set back until the corner leaves it (the plans draw the member
     /// ends clear of each other). Applied after the chord / joint plate rules.</summary>
@@ -1106,6 +1127,11 @@ public sealed class TrussJointPlate
     /// plate's band along the chord (e.g. outside web splice / pin plates whose extent lines are drawn without figures; flag it).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UnderGusset { get; set; }
+    /// <summary>OPTIONAL (false = a whole plate, omitted when false): web-face plate that lies IN THE GUSSET LAYER (on the web face the gussets lie on) and is
+    /// therefore built only outside the joint's inner gusset outline: two pieces from the plate ends to the gusset edges over the plate band (a splice plate
+    /// as thick as the gussets continuing beyond them, e.g. PTC L12 "2-Splice Pls. 34 x 1 o.s." with 1 in. gussets on the 2'-5 o. to o. webs).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool OutsideGusset { get; set; }
     /// <summary>OPTIONAL (0 = none, omitted when 0): rivets through this plate (and the steel under it, grip probed along the shank), in <see cref="RivetRows"/>
     /// equally spaced lines across the plate (1.5 d from its edges) with the count shared out evenly along its length (1.5 d from its ends); web-face plates:
     /// this count on each web. Head on the plate's outer face.</summary>

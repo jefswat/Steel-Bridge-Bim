@@ -9,7 +9,41 @@ public static partial class TrussGenerator
     private sealed partial class Gen
     {
         // ------------------------------------------------------------------ rivets AS DRAWN (TrussRivetGroup.Positions, QC PTC I052)
-        private int _posPlaced, _posMoved, _posDropped, _dropFree, _dropRun, _dropRange, _dropOutside;
+        private int _posPlaced, _posMoved, _posDropped, _dropFree, _dropRun, _dropRange, _dropOutside, _posOnePly;
+        private readonly SortedSet<string> _onePlyJoints = new(StringComparer.Ordinal);
+
+        /// <summary>Number of section pieces in the contiguous run from the outer face on side <paramref name="sx"/> at the shank axis (0 = none).</summary>
+        private int RunPieces(Inst m, Vec3 at, int sx)
+        {
+            double len = (m.B - m.A).Length, cut = len - m.SA - m.SB;
+            double s = Vec3.Dot(at - (m.A + m.Axis * m.SA), m.Axis);
+            double y = Vec3.Dot(at - m.A, m.Y) - m.Def.OffsetZ;
+            var iv = new List<(double lo, double hi)>();
+            foreach (var pc in m.Sec.Pieces)
+            {
+                if (PieceSpan(m, pc, cut) is not { } sp || s < sp.ps - 1e-6 || s > sp.ps + sp.pl + 1e-6) continue;
+                var poly = pc.Polygon; var xs = new List<double>();
+                for (int a = 0, b = poly.Length - 1; a < poly.Length; b = a++)
+                {
+                    var p = poly[a]; var q = poly[b];
+                    if ((p.Y > y) == (q.Y > y)) continue;
+                    xs.Add(sx * (p.X + (q.X - p.X) * (y - p.Y) / (q.Y - p.Y)));
+                }
+                xs.Sort();
+                for (int k = 0; k + 1 < xs.Count; k += 2) if (xs[k + 1] > 1e-6) iv.Add((xs[k], xs[k + 1]));
+            }
+            if (iv.Count == 0) return 0;
+            iv.Sort((p, q) => q.hi.CompareTo(p.hi));
+            double lo = iv[0].lo; int n = 1; bool grew = true;
+            var used = new HashSet<int> { 0 };
+            while (grew)
+            {
+                grew = false;
+                for (int k = 0; k < iv.Count; k++)
+                    if (!used.Contains(k) && iv[k].hi >= lo - 5e-4 && iv[k].lo < lo - 1e-9) { lo = iv[k].lo; used.Add(k); n++; grew = true; }
+            }
+            return n;
+        }
         /// <summary>Rivets placed as drawn inside the gusset, per joint context (gusset rivet cover record).</summary>
         private readonly Dictionary<JointCtx, int> _jointDrawn = new(ReferenceEqualityComparer.Instance);
 
@@ -30,7 +64,7 @@ public static partial class TrussGenerator
             var asu = RivetFlag(rg.Unresolved, beyond
                 ? "positions as drawn just outside the gusset (fills / splice plates / member end)"
                 : "positions as drawn on the joint sheet (rivet symbols read from the raster sheet)");
-            int placed = 0, moved = 0, dropped = 0;
+            int placed = 0, moved = 0, dropped = 0, onePly = 0;
             var dm = through ? m.Axis : Away(m, start);
             foreach (var p0 in rg.Positions!)
             {
@@ -68,6 +102,16 @@ public static partial class TrussGenerator
                 var d1 = through ? (Vec3.Dot(at - c.P, m.Axis) >= 0 ? m.Axis : -m.Axis) : Away(m, start);
                 if (!beyond) { NoteRivet(c, at, e); Occupy(c, uv, dia); _jointDrawn[c] = (_jointDrawn.TryGetValue(c, out int nd) ? nd : 0) + 1; }
                 double ins = IsChord(m.Def.Role) ? PlatesAt(_insidePlates, c, at) : 0;
+                // OPTIONAL DropOnePlyBeyondRivets: a beyond symbol whose shank would fasten one member piece only (nothing else there in the model) is not placed
+                if (beyond && sectionRule && _d.JointDefaults.DropOnePlyBeyondRivets && ins <= 0 && PlatesAt(_outsidePlates, c, at) <= 0
+                    && RunPieces(m, at, sxPos) <= 1 && RunPieces(m, at, -sxPos) <= 1)
+                {
+                    double s2 = Vec3.Dot(at - (m.A + m.Axis * m.SA), m.Axis), y2 = Vec3.Dot(at - m.A, m.Y) - m.Def.OffsetZ;
+                    Model.DroppedRivets.Add(new TrussDroppedRivet(c.Plane, c.Point, m.Mark, uv.X, uv.Y, s2, y2, dia, true, "one-ply"));
+                    onePly++;
+                    _onePlyJoints.Add($"{c.Point} ({c.Plane}) {m.Mark}");
+                    continue;
+                }
                 foreach (int side in new[] { -1, 1 })
                 {
                     var run = RunAt(at, side);
@@ -87,7 +131,7 @@ public static partial class TrussGenerator
                 }
                 placed++;
             }
-            _posPlaced += placed; _posMoved += moved; _posDropped += dropped;
+            _posPlaced += placed; _posMoved += moved; _posDropped += dropped; _posOnePly += onePly;
             Info($"Truss: joint {c.Point} ({c.Plane}) member {m.Mark}: {2 * placed} rivets {TrussSections.FormatIn(dia)} as drawn ({placed} per {(beyond ? "member face beyond the gusset" : "gusset face")}"
                 + (moved > 0 ? $", {moved} moved up to 3/4 in. onto a clean plate stack" : "") + (dropped > 0 ? $", {dropped} dropped" : "") + $"){(rg.Source.Length > 0 ? " (" + rg.Source + ")" : "")}.");
             if (dropped > 0)
@@ -111,6 +155,8 @@ public static partial class TrussGenerator
 
         private void ReportPositionRivets()
         {
+            if (_posOnePly > 0)
+                Warn($"Truss CHECK rivets: {_posOnePly} rivet symbols drawn just beyond the gussets would fasten one member piece only (no splice plate, fill, second ply or angle there in the model: the plate they belong to is not identified on the sheets) - not placed (TrussModel.DroppedRivets, reason one-ply): {string.Join("; ", _onePlyJoints)}.");
             if (_posPlaced + _posDropped == 0) return;
             Info($"Truss {_d.Name}: {_posPlaced} rivets per face placed as drawn ({_posMoved} moved up to 3/4 in. onto a clean plate stack / free head spot, {_posDropped} dropped: {_dropRange} beyond the member's cut length, {_dropFree} on another rivet's head, {_dropRun} without a clean plate stack, {_dropOutside} of them outside the member section's in-plane extent: symbols that are not gusset rivets - rivets drawn in profile at member edges, text - or a member narrower than drawn).");
         }

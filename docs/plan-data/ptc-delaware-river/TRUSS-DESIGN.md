@@ -1424,3 +1424,48 @@ drawn less the positions with nothing behind (160 over the 8 gussets: post cover
 18 not placed with a head over a joint rivet head, 28 off the steel). Steel 14,531,035 -> 14,535,362 lb. Clash (main span, no bolts) 882 -> 885 (+3 = the catwalk posts on
 the 7/8 plate, above); with bolts Bolt x Bolt 1,068 -> 1,068 (other Bolt x part rows grow with the ~1,000 new rivet shanks). check-truss-ptc 616 PASS / 19 DIFF / 73 INFO /
 2 CONFLICT before and after. Tests 799 / 799.
+
+## 44. Joint plate stacking voids, inlay trims, beyond-gusset rivets (2026-11-02 agent review J, fork-stack; evidence `qc/ptc/main-span/work11/review/J.csv` / `J.md`)
+
+What was wrong (review J "NEW" rows + PARTLY rows of section 40): every joint plate is ONE flat plate at the highest steel under its whole reach. Where two inside plates /
+fills of different lengths share a face the listed order put the SHORTER one against the web and the longer one rode over it, leaving a void beyond the short plate
+that the rivet grips crossed: L10 (i.s. 7/8 over i.s. 3/4), U12 (13/16 over 3/4), U13 (3/4 over 5/8), L20 (13/16 over 3/4), U5 (3/4 fill over 9/16 fill); L14 plates reach
+past the 18 x 1 / 9/16 steps. The sheets (p.75, p.78, p.81, p.82, p.84, p.89) dimension both plates and draw no fill beyond the shorter one; at U12 / U13 / L20 / U7 the short
+i.s. plate has the inlay's extent. So the longer plate lies against the member and the shorter one on it.
+
+Generator (generic, all OPTIONAL, omitted from the .sbm when unset; test `TrussJointDetailTests.JointPlateStacking_LongerInside_StepFills_OutsideGusset`):
+- `TrussJointDefaults.LongerJointPlatesInside`: plates of one face at the same level (1/32 in.) are stacked longest first.
+- `TrussJointDefaults.JointPlateStepFills` (step size): the steel under each plate is evaluated stretch by stretch (breaks at the joint, the plate ends already placed, the
+  inlay ply ends); a step down by more than the value gets a fill of the step thickness under the plate ("step fill under ...", flagged UNRESOLVED dimension-only: not drawn
+  on the sheet). Stretches under 1 in. (within the +-1 in. of the scaled extents) get none (counted). PTC 3/32 in. (steps of 1/8 in. and up).
+- `TrussJointDefaults.PlateRivetGapBridge`: joint plate rivets grip across a gap up to the value (cover splice plates on chord covers 1/16 in. different: the sheets list
+  no cover fill there; the gap stays in the grip, no geometry change). PTC 3/32 in.
+- `TrussJointPlate.OutsideGusset` (splices.csv face `web-os-beyond`): plate in the gusset layer = the pieces from its ends to the inner gusset outline over its band.
+  L12 "2-Splice Pls. 34 x 1 o.s." (207 in.): p.81 prints 2'-5 in. to in. gussets = the 2'-5 o. to o. webs and 1 in. gussets, so the 1 in. plate cannot lie under them,
+  and outside them its rivets beyond the gussets would cross a 1 in. void; built as the pieces beyond the gussets (L14's callout stays outside the gussets: there the gussets
+  are inlaid in the outer L13-L14 ply layer). Flag text says so.
+- Inlay trims (`TrussJointPlate.Replaces`) now stop CHORD plies only: the U11 post ply S-U11-L11-W2 34 x 1 1/8 (same size as the chord inlay) had been cut to z -49.3; now
+  -28.0 (as before the inlays; -25.5 in the first review = before section 40's other changes).
+- Drawn rivets in an inlay zone: a ply stopped by an inlay counts as present for the clean-stack test of the as-drawn rivets (the inlay lies in its layer; the grip is
+  re-probed from the steel as before). L6 recovers 49, U5 26 of the dropped positions (both faces).
+- `TrussJointDefaults.DropOnePlyBeyondRivets`: rivet symbols drawn just beyond the gusset whose shank would fasten one member piece only (no second ply, angle, splice plate
+  or fill there in the model) are not placed; listed in `TrussModel.DroppedRivets` (reason one-ply) and one CHECK warning (main span: 514 positions, both trusses / halves).
+  L17 / U17 / L18 / L19 / U19 one-ply rivets: the splice plates there are read at about +-15 in. (splices.csv) and nothing else is drawn under the symbols - which plate they
+  fasten is not identified on p.87 / p.88 (open, flagged by the warning).
+
+Data: splices.csv L12 o.s. 34 x 1 -> `web-os-beyond`; U7 new row "2-i.s. Spl. Pls. 31 1/2 x 3/4" (the same callout / dimension line as the 34 x 1 1/8 inlay, -23.8..+23.8, review J
+U7); rivet-count-zones.csv U8 edge angle strip widened 15 px outward (150 dpi) so the modeled outline edge stays inside it to y 608 = z -38 (the angle had stopped at z -29 where
+the edge left the strip; p.77 / section 38 read z -16..-38). Options set in connections-ptc.csx section 1 (main truss only).
+
+Reconciled, left as read (reasons): U3 "2-Fills 18 x 5/8" - the dimension line starts at the end of the 31 1/2 x 1/2 splice plate (p.75), but under the splice plate right of FIN the
+18 in. band needs the same 5/8 packing (U3-U4 web 3/4 + leg 5/8 vs the plate), nothing else is drawn there, so the fill stays FIN..+56.5 (flagged scaled). U5 "2-I.S. Spl. Pls.
+31 1/2 x 7/8": at 400-700 dpi its dimension line runs right through the inlay end to an arrow at 150-dpi x 2221 (+37.5, as splices.csv); the left end could not be separated
+from the 9/16 fill line that starts at x 1911 (-35.6) - the left end may be the inlay end (-19.4) as review J suggests; kept -35.6 (open: re-read with the fill rows, which may be
+shifted by one row: the line from x 1883 / 1833 may belong to the 3/4 / 18 x 5/8 fills).
+
+Results (copy of the committed PTC model, chain connections-ptc .. rivets-ptc; own rivet-shank sampler `temp/diag.csx`, S truss joints L0-U22, both faces):
+rivets with air > 1/16 in. in the grip 1,566 -> 971 (the rest are mostly the bridged 1/16 cover steps and grip ends past the steel: U11 post, U12-L12 post W2), rivets touching one
+part only 1,068 -> 188; per joint (air): L10 191 -> 1, L14 227 -> 18 (1/16 only), U12 136 -> 45, U13 128 -> 57, L20 118 -> 36, U5 45 -> 30 (1/16 only), U11 260 -> 19, U7 3 -> 16 (1/16).
+24 automatic step fills (U11 3/8 x 77 13/16 under the inside splice = the review's "unsure" 3/8 void at U11, L14 1/2 x 55 7/8 and 1/2 x 53 3/16, U14 cover 1/4 x 12 5/16
+top / bottom, U9 / U16 / U3 short ones; each flagged). `sbm clash` (all 7 PTC bridges, no bolts) 2,918 -> 2,918 rows, identical set; check-truss-ptc 616 PASS / 19 DIFF / 73 INFO /
+2 CONFLICT before and after; tests 797 passed. Approach / girder bridges: unchanged (options set on the main truss only; inlays only exist there).

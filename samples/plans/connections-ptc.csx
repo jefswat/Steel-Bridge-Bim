@@ -86,6 +86,15 @@ var report = new List<string>();
     // "L:34x3/4;R:34x1 1/8", "#2" = the second ply of that size from the outside) - TrussJointPlate.Replaces stops those plies at the plate ends.
     // Rows without u0 / u1 keep the older rule (length + side words in the item, centred otherwise).
     var spl = Csv("splices.csv").Where(r => r["structure"] == "main").ToList();
+    // STACKING (agent review J 2026-11-02, fork-stack; TRUSS-DESIGN.md section 42): the joint sheets dimension two inside plates / fills of different lengths
+    // on one face and draw no fill beyond the shorter one, so the longer one lies against the member and the shorter one on it (LongerJointPlatesInside);
+    // where a plate still reaches past thicker steel by more than 3/32 in. (i.e. 1/8 in. and up) a step fill is built and flagged (JointPlateStepFills); the cover splice rivets
+    // grip across the 1/16 in. cover thickness steps the sheets leave unfilled (PlateRivetGapBridge 3/32 in.); rivet symbols drawn just beyond the gussets
+    // where the model has one member piece only are not placed and are listed (DropOnePlyBeyondRivets).
+    t.JointDefaults.LongerJointPlatesInside = true;
+    t.JointDefaults.JointPlateStepFills = In(3.0 / 32);
+    t.JointDefaults.PlateRivetGapBridge = In(3.0 / 32);
+    t.JointDefaults.DropOnePlyBeyondRivets = true;
     int nPl = 0, nSkip = 0, nInlay = 0, nExt = 0;
     var skipped = new List<string>();
     var extentJoints = new HashSet<string>();
@@ -140,7 +149,7 @@ var report = new List<string>();
                 case "cover": case "fill-cover": faces.Add(TrussPlateFace.Top); faces.Add(TrussPlateFace.Bottom); break;
                 case "cover-top": case "fill-cover-top": faces.Add(TrussPlateFace.Top); break;
                 case "cover-bot": case "fill-cover-bot": faces.Add(TrussPlateFace.Bottom); break;
-                case "web-os": case "inlay-os": case "fill-os": faces.Add(TrussPlateFace.WebOutside); break;
+                case "web-os": case "inlay-os": case "fill-os": case "web-os-beyond": faces.Add(TrussPlateFace.WebOutside); break;
                 case "web-is": case "inlay-is": case "fill-is": faces.Add(TrussPlateFace.WebInside); break;
                 default: nSkip++; skipped.Add($"{j} {r["item"]} (face '{face}' not recognised)"); continue;
             }
@@ -193,13 +202,15 @@ var report = new List<string>();
                         RivetUnresolved = rc > 0 ? U("p." + r["page"], $"rivets of the {r["item"]} at {pt}", $"the flange plan view draws {rc} rivets (image-counted: {r["rivet_note"]}) on {r["rivet_rows"]} gage lines without gages or pitch (p.70: 4 in. max. pitch)",
                             $"{rc} rivets per plate, {r["rivet_rows"]} lines equally spaced across the plate, equally spaced along it, 1.5 d edge distance; grip = the steel under the plate.") : null,
                         Face = f, Width = In(wid.Value), Thickness = In(thk.Value), Length = In(ol), Offset = sgn * In(oc), Fill = fill,
+                        // face web-os-beyond (agent review 2026-11-02, fork-stack): a web splice plate as thick as the gussets, lying in the gusset layer beyond the gusset edges
+                        OutsideGusset = face == "web-os-beyond",
                         Replaces = inlay ? refs.Select(q => new TrussPlyRef { Side = pr ? -q.side : q.side, Width = In(q.w), Thickness = In(q.th), Index = q.idx }).ToList() : null,
                         // read rows: the joint sheets' MATERIAL note (p.75: "All material listed on this sheet shall be silicon steel except where noted (C)")
                         Label = r["item"], Material = hasExtent ? (r["item"].Contains("(C)") ? "C" : "S") : (r["note"].Contains("(S)") ? "S" : "C"), Source = $"p.{r["page"]} ({conf})",
                         Unresolved = printed ? "" : U("p." + r["page"], $"{r["item"]} at {pt}",
                             hasExtent ? $"the extent is drawn by dimension lines without figures: scaled ({scale}; {conf} confidence) and the plate order in the stack is drawn, not dimensioned"
                                       : $"the length is scaled from the joint sheet ({r["extent_note"]}; {conf} confidence) and the plate order in the stack is drawn, not dimensioned",
-                            "plate as listed, " + where + (inlay ? ", in the layer of the chord web plies it replaces (they stop at its ends: 'End of ... webs')" : "") + ", stacked on the steel under it (web, angle legs or the fills already placed)."),
+                            "plate as listed, " + where + (face == "web-os-beyond" ? ", in the gusset layer from its ends to the gusset edges (the gussets lie on the same web face: in to in = the webs o. to o.; outside them the rivets beyond the gussets would cross a void as thick as the gusset)" : "") + (inlay ? ", in the layer of the chord web plies it replaces (they stop at its ends: 'End of ... webs')" : "") + ", stacked on the steel under it (web, angle legs or the fills already placed)."),
                     });
                     nPl++;
                 }
