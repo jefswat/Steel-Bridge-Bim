@@ -71,6 +71,21 @@ public static partial class TrussGenerator
                     u = new Vec3(u2.X, u2.Y, 0).Normalized();
                     if (fr.Horizontal) { vAx = Vec3.Cross(Up, u).Normalized(); w = Up; }
                     else w = Vec3.Cross(u, Up).Normalized();
+                    // OPTIONAL pitch (U rises) then roll (about U)
+                    if (fr.PitchDegrees != 0)
+                    {
+                        double pp = fr.PitchDegrees * Math.PI / 180;
+                        var u1 = (u * Math.Cos(pp) + Up * Math.Sin(pp)).Normalized();
+                        if (fr.Horizontal) w = Vec3.Cross(u1, vAx).Normalized();
+                        else vAx = Vec3.Cross(w, u1).Normalized();
+                        u = u1;
+                    }
+                    if (fr.RollDegrees != 0)
+                    {
+                        double rr = fr.RollDegrees * Math.PI / 180;
+                        var v1 = (vAx * Math.Cos(rr) + w * Math.Sin(rr)).Normalized();
+                        w = Vec3.Cross(u, v1).Normalized(); vAx = v1;
+                    }
                     if (it.Mirror) Warn($"Truss: plane item {it.Name} - Mirror is not used with an explicit frame{Src}.");
                 }
                 else
@@ -141,7 +156,7 @@ public static partial class TrussGenerator
             if (_itemRivetFrames.Count == 0) return;
             var parts = Model.Steel.Parts;
             var boxes = parts.Select(p => p.Mesh is { IsEmpty: false } ? p.Mesh.Bounds() : default).ToList();
-            int n = 0, miss = 0, shared = 0;
+            int n = 0, miss = 0, shared = 0, bridged = 0; double bridgedMax = 0;
             foreach (var (it, a, u, vAx, w, L, mirror, asm) in _itemRivetFrames)
                 foreach (bool mir in mirror ? new[] { false, true } : new[] { false })
                     foreach (var rv in it.Rivets!)
@@ -159,10 +174,20 @@ public static partial class TrussGenerator
                             pr.Add(parts[i].Mesh, i, lo, hi);
                         }
                         if (pr.At(at, ax, 0.35) is not { } iv) { miss++; continue; }
+                        if (it.RivetGapTolerance > 0)
+                        {
+                            // OPTIONAL: the grip continues across air gaps up to the tolerance on both sides of the point
+                            var ivs = pr.Intervals(at, ax, 0.35);
+                            double t0 = iv.t0, t1 = iv.t1, gsum = 0;
+                            foreach (var nx in ivs.Where(x => x.t0 > t1 - 1e-9).OrderBy(x => x.t0)) { double gp = nx.t0 - t1; if (gp > it.RivetGapTolerance) break; if (gp > 1e-5) gsum += gp; t1 = Math.Max(t1, nx.t1); }
+                            foreach (var nx in ivs.Where(x => x.t1 < t0 + 1e-9).OrderByDescending(x => x.t1)) { double gp = t0 - nx.t1; if (gp > it.RivetGapTolerance) break; if (gp > 1e-5) gsum += gp; t0 = Math.Min(t0, nx.t0); }
+                            if (gsum > 1e-5) { bridged++; bridgedMax = Math.Max(bridgedMax, gsum); }
+                            iv = (t0, t1);
+                        }
                         var asu = RivetFlag(rv.Unresolved ?? (it.Unresolved.Length > 0 ? it.Unresolved : null), "rivets of the plane item at the given points");
                         if (MergeRivet(at + ax * iv.t1, -ax, Math.Abs(ax.Z) > 0.9 ? u : Up, iv.t1 - iv.t0, rv.Diameter, asm, rv.Material, asu)) shared++; else n++;
                     }
-            Info($"Truss: plane item rivets - {n} placed{(shared > 0 ? $", {shared} in a hole already taken (one rivet through the whole stack)" : "")}{(miss > 0 ? $", {miss} positions not in steel (skipped)" : "")}{Src}.");
+            Info($"Truss: plane item rivets - {n} placed{(shared > 0 ? $", {shared} in a hole already taken (one rivet through the whole stack)" : "")}{(miss > 0 ? $", {miss} positions not in steel (skipped)" : "")}{(bridged > 0 ? $", {bridged} across air gaps (max {bridgedMax / 0.0254:0.000} in.)" : "")}{Src}.");
         }
     }
 }

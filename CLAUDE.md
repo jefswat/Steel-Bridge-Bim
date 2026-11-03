@@ -1434,6 +1434,7 @@ UNRESOLVED FLAG (general, reusable): `SBM.Core/Assumption.cs` `Assumption{Status
   MAIN SPAN REVIEW BATCH 6 - walkways (2026-10-28, TRUSS-DESIGN.md 31; OPTIONAL `TrussPlaneItemDefinition.Frame` = `TrussItemFrame` (station / offset / elevation, vertical or horizontal plane) + `Category` /
   `AssemblyKind` / `Density`; test `TrussBatch6Tests`): walkways-ptc.csx main span = FB11 walk at El. 141.6035, top chord catwalk + ropes, U22 beacon platform, navigation light platforms, cages, south ladders, toe plates; CL walkway W15-W15' one rail angle per side (p.106, user decision).
   Batch 7 sheet links: W14 joint p.84 / 85, wind chords + p.71, p.55 only on the main stringer seats.
+  Suspended floor laterals as drawn (2026-11-03, TRUSS-DESIGN.md 42, details-ptc.csx section 3b): OPTIONAL `TrussItemFrame.PitchDegrees` / `RollDegrees` (pitched plane item frames) and `TrussPlaneItemDefinition.RivetGapTolerance` (test `TrussBatch6Tests.PlaneItemFrame_Pitch_RivetGapTolerance`).
   REMAINING DETAILS (step 5, 2026-10-21, TRUSS-DESIGN.md section 20; `samples/plans/details-ptc.csx`, run after bracing-ptc, before rivets-ptc): generic OPTIONAL inputs (omitted when unset)
   `TrussBracingGussetDefinition.EdgeAngleOnCrossing` (edge angle on the member crossing the plate edge - highest rank, a face within 0.5 m pulls the plate down to `Gap` from it - instead of the
   truss-plane stack) / `EdgeAngleOutside` (angle on the plate's outer face) / `NoStackClip`; end connections on rolled shapes turned 90 deg (`Rotated`: web plane = axis + section x) and, with a

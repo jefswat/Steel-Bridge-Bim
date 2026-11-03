@@ -1329,3 +1329,36 @@ Results (copy of the committed PTC model, components-ptc only; the later scripts
 positions, 30 suspender support diaphragms (60 web plate pieces + 120 angles, 1,080 rivet positions), 8 diagonal fills (U21 / U21' / L21 / L21', both trusses). Lug starts moved
 clear of the members already at the joint by 0.4 - 6.7 in. (report line). CHECK rows printed by the script: the inner-edge lugs next to the vertical are short after the clearance (U15 / U15' 16 rivets on 24 in. = 2 13/16 in., U16 / U16' 12 on 15 5/16 in. = 2 1/4 in. per gage
 line (under 3 d). Clash rows (all 7 units, no bolts) 3,357 -> 3,357 (no component clashes); check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after; tests 783 passed.
+
+## 42. Suspended floor lateral connections as drawn (agent review 2, 2026-11-03, fork-floorlat; evidence `qc/ptc/main-span/work11/review/B4` + B2 / B5 L13 rows)
+Review finding: 0 of 76 member ends of the span 19 floor lateral system were connected as drawn (FX plates not riveted to the floor beam, top plates without lateral
+rivets, edge angles 9 in. off the web, one-sided wind chord plates hanging off the lateral tips, laterals riveted on one face only, no wind chord splices, nothing at
+L13 / LQ13 / WM22). Sheets: p.99 (FLOOR LATERAL CONN. AT FLOOR BEAM W14 / W16, W18 & W20; SECTIONS A / B / C FOR WIND CHORD CONN. AT W15, W17 & W19 / AT W21; raster,
+calibrated on the 14 BP 73 flange width in Section A at W21 = 2.10 pt / in., 3/4" = 1'-0 halved), p.71 (rivets per lateral END: 20 / 52 / 16), p.83 Section B / C
+(L13), p.93 Section E (WM22), p.95 (LQ13).
+Generic inputs (OPTIONAL, omitted from the .sbm when unset; plane items only, `TrussGeneratorBracing.cs` untouched): `TrussItemFrame.PitchDegrees` (U rises: about V of a
+horizontal frame / W of a vertical one) + `RollDegrees` (about U), `TrussPlaneItemDefinition.RivetGapTolerance` (grip continues across air gaps up to it on both sides of
+the given point, counted in the Info line). Test `TrussBatch6Tests.PlaneItemFrame_Pitch_RivetGapTolerance`.
+Data, `details-ptc.csx` section 3 (generated FX bottom plates kept: BearOn + fills, now 10 / 26 rivets per member, no edge angle; generated top plates and wind chord plates
+removed) and NEW section 3b (explicit plane items `FLC-*`, assembly BR-FLOORLAT, geometry read from a first regeneration: member cut ends, top / bottom faces in the plate's
+pitched frame, chord faces, floor beam web faces and bottoms by ray; every item carries the dimension-only flag "floor lateral connection details as drawn"):
+- FX14 - FX20 (+ primes): bottom plate riveted to the floor beam bottom flange (2 staggered columns 3.7 / 6.8 in. from the CL floor beam each side, 36 per crossing);
+  one top plate per side on the lateral tops (7/16; 3/4 on the L13 side of W14) to 1/16 in. off the web face, pitched with that side's lateral grade; web angle under it
+  (L 4 1/2 x 3 1/2 x 1/2 N.S. / L 3 1/2 x 3 1/2 x 1/2 F.S.; W14 L13 side L 8 x 8 x 1/2 on the plate, leg up) with a rivet column into the plate and web rivets through
+  both angles at the same stations (web rivets are not drawn in plan: flagged); L 3 1/2 x 3 x 3/8 along the free edge of every plate 26 3/4 in. from the CL floor beam
+  (9 rivets each); laterals 10 per plate (14 BP 73) / 26 (2-15[ 50) = the p.71 count per end. The 'Bend Line' is not modeled (flat plates, flag).
+- W15 / W17 / W19 / W21 (+ primes, S and N): ONE 7/16 top plate on the chord top flange and the lateral / K tops (slotted for the floor beam web inside the chord) and
+  ONE 7/16 bottom plate under them, each the drawn rectangle (+-24 in. along the chord, chord outer edge to 31 1/2 in. inside the CL chord) united with 1 1/2 in. margins
+  round the member rivets; 28 chord rivets per plate in 4 rows (the plates are the chord flange splice), 10 per lateral / 8 per K per plate (p.71 20 / 16 per end);
+  top plate riveted to the floor beam bent angles L 7 x 4 x 3/4 (7 per side), bottom plate to the floor beam bottom angles through a beveled fill (Section B; thickness =
+  the modeled gap); Section C web splice 2-Pls 11 x 3/8 x 13 1/4 with 10 x 1 in. rivets (plate length / rivet positions scaled).
+  CONFLICT rows (reported, nothing moved): the bent angles sit on the chord in the model (p.94 / p.69 elevations) while Section A rivets them on the 7/16 plate (plate x
+  angle 0.31 - 0.38 in.); over the chord the modeled floor beam web reaches the chord top flange and passes through the top plate (slot drawn only inside the chord).
+- L13 / L13' (S and N): one 3/4 plate flat on the 2-15[ 50 box top (as-built p.99 revision; p.83 draws the first-issue 14 BP 73), outline row L13F united with the
+  rivet margins and notched round the F8 end connection angles / stiffeners found on the web face; 1-L 8 x 8 x 3/4 on the plate along the stack face (leg up; 10 + 10
+  rivets); 1-L 8 x 4 x 1 on the plate, 8 in. leg up the F8 web, in the clear stretches between those obstacles; 26 lateral rivets (half of the p.71 52: the box bottom has
+  no plate drawn - flagged). The bend of Section C (down to the angle) is not modeled.
+- WM22 (W21' K on F7, p.93 Section E): plate pair 7/16 top / bottom of the two K' ends from 1/16 in. off the F7 web, 8 rivets per member per plate (16 per end), one
+  L 4 x 4 x 7/16 per plate on the F7 web face (outstanding leg away from the K), one rivet line into the plate, one into the web.
+Still open (truss-level flags): the W21 K at the shear lock tongue beam (16 WF 88 / 14 WF 48, Sheet 53 not in the set; apex 2'-0 toward W21 not moved); the L13 1/2 double
+K W33 x 130 at LQ13 / LQ13' (p.95 plate in the inclined K plane, not dimensioned - now expressible with a pitched + rolled frame, not done).
