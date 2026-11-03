@@ -236,8 +236,13 @@ public sealed partial class MainViewModel : ObservableObject
                 int dep = bm.Strands.Count(s => s.Depressed);
                 R("Strands", $"{bm.Strands.Count} – {SBM.Core.Prestressed.TxGirderCatalog.StrandSize(pd.StrandDiameter, u)} dia, {pd.StrandStrength:0} ksi low-relaxation");
                 R("Depressed strands", dep == 0 ? "None" : $"{dep}, hold-downs {L(bm.HoldDownFromEnd)} from each end");
-                double cgMid = bm.Strands.Average(s => s.Section.Y), cgEnd = bm.Strands.Average(s => s.EndHeight);
-                R("e at CL / at ends", $"{S(bm.Shape.Yb * 0.0254 - cgMid)} / {S(bm.Shape.Yb * 0.0254 - cgEnd)}");
+                // no strands (level of detail below 300 removes them, or a beam without a pattern): no eccentricity to report
+                if (bm.Strands.Count > 0)
+                {
+                    double cgMid = bm.Strands.Average(s => s.Section.Y), cgEnd = bm.Strands.Average(s => s.EndHeight);
+                    R("e at CL / at ends", $"{S(bm.Shape.Yb * 0.0254 - cgMid)} / {S(bm.Shape.Yb * 0.0254 - cgEnd)}");
+                }
+                else R("e at CL / at ends", "– (no strands in this model)");
                 R("f'c / f'ci", $"{pd.ConcreteStrength:0.0#} / {pd.ReleaseStrength:0.0#} ksi");
                 R("Area / Ix (IGD)", $"{bm.Shape.Area:N0} in² / {bm.Shape.Ix:N0} in⁴");
                 R("Weight (155 pcf)", W(bm.Mass));

@@ -36,6 +36,17 @@ public class SheetFixTests
     private static IEnumerable<string> Texts(Sheet s) => s.Drawing.Layers.SelectMany(l => l.Texts).Select(t => t.Text);
 
     [Fact]
+    public void PrestressedSheets_BeamsWithoutStrands_Build()
+    {
+        // level of detail below 300 removes the strands (LodApply): the beam data table / schedule must not average an empty list
+        var (_, br) = Model("Br02069 TH65.sbm");
+        foreach (var b in br.Prestressed!.Beams) b.Strands.Clear();
+        var sheets = SheetSet.Build(br, new SheetFormat(17, 11, "P", "B", "D"));
+        Assert.NotEmpty(sheets);
+        Assert.Contains(sheets.SelectMany(Texts), t => t.Contains("no strands in the model"));
+    }
+
+    [Fact]
     public void PrestressedNotes_AreAgencySpecific_WithStrengthsPerBeamType()
     {
         var (_, br) = Model("Br02069 TH65.sbm");

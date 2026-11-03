@@ -324,8 +324,8 @@ public static class PrestressedViews
             new[] { "STRANDS", $"{b.Strands.Count} - {PsText.Strand(pd, u)} dia., {pd.StrandStrength:0} ksi low-relaxation" },
             new[] { sh.IsTx ? "DEPRESSED STRANDS" : "DEFLECTED STRANDS", nDefl > 0 ? $"{nDefl}, hold-downs {u.FormatLength(b.HoldDownFromEnd)} from the ends" : "none" },
             new[] { "DEBONDED STRANDS", nDeb > 0 ? $"{nDeb} (see table)" : "none" },
-            new[] { "C.G. STRANDS: MIDSPAN / END", $"{S(b.Strands.Average(s => s.Section.Y))} / {S(b.Strands.Average(s => s.EndHeight))} above the bottom" },
-            new[] { "ECCENTRICITY: MIDSPAN / END", $"{S(yb - b.Strands.Average(s => s.Section.Y))} / {S(yb - b.Strands.Average(s => s.EndHeight))}" },
+            new[] { "C.G. STRANDS: MIDSPAN / END", b.Strands.Count == 0 ? "- (no strands in the model)" : $"{S(b.Strands.Average(s => s.Section.Y))} / {S(b.Strands.Average(s => s.EndHeight))} above the bottom" },
+            new[] { "ECCENTRICITY: MIDSPAN / END", b.Strands.Count == 0 ? "-" : $"{S(yb - b.Strands.Average(s => s.Section.Y))} / {S(yb - b.Strands.Average(s => s.EndHeight))}" },
             new[] { "CONCRETE VOLUME / WEIGHT EACH", $"{(u.IsUS ? $"{b.Volume * 1.307951:0.0} CY" : $"{b.Volume:0.00} m3")}, {W(b.Mass)} at 155 pcf" },
             new[] { "HAUNCH AT CL BEAM MIN / MAX", $"{S(beams.Min(x => x.MinHaunch))} / {S(beams.Max(x => x.MaxHaunch))}" },
             new[] { "SKEW OF ENDS", Range(beams.SelectMany(x => new[] { x.SkewStart, x.SkewEnd }), v => $"{v:0.##} deg") },
@@ -402,7 +402,7 @@ public static class PrestressedViews
                 $"{b.SkewStart:0.##}° / {b.SkewEnd:0.##}°", $"{b.Strands.Count} - {PsText.Strand(pd, u)}",
                 $"{b.Strands.Count(s => s.Depressed)} / {b.Strands.Count(s => s.Debonded)}",
                 $"{pd.ConcreteStrength:0.0#} / {pd.ReleaseStrength:0.0#}",
-                $"{S(yb - b.Strands.Average(s => s.Section.Y))} / {S(yb - b.Strands.Average(s => s.EndHeight))}",
+                b.Strands.Count == 0 ? "-" : $"{S(yb - b.Strands.Average(s => s.Section.Y))} / {S(yb - b.Strands.Average(s => s.EndHeight))}",
                 $"{S(g.Min(x => x.MinHaunch))} / {S(g.Max(x => x.MaxHaunch))}", W(b.Mass),
             });
         }
