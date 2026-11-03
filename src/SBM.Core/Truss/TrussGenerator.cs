@@ -1857,6 +1857,34 @@ public static partial class TrussGenerator
             return best;
         }
 
+        /// <summary>Base level of an INLAY plate (<see cref="TrussJointPlate.Replaces"/>) on a web face when a web ply that is NOT replaced lies outside the
+        /// replaced ply in the plate's band (the inlay then takes the replaced ply's own layer: its base = the replaced ply's inner face, not the outermost
+        /// steel); null = no such outer ply (the plate stacks on the steel under the removed ply as before).</summary>
+        internal static double? InlayLayerBase(TrussBuiltSection sec, double offsetZ, TrussPlateFace face, double b0, double b1, Func<TrussSectionPiece, bool> replaced)
+        {
+            if (face is not (TrussPlateFace.WebOutside or TrussPlateFace.WebInside)) return null;
+            const double eps = 1e-5;
+            bool outward = face == TrussPlateFace.WebOutside;
+            double? rIn = null, rOut = null;
+            var others = new List<(double lo, double hi)>();
+            foreach (var pc in sec.Pieces)
+            {
+                if (pc.Length > 0 || !double.IsNaN(pc.Start)) continue;
+                var cl = ClipBand(pc.Polygon, 1, b0 - offsetZ + eps, b1 - offsetZ - eps);
+                if (cl.Count < 3 || cl.Min(q => q.X) <= 1e-6) continue;
+                double lo = cl.Min(q => q.X), hi = cl.Max(q => q.X);
+                if (pc.PlyIndex >= 0 && replaced(pc))
+                {
+                    rIn = rIn is { } a ? (outward ? Math.Min(a, lo) : Math.Max(a, hi)) : (outward ? lo : hi);
+                    rOut = rOut is { } b ? (outward ? Math.Max(b, hi) : Math.Min(b, lo)) : (outward ? hi : lo);
+                }
+                else others.Add((lo, hi));
+            }
+            if (rIn == null || rOut == null) return null;
+            bool outer = others.Any(o => outward ? o.lo >= rOut.Value - 1e-4 : o.hi <= rOut.Value + 1e-4);
+            return outer ? rIn : null;
+        }
+
         /// <summary>Extent along <paramref name="ax"/> (from the point) of the joint's inner gusset outline over the band b0..b1 along <paramref name="yv"/>
         /// (<see cref="TrussJointPlate.UnderGusset"/>); null = no gusset there.</summary>
         private (double a0, double a1)? GussetExtentAlong(string pl, string pt, Vec3 P, Vec3 ax, Vec3 yv, double b0, double b1)
@@ -1945,7 +1973,10 @@ public static partial class TrussGenerator
                             bool through = Through(pl.Name, jdef.Point).Contains(c);
                             double dir = Vec3.Dot(StartsAt(c, pl.Name, jdef.Point) ? c.Axis : -c.Axis, ax);
                             if (!through && !(dir > 0 ? a1 > 1e-4 : a0 < -1e-4)) continue;
-                            if (PieceLevel(c.Sec, c.Def.OffsetZ, p.Face, b0, b1, q => ReplacedAt(c, q, pl.Name, jdef.Point, through ? 0 : (dir > 0 ? a1 : -a0)) ||(q.BetweenGussets && p.Replaces is { Count: > 0 })) is { } lv) Take(lv); else Take(FaceOf(c, p.Face));
+                            Func<TrussSectionPiece, bool> replaced = q => ReplacedAt(c, q, pl.Name, jdef.Point, through ? 0 : (dir > 0 ? a1 : -a0));
+                            // an inlay whose replaced ply has a ply OUTSIDE it lies in that ply's own layer (PTC L22: 34 x 1 1/16 inlay under the 34 x 1 o.s. ply)
+                            if (p.Replaces is { Count: > 0 } && InlayLayerBase(c.Sec, c.Def.OffsetZ, p.Face, b0, b1, replaced) is { } il) { Take(il); continue; }
+                            if (PieceLevel(c.Sec, c.Def.OffsetZ, p.Face, b0, b1, q => replaced(q) ||(q.BetweenGussets && p.Replaces is { Count: > 0 })) is { } lv) Take(lv); else Take(FaceOf(c, p.Face));
                         }
                         if (best == null) foreach (var c in chords) Take(FaceOf(c, p.Face));
                         foreach (var q in placed)

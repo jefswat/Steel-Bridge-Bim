@@ -80,10 +80,10 @@ main,L14,SKIP,"1230,327;1246,327;1246,642;1230,642",post U14-L14 left edge: rive
 main,L14,SKIP,"1334,327;1350,327;1350,642;1334,642",post U14-L14 right edge: rivets drawn in profile
 main,L14,U14-L14,"1246,327;1334,327;1334,642;1246,642",post field (p.84)
 main,L14,L14-W14,"1238,818;1342,818;1342,960;1238,960",hanger field below the chord (p.84)
-main,L22,SKIP,"250,795;354,795;354,897;250,897",top-west chord-end diaphragm / lug angle ring block (p.90): not a member group of the gusset - not placed
-main,L22,SKIP,"884,795;988,795;988,897;884,897",top-east chord-end diaphragm / lug angle ring block
-main,L22,SKIP,"250,1100;990,1100;990,1216;250,1216",bottom lug angle blocks and bottom strut connection below the chord
-main,L22,SKIP,"700,738;806,738;806,766;700,766",top strut bracket plate (2-3/8 gussets) rivets
+main,L22,SKIP,"250,795;354,795;354,897;250,897","top-west chord-end diaphragm / end angle block (p.90): on the corner piece cut off along line X (final condition, user 2026-11-03) - not placed"
+main,L22,SKIP,"884,795;988,795;988,897;884,897","top-east chord-end diaphragm / end angle block (p.90): on the corner piece cut off along line X (final condition, user 2026-11-03) - not placed"
+main,L22,SKIP,"250,1100;990,1100;990,1216;250,1216","bottom lug angle / end angle blocks below the chord (p.90): outside the 1 1/8 splice gusset = on the corner pieces cut off along line X (final condition, user 2026-11-03) - not placed; the bottom strut connection strip at the CL (inside the splice gusset) stays and is not a member group of the gusset either"
+main,L22,SKIP,"700,738;806,738;806,766;700,766","bracket 2-3/8 Gus. Pls. (C) above the gusset east of the CL, fastened by '1 1/8 Erection Bolts' (p.90): erection piece, not built (final condition only, user 2026-11-03) - not placed"
 main,U8,SKIP,"677.7,511.8;637.4,605.1;652.0,611.5;692.3,518.2","right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02) (2026-11-02 agent review (fork-gussets): the 5-rivet angle is drawn on the upper part of the edge only: y 515-608, about 16 in. above the gusset bottom (was to y 651))"
 main,U9,SKIP,"1599,467;1500,734;1529,745;1628,478",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
 main,L9,SKIP,"1175,1043;1246,917;1220,902;1149,1028",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)

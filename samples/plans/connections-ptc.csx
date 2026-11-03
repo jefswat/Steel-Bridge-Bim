@@ -612,6 +612,10 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
                 $"the plate is drawn, not dimensioned: outline scaled from a {r["dpi"]} dpi render ({r["confidence"]} confidence, about +-1 in.; evidence: {r["evidence"]})"
                 + (simWhy.Length > 0 ? "; the sheet gives this joint only as similar to the drawn one" : ""),
                 "outline as scaled, sheared onto the model chord (verticals kept plumb)" + (sign < 0 ? ", mirrored" : "") + ".");
+            // L22 final condition (user decision 2026-11-03; TRUSS-DESIGN.md section 42): the outline row is the 1 in. plate LEFT after the p.90 flame cut on lines X
+            if (key == "main" && r["joint"].Trim() == "L22")
+                oText += " Final condition (user decision 2026-11-03): the plate as left after the p.90 note 'Flame cut 1\" gusset plates at L22 on lines X after field rivets have been driven'"
+                    + " - the four corner pieces outside lines X (crown jacking brackets) are not built; lines X traced at 450 dpi (4.28 px/in at 150 dpi, +-1 in.).";
             // 2026-11-02 agent review (fork-gussets): the reading rule of these outlines is "the top (bottom) edge of an upper (lower) chord joint is the chord top
             // (bottom) line"; a traced straight edge does not follow the kinked chords of the main truss (U9 / U13 up to 12 in. below the chord top, L8' 10 in.
             // above the chord bottom) -> the generator puts that edge on each chord's own face line (ChordFaceEdge). Main truss only: U1-U21, L1-L10, L12
