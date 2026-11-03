@@ -20,7 +20,7 @@ main,U11,SKIP,"1150,855;1330,855;1330,900;1150,900",callout text (1-L 8 x 6 x 5/
 main,U11,U11-L11,"1371,787;1510,787;1510,1225;1371,1225",post field between the profile edges (p.79)
 main,U12,SKIP,"1666,671;1689,671;1689,1000;1666,1000",post U12-L12 left edge: rivets drawn in profile
 main,U12,SKIP,"1802,671;1816,671;1816,1000;1802,1000",post U12-L12 right edge: rivets drawn in profile
-main,U12,SKIP,"1505,725;1665,725;1665,950;1505,950",bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U12,SKIP,"1501.7,737.3;1645.5,960.3;1658.9,951.7;1515.1,728.7","bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge (2026-11-02 agent review (fork-gussets): drawn angle along the re-traced lower left edge to y 956, about 12 in. above the bottom corner)"
 main,U12,SKIP,"1950,555;2015,555;2015,920;1950,920",bracing angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
 main,U12,SKIP,"1668,494;1702,488;1735,652;1700,660",chord splice line: profile symbols of the inlay / fill edges
 main,U12,SKIP,"1728,498;1765,494;1815,630;1785,640",chord splice line: profile symbols of the inlay / fill edges
@@ -33,7 +33,7 @@ main,L0,SKIP,"1678,795;1694,795;1694,915;1678,915",end post U0-L0 left edge: riv
 main,L0,SKIP,"1778,795;1797,795;1797,915;1778,915",end post U0-L0 right edge: rivets drawn in profile
 main,U13,SKIP,"605,630;619,630;619,915;605,915",post U13-L13 left edge: rivets drawn in profile
 main,U13,SKIP,"719,630;738,630;738,915;719,915",post U13-L13 right edge: rivets drawn in profile
-main,U13,SKIP,"485,660;605,660;605,880;485,880",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U13,SKIP,"482.9,671.7;582.9,863.7;597.1,856.3;497.1,664.3",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (2026-11-02 agent review (fork-gussets): drawn angle ends about 12 in. above the bottom corner at y 860; was clipped at y 880)
 main,U13,SKIP,"893,520;946,520;946,840;893,840",bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge
 main,U13,SKIP,"608,458;628,452;668,598;648,603",chord splice line: profile symbols of the inlay / fill edges
 main,U13,SKIP,"683,452;707,447;748,572;724,578",chord splice line: profile symbols of the inlay / fill edges
@@ -55,7 +55,7 @@ main,U15,SKIP,"2027,408;2047,403;2075,552;2055,557",chord splice line: profile s
 main,U15,U15-L15,"1957,590;2065,590;2065,820;1957,820",post field (p.82)
 main,U16,SKIP,"490,610;502,610;502,805;490,805",post U16-L16 left edge: rivets drawn in profile
 main,U16,SKIP,"614,610;626,610;626,805;614,805",post U16-L16 right edge: rivets drawn in profile
-main,U16,SKIP,"428,610;490,610;490,740;428,740",stiffener angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge
+main,U16,SKIP,"412.7,630.2;465.1,748.2;479.7,741.8;427.3,623.8","stiffener angle strip L 4 x 3 1/2 x 7/16 (C) on the gusset edge (2026-11-02 agent review (fork-gussets): Stiff. L drawn about 30 in. from the top corner (to y 745), was clipped at y 740 on the old edge = 22 11/16 in.)"
 main,U16,U16-L16,"502,610;614,610;614,805;502,805",post field (p.87)
 main,U17,SKIP,"1911,615;1929,615;1929,795;1911,795",post U17-L17 left edge: rivets drawn in profile
 main,U17,SKIP,"2034,615;2048,615;2048,795;2034,795",post U17-L17 right edge: rivets drawn in profile
@@ -67,8 +67,8 @@ main,L17,SKIP,"1202,675;1217,675;1217,875;1202,875",post U17-L17 left edge: rive
 main,L17,SKIP,"1312,675;1336,675;1336,875;1312,875",post U17-L17 right edge: rivets drawn in profile
 main,L17,SKIP,"1205,936;1222,931;1264,1063;1247,1070",chord splice line: profile symbols of the inlay / fill edges
 main,L17,SKIP,"1275,912;1292,907;1335,1033;1318,1040",chord splice line: profile symbols of the inlay / fill edges
-main,L13,SKIP,"478,588;514,588;472,1048;430,1048",left edge angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.83)
-main,L13,SKIP,"798,512;822,503;1003,666;984,694",upper-right edge angle strip 2-Ls 4 x 3 1/2 x 7/16 (C)
+main,L13,SKIP,"496.1,591.5;412.1,1040.0;427.9,1043.0;511.9,594.5","left edge angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.83) (2026-11-02 agent review (fork-gussets): angle from the top corner 8'-10 1/2 along the edge to the chord top (dimensioned, p.83; was clipped by the strip at 75 15/16 in.))"
+main,L13,SKIP,"787.8,520.1;992.8,694.1;1003.2,681.9;798.2,507.9",upper-right edge angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) (2026-11-02 agent review (fork-gussets): angle over the whole edge from the vertical down to the chord L13-L14 top (p.83; was 44 5/8 in.))
 main,L13,SKIP,"850,862;1082,862;1082,970;850,970",wind chord L13-W14 / floor system connection (1 in. carbon rivets): not a gusset-to-member group of the truss plane - not placed
 main,L13,SKIP,"676,514;692,514;692,852;676,852",post U13-L13 left edge: rivets drawn in profile
 main,L13,SKIP,"790,514;806,514;806,852;790,852",post U13-L13 right edge: rivets drawn in profile
@@ -84,7 +84,7 @@ main,L22,SKIP,"250,795;354,795;354,897;250,897",top-west chord-end diaphragm / l
 main,L22,SKIP,"884,795;988,795;988,897;884,897",top-east chord-end diaphragm / lug angle ring block
 main,L22,SKIP,"250,1100;990,1100;990,1216;250,1216",bottom lug angle blocks and bottom strut connection below the chord
 main,L22,SKIP,"700,738;806,738;806,766;700,766",top strut bracket plate (2-3/8 gussets) rivets
-main,U8,SKIP,"679,491;630,646;659,655;708,500",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
+main,U8,SKIP,"677.7,511.8;637.4,605.1;652.0,611.5;692.3,518.2","right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02) (2026-11-02 agent review (fork-gussets): the 5-rivet angle is drawn on the upper part of the edge only: y 515-608, about 16 in. above the gusset bottom (was to y 651))"
 main,U9,SKIP,"1599,467;1500,734;1529,745;1628,478",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
 main,L9,SKIP,"1175,1043;1246,917;1220,902;1149,1028",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
 main,L9,SKIP,"1343,919;1410,1074;1437,1062;1370,907",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.77; agent review gussets G51 / rivets R02)
@@ -95,3 +95,6 @@ main,L12,SKIP,"876,407;969,554;994,538;901,391",right bracing angle strip L 4 x 
 main,L18,SKIP,"827,829;919,957;943,939;851,811",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.88; agent review gussets G51; L19 takes the L18 outline)
 main,U19,SKIP,"1508,673;1449,534;1422,546;1481,685",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.88; agent review gussets G51 / rivets R02)
 main,U20,SKIP,"571,689;476,570;452,589;547,708",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.89; agent review gussets G51 / rivets R02; U21 inherits via the shared outline - G53 UNRESOLVED)
+main,L19,SKIP,"1632.9,823.3;1707.1,939.3;1720.5,930.7;1646.3,814.7",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.88) (2026-11-02 agent review (fork-gussets))
+main,L21,SKIP,"1481.2,829.9;1605.1,941.9;1615.9,930.1;1492.0,818.1",right bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.89) (2026-11-02 agent review (fork-gussets))
+main,U21,SKIP,"1219.5,568.8;1359.5,700.8;1370.5,689.2;1230.5,557.2",left bracing angle strip 2-Ls 4 x 3 1/2 x 7/16 (C) on the gusset edge (p.89; starts at the chord bottom corner of the plumb side edge) (2026-11-02 agent review (fork-gussets))

@@ -317,7 +317,12 @@ foreach (var (key, bridges, C) in structures)
             else if (similar.TryGetValue((st, pt.TrimEnd('\'')), out var sim) && (det.TryGetValue((sim.st, sim.pt), out var srow) || det.TryGetValue((sim.st, sim.pt + "'"), out srow)))
             {
                 src = srow; sst = sim.st; spt = srow[0]["joint"]; mirror = primed != spt.EndsWith("'");
-                how = $" ({sim.page}: details not shown, similar to {(sim.st == st ? "" : sim.st.Replace("approach3", "3-span ").Replace("approach4", "4-span "))}{spt} - its counts{(mirror ? ", mirrored" : "")})";
+                // agent review 2026-11-02 (fork-gussets): main L19 / U21 / L21 ARE drawn (p.88 / p.89, own gusset outlines now) - only their rivet symbols were not
+                // counted / read: say so instead of "details not shown"
+                bool drawnNotCounted = st == "main" && pt.TrimEnd('\'') is "L19" or "U21" or "L21";
+                how = drawnNotCounted
+                    ? $" ({sim.page}: the joint is drawn with the same arrangement as {spt}; its own rivet symbols were not read - {spt}'s counts / positions{(mirror ? ", mirrored" : "")})"
+                    : $" ({sim.page}: details not shown, similar to {(sim.st == st ? "" : sim.st.Replace("approach3", "3-span ").Replace("approach4", "4-span "))}{spt} - its counts{(mirror ? ", mirrored" : "")})";
             }
             if (src == null || !memsOf.ContainsKey(sst)) continue;
             // target members by class

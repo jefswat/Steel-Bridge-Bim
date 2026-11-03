@@ -1028,7 +1028,12 @@ public static partial class TrussGenerator
         /// <summary>Gusset outline of a joint in its (u, v) frame about the point: the joint's own outline, else the convex envelope of the member laps.</summary>
         private List<Vec2> GussetOutline(string pl, string pt, List<Inst> here, TrussJointDefinition? jdef, Vec3 P, Vec3 u, Vec3 v)
         {
-            if (jdef is { Outline.Count: >= 3 }) return ExtendGusset(jdef.Outline.Select(q => new Vec2(q.U, q.V)).ToList(), jdef.GussetExtension, $"gusset outline of joint {pt} ({pl})");
+            if (jdef is { Outline.Count: >= 3 })
+            {
+                var given = jdef.Outline.Select(q => new Vec2(q.U, q.V)).ToList();
+                if (jdef.ChordFaceEdge != TrussChordFaceEdge.None) given = SnapToChordFace(given, jdef.ChordFaceEdge, pl, pt, here, u, v);
+                return ExtendGusset(given, jdef.GussetExtension, $"gusset outline of joint {pt} ({pl})");
+            }
             var jd = _d.JointDefaults;
             var pts = new List<Vec2>();
             double margin = jd.Margin;
