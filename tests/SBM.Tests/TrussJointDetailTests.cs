@@ -247,4 +247,65 @@ public class TrussJointDetailTests
         Assert.Contains("RivetZones", p.ToJson());
         Assert.DoesNotContain("RivetZones", TrussTests.Model(extras: false).p.ToJson());
     }
+
+    /// <summary>Agent review 2026-11-02 (PTC stacking voids, fork-stack): OPTIONAL LongerJointPlatesInside (equal-level plates of a face stacked longest first),
+    /// JointPlateStepFills (fill of the step thickness under a plate that reaches past the thicker steel it lies on) and TrussJointPlate.OutsideGusset
+    /// (plate in the gusset layer = the pieces beyond the gusset). Defaults build as before.</summary>
+    [Fact]
+    public void JointPlateStacking_LongerInside_StepFills_OutsideGusset()
+    {
+        static (BridgeModel bm, BridgeProject p) Run(bool longer, double stepFill, bool outsideGusset = false)
+        {
+            var (p, b) = TrussTests.Model(extras: false);
+            var t = b.Truss!;
+            t.JointDefaults.LongerJointPlatesInside = longer;
+            t.JointDefaults.JointPlateStepFills = stepFill;
+            var plates = new List<TrussJointPlate>
+            {
+                new() { Face = TrussPlateFace.WebInside, Width = In(12), Thickness = In(0.75), Length = In(20), Label = "short i.s." },
+                new() { Face = TrussPlateFace.WebInside, Width = In(12), Thickness = In(0.875), Length = In(60), Label = "long i.s." },
+            };
+            if (outsideGusset) plates.Add(new() { Face = TrussPlateFace.WebOutside, Width = In(12), Thickness = In(0.5), Length = In(200), Label = "o.s. beyond", OutsideGusset = true });
+            t.Joints.Add(new TrussJointDefinition { Point = "L3", Plane = "N", Plates = plates });
+            return (Regen(p), p);
+        }
+        (double lo, double hi) X(BridgeModel bm, string label)
+        {
+            var tm = bm.Steel!.Truss!;
+            var P = tm.Point("N", "L3")!.World;
+            var mem = tm.Member("N-L3-L4")!;
+            var nx = Vec3.Cross(mem.B - mem.A, new Vec3(0, 0, 1)).Normalized();
+            var xs = bm.Steel.Parts.Where(x => x.Description.StartsWith(label)).SelectMany(x => x.Mesh.Positions).Select(q => Math.Abs(Vec3.Dot(q - P, nx)) / In(1)).ToList();
+            return (xs.Min(), xs.Max());
+        }
+        var (m0, p0) = Run(false, 0);
+        var (m1, p1) = Run(true, 0);
+        var (m2, p2) = Run(false, In(1.0 / 16));
+        // default: listed order at equal level - the short plate against the web, the long one on it (0.75 in. void beyond the short plate)
+        Assert.Equal(X(m0, "short i.s.").lo, X(m0, "long i.s.").hi, 3);
+        // longer inside: the long plate against the web (where the short one was), the short one on it
+        Assert.Equal(X(m0, "short i.s.").hi, X(m1, "long i.s.").hi, 3);
+        Assert.Equal(X(m1, "long i.s.").lo, X(m1, "short i.s.").hi, 3);
+        Assert.DoesNotContain(m1.Steel!.Parts, x => x.Description.StartsWith("step fill"));
+        // step fills: two 0.75 in. fills under the long plate beyond the short one (20 in. each side), flagged
+        var sf = m2.Steel!.Parts.Where(x => x.Description.StartsWith("step fill")).ToList();
+        Assert.Equal(2, sf.Count);
+        Assert.All(sf, x => { Assert.NotNull(x.Assumption); Assert.Contains("UNRESOLVED", x.Assumption!.Reason + x.Assumption.Status); Assert.Equal(In(20), x.Length, 6); });
+        Assert.Contains("12 x 3/4 x 20", sf[0].Description.Replace("\"", ""));
+        // outside the gusset: only the pieces beyond the gusset outline (less steel than the whole plate), in the gusset layer (on the web face)
+        var (m3, p3) = Run(false, 0, true);
+        var og = m3.Steel!.Parts.Single(x => x.Description.StartsWith("o.s. beyond"));
+        double full = 2 * 12 * 0.5 * 200 * Math.Pow(In(1), 3);
+        Assert.InRange(og.Mesh.Volume(), 0.05 * full, 0.9 * full);
+        Assert.Contains("gusset layer", og.Description);
+        var gus = m3.Steel.Parts.First(x => x.Category == PartCategory.TrussGusset && x.Mark.Contains("L3"));
+        Assert.Equal(X(m3, "o.s. beyond").lo, gus.Mesh.Positions.Select(q => Math.Abs(Vec3.Dot(q - m3.Steel.Truss!.Point("N", "L3")!.World, Vec3.Cross(m3.Steel.Truss.Member("N-L3-L4")!.B - m3.Steel.Truss.Member("N-L3-L4")!.A, new Vec3(0, 0, 1)).Normalized())) / In(1)).Min(), 3);
+        // inputs omitted from the .sbm when unused
+        Assert.DoesNotContain("LongerJointPlatesInside", p0.ToJson());
+        Assert.DoesNotContain("JointPlateStepFills", p0.ToJson());
+        Assert.DoesNotContain("OutsideGusset", p0.ToJson());
+        Assert.Contains("LongerJointPlatesInside", p1.ToJson());
+        Assert.Contains("JointPlateStepFills", p2.ToJson());
+        Assert.Contains("OutsideGusset", p3.ToJson());
+    }
 }
