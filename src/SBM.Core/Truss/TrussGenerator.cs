@@ -237,6 +237,7 @@ public static partial class TrussGenerator
             BuildEndConnections();
             BuildBracingGussets();
             BuildPlaneItems();
+            BuildFacePlates();
             int jointRivet0 = steel.Bolts.Count;
             if (Fasteners)
             {
@@ -250,6 +251,7 @@ public static partial class TrussGenerator
             if (_d.LineItems != null) foreach (var li in _d.LineItems.Where(l => l.ClipAngles != null && l.Transverse && l.Kind == TrussLineItemKind.Steel)) BuildClipAngles(li);
             if (Fasteners && _d.LineItems != null && _d.LineItems.Any(li => li.Rivets is { Count: > 0 } || li.ClipAngles != null)) PlaceLineItemRivets();
             if (Fasteners) PlacePlaneItemRivets();
+            if (Fasteners) PlaceFacePlateRivets();
             foreach (var s in _d.Suspenders) BuildSuspender(s);
             for (int i = 0; i < _d.Shoes.Count; i++) BuildShoe(_d.Shoes[i], i);
             if (Fasteners && _d.RivetHeadsFlushAtSolePlates) FlushRivetsAtSolePlates();

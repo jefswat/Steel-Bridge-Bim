@@ -141,7 +141,7 @@ public static partial class TrussGenerator
             if (_itemRivetFrames.Count == 0) return;
             var parts = Model.Steel.Parts;
             var boxes = parts.Select(p => p.Mesh is { IsEmpty: false } ? p.Mesh.Bounds() : default).ToList();
-            int n = 0, miss = 0, shared = 0;
+            int n = 0, miss = 0, shared = 0, lone = 0;
             foreach (var (it, a, u, vAx, w, L, mirror, asm) in _itemRivetFrames)
                 foreach (bool mir in mirror ? new[] { false, true } : new[] { false })
                     foreach (var rv in it.Rivets!)
@@ -159,10 +159,11 @@ public static partial class TrussGenerator
                             pr.Add(parts[i].Mesh, i, lo, hi);
                         }
                         if (pr.At(at, ax, 0.35) is not { } iv) { miss++; continue; }
+                        if (it.RivetsNeedSteelBehind && it.Kind == TrussPlaneItemKind.Plate && iv.t1 - iv.t0 < Math.Abs(it.W1 - it.W0) + 0.0254 / 32) { lone++; continue; }
                         var asu = RivetFlag(rv.Unresolved ?? (it.Unresolved.Length > 0 ? it.Unresolved : null), "rivets of the plane item at the given points");
                         if (MergeRivet(at + ax * iv.t1, -ax, Math.Abs(ax.Z) > 0.9 ? u : Up, iv.t1 - iv.t0, rv.Diameter, asm, rv.Material, asu)) shared++; else n++;
                     }
-            Info($"Truss: plane item rivets - {n} placed{(shared > 0 ? $", {shared} in a hole already taken (one rivet through the whole stack)" : "")}{(miss > 0 ? $", {miss} positions not in steel (skipped)" : "")}{Src}.");
+            Info($"Truss: plane item rivets - {n} placed{(shared > 0 ? $", {shared} in a hole already taken (one rivet through the whole stack)" : "")}{(miss > 0 ? $", {miss} positions not in steel (skipped)" : "")}{(lone > 0 ? $", {lone} positions with nothing behind the piece (not placed)" : "")}{Src}.");
         }
     }
 }

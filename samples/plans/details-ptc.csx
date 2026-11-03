@@ -141,31 +141,40 @@ if (T(Main) is { } tmS)
 }
 
 // ================================================================ 2. portal knee braces at U11 / U11' (p.100)
-// Dimensioned: knee working line meets the post CL 20'-1 1/8 below U11; straight part = box 2'-11 3/4 b.b. Ls (in the portal plane) x 2'-4 1/2 b.b. Ls, 2-Pls (34 1/2-14) x 1/2
-// (the side plates, manholes 14 x 20 @ 4'-0), 2-Pls 28 x 1/2 (covers), 4-Ls 6 x 6 x 1/2; curved part "R = 20'-0 Back of Ls"; Section C-C developed 2'-3 + 4'-3 1/2 + 2'-3 from the
+// Dimensioned: knee working line meets the post CL 20'-1 5/8 below U11 (agent review 2 2026-11-03: was read 20'-1 1/8); straight part = box 2'-4 1/2 b.b. Ls IN the portal
+// plane x 2'-11 3/4 b.b. Ls along the bridge (agent review 2: the section above the knee draws the 2'-4 1/2 side in the portal plane and the 14 x 20 manholes on the faces
+// normal to it; the knee scales 29 in. deep in the portal elevation at 8.8 px / in., calibrated on '2'-5 in to in of gus. pls.'; the 2'-11 3/4 width = the post's out-to-out
+// covers, so the 2-3/4 gussets lap both): 2-Pls (34 1/2-14) x 1/2 on the in-plane faces (manholes 14 x 20 @ 4'-0), 2-Pls 28 x 1/2 on the faces along the bridge,
+// 4-Ls 6 x 6 x 1/2; curved part "R = 20'-0 Back of Ls"; Section C-C developed 2'-3 + 4'-3 1/2 + 2'-3 from the
 // splice to the CL bridge; portal strut working line through U11 (Section D-D), strut 2'-10 1/2 deep. The sheet is drawn with breaks in the post, the strut and the knee,
 // so nothing can be scaled along them. Construction (all from the dimensions above + two readings, flagged): the knee is symmetric about the CL bridge with its
 // centreline horizontal there and its top cover on the strut bottom; R = 20'-0 at the back of the TOP angles (the label points at the upper edge) -> centreline
-// radius 18'-6 1/8; the straight part is the line through the 20'-1 1/8 point tangent to that arc; its end at the post stops 1/2 in. clear of the knee gussets
-// (2'-5 in to in + 3/4 gussets). The curved part is modeled with the straight-part box (Section E-E / B-B: web 36 x 1/2 + L 6 x 6 x 1/2 + 5/8 gusset not built).
+// radius 20'-0 - 14 3/4; the straight part is the line through the 20'-1 5/8 point tangent to that arc; its end at the post is square, its top corner 1/4 in. clear of the post
+// web face (2'-5 in to in / 2). The curved part is modeled with the straight-part box (Section E-E / B-B: web 36 x 1/2 + L 6 x 6 x 1/2 + 5/8 gusset not built).
+// Knee to post (p.100 PORTAL AT U11, portal-plane view): '2-3/4" gussets' on the post cover plates (faces along the bridge, 1'-6 3/8 from the post CL) lapping the knee's
+// 28 x 1/2 plates, 64 x 1 in. carbon field rivets in the post (4 lines) and 37 x 1 in. shop rivets in the knee (traced; outline traced, R fillets as drawn).
 string kneeFlag = U("p.100", "portal knee braces at U11 (straight box + R 20'-0 curve)",
-    "the portal sheet is drawn with breaks in the post, strut and knee: only the 20'-1 1/8 drop of the knee working line, R = 20'-0 (back of Ls), the box section and the developed lengths in Section C-C are dimensioned",
-    "knee symmetric about the CL bridge, centreline horizontal there with the top cover on the strut bottom, R = 20'-0 at the back of the top angles, straight part tangent through the 20'-1 1/8 point, ending 1/2 in. clear of the post knee gussets; the curved part keeps the straight box section; manholes, splice, knee gussets (2-3/4, 5/8) and rivets not built.");
+    "the portal sheet is drawn with breaks in the post, strut and knee: only the 20'-1 5/8 drop of the knee working line, R = 20'-0 (back of Ls), the box section and the developed lengths in Section C-C are dimensioned",
+    "knee symmetric about the CL bridge, centreline horizontal there with the top cover on the strut bottom, R = 20'-0 at the back of the top angles, straight part tangent through the 20'-1 5/8 point, ending square 1/4 in. clear of the post web face; the curved part keeps the straight box section; manholes, splice, the 5/8 gusset at the strut and the strut end rivets not built.");
+string kneeGussetFlag = U("p.100", "portal knee to post gussets 2-3/4 in. (U11)",
+    "the portal-plane view draws the two gussets on the post with the knee end and both rivet groups, without outline dimensions; the view is broken in the post above and below the gussets",
+    "outline and rivet positions traced at 8.8 px / in. (300 dpi, calibrated on '2'-5 in to in of gus. pls.'), +-1 in., placed from the 20'-1 5/8 knee W.P. on the post CL; gussets on the post cover plates (1'-6 3/8 from the post CL), 3/4 in. carbon.");
 if (T(Main) is { } tmK)
 {
     var t = tmK;
     Flag(t, "portal at U11: portal strut", U("p.100, p.79", "portal strut at U11 (box 34 1/2 deep, Section D-D plates) and the knee brace connections",
         "Section D-D lists the strut plates (34 1/2 x 11/16, 24 1/2 x 7/16, (33-13 1/2) x 11/16, (35 1/2-13 1/2) x 9/16, 2-6 x 1/2 bars) around a skewed W.P. outline; the knee gussets / splice are drawn without outline dimensions",
-        "the strut stays the nominal envelope between the U11 points; knee gussets, splice and rivets not built."));
+        "strut = the p.71 box; its U11 plates are built by bracing-ptc.csx section 2b, the knee-to-post gussets here (traced); the knee splice and the 5/8 knee-to-strut gusset (E-E) are not built."));
     Flag(t, "portal knee braces at U11", kneeFlag);
     t.PlaneItems ??= new();
     t.PlaneItems.RemoveAll(p => p.Name.StartsWith("PK"));
-    double h = In(18.375), zQ = -(Ft(20) + In(1.125)), Rc = Ft(20) - In(17.875);
+    double h = In(14.75), zQ = -(Ft(20) + In(1.625)), Rc = Ft(20) - In(14.25);
     foreach (var pr in new[] { "", "'" })
     {
         if (!t.Points.Any(p => p.Name == "U11" + pr)) { report.Add($"portal U11{pr}: point not found"); continue; }
         // knee top cover on the portal strut bottom: the p.71 box bottom is parallel to CL U11-U12 (batch 5e), so take its LOWEST point over the knee width
-        // (+-14 3/4 in. along the bridge); the old flat 17 1/4 in. (half the 34 1/2 plate) let the knee into the sloped bottom by 0.28 in. (recheck N07)
+        // (the knee is 3'-0 3/4 wide along the bridge, wider than the strut bottom: its full width +-17 3/4); the old flat 17 1/4 in. let the knee into the sloped
+        // bottom by 0.28 in. (recheck N07)
         double zTop = -In(17.25);
         var bot = t.Sections.FirstOrDefault(sx => sx.Name == "PORTAL U11" + pr)?.CustomPieces?.FirstOrDefault(pc => pc.Label.StartsWith("PL (35 1/2-13 1/2)"));
         if (bot != null)
@@ -174,7 +183,7 @@ if (T(Main) is { } tmK)
             var byU = bot.Polygon.OrderBy(q => q.U).ToList();
             var lowPts = new List<TrussUV> { byU.Take(2).OrderBy(q => q.V).First(), byU.Skip(byU.Count - 2).OrderBy(q => q.V).First() };
             double Yb(double x) => lowPts[0].V + (lowPts[1].V - lowPts[0].V) * (x - lowPts[0].U) / (lowPts[1].U - lowPts[0].U);
-            zTop = Math.Min(Yb(-In(14.75)), Yb(In(14.75)));
+            zTop = Math.Min(Yb(-In(17.75)), Yb(In(17.75)));
         }
         double zc = zTop - h;
         report.Add($"portal U11{pr}: knee top cover {-zTop / 0.0254:0.000} in. below the strut working line (lowest strut bottom over the knee width)");
@@ -183,7 +192,10 @@ if (T(Main) is { } tmK)
         double F(double th) => Lh * Math.Sin(th) - dyp * Math.Cos(th) - Rc;
         double lo = 0, hi = Math.PI / 3;
         for (int k = 0; k < 80; k++) { double mid = (lo + hi) / 2; if (F(mid) > 0) hi = mid; else lo = mid; }
-        double th = (lo + hi) / 2, uV = (zc - zQ) / Math.Tan(th), us = In(15.25) + In(0.5) + h * Math.Sin(th);
+        // 2026-11-03 agent review 2 (fork-u11): p.100 draws the knee end at the post face (the dashed end line on the post's inner web line, 2'-5 in to in /
+        // 2 from the post CL) and the 2-3/4 gussets on the post cover plates (portal-plane view), not in the truss plane: square-cut end, its top corner 1/4 in.
+        // clear of the post web face (was 1/2 in. clear of a 3/4 plate assumed on the web face)
+        double th = (lo + hi) / 2, uV = (zc - zQ) / Math.Tan(th), us = In(14.5) + In(0.25) + h * Math.Sin(th);
         var path = new List<TrussPathVertex> { new(us, zQ + us * Math.Tan(th)), new(uV, zc, Rc), new(Lh, zc) };
         double arc = Rc * th;
         report.Add($"portal U11{pr}: knee slope {th * 180 / Math.PI:0.00} deg, straight part {((uV - Rc * Math.Tan(th / 2)) - us) / Math.Cos(th) / 0.3048:0.00} ft, arc on the centreline {arc / 0.0254:0.0} in (C-C developed splice -> CL 105.5 in incl. the straight run past the splice)");
@@ -197,15 +209,42 @@ if (T(Main) is { } tmK)
         foreach (int s in new[] { 1, -1 })
         {
             string sd = s > 0 ? "A" : "B";
-            Item($"SP{sd}", "side PL (34 1/2-14) x 1/2", (s * In(14.25), -In(17.25)), (s * In(14.75), -In(17.25)), (s * In(14.75), In(17.25)), (s * In(14.25), In(17.25)));
-            Item($"CV{sd}", "cover PL 28 x 1/2", (-In(14), s * In(17.875)), (In(14), s * In(17.875)), (In(14), s * In(18.375)), (-In(14), s * In(18.375)));
+            // section (W = along the bridge, V = in the portal plane normal to the knee): PL (34 1/2-14) x 1/2 on the in-plane faces (V = +-14 1/4 .. 14 3/4, manholes),
+            // PL 28 x 1/2 on the faces along the bridge (W = +-17 7/8 .. 18 3/8), L 6 x 6 x 1/2 in the corners (2'-4 1/2 x 2'-11 3/4 b.b. Ls)
+            Item($"SP{sd}", "PL (34 1/2-14) x 1/2", (-In(17.25), s * In(14.25)), (In(17.25), s * In(14.25)), (In(17.25), s * In(14.75)), (-In(17.25), s * In(14.75)));
+            Item($"CV{sd}", "PL 28 x 1/2", (s * In(17.875), -In(14)), (s * In(18.375), -In(14)), (s * In(18.375), In(14)), (s * In(17.875), In(14)));
             foreach (int r in new[] { 1, -1 })
             {
-                // L 6 x 6 x 1/2 in the corner (W = s side, V = r side): backs on the side plate (W = +-14.25) and on the cover (V = +-17.875)
-                double W0 = s * In(14.25), V0 = r * In(17.875);
+                // L 6 x 6 x 1/2 in the corner (W = s side, V = r side): backs on the 28 x 1/2 plate (W = +-17.875) and on the perforated plate (V = +-14.25)
+                double W0 = s * In(17.875), V0 = r * In(14.25);
                 Item($"L{sd}{(r > 0 ? "T" : "B")}", "L 6 x 6 x 1/2",
                     (W0, V0), (W0 - s * In(6), V0), (W0 - s * In(6), V0 - r * tp), (W0 - s * tp, V0 - r * tp), (W0 - s * tp, V0 - r * In(6)), (W0, V0 - r * In(6)));
             }
+        }
+        // ---- knee to post gussets 2-3/4 (p.100, traced; inches: U from the post CL toward the CL bridge, V up from the knee W.P. on the post CL)
+        var gOut = new (double u, double v)[] { (-12.7, 46.6), (12.3, 46.6), (12.3, 42.0), (16.8, 34.7), (23.6, 30.7), (32.7, 30.1), (37.3, 29.5), (46.4, 6.25), (32.7, 0.6),
+            (29.3, -5.1), (23.6, -14.2), (19.1, -23.3), (15.1, -32.4), (13.4, -40.3), (12.8, -48.9), (-12.7, -48.9) };
+        var postRiv = new (double u, double v)[] {
+            (-8.9,38.7),(-8.6,44.7),(-8.5,2.3),(-8.5,20.5),(-8.5,26.6),(-8.5,32.7),(-8.4,14.5),(-8.2,-15.9),(-8.2,-10.1),(-8.2,8.5),(-8.1,-28.0),(-8.1,-22.1),(-8.1,-3.9),(-8.0,-46.3),(-8.0,-40.1),(-7.8,-34.0),
+            (-3.2,38.8),(-3.2,44.8),(-3.0,26.7),(-3.0,32.7),(-2.9,-9.9),(-2.9,2.4),(-2.9,8.5),(-2.9,14.5),(-2.8,-3.9),(-2.8,20.0),(-2.7,-27.9),(-2.7,-22.0),(-2.6,-40.1),(-2.6,-34.0),(-2.5,-46.3),(-2.5,-15.9),
+            (2.5,44.8),(2.7,14.6),(2.7,26.7),(2.7,38.8),(2.8,20.5),(2.8,32.7),(2.9,-3.8),(2.9,8.5),(3.0,2.3),(3.1,-46.7),(3.1,-15.9),(3.1,-9.9),(3.2,-22.0),(3.3,-40.1),(3.3,-34.0),(3.3,-28.0),
+            (8.2,38.8),(8.2,44.8),(8.3,32.8),(8.4,26.8),(8.5,8.2),(8.5,20.6),(8.6,-3.7),(8.6,2.4),(8.6,14.6),(8.7,-40.1),(8.7,-33.9),(8.7,-27.9),(8.7,-21.9),(8.7,-15.9),(8.7,-9.8),(8.8,-46.1) };
+        var kneeRiv = new (double u, double v)[] {
+            (16.6,17.3),(16.8,13.7),(16.9,-3.1),(17.0,0.7),(17.0,7.4),(17.9,20.5),(19.8,15.1),(20.9,-3.5),(21.1,2.7),(21.2,19.1),(22.3,9.7),(22.3,22.6),(23.2,-0.2),(24.6,4.4),(25.6,21.2),
+            (25.9,17.8),(26.9,24.4),(27.0,-0.6),(28.4,12.4),(29.1,2.6),(30.1,23.2),(30.8,7.1),(31.2,26.5),(32.0,20.6),(33.0,1.9),(33.0,30.1),(34.3,15.3),(34.4,25.2),(35.2,5.3),(35.6,28.5),
+            (36.7,9.8),(37.9,23.3),(39.0,4.9),(40.2,18.0),(41.1,8.0),(42.7,12.7),(45.0,7.6) };
+        // (the traced outline runs clockwise: reversed to counter-clockwise for the plate triangulation)
+        foreach (int s in new[] { 1, -1 })
+        {
+            double w0 = s * In(18.375), w1 = s * In(19.125), wm = s * In(18.75);
+            var rv = postRiv.Select(q => new TrussPlaneItemRivet { U = In(q.u), V = zQ + In(q.v), W = wm, AxisW = -s, Diameter = In(1), Material = "1 in carbon steel rivet", Unresolved = kneeGussetFlag })
+                .Concat(kneeRiv.Select(q => new TrussPlaneItemRivet { U = In(q.u), V = zQ + In(q.v), W = wm, AxisW = -s, Diameter = In(1), Material = "1 in carbon steel rivet", Unresolved = kneeGussetFlag })).ToList();
+            t.PlaneItems.Add(new TrussPlaneItemDefinition
+            {
+                Name = $"PK{pr}-G{(s > 0 ? "A" : "B")}", Label = $"portal knee brace U11{pr}: gusset PL 3/4 (knee to post)", PointA = "N:U11" + pr, PointB = "S:U11" + pr, Kind = TrussPlaneItemKind.Plate,
+                Outline = Enumerable.Reverse(gOut).Select(q => new TrussUV(In(q.u), zQ + In(q.v))).ToList(), W0 = Math.Min(w0, w1), W1 = Math.Max(w0, w1), Mirror = true, Role = TrussMemberRole.Portal,
+                Category = SBM.Core.Steel.PartCategory.TrussConnectionPlate, Panel = $"Portal U11{pr}", Material = "C", Unresolved = kneeGussetFlag, Source = "p.100", Rivets = rv, RivetsNeedSteelBehind = true,
+            });
         }
     }
     report.Add($"{Main}: {t.PlaneItems.Count} portal knee pieces (x 2 mirrored)");
