@@ -978,7 +978,17 @@ public sealed class TrussJointDefinition
     /// Marks get "A" (lower station side) / "B"; layers, rivets and edge angles still use the whole outline (a splice layer bridges the gap).</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double GussetSplitGap { get; set; }
+    /// <summary>OPTIONAL (None = the outline as given, omitted from the .sbm): the outline's chord-side edge chain (Top: the edges facing up, an upper chord
+    /// joint; Bottom: facing down, a lower chord joint) is replaced by the outer face line of EACH chord at the point (the gusset-lapped pieces - web plies,
+    /// angles - not the cover plates), with a kink where the two chords' face lines meet; the side edges next to the chain are carried along their own direction
+    /// onto it. For sheets whose note says the plate edges run to the chord top / bottom (a traced straight edge does not follow a kinked chord).
+    /// Vertices moved more than 30 in. = not applied (warning).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public TrussChordFaceEdge ChordFaceEdge { get; set; }
 }
+
+/// <summary>Gusset edge put on the chord face (<see cref="TrussJointDefinition.ChordFaceEdge"/>).</summary>
+public enum TrussChordFaceEdge { None, Top, Bottom }
 
 /// <summary>
 /// An additional gusset plate layer of a joint (<see cref="TrussJointDefinition.GussetLayers"/>): thickness and its own outline in the joint frame

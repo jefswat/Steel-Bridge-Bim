@@ -343,9 +343,9 @@ approach4 (unit B),L20,U20-L20,beyond,0,3,3,67,4.3,-8.6..8.6
 approach4 (unit B),L20,U20-L20,inside,14,0,14,67,,-8.6..8.6
 approach4 (unit B),L20,unassigned,inside,2,10,12,67,,-8.6..8.6
 main,U0,U0-L0,beyond,2,17,19,73,13.6,-17.8..17.8
-main,U0,U0-L0,inside,0,19,19,73,,-17.8..17.8
+main,U0,U0-L0,inside,0,31,31,73,,-17.8..17.8
 main,U0,U0-U1,beyond,0,1,1,73,8.4,-17.8..17.8
-main,U0,U0-U1,inside,36,18,54,73,,-17.8..17.8
+main,U0,U0-U1,inside,36,6,42,73,,-17.8..17.8
 main,L0,L0-L2,beyond,0,7,7,73,11.0,-17.8..17.8
 main,L0,L0-L2,inside,18,55,73,73,,-17.8..17.8
 main,L0,L0-U1,beyond,0,8,8,73,21.5,-17.8..17.8

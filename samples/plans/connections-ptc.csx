@@ -519,9 +519,20 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
                 $"the plate is drawn, not dimensioned: outline scaled from a {r["dpi"]} dpi render ({r["confidence"]} confidence, about +-1 in.; evidence: {r["evidence"]})"
                 + (simWhy.Length > 0 ? "; the sheet gives this joint only as similar to the drawn one" : ""),
                 "outline as scaled, sheared onto the model chord (verticals kept plumb)" + (sign < 0 ? ", mirrored" : "") + ".");
+            // 2026-11-02 agent review (fork-gussets): the reading rule of these outlines is "the top (bottom) edge of an upper (lower) chord joint is the chord top
+            // (bottom) line"; a traced straight edge does not follow the kinked chords of the main truss (U9 / U13 up to 12 in. below the chord top, L8' 10 in.
+            // above the chord bottom) -> the generator puts that edge on each chord's own face line (ChordFaceEdge). Main truss only: U1-U21, L1-L10, L12
+            // (L0 / L11 shoe joints, L13-L21 hanger joints with plates below the arch chord and the crown joints U22 / L22 keep the traced edge).
+            var cfe = TrussChordFaceEdge.None;
+            if (key == "main")
+            {
+                if (ul == "U" && k >= 1 && k <= 21) cfe = TrussChordFaceEdge.Top;
+                else if (ul == "L" && (k >= 1 && k <= 10 || k == 12)) cfe = TrussChordFaceEdge.Bottom;
+            }
             foreach (var jd in t.Joints.Where(x => x.Point == mj))
             {
                 jd.Outline = outline;
+                jd.ChordFaceEdge = cfe;
                 // keep the thickness reading flag of the approach joints; drop the old envelope wording
                 string old = jd.Unresolved.Contains("convex envelope") ? "" : jd.Unresolved;
                 jd.Unresolved = oText + (old.Length > 0 ? " " + old : "");
@@ -710,6 +721,23 @@ var jointShear = new Dictionary<(string bridge, string joint), double>();
             if (a == "U11" && b == "L11") { m.ChordsAbutAt = new() { m.To }; nCa++; }
         }
         report.Add($"web member ends (agent review 2026-11-02): {nAb} vertical ends the diagonals abut (p.76-p.88), {nSb} short vertical ends set back square clear of the diagonals (U7 / U9 / L10), {nCa} posts the L11 chords abut (p.80)");
+        // agent review 2026-11-02 (fork-gussets, p.73 U0 elevation): the end post U0-L0 (2-Web Pls 23 x 9/16, 4-Ls 6 x 6 x 7/16) runs up to the TOP of the top chord
+        // ('Field Weld and Grind' at the outer top corner) and the top chord U0-U1 ends against it; the model stopped the post at the chord bottom and started the chord
+        // square at the W.P. (9 drawn post rivets per face above the chord bottom had no post steel). Built: post extended to the chord top at its outer face (outer top
+        // corner scaled 71 px = 16.6 in. above the W.P., 4.28 px/in.), chord cut on the post's inner side face (ChordsAbutAt). The drawn dashed bevel between them
+        // (outer top corner down to the post inner face about 8 in. below the chord top) is not built: the joint line is the post inner face over the chord depth.
+        string u0Flag = U("p.73", "end post U0-L0 at U0 / U0'", "the elevation draws the post running to the top of the top chord with a dashed bevel joint to the chord (field weld and grind at the "
+            + "outer top corner) but prints no dimension for the post top or the bevel (outer top corner scaled 16.6 in. above the W.P. at 4.28 px/in.)",
+            "post extended square to 16.6 in. above the W.P.; the top chord cut on the post's inner face (the bevel is not modeled).");
+        int nU0 = 0;
+        foreach (var m in tm4.Members.Where(m => m.Plane.Length == 0 && m.Role == TrussMemberRole.Vertical && m.From.TrimEnd('\'') == "U0" && m.To.TrimEnd('\'') == "L0"))
+        {
+            m.StartSetback = -In(16.6);
+            m.ChordsAbutAt = new() { m.From };
+            m.Unresolved = string.Join(" ", new[] { System.Text.RegularExpressions.Regex.Replace(m.Unresolved ?? "", @"UNRESOLVED \(p\.73\): end post U0-L0 at U0 / U0'.*?(?=UNRESOLVED|$)", "").Trim(), u0Flag }.Where(x => x.Length > 0));
+            nU0++;
+        }
+        report.Add($"end post at U0 / U0' (agent review 2026-11-02, p.73): {nU0} posts run to the chord top, the top chord abuts the post inner face");
         tm4.Unresolved.RemoveAll(x => x.Contains("post U11-L11 below the L11 chords"));
         tm4.Unresolved.Add(U("p.80", "post U11-L11 below the L11 chords",
             "the elevation draws the post webs running down through the joint (round the bottom strut box) to the FIN. line over the shoe, with the chords cut against its sides; the post bottom and the cut of its cover plates round the strut are not dimensioned",

@@ -1162,3 +1162,46 @@ the CL)', p.101 / p.102 ladders at the cross walkways. All changes in `samples/p
   - Lateral apex plate edge angles x bottom laterals 0.10 - 0.22 in. (N-BGLM*-T-EA x BL-*), walkway CL posts x cross walk rails 0.16 in., platform FB0' rail x gusset
     L0' 0.38 in., floor beam stiffener x cross walk rail FB0' 0.22 in. (layout drawn only).
 
+
+## 38. Main span gusset outlines, edge angles and the U0 end post (2026-11-02 agent review, fork-gussets; evidence `qc/ptc/main-span/work10/review/batch1-6`)
+
+Rule behind the traced outlines (section 15): "the top (bottom) edge of an upper (lower) chord joint is the chord top (bottom) line". A traced edge is one straight
+line, the main truss chords kink at every panel point, and the drawn chord direction used for the vertical shear is the MEAN of the two chords, so the traced edge
+ran off each chord: U9 / U9' up to 12 1/2 in. below the chord top (about 100 drawn rivets above the plate), U13 / U13' 9 in., U14' 6 in. above, L8' 9 11/16 in.
+- Generic OPTIONAL `TrussJointDefinition.ChordFaceEdge` (None | Top | Bottom, omitted when None; `Truss/TrussGeneratorChordFace.cs`, tests `TrussChordFaceEdgeTests`):
+  the outline's chord-side edge chain (edges facing the chord face within 35 deg) is replaced by EACH chord's own outer face line (the gusset-lapped pieces: web plies /
+  angles, not the cover plates), with a vertex where the two face lines meet; the side edges next to the chain are carried along their own direction onto it
+  (warning, outline unchanged, when they would move more than 30 in.). Info line per joint with the largest move. connections-ptc 4b sets Top on main U1-U21 and
+  Bottom on L1-L10 / L12 (not the shoe joints L0 / L11, the hanger joints L13-L21 with plate below the arch chord, nor the crown U22 / L22). Largest moves: U9 12 1/2,
+  L8 9 11/16, U13 9 1/16, U14 6 1/8, U5 6, U20 / U21 5 in.; everything else <= 4 3/8 in. Approach trusses unchanged.
+- Re-traced (gusset-outlines.csv, page px at 150 dpi = 4.28 px/in., zoom 1.15-3 crops; dimension-only flags unchanged): L18 right edges (p.88: edge-angle corner
+  924,968 on the chord top, side across the chord, lower right edge straight to the bottom 798,1297 - was 3.5-4.7 in. outside); U16 bottom (p.87: square across the
+  vertical at the lower end of the Stiff. L, then two edges up to the diagonal - the old 20 deg edge lay 8 in. above it); U12 bottom (p.81: across the vertical at
+  y 999 + edge to the right side - the old corner cut left the U12-L13 and vertical rivets outside); U14 bottom (p.82: ~12 in. lower, across the vertical at y 1416;
+  right side = straight continuation of the vertical edge to the chord top, the slanted line was the end of the fills).
+- Own rows for joints the sheets DRAW but that reused another joint's outline: L19 (p.88 right half; work point on the post centre line, chord working line 70 px
+  below the chord top as at L18, chord 10.9 deg), L21 and U21 (p.89 right half; vertical CL x 1412-1413, chord 3.2 / 0.3 deg; U21's plumb side edge 43.6 in.
+  from the vertical CL as the review measured). Their part status texts now name their own page / joint; their rivets keep L18 / L20 / U20's counts and
+  positions (the symbols of the right-half joints were never read) and rivets-ptc says so ("drawn with the same arrangement ... its own rivet symbols were not
+  read") instead of "details not shown".
+- Edge angles (rivet-count-zones.csv strips, now bands along the drawn run): L13 left angle from the top corner 8'-10 1/2 (DIMENSIONED, p.83) to the chord top
+  (was 75 15/16 in.), L13 upper-right angle over the whole edge from the vertical (was 44 5/8), U16 Stiff. L to y 745 (~30 in., was 22 11/16), U12 along the
+  re-traced edge to y 956. Read against the sheet, NOT as the review proposed: U13 lower-left angle ends about 12 in. ABOVE the bottom corner (p.82, y 860; the model
+  ran it to y 880 - it is now shorter), U8 right angle is drawn on the upper part only (p.77 y 515-608, 5 rivets; was to y 651). New strips: L19 / L21 upper-right
+  and U21 lower-left 2-Ls 4 x 3 1/2 x 7/16 (C) (rivets not placed: not counted).
+- U0 end post (p.73): the post U0-L0 runs to the chord top ('Field Weld and Grind' at the outer top corner); the model stopped it at the chord bottom and started
+  the chord square at the W.P. Now (connections-ptc, member-end block) `StartSetback = -16.6 in.` (outer top corner scaled 71 px above the W.P.) and
+  `ChordsAbutAt = [U0]` (chord cut on the post's inner side face); the drawn dashed bevel between them is not built (flag on the post). The 12 field rivet rings on the
+  post rivet lines above the chord bottom were filed under the chord U0-U1 in rivet-positions.csv / rivet-counts.csv; moved to U0-L0 (member frame t = -v).
+- (f) rivets drawn beyond the gusset edge through one web ply (U15-U19, L17-L19, U14', U12', U7'): per sheet the rivets are right - they are the field rivets of
+  the chord splice plates / lug angles drawn beyond the plates (p.82 / p.87 / p.88 / p.89), which are not built yet (splices.csv rows without a length, lug angles:
+  other forks); the ones caused by gusset edges (U12' / U14' diagonal rows, U16 vertical bottom rows, U9 / U13 chord rows above the top edge) are fixed by the
+  outlines above. Nothing dropped.
+- Still open: L11 / L11' inner gusset stays the envelope (p.80: the upper edges with the 2-Ls 5 x 3 1/2 edge angles and the 2'-0 radii at the post can be followed
+  - left edge 330,765 -> 712,513, right edge 878,510 -> 1252,550, top across the post at y ~506 = 97 in. above the W.P. - but the lower edges along both chords
+  run under the stacked 3/4 layers and splice plates and no closed outline can be read; a part-traced outline would invent the rest). U2 top-right corner 2-3 in.
+  (review OK / info) is now on the chord face by the snap.
+- Verification (chain connections-ptc -> ... -> rivets-ptc on a copy of the committed model, 8bd1cf5 base): `sbm clash` all bridges 3,357 -> 2,861 rows (the drop is the
+  section 37 shoe / walkway scripts being re-run on the committed model; main span 825 -> 825, same category counts, no new gusset x member row; approach trusses /
+  girder spans not raised); check-truss-ptc 616 PASS / 19 DIFF / 73 INFO / 2 CONFLICT before and after (gusset-covers-its-rivets rows unchanged); U0 post rivets
+  on the outer lines now placed through gusset + post (grip 1 7/8 / 1 7/16 in.); tests 784 + 2 new passed.
