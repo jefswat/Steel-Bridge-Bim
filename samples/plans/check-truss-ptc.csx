@@ -276,25 +276,26 @@ Print("--- 8b. gusset layers (plates per face, total thickness)");
         if (kc == 15) return ("lower diagonals L15-L16", 38);
         return ("lower diagonals L16-L22", 26);
     }
+    // model (agent review 2, 2026-11-03): PLACED rivets whose shank crosses the member end AND its bracing plate(s) (generator bracing connection audit,
+    // TrussModel.BracingConnections), not the definition counts; an end with no plate record = through an apex / no plate
+    var placed = new Dictionary<(string, bool), int>();
+    foreach (var bc in tm.BracingConnections) foreach (var e in bc.Ends) placed[(e.Member, e.Start)] = placed.GetValueOrDefault((e.Member, e.Start)) + e.Rivets;
     foreach (var g in latM.Concat(strM).GroupBy(m => Plan(m).cls))
     {
         var plan = Plan(g.First()).plan;
-        // model: rivets per plate x 2 plates at each end that has a plate definition naming the member (apex: the strut through it is not an end)
-        var ends = g.SelectMany(m => new[] { m.From, m.To }.Select(sp => (m, sp))).ToList();
-        var vals = new List<int>();
-        foreach (var (m, sp) in ends)
-        {
-            string key = sp.Contains(":LM") || sp.Contains(":UM") ? "N:" + P(sp) : sp;
-            // (a lateral ending at the plate's drawn W.P. (bracing-ptc 2026-11-02): the plate of the panel point with that WorkPoint)
-            string wpl = sp.Contains(':') ? sp[..sp.IndexOf(':')] : "";
-            var d = defs.FirstOrDefault(x => (x.Point == key || x.WorkPoint != null && x.Point.StartsWith(wpl + ":") && $"{wpl}:{x.WorkPoint}" == sp)
-                && (x.Members.Count == 0 || x.Members.Contains(m.Name)));
-            if (d != null && d.Rivets!.TryGetValue(m.Name, out var c)) vals.Add(2 * c);
-        }
-        string model = vals.Count == 0 ? "no plate" : string.Join(" / ", vals.Distinct().OrderBy(v => v)) + $" per end ({vals.Count} ends)";
+        var vals = new List<int>(); int noPlate = 0;
+        foreach (var m in g)
+            foreach (bool st0 in new[] { true, false })
+                if (placed.TryGetValue((m.Name, st0), out var c)) vals.Add(c); else noPlate++;
+        string model = vals.Count == 0 ? "no plate" : string.Join(" / ", vals.Distinct().OrderBy(v => v)) + $" placed per end ({vals.Count} ends{(noPlate > 0 ? $", {noPlate} ends through an apex / without a plate" : "")})";
         if (plan == null) Row("INFO", $"bracing rivets per end: {g.Key}", "-", model);
         else Row(vals.Count > 0 && vals.All(v => v == plan || v == plan + 1) ? "PASS" : "DIFF", $"bracing rivets per end: {g.Key}", $"{plan} (p.71)", model, plan % 2 == 1 ? "odd count split over the two plates" : "");
     }
+    // every bracing connection of the generator audit: member ends without a rivet to their plate / plates not fastened to the truss
+    int endsNo = tm.BracingConnections.Sum(c => c.Ends.Count(e => e.Rivets == 0)), platesNo = tm.BracingConnections.Sum(c => c.Plates.Count(p => !p.Fastened));
+    Row(endsNo == 0 && platesNo == 0 ? "PASS" : "DIFF", "bracing connections complete (placed rivets member + plate, plate fastened to the truss)", "every end / plate",
+        $"{tm.BracingConnections.Count} plate definitions: {endsNo} member ends without a rivet to their plate, {platesNo} plates not fastened"
+        + (endsNo + platesNo > 0 ? " (" + string.Join(", ", tm.BracingConnections.Where(c => c.Ends.Any(e => e.Rivets == 0) || c.Plates.Any(p => !p.Fastened)).Select(c => c.Where).Take(60)) + ")" : ""));
     Row("CONFLICT", "C02 bracing rivet counts: p.71 diagram vs the p.97 / p.98 detail drawings", "p.71: laterals 26 / struts 40 per end (special panels 28-50)",
         "p.97 / p.98 details drawn with 20 (2-13[ 31.8) / 24 (2-13[ 50) per lateral and 18 per strut per plate", "Note A: the diagram governs where it gives a number; the model uses it");
     Row("CONFLICT", "C01 wind chord top vs the suspended floor beam bottom", "p.69 wind chord CL elevations + 14 BP 73 half depth", "p.94 floor beam bottom ~0.3 in. lower (overlap)", "both kept as printed; floor lateral bottom plates sit 0.23 - 0.31 in. into the floor beam covers");

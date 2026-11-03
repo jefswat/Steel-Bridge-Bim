@@ -93,6 +93,9 @@ string mainSwayFlag = U("p.97, p.71", "main span sway frame bottom connections a
     "the detail at L7 ('L8 similar', other points 'similar to L7 / L8 / L9') draws the plates, angles and rivets without outline dimensions or gages; the 1-Pl 15 x 1 1/8 (L7 / L8) / 15 x 1 (L10) under the angles has no length",
     "1/2 in. plates on both channel webs = envelope of the member laps standing on the lateral gusset plate on the strut top (1/4 in. gap), 12 rivets 1 in. per diagonal per plate in 4 lines, edge angle L 4 x 4 x 3/4 on each plate's outer face on the strut, 10 rivets per leg; the 2-Ls 3 1/2 x 3 x 3/8 along the plate top edge and the 15 in. strut plate not built.");
 var swayTopMembers = new List<TrussMemberDefinition>();
+string mainSwayL11Flag = U("p.80", "main span sway frame bottom connection at LM11 (2-1/2 Guss. Pls. lapping the L11 strut webs, 2-Ls 3 1/2 x 3 x 3/8, 1 in. / 7/8 in. rivets)",
+    "p.80 Section A draws the plates lapping the strut webs with three rivet rows and the 2-Ls 3 1/2 x 3 x 3/8 along the plate top edge, but gives no plate outline, lap depth, pitch or rivet count (all scaled at 5.92 px / in. on the 2'-3 3/8 dimension)",
+    "1/2 in. plates on the outer faces of the 2-18[ 42.7 webs = envelope of the member laps carried down 1'-4 7/8 over the strut webs, a fill where the plate stands off the web, 3 rows x 9 rivets 7/8 in. through plate + fill + strut web (rows 3 3/4 / 8 3/4 / 14 3/8 in. below the strut top); 12 rivets per diagonal per plate; the 2-Ls 3 1/2 x 3 x 3/8 are not built.");
 string mainSwayTopFlag = U("p.85", "main span sway frame top connections under the floor beam (2-1/2 Gusset Pls, 4-Ls 6 x 4 x 1/2, 1 in. rivets)",
     "Section D-D and the elevation draw the plates, the four angles and the rivets with only the 1'-4 / 6 in. / 5 in. edge dimensions; no outline, gages or rivet count",
     "1/2 in. plates on both channel webs = envelope of the member laps stopping 1/4 in. under the floor beam and clear of the truss post; per plate one L 6 x 4 x 1/2 on the floor beam bottom and one on the post face, both INSIDE the plate pair (6 in. legs toward the floor beam web, 4 in. legs on the plate; Section D-D, fork-swaytop 2026-11-03), 6 rivets per leg (drawn: 9 in the floor beam leg in two staggered rows and 10 in its plate leg, 6 + 6 in the post angle; one count per bracing plate in the generator); diagonal tops 1/4 in. under the 4 in. leg (drawn about 1 in.); 11 rivets per diagonal per plate as drawn (3 lines drawn, laid in the generator's 4 lines at 2 1/2 / 5 1/2 in.); the drawn plate fills the corner between the floor beam and the post (about 28 3/4 x 21 in.), the generator's envelope of the member lap meets the floor beam / post over the lap only, so the angles' plate legs are riveted only where the plate is behind them.");
@@ -120,13 +123,21 @@ if (T(Main) is { } tmS)
         t.BracingGussets.Add(new TrussBracingGussetDefinition
         {
             Point = apex, Members = both, Label = "2-1/2 Pls. (sway)", Suffix = "-SW", Orientation = TrussBracingPlateOrientation.Transverse, Side = TrussBracingPlateSide.Both, Thickness = In(0.5),
-            EdgeAngle = l11 ? "L3-1/2x3x3/8" : "L4x4x3/4", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeRivets = l11 ? 8 : 10,
+            EdgeAngle = l11 ? "" : "L4x4x3/4", EdgeAngleOnCrossing = true, EdgeAngleOutside = true, EdgeRivets = l11 ? 0 : 10,
             ProbeFaces = true, RivetGapTolerance = In(3.0 / 16),   // the angles sit on the probed strut top or the lateral plate / fill on it
             // batch 8 (recheck N07, 2026-10-30): where a lower lateral meets the apex its 1/2 in. lateral plate (p.97 "2-1/2 Pls") lies on the strut top under the
             // edge angle - the angle stood on the strut top and ran 0.41 in. into the plate; it now sits on the plate
             CrossingFaceOffset = lateralPlate ? In(0.5) : 0,
             RivetsPerMember = 12, RivetPitch = In(3), RivetGage = In(5.5), RivetGage2 = In(2.5), RivetDiameter = l11 ? In(0.875) : In(1),
-            RivetMaterial = l11 ? "7/8 in carbon steel rivet" : "1 in carbon steel rivet", Material = "C", Unresolved = mainSwayFlag, Source = l11 ? "p.80" : "p.97",
+            RivetMaterial = l11 ? "7/8 in carbon steel rivet" : "1 in carbon steel rivet", Material = "C", Unresolved = l11 ? mainSwayL11Flag : mainSwayFlag, Source = l11 ? "p.80" : "p.97",
+            // 2026-11-03 agent review 2 (fork-lowerlat, B1 / B2 / B6 LM0 - LM12): the 2-Ls 4 x 4 x 3/4 carried rivets to the sway plates only - where the angle stood off
+            // the strut (no lateral plate under it, the rolled L12 strut) its strut leg rivets gripped the leg alone and were dropped. p.97 CROSS SECTIONS AT CL BRIDGE
+            // draw '1-Pl. 15 x 1 1/8' (L7) / '15 x 1 1/4' (L8) under the angles on the strut: a fill under each angle leg, probed (beveled) where it stands off
+            EdgeAngleFill = !l11, EdgeAngleFillLabel = "1-Pl. 15 x 1 1/8 (p.97 L7; 15 x 1 1/4 at L8) under the 2-Ls 4 x 4 x 3/4, modeled under each angle leg as probed",
+            // L11 (p.80 Section A, BOTTOM STRUT at the CL): the 1/2 plates lap DOWN over the box strut webs (the 2-18[ 42.7 webs b.b. 1'-11 5/8 = the strut web outer faces,
+            // 22 1/2 b.b. + 9/16) to about 1'-5 below the strut top, riveted in three rows (3 3/4 / 8 3/4 / 14 3/8 in. below the top, ~8 1/2 in. pitch staggered, about 9 per
+            // row; scaled at 5.92 px / in. on the 2'-3 3/8 dimension, 300 dpi); the 2-Ls 3 1/2 x 3 x 3/8 run along the plate TOP edge (not built)
+            LapCrossing = l11 ? In(16.875) : 0, LapRivetRows = l11 ? new() { In(3.75), In(8.75), In(14.375) } : null, LapRivetsPerRow = l11 ? 9 : 0,
         });
         n++;
         foreach (var top in new[] { m.From, m.From.Replace("N:", "S:") })
@@ -452,13 +463,20 @@ if (T(Main) is { } tmB)
         {
             l0 ? new TrussEndConnection { End = TrussMemberEnd.Both, Label = "2-Ls 8x8x5/8 Fin. Strut", Angle = "L8x8x5/8", StandOff = outer - tw / 2, Top = In(14), Length = In(28),
                     WebRivets = new() { Col(2.5, 7, 4, 2), Col(5.5, 7, 4, 2) }, OutRivets = new() { Col(2.5, 7, 4, 2), Col(5.5, 7, 4, 2) },
-                    RivetDiameter = In(1), OutRivetDiameter = In(1.125), RivetMaterial = "1 1/8 in H.S. rivet (into the gusset), 1 in carbon (web)", Material = "S", Source = "p.73", Unresolved = l0EndFlag }
+                    RivetDiameter = In(1), OutRivetDiameter = In(1.125), RivetMaterial = "1 1/8 in H.S. rivet (into the gusset), 1 in carbon (web)", Material = "S", Source = "p.73", Unresolved = l0EndFlag,
+                    // 2026-11-03 agent review 2 (fork-lowerlat, B1 / B6 L0): the webs stopped 4.7 in. short of the gusset face (14 of the 28 web-leg rivets had nothing
+                    // behind them); p.73 'Fin. Strut' = the strut is finished at the angles: its end goes to the probed angle back (gusset face)
+                    TrimMember = 0 }
                : new TrussEndConnection { End = TrussMemberEnd.Both, Label = "tees cut from 24 WF 94 + 11/16 fills", Angle = "L4-1/2x11-1/2x7/8", StandOff = outer - tw / 2,
                     FillThickness = In(11.0 / 16), FillWidth = In(11.5), Top = In(19), Length = In(38),
                     WebRivets = new() { Col(3.5, 9, 4, 3), Col(8.5, 9, 4, 3) }, OutRivets = new() { Col(2.25, 9, 4, 3) },
                     RivetDiameter = In(1), OutRivetDiameter = In(1.25), RivetMaterial = "1 in carbon rivet (web)", Material = "S", Source = "p.80", Unresolved = l11EndFlag,
                     // agent review rivets R08 (p.80 note): 'Provide 1 1/4 in. dia High Tensile Steel Bolts for connecting Bottom Transverse Strut at L11 ... A325-53T' - bolts, not rivets
-                    OutBoltMaterial = "ASTM A325-53T high tensile steel bolt 1 1/4 in. (carburized washers, p.80)" },
+                    OutBoltMaterial = "ASTM A325-53T high tensile steel bolt 1 1/4 in. (carburized washers, p.80)",
+                    // 2026-11-03 agent review 2 (fork-lowerlat, B2 / B6 L11 tees): the strut lapped the tee stems 6.8 in. (9 of the 18 stem rivets per tee gripped tee +
+                    // fill only). p.80 Section A: the strut angles / web plates run to the tee flange ('FIN.'), the 2 x 9 stem rivets (the black field rivets drawn,
+                    // = the model's 18 per tee) all through the strut web; the open-circle bands along the strut are the strut's own shop rivets, not the end connection
+                    TrimMember = 0 },
         };
         nE++;
     }

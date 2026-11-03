@@ -846,6 +846,46 @@ public sealed class TrussBracingGussetDefinition
     /// without being clipped, and connected members standing off it get fills with <see cref="MemberFills"/>. Null = none.</summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? BearOn { get; set; }
+    /// <summary>OPTIONAL: with <see cref="PlateToStack"/>, an envelope plate is carried to the stack line with the WHOLE member lap projected onto it (a lateral
+    /// ending far from the chord: the plate runs along the chord under the edge angle over the lap's length; default = only the lap corner nearest the stack);
+    /// likewise to the crossing member face with <see cref="EdgeAngleOnCrossing"/> (a sway plate carried whole to the floor beam).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool CarryWholeLap { get; set; }
+    /// <summary>OPTIONAL: member rivet positions within 1 1/4 d of the plate edge (a plate clipped clear of a crossing member over the member tip) do not count
+    /// toward the member's rivet number - the rows continue along the member (up to 3 x the rows needed) until it is reached (default: they count, not placed).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool RivetsFillCount { get; set; }
+    /// <summary>OPTIONAL (null = <see cref="EdgeRivets"/> in every leg): rivets per edge angle leg = [first angle: stack / crossing leg, plate leg; second angle
+    /// (-EA2, <see cref="EdgeAngleAlsoOnStack"/>): stack leg, plate leg]; missing entries = EdgeRivets.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<int>? EdgeRivetCounts { get; set; }
+    /// <summary>OPTIONAL (0 / 1 = one row): rows of rivets in the edge angle's plate leg, staggered by a quarter of the row pitch each way.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int EdgeRivetPlateRows { get; set; }
+    /// <summary>OPTIONAL (0 = 2 or 4 lines by <see cref="RivetGage2"/>): 3 = three member rivet lines (at +-<see cref="RivetGage"/> and on the member CL,
+    /// or spread by <see cref="RivetGageEdge"/>).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int RivetLines { get; set; }
+    /// <summary>OPTIONAL: a fill under the leg of each edge angle on the crossing member (<see cref="EdgeAngleOnCrossing"/>) where it stands off the steel below
+    /// (no lateral plate under it, a rolled strut): thickness probed at the leg corners (beveled), one fill per run of stand-off 1/16 - 3 in.; label
+    /// <see cref="EdgeAngleFillLabel"/>. The angle's crossing-leg rivets then grip angle + fill + crossing member.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool EdgeAngleFill { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? EdgeAngleFillLabel { get; set; }
+    /// <summary>OPTIONAL (null = every plate): the edge angle(s) only on the plate of this side of a <see cref="TrussBracingPlateSide.Both"/> pair.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public TrussBracingPlateSide? EdgeAngleSide { get; set; }
+    /// <summary>OPTIONAL (0 = none): the plate LAPS the side face of the crossing member (<see cref="EdgeAngleOnCrossing"/> finds it) this far (m) beyond its
+    /// face instead of stopping clear of it (a sway plate lapping the strut webs, p.80 Section A); a fill between plate and member side where they stand off
+    /// (1/16 - 2 in.), and <see cref="LapRivetsPerRow"/> rivets in rows at the depths <see cref="LapRivetRows"/> (m beyond the face) through plate + fill +
+    /// member. Use without an edge angle on the crossing member.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double LapCrossing { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<double>? LapRivetRows { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int LapRivetsPerRow { get; set; }
 }
 
 /// <summary>
