@@ -993120,6 +993120,16 @@
           "UNRESOLVED (p.83, p.71): floor lateral connection plate at L13 (1-3/4 in. Gusset Pl. (Bent), 1-L 8 x 8 x 3/4 on the chord, 1-L 8 x 4 x 1 on the floor beam) - Section B draws the plate, both angles and the rivets (about 24 x 1 in. in the lateral, 20 in the 8 x 8 angle) without dimensions, Section C the bend to the floor beam angle without its offset; the plate\u0027s level relative to the modeled 2-15[ 50 lateral L13 - W14 (p.71) is not given - a flat plate from the trace stood up to 8 3/4 in. off it and cut the F8 stiffeners. not built (outline traced in truss/lateral-plates.csv row L13F for a later pass); the floor laterals end clear of the truss joint.",
           "UNRESOLVED (p.79): U11: the two 1-Fill 13 x 1 (C) and 13 field rivets drawn on the lateral BEYOND the drawn plate edge - the top plan view draws the plate edge across the lateral between the 13 rivets under the plate and two fills with 13 field rivets outside it; what those rivets connect is not drawn (no plate shown over them). not built; the lateral is connected by the 13 rivets under the 7/8 plate and the 13 in the 9/16 plate (p.71: 26 per end).",
           "UNRESOLVED (p.79): U11 portal strut end - the top plan view draws the portal top 1\u0027-5 3/8 from the truss CL (1 3/4 in. past the gusset) and its first rivet row at 1\u0027-6 5/8; Section B draws the portal 3 1/2 - 4 in. clear of the gusset (the angle strip). the portal end stays at the stack clearance (1\u0027-8 3/8 from the CL, room for the bottom edge angle); its rivet rows are laid from its end (1 1/2 in.).",
+          "UNRESOLVED (p.100, p.79): portal strut at U11 (box 34 1/2 deep, Section D-D plates) and the knee brace connections - Section D-D lists the strut plates (34 1/2 x 11/16, 24 1/2 x 7/16, (33-13 1/2) x 11/16, (35 1/2-13 1/2) x 9/16, 2-6 x 1/2 bars) around a skewed W.P. outline; the knee gussets / splice are drawn without outline dimensions. strut = the p.71 box; its U11 plates are built by bracing-ptc.csx section 2b, the knee-to-post gussets here (traced); the knee splice and the 5/8 knee-to-strut gusset (E-E) are not built.",
+          "UNRESOLVED (p.99): floor lateral bottom plates at the floor beams W14 / W16 / W18 / W20 (bottom 3/4 or 7/16 Pl.) - the details draw the plate under the floor beam with its rivets but without outline dimensions; the fillers on the floor beam web are not dimensioned. the X diagonals are split at the crossing and stop clear of the floor beam; bottom plate = envelope of the four member laps, under the floor beam bottom flange with fills of the modeled gap where a lateral face stands off it (fill not drawn), 10 (14 BP 73) / 26 (2-15[ 50) rivets per member in 4 lines 5 3/4 / 4 in. from the member CL; the floor beam rivets, top plates and angles: section 3b.",
+          "UNRESOLVED (p.93, p.99, p.71): connection of the W21 K (from the unprimed half) to the shear lock tongue beam at WM22 - p.93 Section E frames the W21 K on 2-7/16 Lat. Pls. to a 14 WF 48 at the end of the tongue beam (16 WF 88 \u002B 2-Cov. Pls. 11 1/2 x 1/2 x 5\u0027-6, detail Sheet 53 - not in the set), with its work point 2\u0027-0 toward W21; the tongue beam is not built (16 WF 88 not in AISC v16, Sheet 53 missing). the W21 K ends stop clear of F7 at the modeled apex on the F7 CL, no plates / rivets at that end.",
+          "UNRESOLVED (p.95): connection of the L13 1/2 double K (33 WF 130) to F8 at LQ13 / LQ13\u0027 - the rotated section draws the 1/2 gusset and the L 4 x 3 1/2 x 7/16 edge angle riveted to F8 and to both W33s, but the plate lies in the inclined plane of the K and neither its outline nor the W33 laps nor the plate level on F8 are dimensioned. not built; the W33 ends stop clear of F8.",
+          "UNRESOLVED (p.71, p.73, p.80, p.97): box strut L0 / L11: the lateral plates against the box struts - the box strut end connections are detailed on p.73 / p.80 (built), but how the 1/2 in. lateral plates meet the 30 / 40 in. struts is not drawn. the lateral plates lie on the laterals and stop 1/4 in. clear of the box strut.",
+          "USER DECISION (p.90, 2026-11-03): L22 is modeled in its FINAL CONDITION only. The crown jacking brackets - Diaph. Material 4-Ls 5 x 3 1/2 x 1/2 \u002B 1-1/2 Web Pl. (F.1.E.), 1-L 4 x 4 x 1/2 (F.2.E.), end angles 2-Ls 8 x 6 x 1/2 (C) / 2-Ls 4 x 4 x 1/2 (C) on the FIN. gusset ends - sit on the corner pieces of the 1 in. gussets that the p.90 note \u0027Flame cut 1\u0022 gusset plates at L22 on lines X after field rivets have been driven\u0027 removes, fastened inside line X by \u00271\u0022 Shop Bolts\u0027; with the crown jacking scheme of Section A / B (2-Slabs 22 x 10 1/2 (C), 2 jacking rods, jacking bodies, jack 2\u0027-4) they are erection equipment and are not built; the 1 in. gussets are built as left after the cut (gusset-outlines.csv) and the field rivets of the cut-off pieces are not placed.",
+          "UNRESOLVED (p.90): the holes of the \u00271\u0022 Shop Bolts\u0027 that fastened the crown jacking brackets to the 1 in. gussets just inside lines X (3 per band row above the chord, about 4 per side under the 1 1/8 splice gusset below it) - the sheet does not say whether the bolts are removed with the brackets, left in place, or replaced by rivets in the final condition. no fasteners placed in them (the generator cuts no holes).",
+          "UNRESOLVED (p.90): the piece fastened by \u00271 1/8 Erection Bolts\u0027 above the L22 gusset east of the CL (2-3/8 Gus. Pls. (C) bracket on the gusset top edge and a member drawn broken above it; U22-L22 is on the CL, so it is not a truss member) - the sheet names only its fasteners (erection bolts) and draws the piece without a name, size or entry in the joint\u0027s material lists. treated as erection equipment under the final-condition decision (user 2026-11-03): not built, its 6 drawn rivets not placed (rivet-count-zones.csv SKIP).",
+          "UNRESOLVED (p.84): internal diaphragm at L14 (Section E: DIAPHRAGM 4-Ls 8 x 7 1/2 x 5/8, 3-Ls 5 x 5 x 5/8, 1-L 6 1/2 x 6 x 5/8, 1-3/4 Web Pl., 2-Fills 12 1/4 x 1; 1 1/8 rivets, 2\u0027-5 in. to in. gussets) - Section E gives the make-up across the member but the elevation does not dimension where along the member it sits or its length, and the angles\u0027 lengths are not given. not built.",
+          "UNRESOLVED (p.75, p.74, p.97): L1 / L3 1-L 5 x 5 x 7/16 (C) each side of the vertical on the chord web and 1-Fill 6 x 1/2 (C) top and bottom - read on p.75 (L1 \u0027similar to L3\u0027, p.74): the angles are the bottom strut LS-L1 / LS-L3 end connection to the chord web (p.97 L1 cross section, \u0027use similar details for L2 to L8\u0027), the fills pack the lateral bracing plates S-BGL1 / S-BGL3 on the chord flange angles; both are bracing-connection items (bracing-ptc.csx). not built here: left to the bracing connections (bottom strut angles L1-L8 are the same detail).",
           "UNRESOLVED (p.97, p.71): main span sway frame bottom connections at the strut CL (2-1/2 Pls., 2-Ls 4 x 4 x 3/4, 2-Ls 3 1/2 x 3 x 3/8) - the detail at L7 (\u0027L8 similar\u0027, other points \u0027similar to L7 / L8 / L9\u0027) draws the plates, angles and rivets without outline dimensions or gages; the 1-Pl 15 x 1 1/8 (L7 / L8) / 15 x 1 (L10) under the angles has no length. 1/2 in. plates on both channel webs = envelope of the member laps standing on the lateral gusset plate on the strut top (1/4 in. gap), 12 rivets 1 in. per diagonal per plate in 4 lines, edge angle L 4 x 4 x 3/4 on each plate\u0027s outer face on the strut, 10 rivets per leg; the 2-Ls 3 1/2 x 3 x 3/8 along the plate top edge and the 15 in. strut plate not built.",
           "UNRESOLVED (p.85): main span sway frame top connections under the floor beam (2-1/2 Gusset Pls, 4-Ls 6 x 4 x 1/2, 1 in. rivets) - Section D-D and the elevation draw the plates, the four angles and the rivets with only the 1\u0027-4 / 6 in. / 5 in. edge dimensions; no outline, gages or rivet count. 1/2 in. plates on both channel webs = envelope of the member laps stopping 1/4 in. under the floor beam and clear of the truss post; per plate one L 6 x 4 x 1/2 on the floor beam bottom and one on the post face, both INSIDE the plate pair (6 in. legs toward the floor beam web, 4 in. legs on the plate; Section D-D, fork-swaytop 2026-11-03), 6 rivets per leg (drawn: 9 in the floor beam leg in two staggered rows and 10 in its plate leg, 6 \u002B 6 in the post angle; one count per bracing plate in the generator); diagonal tops 1/4 in. under the 4 in. leg (drawn about 1 in.); 11 rivets per diagonal per plate as drawn (3 lines drawn, laid in the generator\u0027s 4 lines at 2 1/2 / 5 1/2 in.); the drawn plate fills the corner between the floor beam and the post (about 28 3/4 x 21 in.), the generator\u0027s envelope of the member lap meets the floor beam / post over the lap only, so the angles\u0027 plate legs are riveted only where the plate is behind them.",
           "UNRESOLVED (p.100, p.79): portal strut at U11 (box 34 1/2 deep, Section D-D plates) and the knee brace connections - Section D-D lists the strut plates (34 1/2 x 11/16, 24 1/2 x 7/16, (33-13 1/2) x 11/16, (35 1/2-13 1/2) x 9/16, 2-6 x 1/2 bars) around a skewed W.P. outline; the knee gussets / splice are drawn without outline dimensions. strut = the p.71 box; its U11 plates are built by bracing-ptc.csx section 2b, the knee-to-post gussets here (traced); the knee splice and the 5/8 knee-to-strut gusset (E-E) are not built.",
@@ -1109219,7 +1109229,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW0",
@@ -1109251,7 +1109269,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM1",
@@ -1109318,7 +1109344,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW1",
@@ -1109350,7 +1109384,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM2",
@@ -1109417,7 +1109459,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW2",
@@ -1109449,7 +1109499,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM3",
@@ -1109516,7 +1109574,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW3",
@@ -1109548,7 +1109614,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM4",
@@ -1109615,7 +1109689,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW4",
@@ -1109647,7 +1109729,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM5",
@@ -1109714,7 +1109804,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW5",
@@ -1109746,7 +1109844,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM6",
@@ -1109813,7 +1109919,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW6",
@@ -1109845,7 +1109959,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM7",
@@ -1109912,7 +1110034,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW7",
@@ -1109944,7 +1110074,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM8",
@@ -1110011,7 +1110149,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW8",
@@ -1110043,7 +1110189,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM9",
@@ -1110110,7 +1110264,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW9",
@@ -1110142,7 +1110304,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM10",
@@ -1110209,7 +1110379,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW10",
@@ -1110241,7 +1110419,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM11",
@@ -1110412,7 +1110598,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW12",
@@ -1110444,7 +1110638,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM0\u0027",
@@ -1110511,7 +1110713,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW0\u0027",
@@ -1110543,7 +1110753,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM1\u0027",
@@ -1110610,7 +1110828,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW1\u0027",
@@ -1110642,7 +1110868,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM2\u0027",
@@ -1110709,7 +1110943,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW2\u0027",
@@ -1110741,7 +1110983,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM3\u0027",
@@ -1110808,7 +1111058,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW3\u0027",
@@ -1110840,7 +1111098,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM4\u0027",
@@ -1110907,7 +1111173,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW4\u0027",
@@ -1110939,7 +1111213,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM5\u0027",
@@ -1111006,7 +1111288,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW5\u0027",
@@ -1111038,7 +1111328,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM6\u0027",
@@ -1111105,7 +1111403,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW6\u0027",
@@ -1111137,7 +1111443,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM7\u0027",
@@ -1111204,7 +1111518,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW7\u0027",
@@ -1111236,7 +1111558,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM8\u0027",
@@ -1111303,7 +1111633,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW8\u0027",
@@ -1111335,7 +1111673,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM9\u0027",
@@ -1111402,7 +1111748,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW9\u0027",
@@ -1111434,7 +1111788,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM10\u0027",
@@ -1111501,7 +1111863,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW10\u0027",
@@ -1111533,7 +1111903,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:LM11\u0027",
@@ -1111704,7 +1112082,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "S:SW12\u0027",
@@ -1111736,7 +1112122,15 @@
             "PlateToStack": true,
             "EdgeAngleAlsoOnStack": true,
             "RivetGapTolerance": 0.004762499999999999,
-            "ProbeFaces": true
+            "ProbeFaces": true,
+            "CarryWholeLap": true,
+            "EdgeRivetCounts": [
+              9,
+              10,
+              6,
+              6
+            ],
+            "RivetLines": 3
           },
           {
             "Point": "N:FX14",

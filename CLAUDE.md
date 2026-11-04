@@ -20,6 +20,7 @@ engineer who directs and tests; Claude writes and maintains all code. Keep this 
 - Release: `dotnet publish src/SBM.App -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -o dist/SteelBridgeModeler`
   and the same for `src/SBM.Cli` (same output folder â†’ `sbm.exe` beside the app).
 - Automation docs for the user: `docs/API.md`; example scripts in `samples/scripts`.
+- Pickup notes for the next session: `docs/PICKUP-NEXT-WEEK.md` (state of the PTC main span review, open items with diagnosis, rebuild procedure).
 - To-do list of requested features not built yet: `docs/TODO.md` (street view on an alignment, drop a person on the ground, GeoTIFF support). Add new requests there.
 - User docs: `docs/USER-GUIDE.md` (the app), `docs/PDF-READING.md` (reading plan PDFs: rules, tools, workflow), `docs/TERRAIN-AND-AERIALS.md`
   (georeference, automatic 3DEP terrain, NAIP orthoimage via `tools/terrain/aerial.py`, Google Earth check). Keep them current with the features.

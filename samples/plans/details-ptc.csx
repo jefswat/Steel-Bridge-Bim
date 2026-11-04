@@ -156,6 +156,10 @@ if (T(Main) is { } tmS)
                 EdgeAngle = top11 ? "L6x4-1/2x1/2" : "L6x4x1/2", EdgeAngleOnCrossing = true, EdgeAngleAlsoOnStack = true, PlateToStack = true, EdgeRivets = 6, ProbeFaces = true, RivetGapTolerance = In(3.0 / 16),
                 RivetsPerMember = top11 ? 12 : 11, RivetPitch = In(3), RivetGage = In(5.5), RivetGage2 = In(2.5), RivetDiameter = In(1), RivetMaterial = "1 in carbon steel rivet",
                 Material = "C", Unresolved = top11 ? mainSwayTop11Flag : mainSwayTopFlag, Source = top11 ? "p.79" : "p.85",
+                // 2026-11-04 (agent review 2 follow-up): p.85 Section D-D draws a full corner plate from the post face along the floor beam (not the lap
+                // diamond): the whole lap is carried to the floor beam and the stack; rivets per angle leg as drawn (floor beam angle 9 in the floor beam leg /
+                // 10 in the plate leg, post angle 6 / 6) and 3 member rivet lines (11 per diagonal per plate). SW11 (p.79) keeps the defaults.
+                CarryWholeLap = !top11, EdgeRivetCounts = top11 ? null : new() { 9, 10, 6, 6 }, RivetLines = top11 ? 0 : 3,
             });
             nt++;
         }

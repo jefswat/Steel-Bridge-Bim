@@ -1,0 +1,1567 @@
+where,kind,name,n1,n2,ok
+"N:L1",end,"LS-L1 (start)",32,,1
+"N:L1",end,"LL-NL1-LM0 (start)",26,,1
+"N:L1",plate,"N-BGL1-B",0,13,1
+"N:L1",plate,"N-BGL1-T",0,14,1
+"N:L1",angle,"N-BGL1-B-EA",13,18,1
+"N:L1",angle,"N-BGL1-T-EA",14,19,1
+"N:L1'",end,"LS-L1' (start)",32,,1
+"N:L1'",end,"LL-NL1'-LM0' (start)",26,,1
+"N:L1'",plate,"N-BGL1'-B",0,13,1
+"N:L1'",plate,"N-BGL1'-T",0,14,1
+"N:L1'",angle,"N-BGL1'-B-EA",13,18,1
+"N:L1'",angle,"N-BGL1'-T-EA",14,19,1
+"N:L10",end,"LS-L10 (start)",39,,1
+"N:L10",end,"LL-NL10-LM9 (start)",32,,1
+"N:L10",plate,"N-BGL10-B",0,11,1
+"N:L10",plate,"N-BGL10-T",0,7,1
+"N:L10",angle,"N-BGL10-B-EA",11,22,1
+"N:L10",angle,"N-BGL10-T-EA",7,34,1
+"N:L10'",end,"LS-L10' (start)",39,,1
+"N:L10'",end,"LL-NL10'-LM9' (start)",32,,1
+"N:L10'",plate,"N-BGL10'-B",0,11,1
+"N:L10'",plate,"N-BGL10'-T",0,6,1
+"N:L10'",angle,"N-BGL10'-B-EA",11,22,1
+"N:L10'",angle,"N-BGL10'-T-EA",6,34,1
+"N:L11-a",end,"LL-NL11-LM10 (start)",36,,1
+"N:L11-a",plate,"N-BGL11-a-B",0,2,1
+"N:L11-a",plate,"N-BGL11-a-T",0,2,1
+"N:L11-a",angle,"N-BGL11-a-B-EA",7,2,1
+"N:L11-a",angle,"N-BGL11-a-T-EA",7,2,1
+"N:L11-b",end,"LL-NL11-LM12 (start)",40,,1
+"N:L11-b",plate,"N-BGL11-b-B",0,0,0
+"N:L11-b",plate,"N-BGL11-b-T",0,3,1
+"N:L11-b",angle,"N-BGL11-b-B-EA",13,0,0
+"N:L11-b",angle,"N-BGL11-b-T-EA",13,3,1
+"N:L11'-a",end,"LL-NL11'-LM10' (start)",36,,1
+"N:L11'-a",plate,"N-BGL11'-a-B",0,2,1
+"N:L11'-a",plate,"N-BGL11'-a-T",0,2,1
+"N:L11'-a",angle,"N-BGL11'-a-B-EA",7,2,1
+"N:L11'-a",angle,"N-BGL11'-a-T-EA",7,2,1
+"N:L11'-b",end,"LL-NL11'-LM12' (start)",40,,1
+"N:L11'-b",plate,"N-BGL11'-b-B",0,0,0
+"N:L11'-b",plate,"N-BGL11'-b-T",0,3,1
+"N:L11'-b",angle,"N-BGL11'-b-B-EA",13,0,0
+"N:L11'-b",angle,"N-BGL11'-b-T-EA",13,3,1
+"N:L12",end,"LS-L12 (start)",50,,1
+"N:L12",end,"LL-NL12-LM13 (start)",48,,1
+"N:L12",plate,"N-BGL12-B",0,6,1
+"N:L12",plate,"N-BGL12-T",0,8,1
+"N:L12",angle,"N-BGL12-B-EA",6,37,1
+"N:L12",angle,"N-BGL12-T-EA",8,22,1
+"N:L12'",end,"LS-L12' (start)",50,,1
+"N:L12'",end,"LL-NL12'-LM13' (start)",48,,1
+"N:L12'",plate,"N-BGL12'-B",0,6,1
+"N:L12'",plate,"N-BGL12'-T",0,10,1
+"N:L12'",angle,"N-BGL12'-B-EA",6,37,1
+"N:L12'",angle,"N-BGL12'-T-EA",10,22,1
+"N:L13H",end,"LS-L13H (start)",46,,1
+"N:L13H",end,"LL-NL13H-LQ13 (start)",24,,1
+"N:L13H",plate,"N-BGL13H-B",0,13,1
+"N:L13H",plate,"N-BGL13H-T",0,13,1
+"N:L13H",angle,"N-BGL13H-B-EA",13,13,1
+"N:L13H",angle,"N-BGL13H-T-EA",13,13,1
+"N:L13H'",end,"LS-L13H' (start)",46,,1
+"N:L13H'",end,"LL-NL13H'-LQ13' (start)",24,,1
+"N:L13H'",plate,"N-BGL13H'-B",0,13,1
+"N:L13H'",plate,"N-BGL13H'-T",0,13,1
+"N:L13H'",angle,"N-BGL13H'-B-EA",13,13,1
+"N:L13H'",angle,"N-BGL13H'-T-EA",13,13,1
+"N:L15",end,"LL-NL15-LM16 (start)",38,,1
+"N:L15",plate,"N-BGL15-B",0,11,1
+"N:L15",plate,"N-BGL15-T",0,10,1
+"N:L15",angle,"N-BGL15-B-EA",11,28,1
+"N:L15",angle,"N-BGL15-T-EA",10,26,1
+"N:L15'",end,"LL-NL15'-LM16' (start)",38,,1
+"N:L15'",plate,"N-BGL15'-B",0,11,1
+"N:L15'",plate,"N-BGL15'-T",0,10,1
+"N:L15'",angle,"N-BGL15'-B-EA",11,28,1
+"N:L15'",angle,"N-BGL15'-T-EA",10,26,1
+"N:L16",end,"LS-L16 (start)",40,,1
+"N:L16",end,"LL-NL16-LM17 (start)",26,,1
+"N:L16",plate,"N-BGL16-B",0,11,1
+"N:L16",plate,"N-BGL16-T",0,12,1
+"N:L16",angle,"N-BGL16-B-EA",11,26,1
+"N:L16",angle,"N-BGL16-T-EA",12,21,1
+"N:L16'",end,"LS-L16' (start)",40,,1
+"N:L16'",end,"LL-NL16'-LM17' (start)",26,,1
+"N:L16'",plate,"N-BGL16'-B",0,11,1
+"N:L16'",plate,"N-BGL16'-T",0,12,1
+"N:L16'",angle,"N-BGL16'-B-EA",11,26,1
+"N:L16'",angle,"N-BGL16'-T-EA",12,21,1
+"N:L17",end,"LS-L17 (start)",40,,1
+"N:L17",end,"LL-NL17-LM18 (start)",26,,1
+"N:L17",plate,"N-BGL17-B",0,10,1
+"N:L17",plate,"N-BGL17-T",0,11,1
+"N:L17",angle,"N-BGL17-B-EA",10,20,1
+"N:L17",angle,"N-BGL17-T-EA",11,24,1
+"N:L17'",end,"LS-L17' (start)",40,,1
+"N:L17'",end,"LL-NL17'-LM18' (start)",26,,1
+"N:L17'",plate,"N-BGL17'-B",0,11,1
+"N:L17'",plate,"N-BGL17'-T",0,11,1
+"N:L17'",angle,"N-BGL17'-B-EA",11,20,1
+"N:L17'",angle,"N-BGL17'-T-EA",11,24,1
+"N:L18",end,"LS-L18 (start)",40,,1
+"N:L18",end,"LL-NL18-LM19 (start)",26,,1
+"N:L18",plate,"N-BGL18-B",0,11,1
+"N:L18",plate,"N-BGL18-T",0,12,1
+"N:L18",angle,"N-BGL18-B-EA",11,24,1
+"N:L18",angle,"N-BGL18-T-EA",12,26,1
+"N:L18'",end,"LS-L18' (start)",40,,1
+"N:L18'",end,"LL-NL18'-LM19' (start)",26,,1
+"N:L18'",plate,"N-BGL18'-B",0,11,1
+"N:L18'",plate,"N-BGL18'-T",0,11,1
+"N:L18'",angle,"N-BGL18'-B-EA",11,24,1
+"N:L18'",angle,"N-BGL18'-T-EA",11,26,1
+"N:L19",end,"LS-L19 (start)",40,,1
+"N:L19",end,"LL-NL19-LM20 (start)",26,,1
+"N:L19",plate,"N-BGL19-B",0,10,1
+"N:L19",plate,"N-BGL19-T",0,10,1
+"N:L19",angle,"N-BGL19-B-EA",10,26,1
+"N:L19",angle,"N-BGL19-T-EA",10,27,1
+"N:L19'",end,"LS-L19' (start)",40,,1
+"N:L19'",end,"LL-NL19'-LM20' (start)",26,,1
+"N:L19'",plate,"N-BGL19'-B",0,10,1
+"N:L19'",plate,"N-BGL19'-T",0,10,1
+"N:L19'",angle,"N-BGL19'-B-EA",10,26,1
+"N:L19'",angle,"N-BGL19'-T-EA",10,27,1
+"N:L2",end,"LS-L2 (start)",32,,1
+"N:L2",end,"LL-NL2-LM1 (start)",26,,1
+"N:L2",plate,"N-BGL2-B",0,12,1
+"N:L2",plate,"N-BGL2-T",0,12,1
+"N:L2",angle,"N-BGL2-B-EA",12,22,1
+"N:L2",angle,"N-BGL2-T-EA",12,23,1
+"N:L2'",end,"LS-L2' (start)",32,,1
+"N:L2'",end,"LL-NL2'-LM1' (start)",26,,1
+"N:L2'",plate,"N-BGL2'-B",0,12,1
+"N:L2'",plate,"N-BGL2'-T",0,13,1
+"N:L2'",angle,"N-BGL2'-B-EA",12,22,1
+"N:L2'",angle,"N-BGL2'-T-EA",13,23,1
+"N:L20",end,"LS-L20 (start)",40,,1
+"N:L20",end,"LL-NL20-LM21 (start)",26,,1
+"N:L20",plate,"N-BGL20-B",0,9,1
+"N:L20",plate,"N-BGL20-T",0,10,1
+"N:L20",angle,"N-BGL20-B-EA",9,24,1
+"N:L20",angle,"N-BGL20-T-EA",10,29,1
+"N:L20'",end,"LS-L20' (start)",40,,1
+"N:L20'",end,"LL-NL20'-LM21' (start)",26,,1
+"N:L20'",plate,"N-BGL20'-B",0,9,1
+"N:L20'",plate,"N-BGL20'-T",0,8,1
+"N:L20'",angle,"N-BGL20'-B-EA",9,24,1
+"N:L20'",angle,"N-BGL20'-T-EA",8,30,1
+"N:L21",end,"LS-L21 (start)",40,,1
+"N:L21",end,"LL-NL21-LM22 (start)",26,,1
+"N:L21",plate,"N-BGL21-B",0,10,1
+"N:L21",plate,"N-BGL21-T",0,10,1
+"N:L21",angle,"N-BGL21-B-EA",10,23,1
+"N:L21",angle,"N-BGL21-T-EA",10,29,1
+"N:L21'",end,"LS-L21' (start)",40,,1
+"N:L21'",end,"LL-NL21'-LM22 (start)",26,,1
+"N:L21'",plate,"N-BGL21'-B",0,9,1
+"N:L21'",plate,"N-BGL21'-T",0,10,1
+"N:L21'",angle,"N-BGL21'-B-EA",9,23,1
+"N:L21'",angle,"N-BGL21'-T-EA",10,29,1
+"N:L22",end,"LS-L22 (start)",16,,1
+"N:L22",plate,"N-BGL22-B",0,5,1
+"N:L22",plate,"N-BGL22-T",0,6,1
+"N:L22",angle,"N-BGL22-B-EA",5,12,1
+"N:L22",angle,"N-BGL22-T-EA",6,13,1
+"N:L3",end,"LS-L3 (start)",32,,1
+"N:L3",end,"LL-NL3-LM2 (start)",26,,1
+"N:L3",plate,"N-BGL3-B",0,14,1
+"N:L3",plate,"N-BGL3-T",0,14,1
+"N:L3",angle,"N-BGL3-B-EA",14,18,1
+"N:L3",angle,"N-BGL3-T-EA",14,19,1
+"N:L3'",end,"LS-L3' (start)",32,,1
+"N:L3'",end,"LL-NL3'-LM2' (start)",26,,1
+"N:L3'",plate,"N-BGL3'-B",0,14,1
+"N:L3'",plate,"N-BGL3'-T",0,14,1
+"N:L3'",angle,"N-BGL3'-B-EA",14,18,1
+"N:L3'",angle,"N-BGL3'-T-EA",14,19,1
+"N:L4",end,"LS-L4 (start)",32,,1
+"N:L4",end,"LL-NL4-LM3 (start)",26,,1
+"N:L4",plate,"N-BGL4-B",0,13,1
+"N:L4",plate,"N-BGL4-T",0,14,1
+"N:L4",angle,"N-BGL4-B-EA",13,24,1
+"N:L4",angle,"N-BGL4-T-EA",14,22,1
+"N:L4'",end,"LS-L4' (start)",32,,1
+"N:L4'",end,"LL-NL4'-LM3' (start)",26,,1
+"N:L4'",plate,"N-BGL4'-B",0,13,1
+"N:L4'",plate,"N-BGL4'-T",0,14,1
+"N:L4'",angle,"N-BGL4'-B-EA",13,24,1
+"N:L4'",angle,"N-BGL4'-T-EA",14,22,1
+"N:L5",end,"LS-L5 (start)",32,,1
+"N:L5",end,"LL-NL5-LM4 (start)",26,,1
+"N:L5",plate,"N-BGL5-B",0,10,1
+"N:L5",plate,"N-BGL5-T",0,14,1
+"N:L5",angle,"N-BGL5-B-EA",10,23,1
+"N:L5",angle,"N-BGL5-T-EA",14,20,1
+"N:L5'",end,"LS-L5' (start)",32,,1
+"N:L5'",end,"LL-NL5'-LM4' (start)",26,,1
+"N:L5'",plate,"N-BGL5'-B",0,9,1
+"N:L5'",plate,"N-BGL5'-T",0,14,1
+"N:L5'",angle,"N-BGL5'-B-EA",9,23,1
+"N:L5'",angle,"N-BGL5'-T-EA",14,20,1
+"N:L6",end,"LS-L6 (start)",32,,1
+"N:L6",end,"LL-NL6-LM5 (start)",26,,1
+"N:L6",plate,"N-BGL6-B",0,14,1
+"N:L6",plate,"N-BGL6-T",0,11,1
+"N:L6",angle,"N-BGL6-B-EA",14,20,1
+"N:L6",angle,"N-BGL6-T-EA",11,25,1
+"N:L6'",end,"LS-L6' (start)",32,,1
+"N:L6'",end,"LL-NL6'-LM5' (start)",26,,1
+"N:L6'",plate,"N-BGL6'-B",0,14,1
+"N:L6'",plate,"N-BGL6'-T",0,11,1
+"N:L6'",angle,"N-BGL6'-B-EA",14,20,1
+"N:L6'",angle,"N-BGL6'-T-EA",11,25,1
+"N:L7",end,"LS-L7 (start)",32,,1
+"N:L7",end,"LL-NL7-LM6 (start)",26,,1
+"N:L7",plate,"N-BGL7-B",0,13,1
+"N:L7",plate,"N-BGL7-T",0,10,1
+"N:L7",angle,"N-BGL7-B-EA",13,19,1
+"N:L7",angle,"N-BGL7-T-EA",10,20,1
+"N:L7'",end,"LS-L7' (start)",32,,1
+"N:L7'",end,"LL-NL7'-LM6' (start)",26,,1
+"N:L7'",plate,"N-BGL7'-B",0,13,1
+"N:L7'",plate,"N-BGL7'-T",0,10,1
+"N:L7'",angle,"N-BGL7'-B-EA",13,19,1
+"N:L7'",angle,"N-BGL7'-T-EA",10,20,1
+"N:L8",end,"LS-L8 (start)",38,,1
+"N:L8",end,"LL-NL8-LM7 (start)",26,,1
+"N:L8",plate,"N-BGL8-B",0,13,1
+"N:L8",plate,"N-BGL8-T",0,11,1
+"N:L8",angle,"N-BGL8-B-EA",13,21,1
+"N:L8",angle,"N-BGL8-T-EA",11,24,1
+"N:L8'",end,"LS-L8' (start)",38,,1
+"N:L8'",end,"LL-NL8'-LM7' (start)",26,,1
+"N:L8'",plate,"N-BGL8'-B",0,13,1
+"N:L8'",plate,"N-BGL8'-T",0,11,1
+"N:L8'",angle,"N-BGL8'-B-EA",13,21,1
+"N:L8'",angle,"N-BGL8'-T-EA",11,23,1
+"N:L9",end,"LS-L9 (start)",39,,1
+"N:L9",end,"LL-NL9-LM8 (start)",32,,1
+"N:L9",plate,"N-BGL9-B",0,13,1
+"N:L9",plate,"N-BGL9-T",0,12,1
+"N:L9",angle,"N-BGL9-B-EA",13,20,1
+"N:L9",angle,"N-BGL9-T-EA",12,23,1
+"N:L9'",end,"LS-L9' (start)",39,,1
+"N:L9'",end,"LL-NL9'-LM8' (start)",32,,1
+"N:L9'",plate,"N-BGL9'-B",0,13,1
+"N:L9'",plate,"N-BGL9'-T",0,12,1
+"N:L9'",angle,"N-BGL9'-B-EA",13,20,1
+"N:L9'",angle,"N-BGL9'-T-EA",12,23,1
+"N:LM0",end,"LL-NL1-LM0 (end)",26,,1
+"N:LM0",end,"LL-SL1-LM0 (end)",26,,1
+"N:LM0",plate,"N-BGLM0-B",12,0,1
+"N:LM0",plate,"N-BGLM0-T",12,0,1
+"N:LM0'",end,"LL-NL1'-LM0' (end)",26,,1
+"N:LM0'",end,"LL-SL1'-LM0' (end)",26,,1
+"N:LM0'",plate,"N-BGLM0'-B",12,0,1
+"N:LM0'",plate,"N-BGLM0'-T",12,0,1
+"N:LM1",end,"LL-NL2-LM1 (end)",26,,1
+"N:LM1",end,"LL-SL2-LM1 (end)",26,,1
+"N:LM1",plate,"N-BGLM1-B",12,0,1
+"N:LM1",plate,"N-BGLM1-T",12,0,1
+"N:LM1'",end,"LL-NL2'-LM1' (end)",26,,1
+"N:LM1'",end,"LL-SL2'-LM1' (end)",26,,1
+"N:LM1'",plate,"N-BGLM1'-B",12,0,1
+"N:LM1'",plate,"N-BGLM1'-T",12,0,1
+"N:LM10",end,"LL-NL11-LM10 (end)",36,,1
+"N:LM10",end,"LL-SL11-LM10 (end)",36,,1
+"N:LM10",plate,"N-BGLM10-B",12,0,1
+"N:LM10",plate,"N-BGLM10-T",12,0,1
+"N:LM10'",end,"LL-NL11'-LM10' (end)",36,,1
+"N:LM10'",end,"LL-SL11'-LM10' (end)",36,,1
+"N:LM10'",plate,"N-BGLM10'-B",12,0,1
+"N:LM10'",plate,"N-BGLM10'-T",12,0,1
+"N:LM12",end,"LL-NL11-LM12 (end)",40,,1
+"N:LM12",end,"LL-SL11-LM12 (end)",40,,1
+"N:LM12",plate,"N-BGLM12-B",12,0,1
+"N:LM12",plate,"N-BGLM12-T",12,0,1
+"N:LM12'",end,"LL-NL11'-LM12' (end)",40,,1
+"N:LM12'",end,"LL-SL11'-LM12' (end)",40,,1
+"N:LM12'",plate,"N-BGLM12'-B",12,0,1
+"N:LM12'",plate,"N-BGLM12'-T",12,0,1
+"N:LM13",end,"LL-NL12-LM13 (end)",48,,1
+"N:LM13",end,"LL-SL12-LM13 (end)",48,,1
+"N:LM13",plate,"N-BGLM13-B",0,0,0
+"N:LM13",plate,"N-BGLM13-T",0,0,0
+"N:LM13",angle,"N-BGLM13-T-EA",10,0,0
+"N:LM13'",end,"LL-NL12'-LM13' (end)",48,,1
+"N:LM13'",end,"LL-SL12'-LM13' (end)",48,,1
+"N:LM13'",plate,"N-BGLM13'-B",0,0,0
+"N:LM13'",plate,"N-BGLM13'-T",0,0,0
+"N:LM13'",angle,"N-BGLM13'-T-EA",10,0,0
+"N:LM13H",end,"LL-LM13H-NLQ13 (start)",28,,1
+"N:LM13H",end,"LL-LM13H-SLQ13 (start)",28,,1
+"N:LM13H",plate,"N-BGLM13H-B",12,0,1
+"N:LM13H",plate,"N-BGLM13H-T",12,0,1
+"N:LM13H'",end,"LL-LM13H'-NLQ13' (start)",28,,1
+"N:LM13H'",end,"LL-LM13H'-SLQ13' (start)",28,,1
+"N:LM13H'",plate,"N-BGLM13H'-B",12,0,1
+"N:LM13H'",plate,"N-BGLM13H'-T",12,0,1
+"N:LM16",end,"LL-NL15-LM16 (end)",38,,1
+"N:LM16",end,"LL-SL15-LM16 (end)",38,,1
+"N:LM16",end,"LL-CL16 (start)",26,,1
+"N:LM16",plate,"N-BGLM16-B",12,0,1
+"N:LM16",plate,"N-BGLM16-T",12,0,1
+"N:LM16'",end,"LL-NL15'-LM16' (end)",38,,1
+"N:LM16'",end,"LL-SL15'-LM16' (end)",38,,1
+"N:LM16'",end,"LL-CL16' (start)",26,,1
+"N:LM16'",plate,"N-BGLM16'-B",12,0,1
+"N:LM16'",plate,"N-BGLM16'-T",12,0,1
+"N:LM17",end,"LL-NL16-LM17 (end)",26,,1
+"N:LM17",end,"LL-SL16-LM17 (end)",26,,1
+"N:LM17",end,"LL-CL16 (end)",26,,1
+"N:LM17",plate,"N-BGLM17-B",12,0,1
+"N:LM17",plate,"N-BGLM17-T",12,0,1
+"N:LM17'",end,"LL-NL16'-LM17' (end)",26,,1
+"N:LM17'",end,"LL-SL16'-LM17' (end)",26,,1
+"N:LM17'",end,"LL-CL16' (end)",26,,1
+"N:LM17'",plate,"N-BGLM17'-B",12,0,1
+"N:LM17'",plate,"N-BGLM17'-T",12,0,1
+"N:LM18",end,"LL-NL17-LM18 (end)",26,,1
+"N:LM18",end,"LL-SL17-LM18 (end)",26,,1
+"N:LM18",plate,"N-BGLM18-B",12,0,1
+"N:LM18",plate,"N-BGLM18-T",12,0,1
+"N:LM18'",end,"LL-NL17'-LM18' (end)",26,,1
+"N:LM18'",end,"LL-SL17'-LM18' (end)",26,,1
+"N:LM18'",plate,"N-BGLM18'-B",12,0,1
+"N:LM18'",plate,"N-BGLM18'-T",12,0,1
+"N:LM19",end,"LL-NL18-LM19 (end)",26,,1
+"N:LM19",end,"LL-SL18-LM19 (end)",26,,1
+"N:LM19",plate,"N-BGLM19-B",12,0,1
+"N:LM19",plate,"N-BGLM19-T",12,0,1
+"N:LM19'",end,"LL-NL18'-LM19' (end)",26,,1
+"N:LM19'",end,"LL-SL18'-LM19' (end)",26,,1
+"N:LM19'",plate,"N-BGLM19'-B",12,0,1
+"N:LM19'",plate,"N-BGLM19'-T",12,0,1
+"N:LM2",end,"LL-NL3-LM2 (end)",26,,1
+"N:LM2",end,"LL-SL3-LM2 (end)",26,,1
+"N:LM2",plate,"N-BGLM2-B",12,0,1
+"N:LM2",plate,"N-BGLM2-T",12,0,1
+"N:LM2'",end,"LL-NL3'-LM2' (end)",26,,1
+"N:LM2'",end,"LL-SL3'-LM2' (end)",26,,1
+"N:LM2'",plate,"N-BGLM2'-B",12,0,1
+"N:LM2'",plate,"N-BGLM2'-T",12,0,1
+"N:LM20",end,"LL-NL19-LM20 (end)",26,,1
+"N:LM20",end,"LL-SL19-LM20 (end)",26,,1
+"N:LM20",plate,"N-BGLM20-B",12,0,1
+"N:LM20",plate,"N-BGLM20-T",12,0,1
+"N:LM20'",end,"LL-NL19'-LM20' (end)",26,,1
+"N:LM20'",end,"LL-SL19'-LM20' (end)",26,,1
+"N:LM20'",plate,"N-BGLM20'-B",12,0,1
+"N:LM20'",plate,"N-BGLM20'-T",12,0,1
+"N:LM21",end,"LL-NL20-LM21 (end)",26,,1
+"N:LM21",end,"LL-SL20-LM21 (end)",26,,1
+"N:LM21",plate,"N-BGLM21-B",12,0,1
+"N:LM21",plate,"N-BGLM21-T",12,0,1
+"N:LM21'",end,"LL-NL20'-LM21' (end)",26,,1
+"N:LM21'",end,"LL-SL20'-LM21' (end)",26,,1
+"N:LM21'",plate,"N-BGLM21'-B",12,0,1
+"N:LM21'",plate,"N-BGLM21'-T",12,0,1
+"N:LM22",end,"LL-NL21-LM22 (end)",26,,1
+"N:LM22",end,"LL-SL21-LM22 (end)",26,,1
+"N:LM22",end,"LL-NL21'-LM22 (end)",26,,1
+"N:LM22",end,"LL-SL21'-LM22 (end)",26,,1
+"N:LM22",plate,"N-BGLM22-B",12,0,1
+"N:LM22",plate,"N-BGLM22-T",12,0,1
+"N:LM3",end,"LL-NL4-LM3 (end)",26,,1
+"N:LM3",end,"LL-SL4-LM3 (end)",26,,1
+"N:LM3",plate,"N-BGLM3-B",12,0,1
+"N:LM3",plate,"N-BGLM3-T",12,0,1
+"N:LM3'",end,"LL-NL4'-LM3' (end)",26,,1
+"N:LM3'",end,"LL-SL4'-LM3' (end)",26,,1
+"N:LM3'",plate,"N-BGLM3'-B",12,0,1
+"N:LM3'",plate,"N-BGLM3'-T",12,0,1
+"N:LM4",end,"LL-NL5-LM4 (end)",26,,1
+"N:LM4",end,"LL-SL5-LM4 (end)",26,,1
+"N:LM4",plate,"N-BGLM4-B",12,0,1
+"N:LM4",plate,"N-BGLM4-T",12,0,1
+"N:LM4'",end,"LL-NL5'-LM4' (end)",26,,1
+"N:LM4'",end,"LL-SL5'-LM4' (end)",26,,1
+"N:LM4'",plate,"N-BGLM4'-B",12,0,1
+"N:LM4'",plate,"N-BGLM4'-T",12,0,1
+"N:LM5",end,"LL-NL6-LM5 (end)",26,,1
+"N:LM5",end,"LL-SL6-LM5 (end)",26,,1
+"N:LM5",plate,"N-BGLM5-B",12,0,1
+"N:LM5",plate,"N-BGLM5-T",12,0,1
+"N:LM5'",end,"LL-NL6'-LM5' (end)",26,,1
+"N:LM5'",end,"LL-SL6'-LM5' (end)",26,,1
+"N:LM5'",plate,"N-BGLM5'-B",12,0,1
+"N:LM5'",plate,"N-BGLM5'-T",12,0,1
+"N:LM6",end,"LL-NL7-LM6 (end)",26,,1
+"N:LM6",end,"LL-SL7-LM6 (end)",26,,1
+"N:LM6",plate,"N-BGLM6-B",12,0,1
+"N:LM6",plate,"N-BGLM6-T",12,0,1
+"N:LM6'",end,"LL-NL7'-LM6' (end)",26,,1
+"N:LM6'",end,"LL-SL7'-LM6' (end)",26,,1
+"N:LM6'",plate,"N-BGLM6'-B",12,0,1
+"N:LM6'",plate,"N-BGLM6'-T",12,0,1
+"N:LM7",end,"LL-NL8-LM7 (end)",26,,1
+"N:LM7",end,"LL-SL8-LM7 (end)",26,,1
+"N:LM7",plate,"N-BGLM7-B",12,0,1
+"N:LM7",plate,"N-BGLM7-T",12,0,1
+"N:LM7'",end,"LL-NL8'-LM7' (end)",26,,1
+"N:LM7'",end,"LL-SL8'-LM7' (end)",26,,1
+"N:LM7'",plate,"N-BGLM7'-B",12,0,1
+"N:LM7'",plate,"N-BGLM7'-T",12,0,1
+"N:LM8",end,"LL-NL9-LM8 (end)",32,,1
+"N:LM8",end,"LL-SL9-LM8 (end)",32,,1
+"N:LM8",plate,"N-BGLM8-B",12,0,1
+"N:LM8",plate,"N-BGLM8-T",12,0,1
+"N:LM8'",end,"LL-NL9'-LM8' (end)",32,,1
+"N:LM8'",end,"LL-SL9'-LM8' (end)",32,,1
+"N:LM8'",plate,"N-BGLM8'-B",12,0,1
+"N:LM8'",plate,"N-BGLM8'-T",12,0,1
+"N:LM9",end,"LL-NL10-LM9 (end)",32,,1
+"N:LM9",end,"LL-SL10-LM9 (end)",32,,1
+"N:LM9",plate,"N-BGLM9-B",12,0,1
+"N:LM9",plate,"N-BGLM9-T",12,0,1
+"N:LM9'",end,"LL-NL10'-LM9' (end)",32,,1
+"N:LM9'",end,"LL-SL10'-LM9' (end)",32,,1
+"N:LM9'",plate,"N-BGLM9'-B",12,0,1
+"N:LM9'",plate,"N-BGLM9'-T",12,0,1
+"N:U12",end,"US-U12 (start)",40,,1
+"N:U12",end,"UL-NU12-UM13 (start)",26,,1
+"N:U12",plate,"N-BGU12-B",0,12,1
+"N:U12",plate,"N-BGU12-T",0,12,1
+"N:U12",angle,"N-BGU12-B-EA",12,18,1
+"N:U12",angle,"N-BGU12-T-EA",12,17,1
+"N:U12'",end,"US-U12' (start)",40,,1
+"N:U12'",end,"UL-NU12'-UM13' (start)",26,,1
+"N:U12'",plate,"N-BGU12'-B",0,12,1
+"N:U12'",plate,"N-BGU12'-T",0,12,1
+"N:U12'",angle,"N-BGU12'-B-EA",12,18,1
+"N:U12'",angle,"N-BGU12'-T-EA",12,17,1
+"N:U13",end,"US-U13 (start)",40,,1
+"N:U13",end,"UL-NU13-UM14 (start)",26,,1
+"N:U13",plate,"N-BGU13-B",0,13,1
+"N:U13",plate,"N-BGU13-T",0,13,1
+"N:U13",angle,"N-BGU13-B-EA",13,16,1
+"N:U13",angle,"N-BGU13-T-EA",13,14,1
+"N:U13'",end,"US-U13' (start)",40,,1
+"N:U13'",end,"UL-NU13'-UM14' (start)",26,,1
+"N:U13'",plate,"N-BGU13'-B",0,13,1
+"N:U13'",plate,"N-BGU13'-T",0,13,1
+"N:U13'",angle,"N-BGU13'-B-EA",13,16,1
+"N:U13'",angle,"N-BGU13'-T-EA",13,14,1
+"N:U14",end,"US-U14 (start)",40,,1
+"N:U14",end,"UL-NU14-UM15 (start)",26,,1
+"N:U14",plate,"N-BGU14-B",0,11,1
+"N:U14",plate,"N-BGU14-T",0,11,1
+"N:U14",angle,"N-BGU14-B-EA",11,19,1
+"N:U14",angle,"N-BGU14-T-EA",11,24,1
+"N:U14'",end,"US-U14' (start)",40,,1
+"N:U14'",end,"UL-NU14'-UM15' (start)",26,,1
+"N:U14'",plate,"N-BGU14'-B",0,11,1
+"N:U14'",plate,"N-BGU14'-T",0,11,1
+"N:U14'",angle,"N-BGU14'-B-EA",11,19,1
+"N:U14'",angle,"N-BGU14'-T-EA",11,24,1
+"N:U15",end,"US-U15 (start)",40,,1
+"N:U15",end,"UL-NU15-UM16 (start)",26,,1
+"N:U15",plate,"N-BGU15-B",0,13,1
+"N:U15",plate,"N-BGU15-T",0,11,1
+"N:U15",angle,"N-BGU15-B-EA",13,17,1
+"N:U15",angle,"N-BGU15-T-EA",11,20,1
+"N:U15'",end,"US-U15' (start)",40,,1
+"N:U15'",end,"UL-NU15'-UM16' (start)",26,,1
+"N:U15'",plate,"N-BGU15'-B",0,13,1
+"N:U15'",plate,"N-BGU15'-T",0,11,1
+"N:U15'",angle,"N-BGU15'-B-EA",13,17,1
+"N:U15'",angle,"N-BGU15'-T-EA",11,20,1
+"N:U16",end,"US-U16 (start)",40,,1
+"N:U16",end,"UL-NU16-UM17 (start)",26,,1
+"N:U16",plate,"N-BGU16-B",0,13,1
+"N:U16",plate,"N-BGU16-T",0,11,1
+"N:U16",angle,"N-BGU16-B-EA",13,24,1
+"N:U16",angle,"N-BGU16-T-EA",11,24,1
+"N:U16'",end,"US-U16' (start)",40,,1
+"N:U16'",end,"UL-NU16'-UM17' (start)",26,,1
+"N:U16'",plate,"N-BGU16'-B",0,13,1
+"N:U16'",plate,"N-BGU16'-T",0,11,1
+"N:U16'",angle,"N-BGU16'-B-EA",13,24,1
+"N:U16'",angle,"N-BGU16'-T-EA",11,23,1
+"N:U17",end,"US-U17 (start)",40,,1
+"N:U17",end,"UL-NU17-UM18 (start)",26,,1
+"N:U17",plate,"N-BGU17-B",0,11,1
+"N:U17",plate,"N-BGU17-T",0,10,1
+"N:U17",angle,"N-BGU17-B-EA",11,23,1
+"N:U17",angle,"N-BGU17-T-EA",10,26,1
+"N:U17'",end,"US-U17' (start)",40,,1
+"N:U17'",end,"UL-NU17'-UM18' (start)",26,,1
+"N:U17'",plate,"N-BGU17'-B",0,11,1
+"N:U17'",plate,"N-BGU17'-T",0,10,1
+"N:U17'",angle,"N-BGU17'-B-EA",11,23,1
+"N:U17'",angle,"N-BGU17'-T-EA",10,26,1
+"N:U18",end,"US-U18 (start)",40,,1
+"N:U18",end,"UL-NU18-UM19 (start)",26,,1
+"N:U18",plate,"N-BGU18-B",0,10,1
+"N:U18",plate,"N-BGU18-T",0,10,1
+"N:U18",angle,"N-BGU18-B-EA",10,27,1
+"N:U18",angle,"N-BGU18-T-EA",10,33,1
+"N:U18'",end,"US-U18' (start)",40,,1
+"N:U18'",end,"UL-NU18'-UM19' (start)",26,,1
+"N:U18'",plate,"N-BGU18'-B",0,10,1
+"N:U18'",plate,"N-BGU18'-T",0,10,1
+"N:U18'",angle,"N-BGU18'-B-EA",10,27,1
+"N:U18'",angle,"N-BGU18'-T-EA",10,33,1
+"N:U19",end,"US-U19 (start)",40,,1
+"N:U19",end,"UL-NU19-UM20 (start)",26,,1
+"N:U19",plate,"N-BGU19-B",0,12,1
+"N:U19",plate,"N-BGU19-T",0,10,1
+"N:U19",angle,"N-BGU19-B-EA",12,23,1
+"N:U19",angle,"N-BGU19-T-EA",10,26,1
+"N:U19'",end,"US-U19' (start)",40,,1
+"N:U19'",end,"UL-NU19'-UM20' (start)",26,,1
+"N:U19'",plate,"N-BGU19'-B",0,11,1
+"N:U19'",plate,"N-BGU19'-T",0,10,1
+"N:U19'",angle,"N-BGU19'-B-EA",11,23,1
+"N:U19'",angle,"N-BGU19'-T-EA",10,26,1
+"N:U20",end,"US-U20 (start)",40,,1
+"N:U20",end,"UL-NU20-UM21 (start)",26,,1
+"N:U20",plate,"N-BGU20-B",0,11,1
+"N:U20",plate,"N-BGU20-T",0,12,1
+"N:U20",angle,"N-BGU20-B-EA",11,25,1
+"N:U20",angle,"N-BGU20-T-EA",12,20,1
+"N:U20'",end,"US-U20' (start)",40,,1
+"N:U20'",end,"UL-NU20'-UM21' (start)",26,,1
+"N:U20'",plate,"N-BGU20'-B",0,11,1
+"N:U20'",plate,"N-BGU20'-T",0,12,1
+"N:U20'",angle,"N-BGU20'-B-EA",11,25,1
+"N:U20'",angle,"N-BGU20'-T-EA",12,20,1
+"N:U21",end,"US-U21 (start)",40,,1
+"N:U21",end,"UL-NU21-UM22 (start)",26,,1
+"N:U21",plate,"N-BGU21-B",0,11,1
+"N:U21",plate,"N-BGU21-T",0,13,1
+"N:U21",angle,"N-BGU21-B-EA",11,24,1
+"N:U21",angle,"N-BGU21-T-EA",13,19,1
+"N:U21'",end,"US-U21' (start)",40,,1
+"N:U21'",end,"UL-NU21'-UM22 (start)",26,,1
+"N:U21'",plate,"N-BGU21'-B",0,11,1
+"N:U21'",plate,"N-BGU21'-T",0,13,1
+"N:U21'",angle,"N-BGU21'-B-EA",11,24,1
+"N:U21'",angle,"N-BGU21'-T-EA",13,19,1
+"N:U22",end,"US-U22 (start)",16,,1
+"N:U22",plate,"N-BGU22-B",0,6,1
+"N:U22",plate,"N-BGU22-T",0,6,1
+"N:U22",angle,"N-BGU22-B-EA",6,14,1
+"N:U22",angle,"N-BGU22-T-EA",6,11,1
+"N:UM12",end,"UL-NU11-UM12 (end)",26,,1
+"N:UM12",end,"UL-SU11-UM12 (end)",26,,1
+"N:UM12",plate,"N-BGUM12-B",12,0,1
+"N:UM12",plate,"N-BGUM12-T",12,0,1
+"N:UM12'",end,"UL-NU11'-UM12' (end)",26,,1
+"N:UM12'",end,"UL-SU11'-UM12' (end)",26,,1
+"N:UM12'",plate,"N-BGUM12'-B",12,0,1
+"N:UM12'",plate,"N-BGUM12'-T",12,0,1
+"N:UM13",end,"UL-NU12-UM13 (end)",26,,1
+"N:UM13",end,"UL-SU12-UM13 (end)",26,,1
+"N:UM13",plate,"N-BGUM13-B",12,0,1
+"N:UM13",plate,"N-BGUM13-T",12,0,1
+"N:UM13'",end,"UL-NU12'-UM13' (end)",26,,1
+"N:UM13'",end,"UL-SU12'-UM13' (end)",26,,1
+"N:UM13'",plate,"N-BGUM13'-B",12,0,1
+"N:UM13'",plate,"N-BGUM13'-T",12,0,1
+"N:UM14",end,"UL-NU13-UM14 (end)",26,,1
+"N:UM14",end,"UL-SU13-UM14 (end)",26,,1
+"N:UM14",plate,"N-BGUM14-B",12,0,1
+"N:UM14",plate,"N-BGUM14-T",12,0,1
+"N:UM14'",end,"UL-NU13'-UM14' (end)",26,,1
+"N:UM14'",end,"UL-SU13'-UM14' (end)",26,,1
+"N:UM14'",plate,"N-BGUM14'-B",12,0,1
+"N:UM14'",plate,"N-BGUM14'-T",12,0,1
+"N:UM15",end,"UL-NU14-UM15 (end)",26,,1
+"N:UM15",end,"UL-SU14-UM15 (end)",26,,1
+"N:UM15",plate,"N-BGUM15-B",12,0,1
+"N:UM15",plate,"N-BGUM15-T",12,0,1
+"N:UM15'",end,"UL-NU14'-UM15' (end)",26,,1
+"N:UM15'",end,"UL-SU14'-UM15' (end)",26,,1
+"N:UM15'",plate,"N-BGUM15'-B",12,0,1
+"N:UM15'",plate,"N-BGUM15'-T",12,0,1
+"N:UM16",end,"UL-NU15-UM16 (end)",26,,1
+"N:UM16",end,"UL-SU15-UM16 (end)",26,,1
+"N:UM16",plate,"N-BGUM16-B",12,0,1
+"N:UM16",plate,"N-BGUM16-T",12,0,1
+"N:UM16'",end,"UL-NU15'-UM16' (end)",26,,1
+"N:UM16'",end,"UL-SU15'-UM16' (end)",26,,1
+"N:UM16'",plate,"N-BGUM16'-B",12,0,1
+"N:UM16'",plate,"N-BGUM16'-T",12,0,1
+"N:UM17",end,"UL-NU16-UM17 (end)",26,,1
+"N:UM17",end,"UL-SU16-UM17 (end)",26,,1
+"N:UM17",plate,"N-BGUM17-B",12,0,1
+"N:UM17",plate,"N-BGUM17-T",12,0,1
+"N:UM17'",end,"UL-NU16'-UM17' (end)",26,,1
+"N:UM17'",end,"UL-SU16'-UM17' (end)",26,,1
+"N:UM17'",plate,"N-BGUM17'-B",12,0,1
+"N:UM17'",plate,"N-BGUM17'-T",12,0,1
+"N:UM18",end,"UL-NU17-UM18 (end)",26,,1
+"N:UM18",end,"UL-SU17-UM18 (end)",26,,1
+"N:UM18",plate,"N-BGUM18-B",12,0,1
+"N:UM18",plate,"N-BGUM18-T",12,0,1
+"N:UM18'",end,"UL-NU17'-UM18' (end)",26,,1
+"N:UM18'",end,"UL-SU17'-UM18' (end)",26,,1
+"N:UM18'",plate,"N-BGUM18'-B",12,0,1
+"N:UM18'",plate,"N-BGUM18'-T",12,0,1
+"N:UM19",end,"UL-NU18-UM19 (end)",26,,1
+"N:UM19",end,"UL-SU18-UM19 (end)",26,,1
+"N:UM19",plate,"N-BGUM19-B",12,0,1
+"N:UM19",plate,"N-BGUM19-T",12,0,1
+"N:UM19'",end,"UL-NU18'-UM19' (end)",26,,1
+"N:UM19'",end,"UL-SU18'-UM19' (end)",26,,1
+"N:UM19'",plate,"N-BGUM19'-B",12,0,1
+"N:UM19'",plate,"N-BGUM19'-T",12,0,1
+"N:UM20",end,"UL-NU19-UM20 (end)",26,,1
+"N:UM20",end,"UL-SU19-UM20 (end)",26,,1
+"N:UM20",plate,"N-BGUM20-B",12,0,1
+"N:UM20",plate,"N-BGUM20-T",12,0,1
+"N:UM20'",end,"UL-NU19'-UM20' (end)",26,,1
+"N:UM20'",end,"UL-SU19'-UM20' (end)",26,,1
+"N:UM20'",plate,"N-BGUM20'-B",12,0,1
+"N:UM20'",plate,"N-BGUM20'-T",12,0,1
+"N:UM21",end,"UL-NU20-UM21 (end)",26,,1
+"N:UM21",end,"UL-SU20-UM21 (end)",26,,1
+"N:UM21",plate,"N-BGUM21-B",12,0,1
+"N:UM21",plate,"N-BGUM21-T",12,0,1
+"N:UM21'",end,"UL-NU20'-UM21' (end)",26,,1
+"N:UM21'",end,"UL-SU20'-UM21' (end)",26,,1
+"N:UM21'",plate,"N-BGUM21'-B",12,0,1
+"N:UM21'",plate,"N-BGUM21'-T",12,0,1
+"N:UM22",end,"UL-NU21-UM22 (end)",26,,1
+"N:UM22",end,"UL-SU21-UM22 (end)",26,,1
+"N:UM22",end,"UL-NU21'-UM22 (end)",26,,1
+"N:UM22",end,"UL-SU21'-UM22 (end)",26,,1
+"N:UM22",plate,"N-BGUM22-B",12,0,1
+"N:UM22",plate,"N-BGUM22-T",12,0,1
+"S:L1",end,"LS-L1 (end)",32,,1
+"S:L1",end,"LL-SL1-LM0 (start)",26,,1
+"S:L1",plate,"S-BGL1-B",0,13,1
+"S:L1",plate,"S-BGL1-T",0,14,1
+"S:L1",angle,"S-BGL1-B-EA",13,18,1
+"S:L1",angle,"S-BGL1-T-EA",14,19,1
+"S:L1'",end,"LS-L1' (end)",32,,1
+"S:L1'",end,"LL-SL1'-LM0' (start)",26,,1
+"S:L1'",plate,"S-BGL1'-B",0,13,1
+"S:L1'",plate,"S-BGL1'-T",0,14,1
+"S:L1'",angle,"S-BGL1'-B-EA",13,18,1
+"S:L1'",angle,"S-BGL1'-T-EA",14,19,1
+"S:L10",end,"LS-L10 (end)",39,,1
+"S:L10",end,"LL-SL10-LM9 (start)",32,,1
+"S:L10",plate,"S-BGL10-B",0,11,1
+"S:L10",plate,"S-BGL10-T",0,7,1
+"S:L10",angle,"S-BGL10-B-EA",11,22,1
+"S:L10",angle,"S-BGL10-T-EA",7,34,1
+"S:L10'",end,"LS-L10' (end)",39,,1
+"S:L10'",end,"LL-SL10'-LM9' (start)",32,,1
+"S:L10'",plate,"S-BGL10'-B",0,11,1
+"S:L10'",plate,"S-BGL10'-T",0,6,1
+"S:L10'",angle,"S-BGL10'-B-EA",11,22,1
+"S:L10'",angle,"S-BGL10'-T-EA",6,34,1
+"S:L11-a",end,"LL-SL11-LM10 (start)",36,,1
+"S:L11-a",plate,"S-BGL11-a-B",0,2,1
+"S:L11-a",plate,"S-BGL11-a-T",0,2,1
+"S:L11-a",angle,"S-BGL11-a-B-EA",7,2,1
+"S:L11-a",angle,"S-BGL11-a-T-EA",7,2,1
+"S:L11-b",end,"LL-SL11-LM12 (start)",40,,1
+"S:L11-b",plate,"S-BGL11-b-B",0,0,0
+"S:L11-b",plate,"S-BGL11-b-T",0,3,1
+"S:L11-b",angle,"S-BGL11-b-B-EA",13,0,0
+"S:L11-b",angle,"S-BGL11-b-T-EA",13,3,1
+"S:L11'-a",end,"LL-SL11'-LM10' (start)",36,,1
+"S:L11'-a",plate,"S-BGL11'-a-B",0,2,1
+"S:L11'-a",plate,"S-BGL11'-a-T",0,2,1
+"S:L11'-a",angle,"S-BGL11'-a-B-EA",7,2,1
+"S:L11'-a",angle,"S-BGL11'-a-T-EA",7,2,1
+"S:L11'-b",end,"LL-SL11'-LM12' (start)",40,,1
+"S:L11'-b",plate,"S-BGL11'-b-B",0,0,0
+"S:L11'-b",plate,"S-BGL11'-b-T",0,3,1
+"S:L11'-b",angle,"S-BGL11'-b-B-EA",13,0,0
+"S:L11'-b",angle,"S-BGL11'-b-T-EA",13,3,1
+"S:L12",end,"LS-L12 (end)",50,,1
+"S:L12",end,"LL-SL12-LM13 (start)",48,,1
+"S:L12",plate,"S-BGL12-B",0,6,1
+"S:L12",plate,"S-BGL12-T",0,8,1
+"S:L12",angle,"S-BGL12-B-EA",6,37,1
+"S:L12",angle,"S-BGL12-T-EA",8,22,1
+"S:L12'",end,"LS-L12' (end)",50,,1
+"S:L12'",end,"LL-SL12'-LM13' (start)",48,,1
+"S:L12'",plate,"S-BGL12'-B",0,6,1
+"S:L12'",plate,"S-BGL12'-T",0,10,1
+"S:L12'",angle,"S-BGL12'-B-EA",6,37,1
+"S:L12'",angle,"S-BGL12'-T-EA",10,22,1
+"S:L13H",end,"LS-L13H (end)",46,,1
+"S:L13H",end,"LL-SL13H-LQ13 (start)",24,,1
+"S:L13H",plate,"S-BGL13H-B",0,13,1
+"S:L13H",plate,"S-BGL13H-T",0,13,1
+"S:L13H",angle,"S-BGL13H-B-EA",13,13,1
+"S:L13H",angle,"S-BGL13H-T-EA",13,13,1
+"S:L13H'",end,"LS-L13H' (end)",46,,1
+"S:L13H'",end,"LL-SL13H'-LQ13' (start)",24,,1
+"S:L13H'",plate,"S-BGL13H'-B",0,13,1
+"S:L13H'",plate,"S-BGL13H'-T",0,13,1
+"S:L13H'",angle,"S-BGL13H'-B-EA",13,13,1
+"S:L13H'",angle,"S-BGL13H'-T-EA",13,13,1
+"S:L15",end,"LL-SL15-LM16 (start)",38,,1
+"S:L15",plate,"S-BGL15-B",0,11,1
+"S:L15",plate,"S-BGL15-T",0,10,1
+"S:L15",angle,"S-BGL15-B-EA",11,28,1
+"S:L15",angle,"S-BGL15-T-EA",10,26,1
+"S:L15'",end,"LL-SL15'-LM16' (start)",38,,1
+"S:L15'",plate,"S-BGL15'-B",0,11,1
+"S:L15'",plate,"S-BGL15'-T",0,10,1
+"S:L15'",angle,"S-BGL15'-B-EA",11,28,1
+"S:L15'",angle,"S-BGL15'-T-EA",10,26,1
+"S:L16",end,"LS-L16 (end)",40,,1
+"S:L16",end,"LL-SL16-LM17 (start)",26,,1
+"S:L16",plate,"S-BGL16-B",0,11,1
+"S:L16",plate,"S-BGL16-T",0,12,1
+"S:L16",angle,"S-BGL16-B-EA",11,26,1
+"S:L16",angle,"S-BGL16-T-EA",12,21,1
+"S:L16'",end,"LS-L16' (end)",40,,1
+"S:L16'",end,"LL-SL16'-LM17' (start)",26,,1
+"S:L16'",plate,"S-BGL16'-B",0,11,1
+"S:L16'",plate,"S-BGL16'-T",0,12,1
+"S:L16'",angle,"S-BGL16'-B-EA",11,26,1
+"S:L16'",angle,"S-BGL16'-T-EA",12,21,1
+"S:L17",end,"LS-L17 (end)",40,,1
+"S:L17",end,"LL-SL17-LM18 (start)",26,,1
+"S:L17",plate,"S-BGL17-B",0,10,1
+"S:L17",plate,"S-BGL17-T",0,11,1
+"S:L17",angle,"S-BGL17-B-EA",10,20,1
+"S:L17",angle,"S-BGL17-T-EA",11,24,1
+"S:L17'",end,"LS-L17' (end)",40,,1
+"S:L17'",end,"LL-SL17'-LM18' (start)",26,,1
+"S:L17'",plate,"S-BGL17'-B",0,11,1
+"S:L17'",plate,"S-BGL17'-T",0,11,1
+"S:L17'",angle,"S-BGL17'-B-EA",11,20,1
+"S:L17'",angle,"S-BGL17'-T-EA",11,24,1
+"S:L18",end,"LS-L18 (end)",40,,1
+"S:L18",end,"LL-SL18-LM19 (start)",26,,1
+"S:L18",plate,"S-BGL18-B",0,11,1
+"S:L18",plate,"S-BGL18-T",0,12,1
+"S:L18",angle,"S-BGL18-B-EA",11,24,1
+"S:L18",angle,"S-BGL18-T-EA",12,26,1
+"S:L18'",end,"LS-L18' (end)",40,,1
+"S:L18'",end,"LL-SL18'-LM19' (start)",26,,1
+"S:L18'",plate,"S-BGL18'-B",0,11,1
+"S:L18'",plate,"S-BGL18'-T",0,11,1
+"S:L18'",angle,"S-BGL18'-B-EA",11,24,1
+"S:L18'",angle,"S-BGL18'-T-EA",11,26,1
+"S:L19",end,"LS-L19 (end)",40,,1
+"S:L19",end,"LL-SL19-LM20 (start)",26,,1
+"S:L19",plate,"S-BGL19-B",0,10,1
+"S:L19",plate,"S-BGL19-T",0,10,1
+"S:L19",angle,"S-BGL19-B-EA",10,26,1
+"S:L19",angle,"S-BGL19-T-EA",10,27,1
+"S:L19'",end,"LS-L19' (end)",40,,1
+"S:L19'",end,"LL-SL19'-LM20' (start)",26,,1
+"S:L19'",plate,"S-BGL19'-B",0,10,1
+"S:L19'",plate,"S-BGL19'-T",0,10,1
+"S:L19'",angle,"S-BGL19'-B-EA",10,26,1
+"S:L19'",angle,"S-BGL19'-T-EA",10,27,1
+"S:L2",end,"LS-L2 (end)",32,,1
+"S:L2",end,"LL-SL2-LM1 (start)",26,,1
+"S:L2",plate,"S-BGL2-B",0,12,1
+"S:L2",plate,"S-BGL2-T",0,12,1
+"S:L2",angle,"S-BGL2-B-EA",12,22,1
+"S:L2",angle,"S-BGL2-T-EA",12,23,1
+"S:L2'",end,"LS-L2' (end)",32,,1
+"S:L2'",end,"LL-SL2'-LM1' (start)",26,,1
+"S:L2'",plate,"S-BGL2'-B",0,12,1
+"S:L2'",plate,"S-BGL2'-T",0,13,1
+"S:L2'",angle,"S-BGL2'-B-EA",12,22,1
+"S:L2'",angle,"S-BGL2'-T-EA",13,23,1
+"S:L20",end,"LS-L20 (end)",40,,1
+"S:L20",end,"LL-SL20-LM21 (start)",26,,1
+"S:L20",plate,"S-BGL20-B",0,9,1
+"S:L20",plate,"S-BGL20-T",0,10,1
+"S:L20",angle,"S-BGL20-B-EA",9,24,1
+"S:L20",angle,"S-BGL20-T-EA",10,29,1
+"S:L20'",end,"LS-L20' (end)",40,,1
+"S:L20'",end,"LL-SL20'-LM21' (start)",26,,1
+"S:L20'",plate,"S-BGL20'-B",0,9,1
+"S:L20'",plate,"S-BGL20'-T",0,8,1
+"S:L20'",angle,"S-BGL20'-B-EA",9,24,1
+"S:L20'",angle,"S-BGL20'-T-EA",8,30,1
+"S:L21",end,"LS-L21 (end)",40,,1
+"S:L21",end,"LL-SL21-LM22 (start)",26,,1
+"S:L21",plate,"S-BGL21-B",0,10,1
+"S:L21",plate,"S-BGL21-T",0,10,1
+"S:L21",angle,"S-BGL21-B-EA",10,23,1
+"S:L21",angle,"S-BGL21-T-EA",10,29,1
+"S:L21'",end,"LS-L21' (end)",40,,1
+"S:L21'",end,"LL-SL21'-LM22 (start)",26,,1
+"S:L21'",plate,"S-BGL21'-B",0,9,1
+"S:L21'",plate,"S-BGL21'-T",0,10,1
+"S:L21'",angle,"S-BGL21'-B-EA",9,23,1
+"S:L21'",angle,"S-BGL21'-T-EA",10,29,1
+"S:L22",end,"LS-L22 (end)",16,,1
+"S:L22",plate,"S-BGL22-B",0,5,1
+"S:L22",plate,"S-BGL22-T",0,6,1
+"S:L22",angle,"S-BGL22-B-EA",5,12,1
+"S:L22",angle,"S-BGL22-T-EA",6,13,1
+"S:L3",end,"LS-L3 (end)",32,,1
+"S:L3",end,"LL-SL3-LM2 (start)",26,,1
+"S:L3",plate,"S-BGL3-B",0,14,1
+"S:L3",plate,"S-BGL3-T",0,14,1
+"S:L3",angle,"S-BGL3-B-EA",14,18,1
+"S:L3",angle,"S-BGL3-T-EA",14,19,1
+"S:L3'",end,"LS-L3' (end)",32,,1
+"S:L3'",end,"LL-SL3'-LM2' (start)",26,,1
+"S:L3'",plate,"S-BGL3'-B",0,14,1
+"S:L3'",plate,"S-BGL3'-T",0,14,1
+"S:L3'",angle,"S-BGL3'-B-EA",14,18,1
+"S:L3'",angle,"S-BGL3'-T-EA",14,19,1
+"S:L4",end,"LS-L4 (end)",32,,1
+"S:L4",end,"LL-SL4-LM3 (start)",26,,1
+"S:L4",plate,"S-BGL4-B",0,13,1
+"S:L4",plate,"S-BGL4-T",0,14,1
+"S:L4",angle,"S-BGL4-B-EA",13,24,1
+"S:L4",angle,"S-BGL4-T-EA",14,22,1
+"S:L4'",end,"LS-L4' (end)",32,,1
+"S:L4'",end,"LL-SL4'-LM3' (start)",26,,1
+"S:L4'",plate,"S-BGL4'-B",0,13,1
+"S:L4'",plate,"S-BGL4'-T",0,14,1
+"S:L4'",angle,"S-BGL4'-B-EA",13,24,1
+"S:L4'",angle,"S-BGL4'-T-EA",14,22,1
+"S:L5",end,"LS-L5 (end)",32,,1
+"S:L5",end,"LL-SL5-LM4 (start)",26,,1
+"S:L5",plate,"S-BGL5-B",0,10,1
+"S:L5",plate,"S-BGL5-T",0,14,1
+"S:L5",angle,"S-BGL5-B-EA",10,23,1
+"S:L5",angle,"S-BGL5-T-EA",14,20,1
+"S:L5'",end,"LS-L5' (end)",32,,1
+"S:L5'",end,"LL-SL5'-LM4' (start)",26,,1
+"S:L5'",plate,"S-BGL5'-B",0,9,1
+"S:L5'",plate,"S-BGL5'-T",0,14,1
+"S:L5'",angle,"S-BGL5'-B-EA",9,23,1
+"S:L5'",angle,"S-BGL5'-T-EA",14,20,1
+"S:L6",end,"LS-L6 (end)",32,,1
+"S:L6",end,"LL-SL6-LM5 (start)",26,,1
+"S:L6",plate,"S-BGL6-B",0,14,1
+"S:L6",plate,"S-BGL6-T",0,11,1
+"S:L6",angle,"S-BGL6-B-EA",14,20,1
+"S:L6",angle,"S-BGL6-T-EA",11,25,1
+"S:L6'",end,"LS-L6' (end)",32,,1
+"S:L6'",end,"LL-SL6'-LM5' (start)",26,,1
+"S:L6'",plate,"S-BGL6'-B",0,14,1
+"S:L6'",plate,"S-BGL6'-T",0,11,1
+"S:L6'",angle,"S-BGL6'-B-EA",14,20,1
+"S:L6'",angle,"S-BGL6'-T-EA",11,25,1
+"S:L7",end,"LS-L7 (end)",32,,1
+"S:L7",end,"LL-SL7-LM6 (start)",26,,1
+"S:L7",plate,"S-BGL7-B",0,13,1
+"S:L7",plate,"S-BGL7-T",0,10,1
+"S:L7",angle,"S-BGL7-B-EA",13,19,1
+"S:L7",angle,"S-BGL7-T-EA",10,20,1
+"S:L7'",end,"LS-L7' (end)",32,,1
+"S:L7'",end,"LL-SL7'-LM6' (start)",26,,1
+"S:L7'",plate,"S-BGL7'-B",0,13,1
+"S:L7'",plate,"S-BGL7'-T",0,10,1
+"S:L7'",angle,"S-BGL7'-B-EA",13,19,1
+"S:L7'",angle,"S-BGL7'-T-EA",10,20,1
+"S:L8",end,"LS-L8 (end)",38,,1
+"S:L8",end,"LL-SL8-LM7 (start)",26,,1
+"S:L8",plate,"S-BGL8-B",0,13,1
+"S:L8",plate,"S-BGL8-T",0,11,1
+"S:L8",angle,"S-BGL8-B-EA",13,21,1
+"S:L8",angle,"S-BGL8-T-EA",11,24,1
+"S:L8'",end,"LS-L8' (end)",38,,1
+"S:L8'",end,"LL-SL8'-LM7' (start)",26,,1
+"S:L8'",plate,"S-BGL8'-B",0,13,1
+"S:L8'",plate,"S-BGL8'-T",0,11,1
+"S:L8'",angle,"S-BGL8'-B-EA",13,21,1
+"S:L8'",angle,"S-BGL8'-T-EA",11,23,1
+"S:L9",end,"LS-L9 (end)",39,,1
+"S:L9",end,"LL-SL9-LM8 (start)",32,,1
+"S:L9",plate,"S-BGL9-B",0,13,1
+"S:L9",plate,"S-BGL9-T",0,12,1
+"S:L9",angle,"S-BGL9-B-EA",13,20,1
+"S:L9",angle,"S-BGL9-T-EA",12,23,1
+"S:L9'",end,"LS-L9' (end)",39,,1
+"S:L9'",end,"LL-SL9'-LM8' (start)",32,,1
+"S:L9'",plate,"S-BGL9'-B",0,13,1
+"S:L9'",plate,"S-BGL9'-T",0,12,1
+"S:L9'",angle,"S-BGL9'-B-EA",13,20,1
+"S:L9'",angle,"S-BGL9'-T-EA",12,23,1
+"S:U12",end,"US-U12 (end)",40,,1
+"S:U12",end,"UL-SU12-UM13 (start)",26,,1
+"S:U12",plate,"S-BGU12-B",0,12,1
+"S:U12",plate,"S-BGU12-T",0,12,1
+"S:U12",angle,"S-BGU12-B-EA",12,18,1
+"S:U12",angle,"S-BGU12-T-EA",12,17,1
+"S:U12'",end,"US-U12' (end)",40,,1
+"S:U12'",end,"UL-SU12'-UM13' (start)",26,,1
+"S:U12'",plate,"S-BGU12'-B",0,12,1
+"S:U12'",plate,"S-BGU12'-T",0,12,1
+"S:U12'",angle,"S-BGU12'-B-EA",12,18,1
+"S:U12'",angle,"S-BGU12'-T-EA",12,17,1
+"S:U13",end,"US-U13 (end)",40,,1
+"S:U13",end,"UL-SU13-UM14 (start)",26,,1
+"S:U13",plate,"S-BGU13-B",0,13,1
+"S:U13",plate,"S-BGU13-T",0,13,1
+"S:U13",angle,"S-BGU13-B-EA",13,16,1
+"S:U13",angle,"S-BGU13-T-EA",13,14,1
+"S:U13'",end,"US-U13' (end)",40,,1
+"S:U13'",end,"UL-SU13'-UM14' (start)",26,,1
+"S:U13'",plate,"S-BGU13'-B",0,13,1
+"S:U13'",plate,"S-BGU13'-T",0,13,1
+"S:U13'",angle,"S-BGU13'-B-EA",13,16,1
+"S:U13'",angle,"S-BGU13'-T-EA",13,14,1
+"S:U14",end,"US-U14 (end)",40,,1
+"S:U14",end,"UL-SU14-UM15 (start)",26,,1
+"S:U14",plate,"S-BGU14-B",0,11,1
+"S:U14",plate,"S-BGU14-T",0,11,1
+"S:U14",angle,"S-BGU14-B-EA",11,19,1
+"S:U14",angle,"S-BGU14-T-EA",11,24,1
+"S:U14'",end,"US-U14' (end)",40,,1
+"S:U14'",end,"UL-SU14'-UM15' (start)",26,,1
+"S:U14'",plate,"S-BGU14'-B",0,11,1
+"S:U14'",plate,"S-BGU14'-T",0,11,1
+"S:U14'",angle,"S-BGU14'-B-EA",11,19,1
+"S:U14'",angle,"S-BGU14'-T-EA",11,24,1
+"S:U15",end,"US-U15 (end)",40,,1
+"S:U15",end,"UL-SU15-UM16 (start)",26,,1
+"S:U15",plate,"S-BGU15-B",0,13,1
+"S:U15",plate,"S-BGU15-T",0,11,1
+"S:U15",angle,"S-BGU15-B-EA",13,17,1
+"S:U15",angle,"S-BGU15-T-EA",11,20,1
+"S:U15'",end,"US-U15' (end)",40,,1
+"S:U15'",end,"UL-SU15'-UM16' (start)",26,,1
+"S:U15'",plate,"S-BGU15'-B",0,13,1
+"S:U15'",plate,"S-BGU15'-T",0,11,1
+"S:U15'",angle,"S-BGU15'-B-EA",13,17,1
+"S:U15'",angle,"S-BGU15'-T-EA",11,20,1
+"S:U16",end,"US-U16 (end)",40,,1
+"S:U16",end,"UL-SU16-UM17 (start)",26,,1
+"S:U16",plate,"S-BGU16-B",0,13,1
+"S:U16",plate,"S-BGU16-T",0,11,1
+"S:U16",angle,"S-BGU16-B-EA",13,24,1
+"S:U16",angle,"S-BGU16-T-EA",11,24,1
+"S:U16'",end,"US-U16' (end)",40,,1
+"S:U16'",end,"UL-SU16'-UM17' (start)",26,,1
+"S:U16'",plate,"S-BGU16'-B",0,13,1
+"S:U16'",plate,"S-BGU16'-T",0,11,1
+"S:U16'",angle,"S-BGU16'-B-EA",13,24,1
+"S:U16'",angle,"S-BGU16'-T-EA",11,23,1
+"S:U17",end,"US-U17 (end)",40,,1
+"S:U17",end,"UL-SU17-UM18 (start)",26,,1
+"S:U17",plate,"S-BGU17-B",0,11,1
+"S:U17",plate,"S-BGU17-T",0,10,1
+"S:U17",angle,"S-BGU17-B-EA",11,23,1
+"S:U17",angle,"S-BGU17-T-EA",10,26,1
+"S:U17'",end,"US-U17' (end)",40,,1
+"S:U17'",end,"UL-SU17'-UM18' (start)",26,,1
+"S:U17'",plate,"S-BGU17'-B",0,11,1
+"S:U17'",plate,"S-BGU17'-T",0,10,1
+"S:U17'",angle,"S-BGU17'-B-EA",11,23,1
+"S:U17'",angle,"S-BGU17'-T-EA",10,26,1
+"S:U18",end,"US-U18 (end)",40,,1
+"S:U18",end,"UL-SU18-UM19 (start)",26,,1
+"S:U18",plate,"S-BGU18-B",0,10,1
+"S:U18",plate,"S-BGU18-T",0,10,1
+"S:U18",angle,"S-BGU18-B-EA",10,27,1
+"S:U18",angle,"S-BGU18-T-EA",10,33,1
+"S:U18'",end,"US-U18' (end)",40,,1
+"S:U18'",end,"UL-SU18'-UM19' (start)",26,,1
+"S:U18'",plate,"S-BGU18'-B",0,10,1
+"S:U18'",plate,"S-BGU18'-T",0,10,1
+"S:U18'",angle,"S-BGU18'-B-EA",10,27,1
+"S:U18'",angle,"S-BGU18'-T-EA",10,33,1
+"S:U19",end,"US-U19 (end)",40,,1
+"S:U19",end,"UL-SU19-UM20 (start)",26,,1
+"S:U19",plate,"S-BGU19-B",0,12,1
+"S:U19",plate,"S-BGU19-T",0,10,1
+"S:U19",angle,"S-BGU19-B-EA",12,23,1
+"S:U19",angle,"S-BGU19-T-EA",10,26,1
+"S:U19'",end,"US-U19' (end)",40,,1
+"S:U19'",end,"UL-SU19'-UM20' (start)",26,,1
+"S:U19'",plate,"S-BGU19'-B",0,11,1
+"S:U19'",plate,"S-BGU19'-T",0,10,1
+"S:U19'",angle,"S-BGU19'-B-EA",11,23,1
+"S:U19'",angle,"S-BGU19'-T-EA",10,26,1
+"S:U20",end,"US-U20 (end)",40,,1
+"S:U20",end,"UL-SU20-UM21 (start)",26,,1
+"S:U20",plate,"S-BGU20-B",0,11,1
+"S:U20",plate,"S-BGU20-T",0,12,1
+"S:U20",angle,"S-BGU20-B-EA",11,25,1
+"S:U20",angle,"S-BGU20-T-EA",12,20,1
+"S:U20'",end,"US-U20' (end)",40,,1
+"S:U20'",end,"UL-SU20'-UM21' (start)",26,,1
+"S:U20'",plate,"S-BGU20'-B",0,11,1
+"S:U20'",plate,"S-BGU20'-T",0,12,1
+"S:U20'",angle,"S-BGU20'-B-EA",11,25,1
+"S:U20'",angle,"S-BGU20'-T-EA",12,20,1
+"S:U21",end,"US-U21 (end)",40,,1
+"S:U21",end,"UL-SU21-UM22 (start)",26,,1
+"S:U21",plate,"S-BGU21-B",0,11,1
+"S:U21",plate,"S-BGU21-T",0,13,1
+"S:U21",angle,"S-BGU21-B-EA",11,24,1
+"S:U21",angle,"S-BGU21-T-EA",13,19,1
+"S:U21'",end,"US-U21' (end)",40,,1
+"S:U21'",end,"UL-SU21'-UM22 (start)",26,,1
+"S:U21'",plate,"S-BGU21'-B",0,11,1
+"S:U21'",plate,"S-BGU21'-T",0,13,1
+"S:U21'",angle,"S-BGU21'-B-EA",11,24,1
+"S:U21'",angle,"S-BGU21'-T-EA",13,19,1
+"S:U22",end,"US-U22 (end)",16,,1
+"S:U22",plate,"S-BGU22-B",0,6,1
+"S:U22",plate,"S-BGU22-T",0,6,1
+"S:U22",angle,"S-BGU22-B-EA",6,14,1
+"S:U22",angle,"S-BGU22-T-EA",6,11,1
+"N:LM0-SW",end,"SW-N0 (end)",24,,1
+"N:LM0-SW",end,"SW-S0 (end)",24,,1
+"N:LM0-SW",plate,"N-BGLM0-SW-B",0,3,1
+"N:LM0-SW",plate,"N-BGLM0-SW-T",0,0,0
+"N:LM0-SW",angle,"N-BGLM0-SW-B-EA",10,3,1
+"N:LM0-SW",angle,"N-BGLM0-SW-T-EA",10,0,0
+"N:SW0-SW",end,"SW-N0 (start)",22,,1
+"N:SW0-SW",plate,"N-BGSW0-SW-B",0,15,1
+"N:SW0-SW",plate,"N-BGSW0-SW-T",0,15,1
+"N:SW0-SW",angle,"N-BGSW0-SW-B-EA",10,9,1
+"N:SW0-SW",angle,"N-BGSW0-SW-B-EA2",6,6,1
+"N:SW0-SW",angle,"N-BGSW0-SW-T-EA",10,9,1
+"N:SW0-SW",angle,"N-BGSW0-SW-T-EA2",6,6,1
+"S:SW0-SW",end,"SW-S0 (start)",22,,1
+"S:SW0-SW",plate,"S-BGSW0-SW-B",0,15,1
+"S:SW0-SW",plate,"S-BGSW0-SW-T",0,15,1
+"S:SW0-SW",angle,"S-BGSW0-SW-B-EA",10,9,1
+"S:SW0-SW",angle,"S-BGSW0-SW-B-EA2",6,6,1
+"S:SW0-SW",angle,"S-BGSW0-SW-T-EA",10,9,1
+"S:SW0-SW",angle,"S-BGSW0-SW-T-EA2",6,6,1
+"N:LM1-SW",end,"SW-N1 (end)",24,,1
+"N:LM1-SW",end,"SW-S1 (end)",24,,1
+"N:LM1-SW",plate,"N-BGLM1-SW-B",0,3,1
+"N:LM1-SW",plate,"N-BGLM1-SW-T",0,0,0
+"N:LM1-SW",angle,"N-BGLM1-SW-B-EA",10,3,1
+"N:LM1-SW",angle,"N-BGLM1-SW-T-EA",10,0,0
+"N:SW1-SW",end,"SW-N1 (start)",22,,1
+"N:SW1-SW",plate,"N-BGSW1-SW-B",0,15,1
+"N:SW1-SW",plate,"N-BGSW1-SW-T",0,15,1
+"N:SW1-SW",angle,"N-BGSW1-SW-B-EA",10,9,1
+"N:SW1-SW",angle,"N-BGSW1-SW-B-EA2",6,6,1
+"N:SW1-SW",angle,"N-BGSW1-SW-T-EA",10,9,1
+"N:SW1-SW",angle,"N-BGSW1-SW-T-EA2",6,6,1
+"S:SW1-SW",end,"SW-S1 (start)",22,,1
+"S:SW1-SW",plate,"S-BGSW1-SW-B",0,15,1
+"S:SW1-SW",plate,"S-BGSW1-SW-T",0,15,1
+"S:SW1-SW",angle,"S-BGSW1-SW-B-EA",10,9,1
+"S:SW1-SW",angle,"S-BGSW1-SW-B-EA2",6,6,1
+"S:SW1-SW",angle,"S-BGSW1-SW-T-EA",10,9,1
+"S:SW1-SW",angle,"S-BGSW1-SW-T-EA2",6,6,1
+"N:LM2-SW",end,"SW-N2 (end)",24,,1
+"N:LM2-SW",end,"SW-S2 (end)",24,,1
+"N:LM2-SW",plate,"N-BGLM2-SW-B",0,3,1
+"N:LM2-SW",plate,"N-BGLM2-SW-T",0,0,0
+"N:LM2-SW",angle,"N-BGLM2-SW-B-EA",10,3,1
+"N:LM2-SW",angle,"N-BGLM2-SW-T-EA",10,0,0
+"N:SW2-SW",end,"SW-N2 (start)",22,,1
+"N:SW2-SW",plate,"N-BGSW2-SW-B",0,15,1
+"N:SW2-SW",plate,"N-BGSW2-SW-T",0,15,1
+"N:SW2-SW",angle,"N-BGSW2-SW-B-EA",10,9,1
+"N:SW2-SW",angle,"N-BGSW2-SW-B-EA2",6,6,1
+"N:SW2-SW",angle,"N-BGSW2-SW-T-EA",10,9,1
+"N:SW2-SW",angle,"N-BGSW2-SW-T-EA2",6,6,1
+"S:SW2-SW",end,"SW-S2 (start)",22,,1
+"S:SW2-SW",plate,"S-BGSW2-SW-B",0,15,1
+"S:SW2-SW",plate,"S-BGSW2-SW-T",0,15,1
+"S:SW2-SW",angle,"S-BGSW2-SW-B-EA",10,9,1
+"S:SW2-SW",angle,"S-BGSW2-SW-B-EA2",6,6,1
+"S:SW2-SW",angle,"S-BGSW2-SW-T-EA",10,9,1
+"S:SW2-SW",angle,"S-BGSW2-SW-T-EA2",6,6,1
+"N:LM3-SW",end,"SW-N3 (end)",24,,1
+"N:LM3-SW",end,"SW-S3 (end)",24,,1
+"N:LM3-SW",plate,"N-BGLM3-SW-B",0,3,1
+"N:LM3-SW",plate,"N-BGLM3-SW-T",0,0,0
+"N:LM3-SW",angle,"N-BGLM3-SW-B-EA",10,3,1
+"N:LM3-SW",angle,"N-BGLM3-SW-T-EA",10,0,0
+"N:SW3-SW",end,"SW-N3 (start)",22,,1
+"N:SW3-SW",plate,"N-BGSW3-SW-B",0,15,1
+"N:SW3-SW",plate,"N-BGSW3-SW-T",0,15,1
+"N:SW3-SW",angle,"N-BGSW3-SW-B-EA",10,9,1
+"N:SW3-SW",angle,"N-BGSW3-SW-B-EA2",6,6,1
+"N:SW3-SW",angle,"N-BGSW3-SW-T-EA",10,9,1
+"N:SW3-SW",angle,"N-BGSW3-SW-T-EA2",6,6,1
+"S:SW3-SW",end,"SW-S3 (start)",22,,1
+"S:SW3-SW",plate,"S-BGSW3-SW-B",0,15,1
+"S:SW3-SW",plate,"S-BGSW3-SW-T",0,15,1
+"S:SW3-SW",angle,"S-BGSW3-SW-B-EA",10,9,1
+"S:SW3-SW",angle,"S-BGSW3-SW-B-EA2",6,6,1
+"S:SW3-SW",angle,"S-BGSW3-SW-T-EA",10,9,1
+"S:SW3-SW",angle,"S-BGSW3-SW-T-EA2",6,6,1
+"N:LM4-SW",end,"SW-N4 (end)",24,,1
+"N:LM4-SW",end,"SW-S4 (end)",24,,1
+"N:LM4-SW",plate,"N-BGLM4-SW-B",0,3,1
+"N:LM4-SW",plate,"N-BGLM4-SW-T",0,0,0
+"N:LM4-SW",angle,"N-BGLM4-SW-B-EA",10,3,1
+"N:LM4-SW",angle,"N-BGLM4-SW-T-EA",10,0,0
+"N:SW4-SW",end,"SW-N4 (start)",22,,1
+"N:SW4-SW",plate,"N-BGSW4-SW-B",0,15,1
+"N:SW4-SW",plate,"N-BGSW4-SW-T",0,15,1
+"N:SW4-SW",angle,"N-BGSW4-SW-B-EA",10,9,1
+"N:SW4-SW",angle,"N-BGSW4-SW-B-EA2",6,6,1
+"N:SW4-SW",angle,"N-BGSW4-SW-T-EA",10,9,1
+"N:SW4-SW",angle,"N-BGSW4-SW-T-EA2",6,6,1
+"S:SW4-SW",end,"SW-S4 (start)",22,,1
+"S:SW4-SW",plate,"S-BGSW4-SW-B",0,15,1
+"S:SW4-SW",plate,"S-BGSW4-SW-T",0,15,1
+"S:SW4-SW",angle,"S-BGSW4-SW-B-EA",10,9,1
+"S:SW4-SW",angle,"S-BGSW4-SW-B-EA2",6,6,1
+"S:SW4-SW",angle,"S-BGSW4-SW-T-EA",10,9,1
+"S:SW4-SW",angle,"S-BGSW4-SW-T-EA2",6,6,1
+"N:LM5-SW",end,"SW-N5 (end)",24,,1
+"N:LM5-SW",end,"SW-S5 (end)",24,,1
+"N:LM5-SW",plate,"N-BGLM5-SW-B",0,3,1
+"N:LM5-SW",plate,"N-BGLM5-SW-T",0,3,1
+"N:LM5-SW",angle,"N-BGLM5-SW-B-EA",12,3,1
+"N:LM5-SW",angle,"N-BGLM5-SW-T-EA",12,3,1
+"N:SW5-SW",end,"SW-N5 (start)",22,,1
+"N:SW5-SW",plate,"N-BGSW5-SW-B",0,15,1
+"N:SW5-SW",plate,"N-BGSW5-SW-T",0,15,1
+"N:SW5-SW",angle,"N-BGSW5-SW-B-EA",10,9,1
+"N:SW5-SW",angle,"N-BGSW5-SW-B-EA2",6,6,1
+"N:SW5-SW",angle,"N-BGSW5-SW-T-EA",10,9,1
+"N:SW5-SW",angle,"N-BGSW5-SW-T-EA2",6,6,1
+"S:SW5-SW",end,"SW-S5 (start)",22,,1
+"S:SW5-SW",plate,"S-BGSW5-SW-B",0,15,1
+"S:SW5-SW",plate,"S-BGSW5-SW-T",0,15,1
+"S:SW5-SW",angle,"S-BGSW5-SW-B-EA",10,9,1
+"S:SW5-SW",angle,"S-BGSW5-SW-B-EA2",6,6,1
+"S:SW5-SW",angle,"S-BGSW5-SW-T-EA",10,9,1
+"S:SW5-SW",angle,"S-BGSW5-SW-T-EA2",6,6,1
+"N:LM6-SW",end,"SW-N6 (end)",24,,1
+"N:LM6-SW",end,"SW-S6 (end)",24,,1
+"N:LM6-SW",plate,"N-BGLM6-SW-B",0,0,0
+"N:LM6-SW",plate,"N-BGLM6-SW-T",0,3,1
+"N:LM6-SW",angle,"N-BGLM6-SW-B-EA",12,0,0
+"N:LM6-SW",angle,"N-BGLM6-SW-T-EA",12,3,1
+"N:SW6-SW",end,"SW-N6 (start)",22,,1
+"N:SW6-SW",plate,"N-BGSW6-SW-B",0,15,1
+"N:SW6-SW",plate,"N-BGSW6-SW-T",0,15,1
+"N:SW6-SW",angle,"N-BGSW6-SW-B-EA",10,9,1
+"N:SW6-SW",angle,"N-BGSW6-SW-B-EA2",6,6,1
+"N:SW6-SW",angle,"N-BGSW6-SW-T-EA",10,9,1
+"N:SW6-SW",angle,"N-BGSW6-SW-T-EA2",6,6,1
+"S:SW6-SW",end,"SW-S6 (start)",18,,1
+"S:SW6-SW",plate,"S-BGSW6-SW-B",0,11,1
+"S:SW6-SW",plate,"S-BGSW6-SW-T",0,11,1
+"S:SW6-SW",angle,"S-BGSW6-SW-B-EA",10,9,1
+"S:SW6-SW",angle,"S-BGSW6-SW-B-EA2",2,6,1
+"S:SW6-SW",angle,"S-BGSW6-SW-T-EA",10,9,1
+"S:SW6-SW",angle,"S-BGSW6-SW-T-EA2",2,6,1
+"N:LM7-SW",end,"SW-N7 (end)",22,,1
+"N:LM7-SW",end,"SW-S7 (end)",22,,1
+"N:LM7-SW",plate,"N-BGLM7-SW-B",0,0,0
+"N:LM7-SW",plate,"N-BGLM7-SW-T",0,0,0
+"N:LM7-SW",angle,"N-BGLM7-SW-B-EA",10,0,0
+"N:LM7-SW",angle,"N-BGLM7-SW-T-EA",10,0,0
+"N:SW7-SW",end,"SW-N7 (start)",22,,1
+"N:SW7-SW",plate,"N-BGSW7-SW-B",0,15,1
+"N:SW7-SW",plate,"N-BGSW7-SW-T",0,15,1
+"N:SW7-SW",angle,"N-BGSW7-SW-B-EA",10,9,1
+"N:SW7-SW",angle,"N-BGSW7-SW-B-EA2",6,6,1
+"N:SW7-SW",angle,"N-BGSW7-SW-T-EA",10,9,1
+"N:SW7-SW",angle,"N-BGSW7-SW-T-EA2",6,6,1
+"S:SW7-SW",end,"SW-S7 (start)",18,,1
+"S:SW7-SW",plate,"S-BGSW7-SW-B",0,11,1
+"S:SW7-SW",plate,"S-BGSW7-SW-T",0,11,1
+"S:SW7-SW",angle,"S-BGSW7-SW-B-EA",10,9,1
+"S:SW7-SW",angle,"S-BGSW7-SW-B-EA2",2,6,1
+"S:SW7-SW",angle,"S-BGSW7-SW-T-EA",10,9,1
+"S:SW7-SW",angle,"S-BGSW7-SW-T-EA2",2,6,1
+"N:LM8-SW",end,"SW-N8 (end)",20,,1
+"N:LM8-SW",end,"SW-S8 (end)",20,,1
+"N:LM8-SW",plate,"N-BGLM8-SW-B",0,0,0
+"N:LM8-SW",plate,"N-BGLM8-SW-T",0,0,0
+"N:LM8-SW",angle,"N-BGLM8-SW-B-EA",10,0,0
+"N:LM8-SW",angle,"N-BGLM8-SW-T-EA",10,0,0
+"N:SW8-SW",end,"SW-N8 (start)",22,,1
+"N:SW8-SW",plate,"N-BGSW8-SW-B",0,15,1
+"N:SW8-SW",plate,"N-BGSW8-SW-T",0,15,1
+"N:SW8-SW",angle,"N-BGSW8-SW-B-EA",10,9,1
+"N:SW8-SW",angle,"N-BGSW8-SW-B-EA2",6,6,1
+"N:SW8-SW",angle,"N-BGSW8-SW-T-EA",10,9,1
+"N:SW8-SW",angle,"N-BGSW8-SW-T-EA2",6,6,1
+"S:SW8-SW",end,"SW-S8 (start)",22,,1
+"S:SW8-SW",plate,"S-BGSW8-SW-B",0,12,1
+"S:SW8-SW",plate,"S-BGSW8-SW-T",0,12,1
+"S:SW8-SW",angle,"S-BGSW8-SW-B-EA",10,9,1
+"S:SW8-SW",angle,"S-BGSW8-SW-B-EA2",3,6,1
+"S:SW8-SW",angle,"S-BGSW8-SW-T-EA",10,9,1
+"S:SW8-SW",angle,"S-BGSW8-SW-T-EA2",3,6,1
+"N:LM9-SW",end,"SW-N9 (end)",18,,1
+"N:LM9-SW",end,"SW-S9 (end)",18,,1
+"N:LM9-SW",plate,"N-BGLM9-SW-B",0,0,0
+"N:LM9-SW",plate,"N-BGLM9-SW-T",0,0,0
+"N:LM9-SW",angle,"N-BGLM9-SW-B-EA",10,0,0
+"N:LM9-SW",angle,"N-BGLM9-SW-T-EA",10,0,0
+"N:SW9-SW",end,"SW-N9 (start)",22,,1
+"N:SW9-SW",plate,"N-BGSW9-SW-B",0,15,1
+"N:SW9-SW",plate,"N-BGSW9-SW-T",0,15,1
+"N:SW9-SW",angle,"N-BGSW9-SW-B-EA",10,9,1
+"N:SW9-SW",angle,"N-BGSW9-SW-B-EA2",6,6,1
+"N:SW9-SW",angle,"N-BGSW9-SW-T-EA",10,9,1
+"N:SW9-SW",angle,"N-BGSW9-SW-T-EA2",6,6,1
+"S:SW9-SW",end,"SW-S9 (start)",22,,1
+"S:SW9-SW",plate,"S-BGSW9-SW-B",0,13,1
+"S:SW9-SW",plate,"S-BGSW9-SW-T",0,13,1
+"S:SW9-SW",angle,"S-BGSW9-SW-B-EA",10,9,1
+"S:SW9-SW",angle,"S-BGSW9-SW-B-EA2",4,6,1
+"S:SW9-SW",angle,"S-BGSW9-SW-T-EA",10,9,1
+"S:SW9-SW",angle,"S-BGSW9-SW-T-EA2",4,6,1
+"N:LM10-SW",end,"SW-N10 (end)",16,,1
+"N:LM10-SW",end,"SW-S10 (end)",16,,1
+"N:LM10-SW",plate,"N-BGLM10-SW-B",0,0,0
+"N:LM10-SW",plate,"N-BGLM10-SW-T",0,0,0
+"N:LM10-SW",angle,"N-BGLM10-SW-B-EA",10,0,0
+"N:LM10-SW",angle,"N-BGLM10-SW-T-EA",10,0,0
+"N:SW10-SW",end,"SW-N10 (start)",22,,1
+"N:SW10-SW",plate,"N-BGSW10-SW-B",0,15,1
+"N:SW10-SW",plate,"N-BGSW10-SW-T",0,15,1
+"N:SW10-SW",angle,"N-BGSW10-SW-B-EA",10,9,1
+"N:SW10-SW",angle,"N-BGSW10-SW-B-EA2",6,6,1
+"N:SW10-SW",angle,"N-BGSW10-SW-T-EA",10,9,1
+"N:SW10-SW",angle,"N-BGSW10-SW-T-EA2",6,6,1
+"S:SW10-SW",end,"SW-S10 (start)",22,,1
+"S:SW10-SW",plate,"S-BGSW10-SW-B",0,13,1
+"S:SW10-SW",plate,"S-BGSW10-SW-T",0,13,1
+"S:SW10-SW",angle,"S-BGSW10-SW-B-EA",10,9,1
+"S:SW10-SW",angle,"S-BGSW10-SW-B-EA2",4,6,1
+"S:SW10-SW",angle,"S-BGSW10-SW-T-EA",10,9,1
+"S:SW10-SW",angle,"S-BGSW10-SW-T-EA2",4,6,1
+"N:LM11-SW",end,"SW-N11 (end)",24,,1
+"N:LM11-SW",end,"SW-S11 (end)",24,,1
+"N:LM11-SW",plate,"N-BGLM11-SW-B",24,0,1
+"N:LM11-SW",plate,"N-BGLM11-SW-T",24,0,1
+"N:SW11-SW",end,"SW-N11 (start)",24,,1
+"N:SW11-SW",plate,"N-BGSW11-SW-B",0,2,1
+"N:SW11-SW",plate,"N-BGSW11-SW-T",0,2,1
+"N:SW11-SW",angle,"N-BGSW11-SW-B-EA",1,0,0
+"N:SW11-SW",angle,"N-BGSW11-SW-B-EA2",2,6,1
+"N:SW11-SW",angle,"N-BGSW11-SW-T-EA",1,0,0
+"N:SW11-SW",angle,"N-BGSW11-SW-T-EA2",2,6,1
+"S:SW11-SW",end,"SW-S11 (start)",24,,1
+"S:SW11-SW",plate,"S-BGSW11-SW-B",0,2,1
+"S:SW11-SW",plate,"S-BGSW11-SW-T",0,2,1
+"S:SW11-SW",angle,"S-BGSW11-SW-B-EA",1,0,0
+"S:SW11-SW",angle,"S-BGSW11-SW-B-EA2",2,6,1
+"S:SW11-SW",angle,"S-BGSW11-SW-T-EA",1,0,0
+"S:SW11-SW",angle,"S-BGSW11-SW-T-EA2",2,6,1
+"N:LM12-SW",end,"SW-N12 (end)",0,,0
+"N:LM12-SW",end,"SW-S12 (end)",0,,0
+"N:LM12-SW",plate,"N-BGLM12-SW-B",0,0,0
+"N:LM12-SW",plate,"N-BGLM12-SW-T",0,0,0
+"N:LM12-SW",angle,"N-BGLM12-SW-B-EA",8,0,0
+"N:LM12-SW",angle,"N-BGLM12-SW-T-EA",8,0,0
+"N:SW12-SW",end,"SW-N12 (start)",22,,1
+"N:SW12-SW",plate,"N-BGSW12-SW-B",0,15,1
+"N:SW12-SW",plate,"N-BGSW12-SW-T",0,15,1
+"N:SW12-SW",angle,"N-BGSW12-SW-B-EA",10,9,1
+"N:SW12-SW",angle,"N-BGSW12-SW-B-EA2",6,6,1
+"N:SW12-SW",angle,"N-BGSW12-SW-T-EA",10,9,1
+"N:SW12-SW",angle,"N-BGSW12-SW-T-EA2",6,6,1
+"S:SW12-SW",end,"SW-S12 (start)",22,,1
+"S:SW12-SW",plate,"S-BGSW12-SW-B",0,15,1
+"S:SW12-SW",plate,"S-BGSW12-SW-T",0,15,1
+"S:SW12-SW",angle,"S-BGSW12-SW-B-EA",10,9,1
+"S:SW12-SW",angle,"S-BGSW12-SW-B-EA2",6,6,1
+"S:SW12-SW",angle,"S-BGSW12-SW-T-EA",10,9,1
+"S:SW12-SW",angle,"S-BGSW12-SW-T-EA2",6,6,1
+"N:LM0'-SW",end,"SW-N0' (end)",24,,1
+"N:LM0'-SW",end,"SW-S0' (end)",24,,1
+"N:LM0'-SW",plate,"N-BGLM0'-SW-B",0,0,0
+"N:LM0'-SW",plate,"N-BGLM0'-SW-T",0,3,1
+"N:LM0'-SW",angle,"N-BGLM0'-SW-B-EA",10,0,0
+"N:LM0'-SW",angle,"N-BGLM0'-SW-T-EA",10,3,1
+"N:SW0'-SW",end,"SW-N0' (start)",22,,1
+"N:SW0'-SW",plate,"N-BGSW0'-SW-B",0,15,1
+"N:SW0'-SW",plate,"N-BGSW0'-SW-T",0,15,1
+"N:SW0'-SW",angle,"N-BGSW0'-SW-B-EA",10,9,1
+"N:SW0'-SW",angle,"N-BGSW0'-SW-B-EA2",6,6,1
+"N:SW0'-SW",angle,"N-BGSW0'-SW-T-EA",10,9,1
+"N:SW0'-SW",angle,"N-BGSW0'-SW-T-EA2",6,6,1
+"S:SW0'-SW",end,"SW-S0' (start)",22,,1
+"S:SW0'-SW",plate,"S-BGSW0'-SW-B",0,15,1
+"S:SW0'-SW",plate,"S-BGSW0'-SW-T",0,15,1
+"S:SW0'-SW",angle,"S-BGSW0'-SW-B-EA",10,9,1
+"S:SW0'-SW",angle,"S-BGSW0'-SW-B-EA2",6,6,1
+"S:SW0'-SW",angle,"S-BGSW0'-SW-T-EA",10,9,1
+"S:SW0'-SW",angle,"S-BGSW0'-SW-T-EA2",6,6,1
+"N:LM1'-SW",end,"SW-N1' (end)",24,,1
+"N:LM1'-SW",end,"SW-S1' (end)",24,,1
+"N:LM1'-SW",plate,"N-BGLM1'-SW-B",0,0,0
+"N:LM1'-SW",plate,"N-BGLM1'-SW-T",0,3,1
+"N:LM1'-SW",angle,"N-BGLM1'-SW-B-EA",10,0,0
+"N:LM1'-SW",angle,"N-BGLM1'-SW-T-EA",10,3,1
+"N:SW1'-SW",end,"SW-N1' (start)",22,,1
+"N:SW1'-SW",plate,"N-BGSW1'-SW-B",0,15,1
+"N:SW1'-SW",plate,"N-BGSW1'-SW-T",0,15,1
+"N:SW1'-SW",angle,"N-BGSW1'-SW-B-EA",10,9,1
+"N:SW1'-SW",angle,"N-BGSW1'-SW-B-EA2",6,6,1
+"N:SW1'-SW",angle,"N-BGSW1'-SW-T-EA",10,9,1
+"N:SW1'-SW",angle,"N-BGSW1'-SW-T-EA2",6,6,1
+"S:SW1'-SW",end,"SW-S1' (start)",22,,1
+"S:SW1'-SW",plate,"S-BGSW1'-SW-B",0,15,1
+"S:SW1'-SW",plate,"S-BGSW1'-SW-T",0,15,1
+"S:SW1'-SW",angle,"S-BGSW1'-SW-B-EA",10,9,1
+"S:SW1'-SW",angle,"S-BGSW1'-SW-B-EA2",6,6,1
+"S:SW1'-SW",angle,"S-BGSW1'-SW-T-EA",10,9,1
+"S:SW1'-SW",angle,"S-BGSW1'-SW-T-EA2",6,6,1
+"N:LM2'-SW",end,"SW-N2' (end)",24,,1
+"N:LM2'-SW",end,"SW-S2' (end)",24,,1
+"N:LM2'-SW",plate,"N-BGLM2'-SW-B",0,0,0
+"N:LM2'-SW",plate,"N-BGLM2'-SW-T",0,3,1
+"N:LM2'-SW",angle,"N-BGLM2'-SW-B-EA",10,0,0
+"N:LM2'-SW",angle,"N-BGLM2'-SW-T-EA",10,3,1
+"N:SW2'-SW",end,"SW-N2' (start)",22,,1
+"N:SW2'-SW",plate,"N-BGSW2'-SW-B",0,15,1
+"N:SW2'-SW",plate,"N-BGSW2'-SW-T",0,15,1
+"N:SW2'-SW",angle,"N-BGSW2'-SW-B-EA",10,9,1
+"N:SW2'-SW",angle,"N-BGSW2'-SW-B-EA2",6,6,1
+"N:SW2'-SW",angle,"N-BGSW2'-SW-T-EA",10,9,1
+"N:SW2'-SW",angle,"N-BGSW2'-SW-T-EA2",6,6,1
+"S:SW2'-SW",end,"SW-S2' (start)",22,,1
+"S:SW2'-SW",plate,"S-BGSW2'-SW-B",0,15,1
+"S:SW2'-SW",plate,"S-BGSW2'-SW-T",0,15,1
+"S:SW2'-SW",angle,"S-BGSW2'-SW-B-EA",10,9,1
+"S:SW2'-SW",angle,"S-BGSW2'-SW-B-EA2",6,6,1
+"S:SW2'-SW",angle,"S-BGSW2'-SW-T-EA",10,9,1
+"S:SW2'-SW",angle,"S-BGSW2'-SW-T-EA2",6,6,1
+"N:LM3'-SW",end,"SW-N3' (end)",24,,1
+"N:LM3'-SW",end,"SW-S3' (end)",24,,1
+"N:LM3'-SW",plate,"N-BGLM3'-SW-B",0,0,0
+"N:LM3'-SW",plate,"N-BGLM3'-SW-T",0,3,1
+"N:LM3'-SW",angle,"N-BGLM3'-SW-B-EA",10,0,0
+"N:LM3'-SW",angle,"N-BGLM3'-SW-T-EA",10,3,1
+"N:SW3'-SW",end,"SW-N3' (start)",22,,1
+"N:SW3'-SW",plate,"N-BGSW3'-SW-B",0,15,1
+"N:SW3'-SW",plate,"N-BGSW3'-SW-T",0,15,1
+"N:SW3'-SW",angle,"N-BGSW3'-SW-B-EA",10,9,1
+"N:SW3'-SW",angle,"N-BGSW3'-SW-B-EA2",6,6,1
+"N:SW3'-SW",angle,"N-BGSW3'-SW-T-EA",10,9,1
+"N:SW3'-SW",angle,"N-BGSW3'-SW-T-EA2",6,6,1
+"S:SW3'-SW",end,"SW-S3' (start)",22,,1
+"S:SW3'-SW",plate,"S-BGSW3'-SW-B",0,15,1
+"S:SW3'-SW",plate,"S-BGSW3'-SW-T",0,15,1
+"S:SW3'-SW",angle,"S-BGSW3'-SW-B-EA",10,9,1
+"S:SW3'-SW",angle,"S-BGSW3'-SW-B-EA2",6,6,1
+"S:SW3'-SW",angle,"S-BGSW3'-SW-T-EA",10,9,1
+"S:SW3'-SW",angle,"S-BGSW3'-SW-T-EA2",6,6,1
+"N:LM4'-SW",end,"SW-N4' (end)",24,,1
+"N:LM4'-SW",end,"SW-S4' (end)",24,,1
+"N:LM4'-SW",plate,"N-BGLM4'-SW-B",0,0,0
+"N:LM4'-SW",plate,"N-BGLM4'-SW-T",0,3,1
+"N:LM4'-SW",angle,"N-BGLM4'-SW-B-EA",10,0,0
+"N:LM4'-SW",angle,"N-BGLM4'-SW-T-EA",10,3,1
+"N:SW4'-SW",end,"SW-N4' (start)",22,,1
+"N:SW4'-SW",plate,"N-BGSW4'-SW-B",0,15,1
+"N:SW4'-SW",plate,"N-BGSW4'-SW-T",0,15,1
+"N:SW4'-SW",angle,"N-BGSW4'-SW-B-EA",10,9,1
+"N:SW4'-SW",angle,"N-BGSW4'-SW-B-EA2",6,6,1
+"N:SW4'-SW",angle,"N-BGSW4'-SW-T-EA",10,9,1
+"N:SW4'-SW",angle,"N-BGSW4'-SW-T-EA2",6,6,1
+"S:SW4'-SW",end,"SW-S4' (start)",22,,1
+"S:SW4'-SW",plate,"S-BGSW4'-SW-B",0,15,1
+"S:SW4'-SW",plate,"S-BGSW4'-SW-T",0,15,1
+"S:SW4'-SW",angle,"S-BGSW4'-SW-B-EA",10,9,1
+"S:SW4'-SW",angle,"S-BGSW4'-SW-B-EA2",6,6,1
+"S:SW4'-SW",angle,"S-BGSW4'-SW-T-EA",10,9,1
+"S:SW4'-SW",angle,"S-BGSW4'-SW-T-EA2",6,6,1
+"N:LM5'-SW",end,"SW-N5' (end)",24,,1
+"N:LM5'-SW",end,"SW-S5' (end)",24,,1
+"N:LM5'-SW",plate,"N-BGLM5'-SW-B",0,3,1
+"N:LM5'-SW",plate,"N-BGLM5'-SW-T",0,3,1
+"N:LM5'-SW",angle,"N-BGLM5'-SW-B-EA",12,3,1
+"N:LM5'-SW",angle,"N-BGLM5'-SW-T-EA",12,3,1
+"N:SW5'-SW",end,"SW-N5' (start)",22,,1
+"N:SW5'-SW",plate,"N-BGSW5'-SW-B",0,15,1
+"N:SW5'-SW",plate,"N-BGSW5'-SW-T",0,15,1
+"N:SW5'-SW",angle,"N-BGSW5'-SW-B-EA",10,9,1
+"N:SW5'-SW",angle,"N-BGSW5'-SW-B-EA2",6,6,1
+"N:SW5'-SW",angle,"N-BGSW5'-SW-T-EA",10,9,1
+"N:SW5'-SW",angle,"N-BGSW5'-SW-T-EA2",6,6,1
+"S:SW5'-SW",end,"SW-S5' (start)",22,,1
+"S:SW5'-SW",plate,"S-BGSW5'-SW-B",0,15,1
+"S:SW5'-SW",plate,"S-BGSW5'-SW-T",0,15,1
+"S:SW5'-SW",angle,"S-BGSW5'-SW-B-EA",10,9,1
+"S:SW5'-SW",angle,"S-BGSW5'-SW-B-EA2",6,6,1
+"S:SW5'-SW",angle,"S-BGSW5'-SW-T-EA",10,9,1
+"S:SW5'-SW",angle,"S-BGSW5'-SW-T-EA2",6,6,1
+"N:LM6'-SW",end,"SW-N6' (end)",24,,1
+"N:LM6'-SW",end,"SW-S6' (end)",24,,1
+"N:LM6'-SW",plate,"N-BGLM6'-SW-B",0,3,1
+"N:LM6'-SW",plate,"N-BGLM6'-SW-T",0,0,0
+"N:LM6'-SW",angle,"N-BGLM6'-SW-B-EA",12,3,1
+"N:LM6'-SW",angle,"N-BGLM6'-SW-T-EA",12,0,0
+"N:SW6'-SW",end,"SW-N6' (start)",22,,1
+"N:SW6'-SW",plate,"N-BGSW6'-SW-B",0,15,1
+"N:SW6'-SW",plate,"N-BGSW6'-SW-T",0,15,1
+"N:SW6'-SW",angle,"N-BGSW6'-SW-B-EA",10,9,1
+"N:SW6'-SW",angle,"N-BGSW6'-SW-B-EA2",6,6,1
+"N:SW6'-SW",angle,"N-BGSW6'-SW-T-EA",10,9,1
+"N:SW6'-SW",angle,"N-BGSW6'-SW-T-EA2",6,6,1
+"S:SW6'-SW",end,"SW-S6' (start)",18,,1
+"S:SW6'-SW",plate,"S-BGSW6'-SW-B",0,11,1
+"S:SW6'-SW",plate,"S-BGSW6'-SW-T",0,11,1
+"S:SW6'-SW",angle,"S-BGSW6'-SW-B-EA",10,9,1
+"S:SW6'-SW",angle,"S-BGSW6'-SW-B-EA2",2,6,1
+"S:SW6'-SW",angle,"S-BGSW6'-SW-T-EA",10,9,1
+"S:SW6'-SW",angle,"S-BGSW6'-SW-T-EA2",2,6,1
+"N:LM7'-SW",end,"SW-N7' (end)",22,,1
+"N:LM7'-SW",end,"SW-S7' (end)",22,,1
+"N:LM7'-SW",plate,"N-BGLM7'-SW-B",0,0,0
+"N:LM7'-SW",plate,"N-BGLM7'-SW-T",0,0,0
+"N:LM7'-SW",angle,"N-BGLM7'-SW-B-EA",10,0,0
+"N:LM7'-SW",angle,"N-BGLM7'-SW-T-EA",10,0,0
+"N:SW7'-SW",end,"SW-N7' (start)",22,,1
+"N:SW7'-SW",plate,"N-BGSW7'-SW-B",0,15,1
+"N:SW7'-SW",plate,"N-BGSW7'-SW-T",0,15,1
+"N:SW7'-SW",angle,"N-BGSW7'-SW-B-EA",10,9,1
+"N:SW7'-SW",angle,"N-BGSW7'-SW-B-EA2",6,6,1
+"N:SW7'-SW",angle,"N-BGSW7'-SW-T-EA",10,9,1
+"N:SW7'-SW",angle,"N-BGSW7'-SW-T-EA2",6,6,1
+"S:SW7'-SW",end,"SW-S7' (start)",18,,1
+"S:SW7'-SW",plate,"S-BGSW7'-SW-B",0,11,1
+"S:SW7'-SW",plate,"S-BGSW7'-SW-T",0,11,1
+"S:SW7'-SW",angle,"S-BGSW7'-SW-B-EA",10,9,1
+"S:SW7'-SW",angle,"S-BGSW7'-SW-B-EA2",2,6,1
+"S:SW7'-SW",angle,"S-BGSW7'-SW-T-EA",10,9,1
+"S:SW7'-SW",angle,"S-BGSW7'-SW-T-EA2",2,6,1
+"N:LM8'-SW",end,"SW-N8' (end)",20,,1
+"N:LM8'-SW",end,"SW-S8' (end)",20,,1
+"N:LM8'-SW",plate,"N-BGLM8'-SW-B",0,0,0
+"N:LM8'-SW",plate,"N-BGLM8'-SW-T",0,0,0
+"N:LM8'-SW",angle,"N-BGLM8'-SW-B-EA",10,0,0
+"N:LM8'-SW",angle,"N-BGLM8'-SW-T-EA",10,0,0
+"N:SW8'-SW",end,"SW-N8' (start)",22,,1
+"N:SW8'-SW",plate,"N-BGSW8'-SW-B",0,15,1
+"N:SW8'-SW",plate,"N-BGSW8'-SW-T",0,15,1
+"N:SW8'-SW",angle,"N-BGSW8'-SW-B-EA",10,9,1
+"N:SW8'-SW",angle,"N-BGSW8'-SW-B-EA2",6,6,1
+"N:SW8'-SW",angle,"N-BGSW8'-SW-T-EA",10,9,1
+"N:SW8'-SW",angle,"N-BGSW8'-SW-T-EA2",6,6,1
+"S:SW8'-SW",end,"SW-S8' (start)",22,,1
+"S:SW8'-SW",plate,"S-BGSW8'-SW-B",0,12,1
+"S:SW8'-SW",plate,"S-BGSW8'-SW-T",0,12,1
+"S:SW8'-SW",angle,"S-BGSW8'-SW-B-EA",10,9,1
+"S:SW8'-SW",angle,"S-BGSW8'-SW-B-EA2",3,6,1
+"S:SW8'-SW",angle,"S-BGSW8'-SW-T-EA",10,9,1
+"S:SW8'-SW",angle,"S-BGSW8'-SW-T-EA2",3,6,1
+"N:LM9'-SW",end,"SW-N9' (end)",18,,1
+"N:LM9'-SW",end,"SW-S9' (end)",18,,1
+"N:LM9'-SW",plate,"N-BGLM9'-SW-B",0,0,0
+"N:LM9'-SW",plate,"N-BGLM9'-SW-T",0,0,0
+"N:LM9'-SW",angle,"N-BGLM9'-SW-B-EA",10,0,0
+"N:LM9'-SW",angle,"N-BGLM9'-SW-T-EA",10,0,0
+"N:SW9'-SW",end,"SW-N9' (start)",22,,1
+"N:SW9'-SW",plate,"N-BGSW9'-SW-B",0,15,1
+"N:SW9'-SW",plate,"N-BGSW9'-SW-T",0,15,1
+"N:SW9'-SW",angle,"N-BGSW9'-SW-B-EA",10,9,1
+"N:SW9'-SW",angle,"N-BGSW9'-SW-B-EA2",6,6,1
+"N:SW9'-SW",angle,"N-BGSW9'-SW-T-EA",10,9,1
+"N:SW9'-SW",angle,"N-BGSW9'-SW-T-EA2",6,6,1
+"S:SW9'-SW",end,"SW-S9' (start)",22,,1
+"S:SW9'-SW",plate,"S-BGSW9'-SW-B",0,13,1
+"S:SW9'-SW",plate,"S-BGSW9'-SW-T",0,13,1
+"S:SW9'-SW",angle,"S-BGSW9'-SW-B-EA",10,9,1
+"S:SW9'-SW",angle,"S-BGSW9'-SW-B-EA2",4,6,1
+"S:SW9'-SW",angle,"S-BGSW9'-SW-T-EA",10,9,1
+"S:SW9'-SW",angle,"S-BGSW9'-SW-T-EA2",4,6,1
+"N:LM10'-SW",end,"SW-N10' (end)",16,,1
+"N:LM10'-SW",end,"SW-S10' (end)",16,,1
+"N:LM10'-SW",plate,"N-BGLM10'-SW-B",0,0,0
+"N:LM10'-SW",plate,"N-BGLM10'-SW-T",0,0,0
+"N:LM10'-SW",angle,"N-BGLM10'-SW-B-EA",10,0,0
+"N:LM10'-SW",angle,"N-BGLM10'-SW-T-EA",10,0,0
+"N:SW10'-SW",end,"SW-N10' (start)",22,,1
+"N:SW10'-SW",plate,"N-BGSW10'-SW-B",0,15,1
+"N:SW10'-SW",plate,"N-BGSW10'-SW-T",0,15,1
+"N:SW10'-SW",angle,"N-BGSW10'-SW-B-EA",10,9,1
+"N:SW10'-SW",angle,"N-BGSW10'-SW-B-EA2",6,6,1
+"N:SW10'-SW",angle,"N-BGSW10'-SW-T-EA",10,9,1
+"N:SW10'-SW",angle,"N-BGSW10'-SW-T-EA2",6,6,1
+"S:SW10'-SW",end,"SW-S10' (start)",22,,1
+"S:SW10'-SW",plate,"S-BGSW10'-SW-B",0,13,1
+"S:SW10'-SW",plate,"S-BGSW10'-SW-T",0,13,1
+"S:SW10'-SW",angle,"S-BGSW10'-SW-B-EA",10,9,1
+"S:SW10'-SW",angle,"S-BGSW10'-SW-B-EA2",4,6,1
+"S:SW10'-SW",angle,"S-BGSW10'-SW-T-EA",10,9,1
+"S:SW10'-SW",angle,"S-BGSW10'-SW-T-EA2",4,6,1
+"N:LM11'-SW",end,"SW-N11' (end)",24,,1
+"N:LM11'-SW",end,"SW-S11' (end)",24,,1
+"N:LM11'-SW",plate,"N-BGLM11'-SW-B",24,0,1
+"N:LM11'-SW",plate,"N-BGLM11'-SW-T",24,0,1
+"N:SW11'-SW",end,"SW-N11' (start)",24,,1
+"N:SW11'-SW",plate,"N-BGSW11'-SW-B",0,2,1
+"N:SW11'-SW",plate,"N-BGSW11'-SW-T",0,2,1
+"N:SW11'-SW",angle,"N-BGSW11'-SW-B-EA",1,0,0
+"N:SW11'-SW",angle,"N-BGSW11'-SW-B-EA2",2,6,1
+"N:SW11'-SW",angle,"N-BGSW11'-SW-T-EA",1,0,0
+"N:SW11'-SW",angle,"N-BGSW11'-SW-T-EA2",2,6,1
+"S:SW11'-SW",end,"SW-S11' (start)",24,,1
+"S:SW11'-SW",plate,"S-BGSW11'-SW-B",0,2,1
+"S:SW11'-SW",plate,"S-BGSW11'-SW-T",0,2,1
+"S:SW11'-SW",angle,"S-BGSW11'-SW-B-EA",1,0,0
+"S:SW11'-SW",angle,"S-BGSW11'-SW-B-EA2",2,6,1
+"S:SW11'-SW",angle,"S-BGSW11'-SW-T-EA",1,0,0
+"S:SW11'-SW",angle,"S-BGSW11'-SW-T-EA2",2,6,1
+"N:LM12'-SW",end,"SW-N12' (end)",0,,0
+"N:LM12'-SW",end,"SW-S12' (end)",0,,0
+"N:LM12'-SW",plate,"N-BGLM12'-SW-B",0,0,0
+"N:LM12'-SW",plate,"N-BGLM12'-SW-T",0,0,0
+"N:LM12'-SW",angle,"N-BGLM12'-SW-B-EA",8,0,0
+"N:LM12'-SW",angle,"N-BGLM12'-SW-T-EA",8,0,0
+"N:SW12'-SW",end,"SW-N12' (start)",22,,1
+"N:SW12'-SW",plate,"N-BGSW12'-SW-B",0,15,1
+"N:SW12'-SW",plate,"N-BGSW12'-SW-T",0,15,1
+"N:SW12'-SW",angle,"N-BGSW12'-SW-B-EA",10,9,1
+"N:SW12'-SW",angle,"N-BGSW12'-SW-B-EA2",6,6,1
+"N:SW12'-SW",angle,"N-BGSW12'-SW-T-EA",10,9,1
+"N:SW12'-SW",angle,"N-BGSW12'-SW-T-EA2",6,6,1
+"S:SW12'-SW",end,"SW-S12' (start)",22,,1
+"S:SW12'-SW",plate,"S-BGSW12'-SW-B",0,15,1
+"S:SW12'-SW",plate,"S-BGSW12'-SW-T",0,15,1
+"S:SW12'-SW",angle,"S-BGSW12'-SW-B-EA",10,9,1
+"S:SW12'-SW",angle,"S-BGSW12'-SW-B-EA2",6,6,1
+"S:SW12'-SW",angle,"S-BGSW12'-SW-T-EA",10,9,1
+"S:SW12'-SW",angle,"S-BGSW12'-SW-T-EA2",6,6,1
+"N:FX14",end,"FL-X13-15a1 (end)",26,,1
+"N:FX14",end,"FL-X13-15a2 (start)",10,,1
+"N:FX14",end,"FL-X13-15b1 (end)",26,,1
+"N:FX14",end,"FL-X13-15b2 (start)",10,,1
+"N:FX14",plate,"N-BGFX14",54,0,1
+"N:FX16",end,"FL-X15-17a1 (end)",10,,1
+"N:FX16",end,"FL-X15-17a2 (start)",10,,1
+"N:FX16",end,"FL-X15-17b1 (end)",10,,1
+"N:FX16",end,"FL-X15-17b2 (start)",10,,1
+"N:FX16",plate,"N-BGFX16",54,0,1
+"N:FX18",end,"FL-X17-19a1 (end)",10,,1
+"N:FX18",end,"FL-X17-19a2 (start)",10,,1
+"N:FX18",end,"FL-X17-19b1 (end)",10,,1
+"N:FX18",end,"FL-X17-19b2 (start)",10,,1
+"N:FX18",plate,"N-BGFX18",54,0,1
+"N:FX20",end,"FL-X19-21a1 (end)",10,,1
+"N:FX20",end,"FL-X19-21a2 (start)",10,,1
+"N:FX20",end,"FL-X19-21b1 (end)",10,,1
+"N:FX20",end,"FL-X19-21b2 (start)",10,,1
+"N:FX20",plate,"N-BGFX20",54,0,1
+"N:FX14'",end,"FL-X13'-15'a1 (end)",26,,1
+"N:FX14'",end,"FL-X13'-15'a2 (start)",10,,1
+"N:FX14'",end,"FL-X13'-15'b1 (end)",26,,1
+"N:FX14'",end,"FL-X13'-15'b2 (start)",10,,1
+"N:FX14'",plate,"N-BGFX14'",54,0,1
+"N:FX16'",end,"FL-X15'-17'a1 (end)",10,,1
+"N:FX16'",end,"FL-X15'-17'a2 (start)",10,,1
+"N:FX16'",end,"FL-X15'-17'b1 (end)",10,,1
+"N:FX16'",end,"FL-X15'-17'b2 (start)",10,,1
+"N:FX16'",plate,"N-BGFX16'",54,0,1
+"N:FX18'",end,"FL-X17'-19'a1 (end)",10,,1
+"N:FX18'",end,"FL-X17'-19'a2 (start)",10,,1
+"N:FX18'",end,"FL-X17'-19'b1 (end)",10,,1
+"N:FX18'",end,"FL-X17'-19'b2 (start)",10,,1
+"N:FX18'",plate,"N-BGFX18'",54,0,1
+"N:FX20'",end,"FL-X19'-21'a1 (end)",10,,1
+"N:FX20'",end,"FL-X19'-21'a2 (start)",10,,1
+"N:FX20'",end,"FL-X19'-21'b1 (end)",10,,1
+"N:FX20'",end,"FL-X19'-21'b2 (start)",10,,1
+"N:FX20'",plate,"N-BGFX20'",54,0,1
