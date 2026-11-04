@@ -14,11 +14,12 @@ Requested features not built yet (newest last). Each entry: what the user asked,
   `FinishedGround` (roads > grading > existing ground); a simple human-scale figure (about 6 ft) as a viewport object for scale; same perspective camera
   and walk keys as the street view.
 
-## Terrain and imagery
+## Plan sets
 
-- **TIF support** (user 2026-11-03): read GeoTIFF files directly - elevation (USGS 3DEP 1 m / 1/3 arc-second tiles, other DEMs) as terrain references
-  and orthoimages (NAIP, state imagery) as draped images - instead of converting them first. Notes: today the app imports LandXML TIN / DXF / OBJ / STL
-  terrain and `.flt` grids, and images as JPG / PNG + world file; the Python pipeline already reads GeoTIFF (`tools/terrain/geotiff.py`: tags,
-  tiling, compression) and resamples into project metres. Needed: a .NET GeoTIFF reader (strips / tiles, deflate / LZW, the GeoKeys or a .tfw world
-  file, the CRS through `SBM.Core/Geometry/MapProjection.cs` and the project's GridScale), References > Import Terrain accepting *.tif / *.tiff, and
-  `ReferenceModelDefinition.ImagePath` accepting a GeoTIFF image. Large tiles (400-500 MB) need clipping to the model extents.
+- **Plans stored as TIFF** (user 2026-11-03): read plan sets that come as TIFF images (scanned sheets; often one multi-page .tif per set, or one .tif per
+  sheet) wherever a plan PDF works today. Notes: `Doc.Project.PlanPdfs` + the sheet-links `planFolders` / `pdf` patterns, the automatic sheet index
+  (`tools/plan_index_auto.py`: scanned pages go to Tesseract OCR - TIFF pages are scans by nature), `sbm db --sheets-for` page numbers, the agent review
+  PDF fingerprints (SHA-256), and the reading tools (PyMuPDF opens TIFF / multi-page TIFF as a document, so most Python tools need only the file filter).
+  The app's plan sheet window shows PDFs in WebView2 (Edge's PDF viewer), which cannot show TIFF: either convert each TIFF set to a PDF once (lossless
+  image-only PDF beside it, fingerprinted against the TIFF) or add an image viewer with page navigation. A folder of single-page TIFFs needs a page order
+  (file name sort or a list).
