@@ -80,3 +80,29 @@ meta `built_at` (writing review tables touches the file but does not rebuild the
   62 starting values, 1,117 distinct generator flags.
 - The "no PDF in the model" flag of these runs is fixed in the build scripts (2026-10-27: every plan-set `build-*.csx` adds its plan PDF to
   `Doc.Project.PlanPdfs`); the committed .sbm files still flag it until they are rebuilt.
+
+## Lessons from the PTC main span joint / bracing reviews (2026-11-02 / 03)
+
+Two rounds on the PTC main span (180 truss joints, 233 bracing end points; files in `qc/ptc/main-span/work10` / `work11`, design notes
+`docs/plan-data/ptc-delaware-river/TRUSS-DESIGN.md` sections 33-47). What carries over to other models:
+
+- **Look at pictures, not only numbers.** One generic renderer (`work10/dump_joints.csx` + `render_joints.py`, `work11/dump_bracing.csx` +
+  `render_bracing.py`: four views per point, part marks, rivets) let reviewers compare each joint with its sheet crop. The user's examples (S-GL22-R,
+  N-BGL15-T, L11') were all visible at a glance; clash counts alone had missed them. Before / after PDFs: `work11/make_pdf2.py` (split under 30 MB).
+- **"Connected" needs a definition.** A bracing end counts only when the member reaches its plate, is riveted to it with the drawn count, the plate is
+  fastened to the truss / strut / floor beam, and nothing floats or overlaps (`work11/REVIEW2-BRIEF.md`). Count PLACED rivets whose shank crosses both
+  parts - the old check counted the numbers written in the plate definitions and passed members with 0 real rivets. The generator now records this
+  (`TrussModel.BracingConnections`, warnings for unriveted ends / unfastened plates / fills > 1 in.; `check-truss-ptc.csx` uses it).
+- **A crude box audit is a screen, not a verdict.** `work11/bracing_audit.csx` (rivets inside the last 0.6 m of a member) found the problem areas but
+  under-counted long laps (L11: 2-9 vs 36-40 placed). Confirm with shank-crossing counts or the generator's own audit.
+- **Missing material hides behind correct outlines.** The user's "same gusset issues everywhere" was true for the material around the gussets (splice /
+  inlay / fill plates without lengths were silently skipped, lug angles, diaphragms, connection angles) and for whole connection families (sway tops,
+  apexes, floor laterals), not for most gusset outlines. A data row the script skips must raise a flag, never vanish.
+- **Fixes create new problems; review again.** The second round found what the first round's fixes broke (stacking voids under longer plates, an inlay
+  in the gusset layer, a post ply cut by an inlay trim, dropped rivets) - plan a re-check of every fixed joint, not only new areas.
+- **Read the sheet notes for stage.** L22's 1 in. gussets were the ERECTION shape; a RIVETS note ("flame cut ... on lines X after field rivets have
+  been driven") gives the final condition. Model the final condition (user decision), list erection items as not built.
+- **Build order matters when the truss is rebuilt.** Scripts that probe steel built later (platform floors on bracing plates) must run again after it:
+  `walkways-ptc.csx` after `bracing-ptc.csx` / `details-ptc.csx` (CLAUDE.md PTC build order).
+- **Parallel agents are expensive.** Six to seven agents at once, each re-reading sheets and rebuilding the full PTC model, cost far more tokens than the
+  user wanted (2026-11-03). Prefer one topic at a time, main-span-only rebuilds for diagnosis, and ask before fanning out.
