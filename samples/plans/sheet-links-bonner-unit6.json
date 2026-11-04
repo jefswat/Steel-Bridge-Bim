@@ -512,17 +512,6 @@
   ],
   "rules": [
     {
-      "id": "framing-plan",
-      "sheets": "^SUPERSTRUCTURE FRAMING PLAN UNIT 6",
-      "basis": "Framing plan Unit 6: beam lines, bearings, diaphragms (user 2026-11-03: the framing plan goes with the girders)",
-      "target": [
-        {
-          "level": "assembly",
-          "category": "prestressed girder"
-        }
-      ]
-    },
-    {
       "id": "foundation-layout",
       "sheets": "^GENERAL DRAWING FOUNDATION LAYOUT UNIT 6",
       "role": "general",
